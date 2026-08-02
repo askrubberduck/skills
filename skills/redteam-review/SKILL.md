@@ -49,6 +49,13 @@ gates converge in far fewer rounds when the red team co-authored the plan.
 6. One CLI down: the remaining decorrelated family alone meets the bar — record the coverage gap.
    Never substitute a same-family reviewer.
 
+## Optional lens: product fit
+
+On request ("critique product match and fit", "strategic scope review") run ONE extra round after
+correctness APPROVE, lens shifted: does the change fit the product's vision and scope, is anything
+shipped that should be cut, is the boundary drawn where users need it. Same dispatch mechanics, same
+verdict line. Findings weigh functionality/extendability/security — never build effort.
+
 ## Record
 
 7. Fold verdicts + adjudications + trajectory (`REJECT/REJECT → APPROVE/APPROVE r2`) into the work

@@ -29,6 +29,10 @@ ln -s "$(pwd)/skills/"* ~/.claude/skills/
 | `worktree-git-hygiene` | Verify-then-delete sweep of branches, worktrees, scratch dirs across repos |
 | `decision-walkthrough` | Owner decisions one at a time: options, tradeoffs, gains, risks, wait |
 | `obligations-critique-sweep` | Adversarial backlog sweep with cut bias; close/cut/merge/unblock autonomously |
+| `campaign-bootstrap` | One broad directive → surveyed, cut, carved into packets, parallel worktree builds |
+| `multi-lane-fixpass` | One gate's findings fanned across parallel lanes by file ownership |
+| `cc-config-diet-audit` | Claude Code setup health + always-loaded context diet |
+| `token-hygiene` | Six measured rules against token burn; audit mode for expensive sessions |
 
 ## Conventions baked into every skill
 
