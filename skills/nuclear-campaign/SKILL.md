@@ -19,9 +19,11 @@ driver once this bootstrap ends.
    separately, they are two packets.
 4. **Plan each packet** via askrubberduck:nuclear-plan before any build starts.
 5. **Launch builds in parallel worktrees** (`.worktrees/<task>/` — never the shared checkout), cheap
-   executor agents for mechanical slices, one session per packet.
+   executor agents for mechanical slices, one session per packet. Apply askrubberduck nuclear-diet
+   rules to the fleet: batched agent traffic, per-stage routing, no raw output in context.
 6. **Hand off**: state the campaign roster (packet, worktree, branch, state) and stop — the
-   bootstrap's job ends where the driving loop begins. End this session at the boundary.
+   bootstrap's job ends where the driving loop begins. End this session at the boundary. When the
+   campaign's packets have merged, askrubberduck nuclear-sweep clears the worktrees they leave behind.
 
 ## Common mistakes
 

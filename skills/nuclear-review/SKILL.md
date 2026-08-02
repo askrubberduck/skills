@@ -1,6 +1,6 @@
 ---
 name: nuclear-review
-description: Use when a PR, diff, packet, or trust-touching change hits its review gate, or the user says "redteam", "decorrelated review", or "codex+agy review". Also when a change was authored by a Claude-family agent and needs an independent judge.
+description: Use when a PR, diff, packet, or trust-touching change hits its review gate, or the user says "redteam", "decorrelated review", or "codex+agy review". Also when a change was authored by a Claude-family agent and needs an independent judge, or when one gate's findings span several files and fix work needs parallel lanes.
 ---
 
 # Decorrelated Red-Team Review
@@ -40,7 +40,8 @@ gates converge in far fewer rounds when the red team co-authored the plan.
 ## Adjudicate
 
 4. Parse both verdicts. Per finding: **fix**, **reject with recorded reason**, or **escalate** to the
-   owner (queue in the repo's obligations registry if it has one).
+   owner (queue in the repo's obligations registry if it has one; present queued decisions via
+   askrubberduck nuclear-decide).
    - On deletion-heavy diffs, check the diff prefix char + post-change file before accepting a
      "fact destroyed" finding — context lines and moved facts are common false BLOCKERs.
    - Family disagreement about framework internals → settle by reading the dependency source, not by vote.
@@ -50,6 +51,23 @@ gates converge in far fewer rounds when the red team co-authored the plan.
    30-minute rounds; it is doer hygiene and never a substitute for the decorrelated gate.
 6. One CLI down: the remaining decorrelated family alone meets the bar — record the coverage gap.
    Never substitute a same-family reviewer.
+
+## Multi-lane fix-pass (when findings fan wide)
+
+When one round's findings span several files/modules and a single fix agent would serialize them,
+fan the fix pass across N parallel lanes by **file ownership** — one lane owns a file, no two lanes
+edit the same file. The gate stays singular: lanes fix, the coordinator re-dispatches the review.
+
+1. Partition findings by owned file set, not by finding type; a finding touching two lanes' files
+   goes to exactly one lane, named in both briefs.
+2. Brief each lane with only its findings plus the shared invariants (perimeter/LOC budget, test
+   suite, naming). Full finding list to every lane = N× tokens for zero extra coverage.
+3. Re-pin the shared budget every round ("LOC 30418, +13 all yours") — drift is additive and
+   invisible per lane.
+4. Crossed reports ("already fixed" / "still broken" about another lane's file) may be reading
+   pre-fix code — settle by reading the current tree, never by lane vote.
+5. Poll lanes at round boundaries; an idle ping with no new state gets no reply. Lanes never talk
+   to the gate or self-approve; round ends when every lane is landed + green → ONE re-dispatch.
 
 ## Optional lens: product fit
 

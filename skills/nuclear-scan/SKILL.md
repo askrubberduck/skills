@@ -33,6 +33,9 @@ One table, then one sentence of recommendation:
 - Items awaiting the owner's decision/sign-off are listed separately — they are *the owner's* next
   actions, not pickable work.
 - If the user asked about specific IDs, answer those first, in the order asked.
+- Name the handoff when the scan reveals one: backlog full of stale/blocked rot → askrubberduck
+  nuclear-cut; pickables ready and the user wants them executed → askrubberduck nuclear-campaign.
+  Naming it is the scan's whole write privilege — the skills do the acting.
 
 ## Common mistakes
 

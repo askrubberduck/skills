@@ -30,9 +30,7 @@ ln -s "$(pwd)/skills/"* ~/.claude/skills/
 | `nuclear-decide` | Owner decisions one at a time: options, tradeoffs, gains, risks, wait |
 | `nuclear-cut` | Adversarial backlog sweep with cut bias; close/cut/merge/unblock autonomously |
 | `nuclear-campaign` | One broad directive → surveyed, cut, carved into packets, parallel worktree builds |
-| `nuclear-lanes` | One gate's findings fanned across parallel lanes by file ownership |
-| `nuclear-diet` | Claude Code setup health + always-loaded context diet |
-| `nuclear-lean` | Six measured rules against token burn; audit mode for expensive sessions |
+| `nuclear-diet` | Token + context diet: six runtime rules, session audit, installed-config audit |
 | `nuclear-proof` | Skeptical second pass on your own work before claiming done |
 | `nuclear-run` | Full-rigor delivery loop: plan, adversarial critique, execute on green, verify |
 
@@ -50,6 +48,6 @@ ln -s "$(pwd)/skills/"* ~/.claude/skills/
 ## Status
 
 v0.1.0 — authored from 15 days of session evidence (baseline failures documented from transcripts).
-Discipline skills (`nuclear-review`, `nuclear-plan`, `nuclear-lean`) passed one-rep
+Discipline skills (`nuclear-review`, `nuclear-plan`, `nuclear-diet`) passed one-rep
 subagent pressure scenarios (fail-closed under ship pressure, coauthor-skip temptation,
 marathon-split); coverage is thin — file issues on any rationalization loophole an agent finds.

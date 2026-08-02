@@ -13,6 +13,7 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
    Trace the real flow end to end before planning — laziness shortens the solution, never the reading.
 2. **Plan.** Detailed decomposition: units of work, gates per unit, acceptance evidence.
    Steel-man at least one alternative decomposition before committing; first idea is a candidate, not a decision.
+   Packet-sized or trust-touching: co-author the plan per the `nuclear-plan` skill instead of drafting solo.
 3. **Critique (adversarial, pre-code).** Red-team the plan: wrong decomposition, missing edge cases,
    simpler design that deletes a concept. Default the critic toward refute. Run as a Workflow judge
    stage on the strongest tier (`model:` inherit). Fold findings; loop until the plan survives.
@@ -23,10 +24,11 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
 5. **Ponytail lens throughout.** Delete before add; stdlib/existing helper before new code; smallest
    diff after full understanding. Simplify touched code before building on it; clear superseded paths
    as the last step of each unit. No migrations, no back-compat shims unless the repo demands them.
-6. **Verify.** Run the project's gates (tests/build/vet or doc gates). Evidence over assertion —
-   a failed or unrun check means not done; say so with output.
-7. **Independent review.** Never self-approve. Use the project's review policy (in waddleloop-genesis:
-   the `nuclear-review` skill / two-family decorrelated gate). Fix-pass until the reviewer passes.
+6. **Verify.** Run the project's gates (tests/build/vet or doc gates), then the `nuclear-proof`
+   self-refutation pass on your own diff. Evidence over assertion — a failed or unrun check means
+   not done; say so with output.
+7. **Independent review.** Never self-approve. Use the project's review policy — default: the
+   `nuclear-review` skill / two-family decorrelated gate. Fix-pass until the reviewer passes.
 
 ## Rules
 

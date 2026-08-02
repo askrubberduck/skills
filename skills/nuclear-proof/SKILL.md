@@ -72,3 +72,6 @@ If you went through all of that — _actually_ went through it, not the perfor
 But we both know you found something. You always do. Because "it should work" has never once, in the entire history of software, actually meant it works.
 
 Now go fix it. For real this time.
+
+And when it survives you: you are still the doer, not the judge. Trust-touching work goes to the
+`nuclear-review` gate — this pass earns you the dispatch, never the approval.
