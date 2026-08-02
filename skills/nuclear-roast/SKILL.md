@@ -29,18 +29,21 @@ Critique product and engineering substance ONLY — never market validation, use
 1. Ground in the real artifacts: canonical docs + actual source, not summaries.
 2. Dispatch decorrelated families (codex + agy) with the full angle list — mechanics, traps, and
    fail-closed rules per askrubberduck nuclear-review. Add your own pass as a third perspective.
-3. Merge findings; every finding carries evidence (file, doc, observed behavior) and a severity.
-   Refuted findings are recorded with the refutation and carried into the next round's prompt.
+3. Merge findings; every finding carries evidence (file, doc, observed behavior). The roast does
+   NOT judge severity and does not triage — every finding survives to the output; the owner weighs
+   them. Refuted findings are recorded with the refutation and carried into the next round's prompt.
 4. **Run and run again**: next round re-dispatches with prior findings settled. Stop only when a
    full round yields nothing new (loop-until-dry) — one pass is a review, not a roast.
-5. Land the output in the repo's reviews doc or a packet — ranked findings, each with evidence and
-   a proposed disposition: fix now / backlog / owner decision (present those via askrubberduck
-   nuclear-decide) / rejected-with-reason.
+5. Land the output in the repo's reviews doc or a packet — the ENTIRE finding list, unfiltered and
+   unranked, each with evidence and a proposed disposition: fix now / backlog / owner decision
+   (present those via askrubberduck nuclear-decide) / rejected-with-reason.
 
 ## Common mistakes
 
 - Roasting the latest diff — wrong altitude; the roast reads the whole standing solution.
 - Findings without evidence — a vibe is not a finding; cite the file or the behavior.
+- Trimming the list to "the important ones" or severity-sorting it — the owner judges weight; the
+  roast only surfaces. A dropped finding is a silent decision the roast had no right to make.
 - Stopping after round one because it "found plenty" — the second round against settled findings is
   where the deep ones surface.
 - Letting the roast write fixes — output is findings + dispositions; execution goes through the

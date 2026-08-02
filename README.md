@@ -40,8 +40,13 @@ ln -s "$(pwd)/skills/"* ~/.claude/skills/
 Generated from skill frontmatter — edit descriptions in `skills/<name>/SKILL.md`, then run
 `python3 scripts/render-catalog.py`.
 
-## Conventions baked into every skill
+## The soul — carried by every skill
 
+- **The doer is never the final judge** — every gate is decorrelated; a self-pass earns the
+  dispatch, never the approval.
+- **Evidence over assertion** — a claim without output is not done; an empty result is never success.
+- **Cut before add** — every finding list treats "delete this" as first-class; every sweep's product
+  is deletions.
 - **Absolute paths, no `cd` chains** — path boilerplate was the #2 token sink in the sessions these
   skills came from.
 - **Grep-first, delegate large reads** — no >20KB file pulls into the main context; page with
