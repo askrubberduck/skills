@@ -45,7 +45,9 @@ gates converge in far fewer rounds when the red team co-authored the plan.
      "fact destroyed" finding — context lines and moved facts are common false BLOCKERs.
    - Family disagreement about framework internals → settle by reading the dependency source, not by vote.
    - Carry settled refutations into the next round's prompt so rounds converge.
-5. Fix pass → re-dispatch both. Loop until **both families APPROVE in the same round**.
+5. Fix pass → run askrubberduck nuclear-proof on your own fixes → re-dispatch both. Loop until
+   **both families APPROVE in the same round**. Self-refutation before each dispatch saves whole
+   30-minute rounds; it is doer hygiene and never a substitute for the decorrelated gate.
 6. One CLI down: the remaining decorrelated family alone meets the bar — record the coverage gap.
    Never substitute a same-family reviewer.
 
