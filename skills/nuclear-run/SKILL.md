@@ -26,7 +26,7 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
 6. **Verify.** Run the project's gates (tests/build/vet or doc gates). Evidence over assertion —
    a failed or unrun check means not done; say so with output.
 7. **Independent review.** Never self-approve. Use the project's review policy (in waddleloop-genesis:
-   the `redteam-review` skill / two-family decorrelated gate). Fix-pass until the reviewer passes.
+   the `nuclear-review` skill / two-family decorrelated gate). Fix-pass until the reviewer passes.
 
 ## Rules
 

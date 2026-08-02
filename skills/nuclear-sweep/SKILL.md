@@ -1,5 +1,5 @@
 ---
-name: worktree-git-hygiene
+name: nuclear-sweep
 description: Use when the user asks to clean up branches, worktrees, stale checkouts, temp/scratch dirs, or .gitignore across one or more repos, or when stale worktrees accumulate after merged work.
 ---
 

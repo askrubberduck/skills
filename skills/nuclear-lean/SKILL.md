@@ -1,5 +1,5 @@
 ---
-name: token-hygiene
+name: nuclear-lean
 description: Use when the user says "min tokens", asks why sessions are expensive, before starting a campaign or multi-agent run, or when a session has crossed days/compactions — any time token burn needs auditing or prevention.
 ---
 

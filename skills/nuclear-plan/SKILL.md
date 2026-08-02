@@ -1,5 +1,5 @@
 ---
-name: plan-redteam-coauthor
+name: nuclear-plan
 description: Use when about to plan or implement packet-sized, architectural, or trust-touching work — a plan or draft exists or is about to be written — or when past review gates for similar work took many REJECT rounds.
 ---
 
@@ -15,14 +15,14 @@ the other families co-author cut it to 4 and deleted 2 of 4 work items as no-cod
 2. **Ask each decorrelated CLI (codex, agy) to PRODUCE a plan, not review one**: "author the safest
    build plan, the task decomposition, and the traps you'd attack", with the design + seam map
    provided. Dispatch mechanics, CLI traps, absolute-path/background rules: same as
-   askrubberduck:redteam-review — pin the agy model, neutral cwd, outputs to scratchpad.
+   askrubberduck:nuclear-review — pin the agy model, neutral cwd, outputs to scratchpad.
 3. **Synthesize** the two decorrelated plans + your own analysis into ONE plan. Reconcile
    disagreements by READING SOURCE (`git show <sha>:path`), never by vote.
 4. Apply a cut pass: any task the synthesis shows unnecessary dies here — cheapest build is the one
    not built.
 5. Fix-pass the draft **in place**, multi-round (r1, r2, …), until both families concur on the plan.
    The draft is a working doc — no commit per round; commit the settled plan once.
-6. Keep the binding decorrelated CODE gate after the build (askrubberduck:redteam-review). Co-authored
+6. Keep the binding decorrelated CODE gate after the build (askrubberduck:nuclear-review). Co-authored
    plans make it converge; they don't replace it.
 
 ## Red flags

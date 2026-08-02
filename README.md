@@ -23,17 +23,17 @@ ln -s "$(pwd)/skills/"* ~/.claude/skills/
 
 | Skill | Gate/task it covers |
 |---|---|
-| `redteam-review` | Decorrelated codex+agy review of a PR/diff/packet; fix-pass loop to two-family APPROVE |
-| `plan-redteam-coauthor` | Red team co-authors the plan before build; kills REJECT churn at the code gate |
-| `pickable-work-scan` | Read-only "what's next / what's open / is X ready" backlog answers |
-| `worktree-git-hygiene` | Verify-then-delete sweep of branches, worktrees, scratch dirs across repos |
-| `decision-walkthrough` | Owner decisions one at a time: options, tradeoffs, gains, risks, wait |
-| `obligations-critique-sweep` | Adversarial backlog sweep with cut bias; close/cut/merge/unblock autonomously |
-| `campaign-bootstrap` | One broad directive → surveyed, cut, carved into packets, parallel worktree builds |
-| `multi-lane-fixpass` | One gate's findings fanned across parallel lanes by file ownership |
-| `cc-config-diet-audit` | Claude Code setup health + always-loaded context diet |
-| `token-hygiene` | Six measured rules against token burn; audit mode for expensive sessions |
-| `but-for-real` | Skeptical second pass on your own work before claiming done |
+| `nuclear-review` | Decorrelated codex+agy review of a PR/diff/packet; fix-pass loop to two-family APPROVE |
+| `nuclear-plan` | Red team co-authors the plan before build; kills REJECT churn at the code gate |
+| `nuclear-scan` | Read-only "what's next / what's open / is X ready" backlog answers |
+| `nuclear-sweep` | Verify-then-delete sweep of branches, worktrees, scratch dirs across repos |
+| `nuclear-decide` | Owner decisions one at a time: options, tradeoffs, gains, risks, wait |
+| `nuclear-cut` | Adversarial backlog sweep with cut bias; close/cut/merge/unblock autonomously |
+| `nuclear-campaign` | One broad directive → surveyed, cut, carved into packets, parallel worktree builds |
+| `nuclear-lanes` | One gate's findings fanned across parallel lanes by file ownership |
+| `nuclear-diet` | Claude Code setup health + always-loaded context diet |
+| `nuclear-lean` | Six measured rules against token burn; audit mode for expensive sessions |
+| `nuclear-proof` | Skeptical second pass on your own work before claiming done |
 | `nuclear-run` | Full-rigor delivery loop: plan, adversarial critique, execute on green, verify |
 
 ## Conventions baked into every skill
@@ -50,6 +50,6 @@ ln -s "$(pwd)/skills/"* ~/.claude/skills/
 ## Status
 
 v0.1.0 — authored from 15 days of session evidence (baseline failures documented from transcripts).
-Discipline skills (`redteam-review`, `plan-redteam-coauthor`, `token-hygiene`) passed one-rep
+Discipline skills (`nuclear-review`, `nuclear-plan`, `nuclear-lean`) passed one-rep
 subagent pressure scenarios (fail-closed under ship pressure, coauthor-skip temptation,
 marathon-split); coverage is thin — file issues on any rationalization loophole an agent finds.

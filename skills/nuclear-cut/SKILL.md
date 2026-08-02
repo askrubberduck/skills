@@ -1,5 +1,5 @@
 ---
-name: obligations-critique-sweep
+name: nuclear-cut
 description: Use when the user asks to reduce work scope, critique or clean the backlog, "run critique on every open but blocked task", "finish all possible items autonomously", or the open/blocked/deferred item count keeps growing.
 ---
 
@@ -22,7 +22,7 @@ Differs from a disposition flow (which acts on IDs the owner names) — this one
 3. Act autonomously on everything that doesn't need the owner: land CLOSE/MERGE/UNBLOCK edits in the
    registries with evidence, one commit per batch.
 4. Items needing the owner (sign-offs, policy calls, anything the doer may not close): queue them and
-   run askrubberduck:decision-walkthrough — never close an owner-gated item yourself, never drop it
+   run askrubberduck:nuclear-decide — never close an owner-gated item yourself, never drop it
    silently.
 
 ## Report shape

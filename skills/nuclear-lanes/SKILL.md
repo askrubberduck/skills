@@ -1,5 +1,5 @@
 ---
-name: multi-lane-fixpass
+name: nuclear-lanes
 description: Use when one review gate returns findings spanning several files/modules and a single fix-pass agent would serialize them — or when parallel fix teammates start crossing reports, drifting budgets, or flooding the coordinator with idle pings.
 ---
 
@@ -23,7 +23,7 @@ the review.
 5. **Batch lane traffic**: coordinator polls lanes at round boundaries; an idle ping carrying no new
    state gets no reply. Each relayed no-op message re-bills the whole coordinator context.
 6. Round ends when every lane reports landed + green; then ONE re-dispatch of the decorrelated gate
-   (askrubberduck:redteam-review). Loop.
+   (askrubberduck:nuclear-review). Loop.
 
 ## Common mistakes
 

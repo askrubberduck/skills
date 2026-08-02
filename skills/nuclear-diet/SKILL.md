@@ -1,5 +1,5 @@
 ---
-name: cc-config-diet-audit
+name: nuclear-diet
 description: Use when the user asks to health-check their Claude Code setup, find extensions that cost context but never get used, deduplicate memory files against checked-in instructions, or trim CLAUDE.md/AGENTS.md bloat.
 ---
 

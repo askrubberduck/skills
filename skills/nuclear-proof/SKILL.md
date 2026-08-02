@@ -1,5 +1,5 @@
 ---
-name: but-for-real
+name: nuclear-proof
 description: "Force a skeptical second pass on your own work. Because 'it should work' has never once been true."
 metadata:
   author: Shpigford

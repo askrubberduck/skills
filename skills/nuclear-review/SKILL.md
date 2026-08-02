@@ -1,5 +1,5 @@
 ---
-name: redteam-review
+name: nuclear-review
 description: Use when a PR, diff, packet, or trust-touching change hits its review gate, or the user says "redteam", "decorrelated review", or "codex+agy review". Also when a change was authored by a Claude-family agent and needs an independent judge.
 ---
 
@@ -8,7 +8,7 @@ description: Use when a PR, diff, packet, or trust-touching change hits its revi
 The doer is never the final judge. The gate is a **different model family** — never a same-family
 second pass. If no decorrelated family is available, the change waits (fail closed).
 
-For packet-sized or trust-touching work, run askrubberduck:plan-redteam-coauthor BEFORE building —
+For packet-sized or trust-touching work, run askrubberduck:nuclear-plan BEFORE building —
 gates converge in far fewer rounds when the red team co-authored the plan.
 
 ## Dispatch

@@ -1,5 +1,5 @@
 ---
-name: pickable-work-scan
+name: nuclear-scan
 description: Use when the user asks "what's next", "what's open for me", "what can be picked up", "status?", "what's left", or pings readiness of named work items ("B28 ready? X ready?") — any read-only backlog question.
 ---
 

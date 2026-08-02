@@ -1,5 +1,5 @@
 ---
-name: campaign-bootstrap
+name: nuclear-campaign
 description: Use when the user asks to start a campaign, "take all plannable work and execute", turn vision/backlog/competitor gaps into parallel builds, or hands one broad directive that implies many work items — and no campaign structure exists yet.
 ---
 
@@ -17,7 +17,7 @@ driver once this bootstrap ends.
 3. **Carve packets** — one packet per independently shippable change, in the repo's work-item
    convention (e.g. `docs/05-work/YYYY-MM-DD-topic/`). No mega-packet; if two changes can ship
    separately, they are two packets.
-4. **Plan each packet** via askrubberduck:plan-redteam-coauthor before any build starts.
+4. **Plan each packet** via askrubberduck:nuclear-plan before any build starts.
 5. **Launch builds in parallel worktrees** (`.worktrees/<task>/` — never the shared checkout), cheap
    executor agents for mechanical slices, one session per packet.
 6. **Hand off**: state the campaign roster (packet, worktree, branch, state) and stop — the

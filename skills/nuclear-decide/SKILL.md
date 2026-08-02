@@ -1,5 +1,5 @@
 ---
-name: decision-walkthrough
+name: nuclear-decide
 description: Use when open decisions, blocked obligations, or sign-offs need the owner's answer — "walk me through the decisions", "talk me through each", "one by one with options" — or when more than one owner decision is pending at once.
 ---
 
