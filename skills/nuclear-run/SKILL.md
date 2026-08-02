@@ -25,7 +25,8 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
    diff after full understanding. Simplify touched code before building on it; clear superseded paths
    as the last step of each unit. No migrations, no back-compat shims unless the repo demands them.
 6. **Verify.** Run the project's gates (tests/build/vet or doc gates), then the `nuclear-proof`
-   self-refutation pass on your own diff. Evidence over assertion — a failed or unrun check means
+   self-refutation pass on your own diff. Trust-touching work additionally gets the `nuclear-break`
+   attacks executed before the gate. Evidence over assertion — a failed or unrun check means
    not done; say so with output.
 7. **Independent review.** Never self-approve. Use the project's review policy — default: the
    `nuclear-review` skill / two-family decorrelated gate. Fix-pass until the reviewer passes.

@@ -81,3 +81,6 @@ verdict line. Findings weigh functionality/extendability/security — never buil
 7. Fold verdicts + adjudications + trajectory (`REJECT/REJECT → APPROVE/APPROVE r2`) into the work
    item's review log. **Never commit raw CLI stdout** — extract verdict + findings, keep outputs in
    the scratchpad (a committed 8.7MB stdout blob once forced a git-history rewrite).
+8. For trust-touching changes, include askrubberduck nuclear-break's executed-attack evidence in the
+   review material. On final APPROVE of a mergeable change: askrubberduck nuclear-land ships and
+   records it.
