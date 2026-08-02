@@ -6,7 +6,7 @@ skill detects the host repo's registries (STATUS/OBLIGATIONS/backlog docs) or as
 
 ## Install
 
-Plugin marketplace:
+### Claude Code
 
 ```
 /plugin marketplace add askrubberduck/skills
@@ -18,6 +18,25 @@ Or symlink for local use:
 ```bash
 ln -s "$(pwd)/skills/"* ~/.claude/skills/
 ```
+
+### Codex
+
+Codex discovers Agent Skills in `~/.codex/skills/` and in the cross-runtime dir `~/.agents/skills/`
+(the latter also serves Copilot CLI and Gemini CLI — prefer it):
+
+```bash
+git clone https://github.com/askrubberduck/skills
+ln -s "$(pwd)/skills/skills/"* ~/.agents/skills/
+```
+
+Skills activate the same way: Codex reads the name + description catalog at startup and loads a
+`SKILL.md` when the task matches. `nuclear-run` references Claude Code's Workflow tool — on Codex
+treat its stages as a manual procedure.
+
+### Agents without native skill discovery
+
+Paste the block from [`AGENTS-CATALOG.md`](AGENTS-CATALOG.md) into the repo's `AGENTS.md` — any
+agent that can read files will then load the right `SKILL.md` on demand.
 
 ## Skills
 
