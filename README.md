@@ -33,6 +33,8 @@ ln -s "$(pwd)/skills/"* ~/.claude/skills/
 | `multi-lane-fixpass` | One gate's findings fanned across parallel lanes by file ownership |
 | `cc-config-diet-audit` | Claude Code setup health + always-loaded context diet |
 | `token-hygiene` | Six measured rules against token burn; audit mode for expensive sessions |
+| `but-for-real` | Skeptical second pass on your own work before claiming done |
+| `nuclear-run` | Full-rigor delivery loop: plan, adversarial critique, execute on green, verify |
 
 ## Conventions baked into every skill
 
