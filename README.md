@@ -21,18 +21,24 @@ ln -s "$(pwd)/skills/"* ~/.claude/skills/
 
 ## Skills
 
-| Skill | Gate/task it covers |
+<!-- skills-table:start -->
+| Skill | Use when |
 |---|---|
-| `nuclear-review` | Decorrelated codex+agy review of a PR/diff/packet; fix-pass loop to two-family APPROVE |
-| `nuclear-plan` | Red team co-authors the plan before build; kills REJECT churn at the code gate |
-| `nuclear-scan` | Read-only "what's next / what's open / is X ready" backlog answers |
-| `nuclear-sweep` | Verify-then-delete sweep of branches, worktrees, scratch dirs across repos |
-| `nuclear-decide` | Owner decisions one at a time: options, tradeoffs, gains, risks, wait |
-| `nuclear-cut` | Adversarial backlog sweep with cut bias; close/cut/merge/unblock autonomously |
-| `nuclear-campaign` | One broad directive → surveyed, cut, carved into packets, parallel worktree builds |
-| `nuclear-diet` | Token + context diet: six runtime rules, session audit, installed-config audit |
-| `nuclear-proof` | Skeptical second pass on your own work before claiming done |
-| `nuclear-run` | Full-rigor delivery loop: plan, adversarial critique, execute on green, verify |
+| `nuclear-campaign` | the user asks to start a campaign, "take all plannable work and execute", turn vision/backlog/competitor gaps into parallel builds, or hands one broad directive that implies many work items — and no campaign structure exists yet |
+| `nuclear-cut` | the user asks to reduce work scope, critique or clean the backlog, "run critique on every open but blocked task", "finish all possible items autonomously", or the open/blocked/deferred item count keeps growing |
+| `nuclear-decide` | open decisions, blocked obligations, or sign-offs need the owner's answer — "walk me through the decisions", "talk me through each", "one by one with options" — or when more than one owner decision is pending at once |
+| `nuclear-diet` | the user says "min tokens", asks why sessions are expensive, wants a Claude Code setup health-check or CLAUDE.md/memory trim, before starting a campaign or multi-agent run, or when a session has crossed days/compactions — any context or token cost needing audit or prevention |
+| `nuclear-plan` | about to plan or implement packet-sized, architectural, or trust-touching work — a plan or draft exists or is about to be written — or when past review gates for similar work took many REJECT rounds |
+| `nuclear-proof` | Force a skeptical second pass on your own work |
+| `nuclear-review` | a PR, diff, packet, or trust-touching change hits its review gate, or the user says "redteam", "decorrelated review", or "codex+agy review" |
+| `nuclear-roast` | the user asks for a "roast", a full critique of the whole product, solution, or architecture from multiple angles, says "run and run again", or wants a milestone-level adversarial read — solution-scoped, not a change review or backlog sweep |
+| `nuclear-run` | Full-rigor delivery loop — detailed plan, adversarial critique/red-team of the plan, execute on green via Workflow with per-stage model routing, ponytail simplification lens, verify before claiming done |
+| `nuclear-scan` | the user asks "what's next", "what's open for me", "what can be picked up", "status?", "what's left", or pings readiness of named work items ("B28 ready? X ready?") — any read-only backlog question |
+| `nuclear-sweep` | the user asks to clean up branches, worktrees, stale checkouts, temp/scratch dirs, or .gitignore across one or more repos, or when stale worktrees accumulate after merged work |
+<!-- skills-table:end -->
+
+Generated from skill frontmatter — edit descriptions in `skills/<name>/SKILL.md`, then run
+`python3 scripts/render-catalog.py`.
 
 ## Conventions baked into every skill
 
@@ -44,6 +50,11 @@ ln -s "$(pwd)/skills/"* ~/.claude/skills/
 - **End the session at stage boundaries** — plan→build→review transitions are compaction points;
   marathon sessions re-bill the whole window every turn.
 - **Fail closed** — a missing reviewer, empty output, or unverified claim is never an implicit pass.
+
+## Credits
+
+`nuclear-proof` adapts Josh Pigford's (Shpigford) "but-for-real" skill; author retained in its
+frontmatter metadata.
 
 ## Status
 

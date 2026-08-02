@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render AGENTS-CATALOG.md from skills/*/SKILL.md frontmatter."""
+"""Render AGENTS-CATALOG.md and the README skills table from skills/*/SKILL.md frontmatter."""
 import re, glob, os
 
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -11,7 +11,7 @@ for p in sorted(glob.glob(os.path.join(root, 'skills', '*', 'SKILL.md'))):
     desc = re.search(r'^description:\s*(.+)', m.group(1), re.M).group(1).strip().strip('"')
     rows.append((name, desc))
 
-out = ["""# Skills catalog
+catalog = ["""# Skills catalog
 
 Paste-ready block for any agent that reads `AGENTS.md` (Cursor, Antigravity, Codex, Copilot, …)
 but lacks native Agent Skills discovery. Regenerate with `python3 scripts/render-catalog.py`.
@@ -25,6 +25,18 @@ skill's description, read the `SKILL.md` at the listed path and follow it before
 Installed location: `~/.agents/skills/<name>/SKILL.md` (or this repo's `skills/<name>/SKILL.md`).
 """]
 for name, desc in rows:
-    out.append(f"- **{name}** — {desc}")
-open(os.path.join(root, 'AGENTS-CATALOG.md'), 'w').write('\n'.join(out) + '\n')
-print(f"wrote AGENTS-CATALOG.md ({len(rows)} skills)")
+    catalog.append(f"- **{name}** — {desc}")
+open(os.path.join(root, 'AGENTS-CATALOG.md'), 'w').write('\n'.join(catalog) + '\n')
+
+table = ["| Skill | Use when |", "|---|---|"]
+for name, desc in rows:
+    short = desc.split('. ')[0].removeprefix('Use when ').rstrip('.')
+    table.append(f"| `{name}` | {short} |")
+readme_path = os.path.join(root, 'README.md')
+readme = open(readme_path).read()
+block = "<!-- skills-table:start -->\n" + '\n'.join(table) + "\n<!-- skills-table:end -->"
+new = re.sub(r'<!-- skills-table:start -->.*?<!-- skills-table:end -->', block, readme, flags=re.S)
+if new == readme and block not in readme:
+    raise SystemExit("README markers not found — add skills-table markers first")
+open(readme_path, 'w').write(new)
+print(f"wrote AGENTS-CATALOG.md + README table ({len(rows)} skills)")
