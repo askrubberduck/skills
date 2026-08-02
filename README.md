@@ -38,6 +38,59 @@ treat its stages as a manual procedure.
 Paste the block from [`AGENTS-CATALOG.md`](AGENTS-CATALOG.md) into the repo's `AGENTS.md` — any
 agent that can read files will then load the right `SKILL.md` on demand.
 
+## The graph
+
+```mermaid
+flowchart LR
+    subgraph discover
+        scan[nuclear-scan]
+    end
+    subgraph build["plan + build"]
+        campaign[nuclear-campaign]
+        plan[nuclear-plan]
+        run[nuclear-run]
+    end
+    subgraph verify["self-verify + attack"]
+        proof[nuclear-proof]
+        break[nuclear-break]
+    end
+    subgraph gate["decorrelated gate"]
+        review[nuclear-review]
+        decide[nuclear-decide]
+    end
+    subgraph ship
+        land[nuclear-land]
+    end
+    cut[nuclear-cut]
+    roast[nuclear-roast]
+    sweep[nuclear-sweep]
+    diet[nuclear-diet]
+    learn[nuclear-learn]
+
+    scan --> campaign
+    scan --> cut
+    campaign --> plan
+    campaign -.-> diet
+    run --> plan
+    run --> proof
+    run --> break
+    plan <--> review
+    proof --> review
+    break --> review
+    review --> decide
+    review --> land
+    cut --> decide
+    roast -.-> decide
+    land -.-> sweep
+    campaign -.-> sweep
+    learn -.-> proof
+```
+
+Solid arrows: the delivery pipeline (discover → plan/build → verify/attack → gate → ship).
+Dotted: supporting handoffs. `nuclear-roast` critiques the whole standing solution,
+`nuclear-learn` feeds session lessons back into skills and memory, `nuclear-diet` keeps every
+stage cheap.
+
 ## Skills
 
 <!-- skills-table:start -->
