@@ -38,6 +38,20 @@ treat its stages as a manual procedure.
 Paste the block from [`AGENTS-CATALOG.md`](AGENTS-CATALOG.md) into the repo's `AGENTS.md` — any
 agent that can read files will then load the right `SKILL.md` on demand.
 
+## Works well with
+
+None of these are required — the collection is self-contained — but they compound it:
+
+- **[ponytail](https://github.com/DietrichGebert/ponytail)** — lazy-senior-dev mode; `nuclear-run`
+  invokes its simplification lens by name, and the whole family shares its cut-before-add soul.
+- **[caveman](https://github.com/JuliusBrussee/caveman)** — terse-prose mode; pairs with
+  `nuclear-diet`'s token discipline (diet cuts payloads, caveman cuts prose).
+- **[rtk](https://www.rtk-ai.app/)** — hook-level CLI proxy that shrinks dev-command output before
+  it reaches the context; the runtime complement to `nuclear-diet`'s rules.
+
+Hard prerequisites are only `git` + `gh`, and at least one non-Claude reviewer CLI (codex,
+Antigravity/Gemini, …) — without a decorrelated family, `nuclear-review` fails closed by design.
+
 ## The graph
 
 ```mermaid
