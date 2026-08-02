@@ -48,5 +48,6 @@ ln -s "$(pwd)/skills/"* ~/.claude/skills/
 ## Status
 
 v0.1.0 — authored from 15 days of session evidence (baseline failures documented from transcripts).
-Not yet pressure-tested with subagent scenarios; treat wording as v0 and file issues on any
-rationalization loophole an agent finds.
+Discipline skills (`redteam-review`, `plan-redteam-coauthor`, `token-hygiene`) passed one-rep
+subagent pressure scenarios (fail-closed under ship pressure, coauthor-skip temptation,
+marathon-split); coverage is thin — file issues on any rationalization loophole an agent finds.
