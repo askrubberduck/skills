@@ -13,5 +13,6 @@
     "backlog",
     "git-hygiene",
     "workflows"
-  ]
+  ],
+  "license": "MIT"
 }
