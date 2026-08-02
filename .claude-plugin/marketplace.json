@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "askrubberduck",
+  "description": "askrubberduck skills collection — process gates and hygiene skills portable across repos",
+  "owner": {
+    "name": "Vladimir Korotkov",
+    "url": "https://github.com/askrubberduck"
+  },
+  "plugins": [
+    {
+      "name": "askrubberduck",
+      "description": "Decorrelated review gates, plan co-authoring, backlog scans, git hygiene, decision facilitation",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}

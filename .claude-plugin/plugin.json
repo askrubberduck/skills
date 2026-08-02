@@ -1,0 +1,17 @@
+{
+  "name": "askrubberduck",
+  "description": "askrubberduck skills collection: decorrelated review gates, plan co-authoring, backlog scans, git hygiene, decision facilitation",
+  "version": "0.1.0",
+  "author": {
+    "name": "Vladimir Korotkov"
+  },
+  "repository": "https://github.com/askrubberduck/skills",
+  "keywords": [
+    "review",
+    "red-team",
+    "planning",
+    "backlog",
+    "git-hygiene",
+    "workflows"
+  ]
+}
