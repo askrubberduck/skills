@@ -8,7 +8,7 @@ description: Use when a PR, diff, packet, or trust-touching change hits its revi
 The doer is never the final judge. The gate is a **different model family** — never a same-family
 second pass. If no decorrelated family is available, the change waits (fail closed).
 
-For packet-sized or trust-touching work, run askrubberduck:nuclear-plan BEFORE building —
+For packet-sized or trust-touching work, run nuclear-plan BEFORE building —
 gates converge in far fewer rounds when the red team co-authored the plan.
 
 ## Dispatch
@@ -41,14 +41,16 @@ gates converge in far fewer rounds when the red team co-authored the plan.
 
 4. Parse both verdicts. Per finding: **fix**, **reject with recorded reason**, or **escalate** to the
    owner (queue in the repo's obligations registry if it has one; present queued decisions via
-   askrubberduck nuclear-decide).
+   nuclear-decide).
    - On deletion-heavy diffs, check the diff prefix char + post-change file before accepting a
      "fact destroyed" finding — context lines and moved facts are common false BLOCKERs.
    - Family disagreement about framework internals → settle by reading the dependency source, not by vote.
    - Carry settled refutations into the next round's prompt so rounds converge.
-5. Fix pass → run askrubberduck nuclear-proof on your own fixes → re-dispatch both. Loop until
-   **both families APPROVE in the same round**. Self-refutation before each dispatch saves whole
-   30-minute rounds; it is doer hygiene and never a substitute for the decorrelated gate.
+5. Fix pass → invoke `nuclear-proof` on your own fixes, writing its findings to `$SP/proof-rN.md`
+   → only then re-dispatch both. **No `proof-rN.md`, no dispatch** — a round sent without it is a
+   skipped step, not a fast round. Self-refutation costs minutes and saves whole 30-minute rounds;
+   it is doer hygiene and never a substitute for the decorrelated gate. Loop until **both families
+   APPROVE in the same round**.
 6. One CLI down: the remaining decorrelated family alone meets the bar — record the coverage gap.
    Never substitute a same-family reviewer.
 
@@ -81,6 +83,6 @@ verdict line. Findings weigh functionality/extendability/security — never buil
 7. Fold verdicts + adjudications + trajectory (`REJECT/REJECT → APPROVE/APPROVE r2`) into the work
    item's review log. **Never commit raw CLI stdout** — extract verdict + findings, keep outputs in
    the scratchpad (a committed 8.7MB stdout blob once forced a git-history rewrite).
-8. For trust-touching changes, include askrubberduck nuclear-break's executed-attack evidence in the
-   review material. On final APPROVE of a mergeable change: askrubberduck nuclear-land ships and
+8. For trust-touching changes, include nuclear-break's executed-attack evidence in the
+   review material. On final APPROVE of a mergeable change: nuclear-land ships and
    records it.

@@ -75,3 +75,12 @@ Now go fix it. For real this time.
 
 And when it survives you: you are still the doer, not the judge. Trust-touching work goes to the
 `nuclear-review` gate — this pass earns you the dispatch, never the approval.
+
+## Leave the receipt
+
+Write what you checked and what you found to `proof-<unit>.md` beside the work — the scratchpad for a
+review round (`proof-rN.md`), the packet otherwise. Two lines per item is enough: what you attacked,
+what survived, what you fixed. "Nothing found" is a legitimate receipt; no receipt is not.
+
+An unwritten pass is indistinguishable from a skipped one, and every caller checks for the file, not
+for your confidence — `nuclear-review` step 5 blocks its dispatch on it.

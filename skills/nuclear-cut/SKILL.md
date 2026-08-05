@@ -22,7 +22,7 @@ Differs from a disposition flow (which acts on IDs the owner names) — this one
 3. Act autonomously on everything that doesn't need the owner: land CLOSE/MERGE/UNBLOCK edits in the
    registries with evidence, one commit per batch.
 4. Items needing the owner (sign-offs, policy calls, anything the doer may not close): queue them and
-   run askrubberduck:nuclear-decide — never close an owner-gated item yourself, never drop it
+   run nuclear-decide — never close an owner-gated item yourself, never drop it
    silently.
 
 ## Report shape

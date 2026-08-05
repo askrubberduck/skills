@@ -10,7 +10,7 @@ the repo forgot; a record without a verified merge is fiction.
 
 ## Preconditions (fail closed — any miss stops the landing)
 
-- The gate actually passed per the repo's policy (e.g. two-family APPROVE from askrubberduck
+- The gate actually passed per the repo's policy (e.g. two-family APPROVE from
   nuclear-review). "Probably fine" is not a gate state.
 - **The branch head equals the reviewed SHA.** Delegated builders commit on detached HEADs and
   wrong branches; confirm branch, origin, and PR head all point at what was reviewed.
@@ -26,8 +26,8 @@ the repo forgot; a record without a verified merge is fiction.
 3. Record the outcome where the repo keeps truth: shipped log / status doc / delivery board — with
    PR number, merged SHA, and what changed. One recorded outcome per landing.
 4. Close or queue obligations the change touched — the doer never closes an item that needs the
-   owner's sign-off; queue those (askrubberduck nuclear-decide presents them).
-5. Clean up: delete the merged branch and its worktree (askrubberduck nuclear-sweep discipline —
+   owner's sign-off; queue those (nuclear-decide presents them).
+5. Clean up: delete the merged branch and its worktree (nuclear-sweep discipline —
    verify merged, then delete). End the session at this boundary; landing is a stage transition.
 
 ## Common mistakes

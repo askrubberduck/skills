@@ -24,15 +24,21 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
 5. **Ponytail lens throughout.** Delete before add; stdlib/existing helper before new code; smallest
    diff after full understanding. Simplify touched code before building on it; clear superseded paths
    as the last step of each unit. No migrations, no back-compat shims unless the repo demands them.
-6. **Verify.** Run the project's gates (tests/build/vet or doc gates), then the `nuclear-proof`
-   self-refutation pass on your own diff. Trust-touching work additionally gets the `nuclear-break`
-   attacks executed before the gate. Evidence over assertion — a failed or unrun check means
-   not done; say so with output.
+6. **Verify.** Run the project's gates (tests/build/vet or doc gates), then invoke `nuclear-proof`
+   on your own diff — it leaves `proof-<unit>.md`; no file, no proof pass happened. Trust-touching
+   work additionally gets the `nuclear-break` attacks executed before the gate. Evidence over
+   assertion — a failed or unrun check means not done; say so with output.
 7. **Independent review.** Never self-approve. Use the project's review policy — default: the
    `nuclear-review` skill / two-family decorrelated gate. Fix-pass until the reviewer passes.
 
 ## Rules
 
-- Continue stages without pausing for approval unless a decision is genuinely the owner's.
+- **Turn-end test.** A turn may end for exactly four reasons: (a) a decision genuinely the owner's —
+  one where no defensible default exists; (b) an external block (spend limit, missing credential,
+  denied permission, a reviewer still running); (c) the work is complete and recorded; (d) a context
+  handoff whose next step is already dispatched or scheduled and named. Anything else: keep going.
+- **"Say the word and I'll…" is a bug, not politeness.** If you can name the next step and it needs
+  no owner input, run it. Handing an already-made plan back for a "go" is how an autonomous run
+  becomes a manual one — it cost ~60 stalled turns in one week of campaign work.
 - Ambiguous scope → cut it; don't add complexity for hypothetical edge cases.
 - Record deferrals and owner decisions in the project's registry (never silently drop).

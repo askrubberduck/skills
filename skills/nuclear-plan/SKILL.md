@@ -15,18 +15,22 @@ the other families co-author cut it to 4 and deleted 2 of 4 work items as no-cod
 2. **Ask each decorrelated CLI (codex, agy) to PRODUCE a plan, not review one**: "author the safest
    build plan, the task decomposition, and the traps you'd attack", with the design + seam map
    provided. Dispatch mechanics, CLI traps, absolute-path/background rules: same as
-   askrubberduck:nuclear-review — pin the agy model, neutral cwd, outputs to scratchpad.
+   nuclear-review — pin the agy model, neutral cwd, outputs to scratchpad.
+   Their raw plans land as `$SP/plan-codex.md` and `$SP/plan-agy.md`. **No files, no co-authorship** —
+   a synthesis without them is a solo draft wearing the word "synthesized".
 3. **Synthesize** the two decorrelated plans + your own analysis into ONE plan. Reconcile
    disagreements by READING SOURCE (`git show <sha>:path`), never by vote.
 4. Apply a cut pass: any task the synthesis shows unnecessary dies here — cheapest build is the one
    not built.
 5. Fix-pass the draft **in place**, multi-round (r1, r2, …), until both families concur on the plan.
    The draft is a working doc — no commit per round; commit the settled plan once.
-6. Keep the binding decorrelated CODE gate after the build (askrubberduck:nuclear-review). Co-authored
+6. Keep the binding decorrelated CODE gate after the build (nuclear-review). Co-authored
    plans make it converge; they don't replace it.
 
 ## Red flags
 
 - "The plan is simple, review after building is enough" — that's how 19-round gates start.
+- A skill named inside another skill's step is an **instruction to invoke it**, not a citation. A week
+  of packet-sized campaign work with zero `nuclear-plan` invocations is what that failure looks like.
 - A refuted attack is not a defended design; N red-teamed mutations are not coverage of the N+1th.
 - One option enumerated is no decision made — synthesis needs real alternatives to reconcile.

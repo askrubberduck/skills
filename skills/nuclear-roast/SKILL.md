@@ -28,7 +28,7 @@ Critique product and engineering substance ONLY — never market validation, use
 
 1. Ground in the real artifacts: canonical docs + actual source, not summaries.
 2. Dispatch decorrelated families (codex + agy) with the full angle list — mechanics, traps, and
-   fail-closed rules per askrubberduck nuclear-review. Add your own pass as a third perspective.
+   fail-closed rules per nuclear-review. Add your own pass as a third perspective.
 3. Merge findings; every finding carries evidence (file, doc, observed behavior). The roast does
    NOT judge severity and does not triage — every finding survives to the output; the owner weighs
    them. Refuted findings are recorded with the refutation and carried into the next round's prompt.
@@ -36,7 +36,7 @@ Critique product and engineering substance ONLY — never market validation, use
    full round yields nothing new (loop-until-dry) — one pass is a review, not a roast.
 5. Land the output in the repo's reviews doc or a packet — the ENTIRE finding list, unfiltered and
    unranked, each with evidence and a proposed disposition: fix now / backlog / owner decision
-   (present those via askrubberduck nuclear-decide) / rejected-with-reason.
+   (present those via nuclear-decide) / rejected-with-reason.
 
 ## Common mistakes
 

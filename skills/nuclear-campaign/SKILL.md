@@ -17,13 +17,16 @@ driver once this bootstrap ends.
 3. **Carve packets** — one packet per independently shippable change, in the repo's work-item
    convention (e.g. `docs/05-work/YYYY-MM-DD-topic/`). No mega-packet; if two changes can ship
    separately, they are two packets.
-4. **Plan each packet** via askrubberduck:nuclear-plan before any build starts.
+4. **Plan each packet** via nuclear-plan before any build starts.
 5. **Launch builds in parallel worktrees** (`.worktrees/<task>/` — never the shared checkout), cheap
-   executor agents for mechanical slices, one session per packet. Apply askrubberduck nuclear-diet
+   executor agents for mechanical slices, one session per packet. Apply nuclear-diet
    rules to the fleet: batched agent traffic, per-stage routing, no raw output in context.
-6. **Hand off**: state the campaign roster (packet, worktree, branch, state) and stop — the
-   bootstrap's job ends where the driving loop begins. End this session at the boundary. When the
-   campaign's packets have merged, askrubberduck nuclear-sweep clears the worktrees they leave behind.
+6. **Hand off into a running loop, never into silence.** State the campaign roster (packet, worktree,
+   branch, state), then in the same turn give the next iteration an owner: invoke the repo's campaign
+   driver, or book the wake that will (`/loop`, a scheduled wakeup, cron), roster as its input. The
+   bootstrap's context ends at the boundary; the campaign's momentum must not. A roster with nobody
+   holding the next iteration is a stalled campaign wearing the word "handoff". When the campaign's
+   packets have merged, nuclear-sweep clears the worktrees they leave behind.
 
 ## Common mistakes
 
@@ -33,3 +36,5 @@ driver once this bootstrap ends.
 - Packets carved by code area instead of shippable outcome — a packet that can't ship alone isn't one.
 - Skipping plan co-authoring because the campaign is "mostly mechanical" — the mechanical slices are
   cheap precisely because the plan was not.
+- Ending the bootstrap turn with "say the word and I'll start the builds". The go-sign was the
+  directive that started the campaign; asking for a second one is where autonomy dies.

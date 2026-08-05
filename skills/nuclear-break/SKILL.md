@@ -28,7 +28,7 @@ review's job. A claim of robustness without an executed attack behind it is an o
 - Every finding's evidence is the **reproducing command or input** — paste it, don't describe it.
 - Entire finding list, no severity triage — the owner weighs, the breaker surfaces.
 - **The breaker never fixes.** Doer and judge stay separate: findings route to the normal pipeline
-  (fix → askrubberduck nuclear-review). Fixing mid-break contaminates both roles.
+  (fix → nuclear-review). Fixing mid-break contaminates both roles.
 - "Unbreakable" is only claimable per attack actually executed — list what was run, including the
   attacks that found nothing. Unattempted ≠ survived.
 - Revert every mutation and restore clean state before reporting; a dirty tree after a break run is

@@ -19,6 +19,11 @@ Or symlink for local use:
 ln -s "$(pwd)/skills/"* ~/.claude/skills/
 ```
 
+The skills call each other by bare name (`nuclear-review`, `nuclear-proof`) — correct for the symlink
+install. Plugin installs list them as `askrubberduck:nuclear-review`; invoke whichever form your
+runtime's skill list shows. A cross-skill step names a skill because it wants it **invoked** — a name
+that doesn't resolve silently degrades the gate it was protecting.
+
 ### Codex
 
 Codex discovers Agent Skills in `~/.codex/skills/` and in the cross-runtime dir `~/.agents/skills/`
