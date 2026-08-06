@@ -1,6 +1,6 @@
 ---
 name: nuclear-learn
-description: Use when asked to mine sessions or outcomes for lessons, extract skills from repeated workflows, "what should become a skill", "what wasted tokens", or for a retro after a campaign, incident, or many-round review gate.
+description: Turn session and delivery evidence into reusable lessons. Use when the user asks for a retrospective, wants to mine sessions or outcomes, asks what should become a skill or what wasted tokens, or after a campaign, incident, or review gate needed many rounds.
 ---
 
 # Nuclear Learn
@@ -9,9 +9,10 @@ The feedback loop: evidence from past work becomes durable updates — a skill, 
 or gets consciously discarded. Lessons that live only in a chat transcript are lessons lost.
 
 Use `$askrubberduck:<name>` as the canonical bundled-skill reference. Before its step starts, resolve
-it with the active host's invocation syntax while retaining the `askrubberduck:` namespace. Use
-`$<name>` or `<name>` only for a deliberate standalone install. If no installed form resolves, stop
-and name the missing skill; never retry under another name after that step's side effects start.
+it with the active host's discovered invocation syntax. Preserve `askrubberduck:` when the host
+exposes plugin namespaces; use `$<name>` or `<name>` when it exposes skills unqualified or for a
+standalone install. If no installed form resolves, stop and name the missing skill; never retry
+under another name after that step's side effects start.
 
 ## Recipe
 

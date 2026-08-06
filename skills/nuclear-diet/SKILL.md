@@ -1,6 +1,6 @@
 ---
 name: nuclear-diet
-description: Use when the user says "min tokens", asks why sessions are expensive, wants an agent setup health-check or CLAUDE.md/AGENTS.md/memory trim, before starting a campaign or multi-agent run, or when a session has crossed days/compactions — any context or token cost needing audit or prevention.
+description: Reduce agent context, memory, and token costs without losing essential guidance. Use when the user asks for minimum tokens, session-cost analysis, an agent setup health check, CLAUDE.md, AGENTS.md, or memory trimming, or before a long campaign or multi-agent run.
 ---
 
 # Nuclear Diet

@@ -1,6 +1,6 @@
 ---
 name: nuclear-campaign
-description: Use when the user asks to start a campaign, "take all plannable work and execute", turn vision/backlog/competitor gaps into parallel builds, or hands one broad directive that implies many work items — and no campaign structure exists yet.
+description: Break a large initiative into prioritized workstreams that can ship independently. Use when the user asks to start a campaign, execute all plannable work, turn vision, backlog, or competitor gaps into parallel builds, or provides a broad directive spanning many work items without an existing campaign structure.
 ---
 
 # Campaign Bootstrap
@@ -10,9 +10,10 @@ campaign is a different job (polling, takeover, merge chaining) — hand that to
 driver once this bootstrap ends.
 
 Use `$askrubberduck:<name>` as the canonical bundled-skill reference. Before its step starts, resolve
-it with the active host's invocation syntax while retaining the `askrubberduck:` namespace. Use
-`$<name>` or `<name>` only for a deliberate standalone install. If no installed form resolves, stop
-and name the missing skill; never retry under another name after that step's side effects start.
+it with the active host's discovered invocation syntax. Preserve `askrubberduck:` when the host
+exposes plugin namespaces; use `$<name>` or `<name>` when it exposes skills unqualified or for a
+standalone install. If no installed form resolves, stop and name the missing skill; never retry
+under another name after that step's side effects start.
 
 ## Recipe
 

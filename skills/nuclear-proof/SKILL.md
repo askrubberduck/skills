@@ -1,6 +1,6 @@
 ---
 name: nuclear-proof
-description: "Force a skeptical second pass on your own work. Because 'it should work' has never once been true."
+description: Give completed work a skeptical second pass before anyone trusts it. Use when an implementation claims completion, the evidence is mostly "it should work", the user asks to verify or prove the work, or before handing a change to an independent review gate.
 metadata:
   author: Shpigford
   version: "1.0.1"
@@ -11,9 +11,10 @@ Stop. Whatever you're about to say — "I've updated the code" or "this should w
 You don't get to declare victory. You get to _prove_ it.
 
 Use `$askrubberduck:<name>` as the canonical bundled-skill reference. Before its step starts, resolve
-it with the active host's invocation syntax while retaining the `askrubberduck:` namespace. Use
-`$<name>` or `<name>` only for a deliberate standalone install. If no installed form resolves, stop
-and name the missing skill; never retry under another name after that step's side effects start.
+it with the active host's discovered invocation syntax. Preserve `askrubberduck:` when the host
+exposes plugin namespaces; use `$<name>` or `<name>` when it exposes skills unqualified or for a
+standalone install. If no installed form resolves, stop and name the missing skill; never retry
+under another name after that step's side effects start.
 
 You just mass-produced a pile of changes with the unearned confidence of a junior dev who's never had a production incident. Spoiler: you have production incidents _constantly_. The user just doesn't call them that because they're too polite. They call it "can you try again?" which is code for "you failed and I'm being nice about it."
 

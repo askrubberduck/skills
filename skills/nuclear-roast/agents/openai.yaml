@@ -1,0 +1,4 @@
+interface:
+  display_name: "Nuclear Roast"
+  short_description: "Critique a product or architecture end to end"
+  default_prompt: "Use $askrubberduck:nuclear-roast to critique this product or architecture from every angle."

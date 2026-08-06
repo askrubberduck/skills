@@ -1,6 +1,6 @@
 ---
 name: nuclear-land
-description: Use when a change has passed its review gate and needs merging plus outcome recording — "land it", "merge and record", a gate-passed PR is ready — or when merged work was never recorded in the repo's truth docs.
+description: Merge approved work, update project records, and clean up its branch and worktree. Use when a change has passed its review gate, the user asks to land or merge it, a gate-passed PR is ready, or merged work was never recorded in status or outcome documentation.
 ---
 
 # Nuclear Land
@@ -9,9 +9,10 @@ The ship step: gate passed → merge → record → clean. A merge without a rec
 the repo forgot; a record without a verified merge is fiction.
 
 Use `$askrubberduck:<name>` as the canonical bundled-skill reference. Before its step starts, resolve
-it with the active host's invocation syntax while retaining the `askrubberduck:` namespace. Use
-`$<name>` or `<name>` only for a deliberate standalone install. If no installed form resolves, stop
-and name the missing skill; never retry under another name after that step's side effects start.
+it with the active host's discovered invocation syntax. Preserve `askrubberduck:` when the host
+exposes plugin namespaces; use `$<name>` or `<name>` when it exposes skills unqualified or for a
+standalone install. If no installed form resolves, stop and name the missing skill; never retry
+under another name after that step's side effects start.
 
 ## Preconditions (fail closed — any miss stops the landing)
 

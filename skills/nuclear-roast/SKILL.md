@@ -1,6 +1,6 @@
 ---
 name: nuclear-roast
-description: Use when the user asks for a "roast", a full critique of the whole product, solution, or architecture from multiple angles, says "run and run again", or wants a milestone-level adversarial read — solution-scoped, not a change review or backlog sweep.
+description: Critique an entire product, solution, or architecture from multiple angles. Use when the user asks for a roast or repeated full critique, or wants a milestone-level adversarial assessment of the standing solution rather than a change review or backlog sweep.
 ---
 
 # Nuclear Roast
@@ -11,9 +11,10 @@ target is one change (`$askrubberduck:nuclear-review`), the backlog
 what exists end to end and argues it should be different or dead.
 
 Use `$askrubberduck:<name>` as the canonical bundled-skill reference. Before its step starts, resolve
-it with the active host's invocation syntax while retaining the `askrubberduck:` namespace. Use
-`$<name>` or `<name>` only for a deliberate standalone install. If no installed form resolves, stop
-and name the missing skill; never retry under another name after that step's side effects start.
+it with the active host's discovered invocation syntax. Preserve `askrubberduck:` when the host
+exposes plugin namespaces; use `$<name>` or `<name>` when it exposes skills unqualified or for a
+standalone install. If no installed form resolves, stop and name the missing skill; never retry
+under another name after that step's side effects start.
 
 ## Angles (every round covers all)
 

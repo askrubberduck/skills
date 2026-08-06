@@ -1,6 +1,6 @@
 ---
 name: nuclear-break
-description: Use when a build claims done and needs breaking — "try to break it", "nuclear break" — or when trust-touching work needs dynamic evidence before its review gate; also when a green test suite is the only proof a change works.
+description: Attack a finished build to expose false confidence before review. Use when a build claims completion, security-, privacy-, or data-sensitive work lacks dynamic evidence, only a green test suite supports the claim, or the user asks to "try to break it" or run a "nuclear break".
 ---
 
 # Nuclear Break
@@ -9,9 +9,10 @@ The breaker EXECUTES hostile intent against the running thing. It never reads-an
 review's job. A claim of robustness without an executed attack behind it is an opinion.
 
 Use `$askrubberduck:<name>` as the canonical bundled-skill reference. Before its step starts, resolve
-it with the active host's invocation syntax while retaining the `askrubberduck:` namespace. Use
-`$<name>` or `<name>` only for a deliberate standalone install. If no installed form resolves, stop
-and name the missing skill; never retry under another name after that step's side effects start.
+it with the active host's discovered invocation syntax. Preserve `askrubberduck:` when the host
+exposes plugin namespaces; use `$<name>` or `<name>` when it exposes skills unqualified or for a
+standalone install. If no installed form resolves, stop and name the missing skill; never retry
+under another name after that step's side effects start.
 
 ## The five attacks
 

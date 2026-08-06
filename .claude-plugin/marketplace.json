@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "askrubberduck",
-  "description": "askrubberduck skills collection",
+  "description": "Plan, challenge, ship, and clean up complex work",
   "owner": {
     "name": "minuscle",
     "url": "https://github.com/askrubberduck"
@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "askrubberduck",
-      "description": "Decorrelated review gates, plan co-authoring, backlog scans, git hygiene, decision facilitation",
+      "description": "Plan, challenge, ship, and clean up complex work",
       "source": "./",
       "category": "productivity"
     }

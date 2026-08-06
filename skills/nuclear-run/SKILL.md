@@ -1,6 +1,6 @@
 ---
 name: nuclear-run
-description: Full-rigor delivery loop — detailed plan, adversarial critique/red-team of the plan, execute on green with host-native orchestration, ponytail simplification lens, and verification before claiming done. Use when the user says "nuclear", "wear ponytail + nuclear soul", "plan, critique, red team, execute on green", "nuclear simplification", or invokes /nuclear-run with a task.
+description: Plan, implement, test, and independently review a high-risk change. Use when the user requests end-to-end delivery with adversarial plan critique, asks for a nuclear run or nuclear simplification, says "wear ponytail + nuclear soul", or invokes nuclear-run with a task.
 ---
 
 # Nuclear Run
@@ -8,9 +8,10 @@ description: Full-rigor delivery loop — detailed plan, adversarial critique/re
 The bundled directive stack the user otherwise types as a preamble. Argument: the task.
 
 Use `$askrubberduck:<name>` as the canonical bundled-skill reference. Before its step starts, resolve
-it with the active host's invocation syntax while retaining the `askrubberduck:` namespace. Use
-`$<name>` or `<name>` only for a deliberate standalone install. If no installed form resolves, stop
-and name the missing skill; never retry under another name after that step's side effects start.
+it with the active host's discovered invocation syntax. Preserve `askrubberduck:` when the host
+exposes plugin namespaces; use `$<name>` or `<name>` when it exposes skills unqualified or for a
+standalone install. If no installed form resolves, stop and name the missing skill; never retry
+under another name after that step's side effects start.
 
 ## Stages
 

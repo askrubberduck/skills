@@ -1,6 +1,6 @@
 ---
 name: nuclear-cut
-description: Use when the user asks to reduce work scope, critique or clean the backlog, "run critique on every open but blocked task", "finish all possible items autonomously", or the open/blocked/deferred item count keeps growing.
+description: Shrink a backlog by removing obsolete work, merging duplicates, and unblocking viable items. Use when the user asks to cut or clean a backlog, critique open or blocked work, finish every viable item autonomously, or when open, blocked, and deferred work keeps accumulating.
 ---
 
 # Obligations Critique Sweep
@@ -10,9 +10,10 @@ smaller backlog, not a tidier one. "Cut this" findings are first-class, equal to
 Differs from a disposition flow (which acts on IDs the owner names) — this one hunts.
 
 Use `$askrubberduck:<name>` as the canonical bundled-skill reference. Before its step starts, resolve
-it with the active host's invocation syntax while retaining the `askrubberduck:` namespace. Use
-`$<name>` or `<name>` only for a deliberate standalone install. If no installed form resolves, stop
-and name the missing skill; never retry under another name after that step's side effects start.
+it with the active host's discovered invocation syntax. Preserve `askrubberduck:` when the host
+exposes plugin namespaces; use `$<name>` or `<name>` when it exposes skills unqualified or for a
+standalone install. If no installed form resolves, stop and name the missing skill; never retry
+under another name after that step's side effects start.
 
 ## Sweep
 

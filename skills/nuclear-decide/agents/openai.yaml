@@ -1,0 +1,4 @@
+interface:
+  display_name: "Nuclear Decide"
+  short_description: "Resolve owner decisions one at a time"
+  default_prompt: "Use $askrubberduck:nuclear-decide to walk me through these owner decisions one at a time."

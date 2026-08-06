@@ -1,7 +1,7 @@
 {
   "name": "askrubberduck",
-  "version": "0.3.0",
-  "description": "askrubberduck skills",
+  "version": "0.4.0",
+  "description": "Plan, challenge, ship, and clean up complex work",
   "author": {
     "name": "minuscle",
     "url": "https://github.com/askrubberduck"
@@ -19,8 +19,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "askrubberduck",
-    "shortDescription": "Rigorous planning, review, and delivery workflows",
-    "longDescription": "Portable, fail-closed workflows for planning, adversarial review, delivery, backlog decisions, and repository hygiene.",
+    "shortDescription": "Plan, challenge, ship, and clean up complex work",
+    "longDescription": "Turn complex work into reviewed, verified changes with guided planning, independent critique, delivery, decisions, and repository cleanup.",
     "developerName": "minuscle",
     "category": "Productivity",
     "capabilities": [
@@ -28,9 +28,9 @@
       "Write"
     ],
     "defaultPrompt": [
-      "Use askrubberduck to plan and deliver this change with independent review.",
-      "Use askrubberduck to red-team this diff before it ships.",
-      "Use askrubberduck to scan what work is ready next."
+      "Use $askrubberduck:nuclear-run to plan and deliver this change with independent review.",
+      "Use $askrubberduck:nuclear-review to red-team this diff before it ships.",
+      "Use $askrubberduck:nuclear-scan to find what work is ready next."
     ]
   }
 }

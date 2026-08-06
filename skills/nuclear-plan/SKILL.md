@@ -1,6 +1,6 @@
 ---
 name: nuclear-plan
-description: Use when about to plan or implement packet-sized, architectural, or trust-touching work — a plan or draft exists or is about to be written — or when past review gates for similar work took many REJECT rounds.
+description: Catch architectural and implementation risks before coding begins. Use when planning large, architectural, security-, privacy-, or data-sensitive work, when a draft plan needs independent critique, or when similar work previously failed several review rounds.
 ---
 
 # Plan Co-Authoring with the Red Team
@@ -10,9 +10,10 @@ plan same-family and send it out for adversarial review — that path produced 1
 the other families co-author cut it to 4 and deleted 2 of 4 work items as no-code-needed.
 
 Use `$askrubberduck:<name>` as the canonical bundled-skill reference. Before its step starts, resolve
-it with the active host's invocation syntax while retaining the `askrubberduck:` namespace. Use
-`$<name>` or `<name>` only for a deliberate standalone install. If no installed form resolves, stop
-and name the missing skill; never retry under another name after that step's side effects start.
+it with the active host's discovered invocation syntax. Preserve `askrubberduck:` when the host
+exposes plugin namespaces; use `$<name>` or `<name>` when it exposes skills unqualified or for a
+standalone install. If no installed form resolves, stop and name the missing skill; never retry
+under another name after that step's side effects start.
 
 ## Recipe
 

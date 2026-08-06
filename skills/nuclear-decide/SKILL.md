@@ -1,6 +1,6 @@
 ---
 name: nuclear-decide
-description: Use when open decisions, blocked obligations, or sign-offs need the owner's answer — "walk me through the decisions", "talk me through each", "one by one with options" — or when more than one owner decision is pending at once.
+description: Resolve owner decisions and sign-offs one at a time. Use when open decisions, blocked obligations, or approvals need the owner's answer, the user asks to walk through decisions or options, or several owner decisions are pending.
 ---
 
 # Decision Walkthrough

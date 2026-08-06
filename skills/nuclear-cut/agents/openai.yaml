@@ -1,0 +1,4 @@
+interface:
+  display_name: "Nuclear Cut"
+  short_description: "Remove stale work and unblock viable backlog items"
+  default_prompt: "Use $askrubberduck:nuclear-cut to remove stale work, unblock viable items, and surface owner decisions."

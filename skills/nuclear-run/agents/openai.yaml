@@ -1,0 +1,4 @@
+interface:
+  display_name: "Nuclear Run"
+  short_description: "Deliver high-risk changes with independent review"
+  default_prompt: "Use $askrubberduck:nuclear-run to plan, implement, test, and independently review this high-risk change."

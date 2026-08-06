@@ -1,0 +1,4 @@
+interface:
+  display_name: "Nuclear Scan"
+  short_description: "Find ready, blocked, and remaining work"
+  default_prompt: "Use $askrubberduck:nuclear-scan to find what work is ready, blocked, and left."

@@ -1,6 +1,6 @@
 ---
 name: nuclear-review
-description: Use when a PR, diff, packet, or trust-touching change hits its review gate, or the user says "redteam", "decorrelated review", or "codex+agy review". Also when work from any model family needs an independent judge, or when one gate's findings span several files and fix work needs parallel lanes.
+description: Find release-blocking risks through an independent cross-model change review. Use when a PR or diff is ready to review, a security-, privacy-, or data-sensitive change reaches its release gate, the user asks for a red-team or independent second opinion, or findings span several files and need separate fixes.
 ---
 
 # Decorrelated Red-Team Review
@@ -9,9 +9,10 @@ The doer is never the final judge. The gate is a **different model family** — 
 second pass. If no decorrelated family is available, the change waits (fail closed).
 
 Use `$askrubberduck:<name>` as the canonical bundled-skill reference. Before its step starts, resolve
-it with the active host's invocation syntax while retaining the `askrubberduck:` namespace. Use
-`$<name>` or `<name>` only for a deliberate standalone install. If no installed form resolves, stop
-and name the missing skill; never retry under another name after that step's side effects start.
+it with the active host's discovered invocation syntax. Preserve `askrubberduck:` when the host
+exposes plugin namespaces; use `$<name>` or `<name>` when it exposes skills unqualified or for a
+standalone install. If no installed form resolves, stop and name the missing skill; never retry
+under another name after that step's side effects start.
 
 For packet-sized or trust-touching work, run `$askrubberduck:nuclear-plan` BEFORE building —
 gates converge in far fewer rounds when the red team co-authored the plan.

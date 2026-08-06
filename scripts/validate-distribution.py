@@ -13,7 +13,8 @@ from typing import Any, Callable
 
 
 EXPECTED_NAME = "askrubberduck"
-EXPECTED_VERSION = "0.3.0"
+EXPECTED_VERSION = "0.4.0"
+EXPECTED_PLUGIN_DESCRIPTION = "Plan, challenge, ship, and clean up complex work"
 EXPECTED_SKILLS = {
     "nuclear-break",
     "nuclear-campaign",
@@ -46,19 +47,25 @@ OUTBOUND_SKILLS = {
 SIBLING_MARKERS = (
     "$askrubberduck:<name>",
     "canonical bundled-skill reference",
-    "retaining the `askrubberduck:` namespace",
-    "deliberate standalone install",
+    "exposes plugin namespaces",
+    "exposes skills unqualified",
     "side effects start",
 )
 README_MARKERS = (
     "codex plugin marketplace add askrubberduck/skills",
     "codex plugin add askrubberduck@askrubberduck",
-    "--ref v0.3.0",
+    "gh release view --repo askrubberduck/skills",
     "~/.agents/skills",
     "$askrubberduck:nuclear-run",
     "$nuclear-run",
+    "/askrubberduck:nuclear-run",
+    "/nuclear-run",
+    "agy plugin validate",
+    "agy plugin install",
+    "agents/openai.yaml",
     "Start a new Codex session",
-    "v0.3.0",
+    "Start a new host session",
+    "v0.4.0",
 )
 
 
@@ -109,14 +116,23 @@ def render_expected(root: Path) -> tuple[str, str]:
 
 def validate(root: Path) -> list[str]:
     errors: list[str] = []
+    agy = load_json(root, "plugin.json", errors)
     codex = load_json(root, ".codex-plugin/plugin.json", errors)
     claude = load_json(root, ".claude-plugin/plugin.json", errors)
     marketplace = load_json(root, ".agents/plugins/marketplace.json", errors)
     claude_marketplace = load_json(root, ".claude-plugin/marketplace.json", errors)
 
+    require_equal(errors, "Agy manifest", agy, {"name": EXPECTED_NAME})
+
     for label, manifest in (("Codex manifest", codex), ("Claude manifest", claude)):
         require_equal(errors, f"{label} name", manifest.get("name"), EXPECTED_NAME)
         require_equal(errors, f"{label} version", manifest.get("version"), EXPECTED_VERSION)
+        require_equal(
+            errors,
+            f"{label} description",
+            manifest.get("description"),
+            EXPECTED_PLUGIN_DESCRIPTION,
+        )
         require_equal(
             errors,
             f"{label} repository",
@@ -146,6 +162,25 @@ def validate(root: Path) -> list[str]:
         ):
             if not interface.get(field):
                 errors.append(f"Codex manifest interface: missing {field}")
+        require_equal(
+            errors,
+            "Codex manifest short description",
+            interface.get("shortDescription"),
+            EXPECTED_PLUGIN_DESCRIPTION,
+        )
+        default_prompts = interface.get("defaultPrompt")
+        if not isinstance(default_prompts, list) or not 1 <= len(default_prompts) <= 3:
+            errors.append("Codex manifest interface: defaultPrompt must contain 1-3 prompts")
+        else:
+            for prompt in default_prompts:
+                if (
+                    not isinstance(prompt, str)
+                    or not prompt.startswith("Use $askrubberduck:")
+                    or len(prompt) > 128
+                ):
+                    errors.append(
+                        "Codex manifest interface: default prompts must be qualified and at most 128 characters"
+                    )
 
     require_equal(errors, "Codex marketplace name", marketplace.get("name"), EXPECTED_NAME)
     entries = marketplace.get("plugins")
@@ -173,6 +208,12 @@ def validate(root: Path) -> list[str]:
         )
         require_equal(errors, "Codex marketplace category", entry.get("category"), "Productivity")
 
+    require_equal(
+        errors,
+        "Claude marketplace description",
+        claude_marketplace.get("description"),
+        EXPECTED_PLUGIN_DESCRIPTION,
+    )
     claude_entries = claude_marketplace.get("plugins")
     if not isinstance(claude_entries, list) or len(claude_entries) != 1:
         errors.append("Claude marketplace: expected exactly one plugin")
@@ -184,6 +225,12 @@ def validate(root: Path) -> list[str]:
             EXPECTED_NAME,
         )
         require_equal(errors, "Claude marketplace source", claude_entries[0].get("source"), "./")
+        require_equal(
+            errors,
+            "Claude marketplace plugin description",
+            claude_entries[0].get("description"),
+            EXPECTED_PLUGIN_DESCRIPTION,
+        )
 
     skill_root = root / "skills"
     found_skills = {path.parent.name for path in skill_root.glob("*/SKILL.md")}
@@ -201,6 +248,57 @@ def validate(root: Path) -> list[str]:
             errors.append(f"skills/{name}/SKILL.md: frontmatter name must match directory")
         if not description or not description.group(1).strip():
             errors.append(f"skills/{name}/SKILL.md: missing description")
+        else:
+            description_text = description.group(1).strip().strip('"')
+            if ". Use " not in description_text:
+                errors.append(
+                    f"skills/{name}/SKILL.md: description must lead with what it does, then 'Use ...'"
+                )
+            if description_text.startswith("Use when"):
+                errors.append(
+                    f"skills/{name}/SKILL.md: description starts with agent-only trigger copy"
+                )
+            if len(description_text) > 1024:
+                errors.append(f"skills/{name}/SKILL.md: description exceeds 1024 characters")
+
+        interface_path = skill_root / name / "agents" / "openai.yaml"
+        try:
+            interface_text = interface_path.read_text()
+        except OSError as exc:
+            errors.append(f"skills/{name}/agents/openai.yaml: missing or unreadable: {exc}")
+        else:
+            interface_match = re.fullmatch(
+                r'interface:\n'
+                r'  display_name: "([^"\n]+)"\n'
+                r'  short_description: "([^"\n]+)"\n'
+                r'  default_prompt: "([^"\n]+)"\n',
+                interface_text,
+            )
+            if not interface_match:
+                errors.append(
+                    f"skills/{name}/agents/openai.yaml: expected display name, short description, and default prompt"
+                )
+            else:
+                display_name, short_description, default_prompt = interface_match.groups()
+                expected_display = " ".join(part.capitalize() for part in name.split("-"))
+                require_equal(
+                    errors,
+                    f"skills/{name}/agents/openai.yaml display name",
+                    display_name,
+                    expected_display,
+                )
+                if not 25 <= len(short_description) <= 64:
+                    errors.append(
+                        f"skills/{name}/agents/openai.yaml: short description must be 25-64 characters"
+                    )
+                if f"$askrubberduck:{name}" not in default_prompt:
+                    errors.append(
+                        f"skills/{name}/agents/openai.yaml: default prompt must use qualified skill name"
+                    )
+                if not default_prompt.startswith("Use ") or len(default_prompt) > 160:
+                    errors.append(
+                        f"skills/{name}/agents/openai.yaml: default prompt must be a short starter prompt"
+                    )
         body = text[frontmatter.end() :]
         for sibling in sorted(found_skills - {name}):
             if re.search(rf"(?<!askrubberduck:)\b{re.escape(sibling)}\b", body):
@@ -273,6 +371,28 @@ def self_test(root: Path) -> list[str]:
         (
             "malformed manifest",
             lambda copy: (copy / ".codex-plugin" / "plugin.json").write_text("{\n"),
+        ),
+        (
+            "missing Agy adapter",
+            lambda copy: (copy / "plugin.json").unlink(),
+        ),
+        (
+            "agent-only description",
+            lambda copy: (copy / "skills" / "nuclear-scan" / "SKILL.md").write_text(
+                (copy / "skills" / "nuclear-scan" / "SKILL.md")
+                .read_text()
+                .replace(
+                    "description: Find ready, blocked, and remaining work without changing anything.",
+                    "description: Use when work status needs scanning.",
+                    1,
+                )
+            ),
+        ),
+        (
+            "malformed Codex skill interface",
+            lambda copy: (
+                copy / "skills" / "nuclear-run" / "agents" / "openai.yaml"
+            ).write_text("interface:\n"),
         ),
     ]
     for label, mutate in cases:

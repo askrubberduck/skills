@@ -49,10 +49,10 @@ def render(root: Path) -> tuple[str, str, int]:
     catalog.extend(f"- **{name}** — {description}" for name, description in rows)
     catalog_text = "\n".join(catalog) + "\n"
 
-    table = ["| Skill | Use when |", "|---|---|"]
+    table = ["| Skill | What it does |", "|---|---|"]
     for name, description in rows:
-        short = description.split(". ")[0].removeprefix("Use when ").rstrip(".")
-        table.append(f"| `{name}` | {short} |")
+        human_summary = description.split(". ", 1)[0].rstrip(".")
+        table.append(f"| `{name}` | {human_summary} |")
     block = "<!-- skills-table:start -->\n" + "\n".join(table) + "\n<!-- skills-table:end -->"
 
     readme_path = root / "README.md"

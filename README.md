@@ -21,6 +21,8 @@ ln -s "$(pwd)/skills/"* ~/.claude/skills/
 ```
 
 Start a new Claude Code session after installing so it refreshes skill discovery.
+Plugin skills are namespaced slash commands, for example `/askrubberduck:nuclear-run`. The local
+symlink install is standalone and therefore exposes `/nuclear-run` instead.
 
 ### Codex CLI and the Codex app (recommended)
 
@@ -33,20 +35,36 @@ codex plugin add askrubberduck@askrubberduck
 codex plugin list
 ```
 
-For a reproducible install after the release tag exists, pin the marketplace checkout:
+For a reproducible install, resolve and pin the latest published release rather than following
+`master`:
 
 ```bash
-codex plugin marketplace add askrubberduck/skills --ref v0.3.0
+release_tag="$(gh release view --repo askrubberduck/skills --json tagName --jq .tagName)"
+codex plugin marketplace add askrubberduck/skills --ref "$release_tag"
 codex plugin add askrubberduck@askrubberduck
 ```
 
-Use versioned release tags when stability matters. Start a new Codex session after installation. Plugin
-skill names are qualified, for example `$askrubberduck:nuclear-run`.
+This pins the latest published release, which may trail `master`. Start a new Codex session after
+installation. Plugin skill names are qualified, for example `$askrubberduck:nuclear-run`.
 
-### Codex IDE and standalone Agent Skills
+### Agy
 
-For hosts that support Agent Skills but not Codex plugins, install the canonical `skills/` directories
-into the cross-runtime discovery path:
+Agy can install the same canonical tree as a native plugin through the root `plugin.json` adapter:
+
+```bash
+git clone https://github.com/askrubberduck/skills askrubberduck-skills
+agy plugin validate ./askrubberduck-skills
+agy plugin install ./askrubberduck-skills
+agy plugin list
+```
+
+Start Agy and invoke `/nuclear-run <task>`. If Agy qualifies the command to avoid a collision, select
+the `/askrubberduck:nuclear-run` form shown by its command picker.
+
+### Standalone Agent Skills
+
+For Codex IDE, Agy, Cursor, Copilot, and other hosts that support Agent Skills but not this repository's
+plugin format, install the canonical `skills/` directories into the cross-runtime discovery path:
 
 ```bash
 git clone https://github.com/askrubberduck/skills askrubberduck-skills
@@ -54,15 +72,22 @@ mkdir -p ~/.agents/skills
 ln -s "$PWD"/askrubberduck-skills/skills/* ~/.agents/skills/
 ```
 
-Start a new Codex session after linking. Standalone names are unqualified, for example
-`$nuclear-run`. Do not install both the plugin and standalone links in the same Codex profile unless
+Start a new host session after linking. Standalone names are unqualified: Codex commonly exposes
+`$nuclear-run`, while Claude and Agy expose `/nuclear-run`; other clients may use a picker or another
+invocation syntax. Do not install both a plugin and standalone links in the same host profile unless
 you intentionally want duplicate skill entries.
 
-The canonical cross-skill reference is `$askrubberduck:<name>`. Codex uses that form literally;
-other agents should retain the `askrubberduck:` namespace and translate only the invocation syntax
-their host exposes. Use `$<name>` or `<name>` only for a deliberate standalone install. A referenced
-skill must resolve before its step begins, or the workflow fails closed instead of silently skipping
-its gate.
+The source uses `$askrubberduck:<name>` as maintainer notation for bundled-skill references. Codex
+uses it literally, Claude translates it to `/askrubberduck:<name>`, and Agy or standalone hosts may
+expose the skill unqualified. Each workflow resolves the host's discovered form before starting a
+dependent step and stops if the referenced skill is unavailable.
+
+| Installation | User invocation | Description source |
+|---|---|---|
+| Codex plugin | `$askrubberduck:nuclear-run` | `agents/openai.yaml`, with `SKILL.md` for triggering |
+| Claude plugin | `/askrubberduck:nuclear-run` | `SKILL.md` |
+| Agy plugin | `/nuclear-run`; namespaced only when needed | `SKILL.md` |
+| Standalone Agent Skills | Unqualified, using the host's syntax | `SKILL.md` |
 
 ### Agents without native skill discovery
 
@@ -140,26 +165,27 @@ stage cheap.
 ## Skills
 
 <!-- skills-table:start -->
-| Skill | Use when |
+| Skill | What it does |
 |---|---|
-| `nuclear-break` | a build claims done and needs breaking — "try to break it", "nuclear break" — or when trust-touching work needs dynamic evidence before its review gate; also when a green test suite is the only proof a change works |
-| `nuclear-campaign` | the user asks to start a campaign, "take all plannable work and execute", turn vision/backlog/competitor gaps into parallel builds, or hands one broad directive that implies many work items — and no campaign structure exists yet |
-| `nuclear-cut` | the user asks to reduce work scope, critique or clean the backlog, "run critique on every open but blocked task", "finish all possible items autonomously", or the open/blocked/deferred item count keeps growing |
-| `nuclear-decide` | open decisions, blocked obligations, or sign-offs need the owner's answer — "walk me through the decisions", "talk me through each", "one by one with options" — or when more than one owner decision is pending at once |
-| `nuclear-diet` | the user says "min tokens", asks why sessions are expensive, wants an agent setup health-check or CLAUDE.md/AGENTS.md/memory trim, before starting a campaign or multi-agent run, or when a session has crossed days/compactions — any context or token cost needing audit or prevention |
-| `nuclear-land` | a change has passed its review gate and needs merging plus outcome recording — "land it", "merge and record", a gate-passed PR is ready — or when merged work was never recorded in the repo's truth docs |
-| `nuclear-learn` | asked to mine sessions or outcomes for lessons, extract skills from repeated workflows, "what should become a skill", "what wasted tokens", or for a retro after a campaign, incident, or many-round review gate |
-| `nuclear-plan` | about to plan or implement packet-sized, architectural, or trust-touching work — a plan or draft exists or is about to be written — or when past review gates for similar work took many REJECT rounds |
-| `nuclear-proof` | Force a skeptical second pass on your own work |
-| `nuclear-review` | a PR, diff, packet, or trust-touching change hits its review gate, or the user says "redteam", "decorrelated review", or "codex+agy review" |
-| `nuclear-roast` | the user asks for a "roast", a full critique of the whole product, solution, or architecture from multiple angles, says "run and run again", or wants a milestone-level adversarial read — solution-scoped, not a change review or backlog sweep |
-| `nuclear-run` | Full-rigor delivery loop — detailed plan, adversarial critique/red-team of the plan, execute on green with host-native orchestration, ponytail simplification lens, and verification before claiming done |
-| `nuclear-scan` | the user asks "what's next", "what's open for me", "what can be picked up", "status?", "what's left", or pings readiness of named work items ("B28 ready? X ready?") — any read-only backlog question |
-| `nuclear-sweep` | the user asks to clean up branches, worktrees, stale checkouts, temp/scratch dirs, or .gitignore across one or more repos, or when stale worktrees accumulate after merged work |
+| `nuclear-break` | Attack a finished build to expose false confidence before review |
+| `nuclear-campaign` | Break a large initiative into prioritized workstreams that can ship independently |
+| `nuclear-cut` | Shrink a backlog by removing obsolete work, merging duplicates, and unblocking viable items |
+| `nuclear-decide` | Resolve owner decisions and sign-offs one at a time |
+| `nuclear-diet` | Reduce agent context, memory, and token costs without losing essential guidance |
+| `nuclear-land` | Merge approved work, update project records, and clean up its branch and worktree |
+| `nuclear-learn` | Turn session and delivery evidence into reusable lessons |
+| `nuclear-plan` | Catch architectural and implementation risks before coding begins |
+| `nuclear-proof` | Give completed work a skeptical second pass before anyone trusts it |
+| `nuclear-review` | Find release-blocking risks through an independent cross-model change review |
+| `nuclear-roast` | Critique an entire product, solution, or architecture from multiple angles |
+| `nuclear-run` | Plan, implement, test, and independently review a high-risk change |
+| `nuclear-scan` | Find ready, blocked, and remaining work without changing anything |
+| `nuclear-sweep` | Clean stale branches, worktrees, checkouts, scratch directories, and ignore rules |
 <!-- skills-table:end -->
 
-Generated from skill frontmatter — edit descriptions in `skills/<name>/SKILL.md`, then run
-`python3 scripts/render-catalog.py`.
+The README uses each frontmatter description's first sentence; `AGENTS-CATALOG.md` keeps the full
+capability-and-trigger description. Codex UI copy lives in `skills/<name>/agents/openai.yaml`.
+After editing frontmatter, run `python3 scripts/render-catalog.py`.
 
 ## Release validation
 
@@ -171,9 +197,10 @@ python3 scripts/render-catalog.py --check
 python3 scripts/validate-distribution.py --self-test
 ```
 
-The validator checks both host manifests, the Codex marketplace source, the canonical 14-skill set,
-cross-skill resolution, install documentation, generated catalog freshness, and known corruption
-cases. It performs no network access and writes only to temporary directories during self-test.
+The validator checks the Codex, Claude, and Agy manifests; every Codex skill interface; the canonical
+14-skill set; human-first descriptions; cross-skill resolution; install documentation; generated
+catalog freshness; and known corruption cases. It performs no network access and writes only to
+temporary directories during self-test.
 
 ## The soul — carried by every skill
 
@@ -198,11 +225,9 @@ frontmatter metadata.
 
 ## Status
 
-v0.3.0 — first-class Codex plugin and marketplace distribution, with the canonical
-`$askrubberduck:<name>` namespace carried across hosts. Codex uses the reference literally; other
-Agent Skills hosts retain `askrubberduck:` while translating only their invocation syntax. Bare
-cross-skill references now fail deterministic validation.
+v0.4.0 (unreleased) — human-first descriptions across all hosts, dedicated Codex skill cards and
+starter prompts, a native Agy adapter, and explicit namespaced-versus-standalone invocation guidance.
+The same canonical 14-skill tree serves Codex, Claude Code, Agy, and generic Agent Skills clients.
 
-The 14-skill collection remains compatible with Claude Code plugin installs, Codex plugin installs,
-and deliberate standalone Agent Skills installs. Host-native orchestration and Claude/Codex session
-stores are documented and validated.
+v0.3.0 — first-class Codex plugin and marketplace distribution, portable host-native orchestration,
+and Claude/Codex session-store support.

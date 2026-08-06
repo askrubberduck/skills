@@ -1,6 +1,6 @@
 ---
 name: nuclear-scan
-description: Use when the user asks "what's next", "what's open for me", "what can be picked up", "status?", "what's left", or pings readiness of named work items ("B28 ready? X ready?") — any read-only backlog question.
+description: Find ready, blocked, and remaining work without changing anything. Use when the user asks what is next, open, ready, left, or available to pick up, requests status, or asks whether a named work item is ready.
 ---
 
 # Pickable Work Scan
@@ -9,9 +9,10 @@ Read-only. Answers "what's next" from the repo's own registries without a full-d
 without acting on anything. Writes (close/approve/park) route to the repo's disposition workflow.
 
 Use `$askrubberduck:<name>` as the canonical bundled-skill reference. Before its step starts, resolve
-it with the active host's invocation syntax while retaining the `askrubberduck:` namespace. Use
-`$<name>` or `<name>` only for a deliberate standalone install. If no installed form resolves, stop
-and name the missing skill; never retry under another name after that step's side effects start.
+it with the active host's discovered invocation syntax. Preserve `askrubberduck:` when the host
+exposes plugin namespaces; use `$<name>` or `<name>` when it exposes skills unqualified or for a
+standalone install. If no installed form resolves, stop and name the missing skill; never retry
+under another name after that step's side effects start.
 
 ## Locate registries (detect, don't configure)
 
