@@ -40,7 +40,7 @@ codex plugin marketplace add askrubberduck/skills --ref v0.3.0
 codex plugin add askrubberduck@askrubberduck
 ```
 
-Use signed release tags when stability matters. Start a new Codex session after installation. Plugin
+Use versioned release tags when stability matters. Start a new Codex session after installation. Plugin
 skill names are qualified, for example `$askrubberduck:nuclear-run`.
 
 ### Codex IDE and standalone Agent Skills
