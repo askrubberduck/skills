@@ -13,7 +13,7 @@ from typing import Any, Callable
 
 
 EXPECTED_NAME = "askrubberduck"
-EXPECTED_VERSION = "0.2.0"
+EXPECTED_VERSION = "0.3.0"
 EXPECTED_SKILLS = {
     "nuclear-break",
     "nuclear-campaign",
@@ -53,12 +53,12 @@ SIBLING_MARKERS = (
 README_MARKERS = (
     "codex plugin marketplace add askrubberduck/skills",
     "codex plugin add askrubberduck@askrubberduck",
-    "--ref v0.2.0",
+    "--ref v0.3.0",
     "~/.agents/skills",
     "$askrubberduck:nuclear-run",
     "$nuclear-run",
     "Start a new Codex session",
-    "v0.2.0",
+    "v0.3.0",
 )
 
 

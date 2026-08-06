@@ -36,13 +36,12 @@ codex plugin list
 For a reproducible install after the release tag exists, pin the marketplace checkout:
 
 ```bash
-codex plugin marketplace add askrubberduck/skills --ref v0.2.0
+codex plugin marketplace add askrubberduck/skills --ref v0.3.0
 codex plugin add askrubberduck@askrubberduck
 ```
 
-The `--ref v0.2.0` command becomes usable after that tag is published; installing this checkout does
-not create a Git tag or publish a release. Start a new Codex session after installation. Plugin skill
-names are qualified, for example `$askrubberduck:nuclear-run`.
+Use signed release tags when stability matters. Start a new Codex session after installation. Plugin
+skill names are qualified, for example `$askrubberduck:nuclear-run`.
 
 ### Codex IDE and standalone Agent Skills
 
@@ -199,11 +198,11 @@ frontmatter metadata.
 
 ## Status
 
-v0.2.0 — authored from session evidence (baseline failures documented from transcripts), then
-corrected by it: a week of measured use found `nuclear-proof`, `nuclear-plan` and `nuclear-break` at
-**zero invocations** despite being required steps, because cross-skill references named a namespace
-that did not resolve and the steps left no artifact anything downstream could check. Both are fixed.
+v0.3.0 — first-class Codex plugin and marketplace distribution, with the canonical
+`$askrubberduck:<name>` namespace carried across hosts. Codex uses the reference literally; other
+Agent Skills hosts retain `askrubberduck:` while translating only their invocation syntax. Bare
+cross-skill references now fail deterministic validation.
 
-Discipline skills (`nuclear-review`, `nuclear-plan`, `nuclear-diet`) passed one-rep
-subagent pressure scenarios (fail-closed under ship pressure, coauthor-skip temptation,
-marathon-split); coverage is thin — file issues on any rationalization loophole an agent finds.
+The 14-skill collection remains compatible with Claude Code plugin installs, Codex plugin installs,
+and deliberate standalone Agent Skills installs. Host-native orchestration and Claude/Codex session
+stores are documented and validated.
