@@ -15,8 +15,12 @@ or gets consciously discarded. Lessons that live only in a chat transcript are l
    repeated failures, repeated tool patterns. Big transcripts are mined by script or subagent —
    never read raw into the main context.
 2. **Classify each candidate lesson** by its durable home — one authoritative home per lesson:
-   - Repeatable multi-step workflow → a **skill** (new, or a section of an existing one — prefer
-     extending; a new skill is a cost).
+   - Repeatable multi-step workflow **the user asks for in words** → a **skill** (new, or a section
+     of an existing one — prefer extending; a new skill is a cost).
+   - Behavior that must fire on **repo state** rather than phrasing — a campaign left open, a gate
+     pending, a stale base — → the checked-in instructions doc. **A skill description matches words;
+     it cannot see state.** A driver skill triggered on "continue campaign" sat at zero invocations
+     for a month while the owner typed "continue" eleven times.
    - Fact, preference, or project state → **memory**.
    - Rule that must bind every turn → the checked-in instructions doc (CLAUDE.md/AGENTS.md).
    - One-off, derivable, or already recorded → **discard, say so**.

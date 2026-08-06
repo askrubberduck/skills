@@ -157,7 +157,11 @@ frontmatter metadata.
 
 ## Status
 
-v0.1.0 — authored from 15 days of session evidence (baseline failures documented from transcripts).
+v0.2.0 — authored from session evidence (baseline failures documented from transcripts), then
+corrected by it: a week of measured use found `nuclear-proof`, `nuclear-plan` and `nuclear-break` at
+**zero invocations** despite being required steps, because cross-skill references named a namespace
+that did not resolve and the steps left no artifact anything downstream could check. Both are fixed.
+
 Discipline skills (`nuclear-review`, `nuclear-plan`, `nuclear-diet`) passed one-rep
 subagent pressure scenarios (fail-closed under ship pressure, coauthor-skip temptation,
 marathon-split); coverage is thin — file issues on any rationalization loophole an agent finds.

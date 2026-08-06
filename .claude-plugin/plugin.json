@@ -1,7 +1,7 @@
 {
   "name": "askrubberduck",
   "description": "askrubberduck skills collection: decorrelated review gates, plan co-authoring, backlog scans, git hygiene, decision facilitation",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": {
     "name": "Vladimir Korotkov"
   },
