@@ -225,7 +225,7 @@ frontmatter metadata.
 
 ## Status
 
-v0.4.0 (unreleased) — human-first descriptions across all hosts, dedicated Codex skill cards and
+v0.4.0 — human-first descriptions across all hosts, dedicated Codex skill cards and
 starter prompts, a native Agy adapter, and explicit namespaced-versus-standalone invocation guidance.
 The same canonical 14-skill tree serves Codex, Claude Code, Agy, and generic Agent Skills clients.
 
