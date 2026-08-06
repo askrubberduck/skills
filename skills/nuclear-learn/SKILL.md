@@ -8,12 +8,25 @@ description: Use when asked to mine sessions or outcomes for lessons, extract sk
 The feedback loop: evidence from past work becomes durable updates — a skill, a memory, a rule —
 or gets consciously discarded. Lessons that live only in a chat transcript are lessons lost.
 
+Use `$askrubberduck:<name>` as the canonical bundled-skill reference. Before its step starts, resolve
+it with the active host's invocation syntax while retaining the `askrubberduck:` namespace. Use
+`$<name>` or `<name>` only for a deliberate standalone install. If no installed form resolves, stop
+and name the missing skill; never retry under another name after that step's side effects start.
+
 ## Recipe
 
-1. **Gather evidence, don't reminisce.** Session transcripts (`~/.claude/projects/<dir>/*.jsonl`),
-   recorded outcomes, review trajectories, token stats. Extract counts: repeated directives,
-   repeated failures, repeated tool patterns. Big transcripts are mined by script or subagent —
-   never read raw into the main context.
+1. **Gather evidence, don't reminisce.** Inspect explicit session roots first, then add recognized
+   default stores unless the caller explicitly limits scope: Claude transcripts
+   (`~/.claude/projects/<dir>/*.jsonl`) and Codex transcripts (`$CODEX_HOME/sessions` and
+   `$CODEX_HOME/archived_sessions`, default `~/.codex/...`) alongside recorded outcomes, review
+   trajectories, and token stats. Label evidence by its declared host; when an explicit root has no
+   label, infer from a recognized schema or mark it `unknown`. Deduplicate only identical canonical
+   paths or stable IDs within the same host/schema — never merge unrelated hosts merely because IDs
+   match. Do not follow symlinks outside the selected root. A missing, malformed, or unknown requested
+   store makes the overall result **partial/incomplete**, but valid stores still proceed; no recognized
+   store stops the transcript-mining path. Missing schema fields are `unavailable`, never estimated.
+   Extract counts and patterns without copying raw prompts into durable output. Big transcripts are
+   mined by script or subagent — never read raw into the main context.
 2. **Classify each candidate lesson** by its durable home — one authoritative home per lesson:
    - Repeatable multi-step workflow **the user asks for in words** → a **skill** (new, or a section
      of an existing one — prefer extending; a new skill is a cost).
@@ -29,7 +42,7 @@ or gets consciously discarded. Lessons that live only in a chat transcript are l
 4. **Apply the updates** — write the skill/memory/rule edit now, not a recommendation to write it.
    While in each home, delete what the new lesson supersedes; stale guidance is worse than none.
 5. **Close the loop**: new or edited skills get at least a one-rep pressure check
-   (nuclear-proof discipline applied to authored guidance) before they're trusted.
+   (`$askrubberduck:nuclear-proof` discipline applied to authored guidance) before they're trusted.
 
 ## Common mistakes
 

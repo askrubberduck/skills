@@ -1,9 +1,9 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "askrubberduck",
-  "description": "askrubberduck skills collection — process gates and hygiene skills portable across repos",
+  "description": "askrubberduck skills collection",
   "owner": {
-    "name": "Vladimir Korotkov",
+    "name": "minuscle",
     "url": "https://github.com/askrubberduck"
   },
   "plugins": [

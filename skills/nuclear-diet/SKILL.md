@@ -1,6 +1,6 @@
 ---
 name: nuclear-diet
-description: Use when the user says "min tokens", asks why sessions are expensive, wants a Claude Code setup health-check or CLAUDE.md/memory trim, before starting a campaign or multi-agent run, or when a session has crossed days/compactions — any context or token cost needing audit or prevention.
+description: Use when the user says "min tokens", asks why sessions are expensive, wants an agent setup health-check or CLAUDE.md/AGENTS.md/memory trim, before starting a campaign or multi-agent run, or when a session has crossed days/compactions — any context or token cost needing audit or prevention.
 ---
 
 # Nuclear Diet
@@ -38,12 +38,21 @@ broken. Numbers first, then the two highest-leverage fixes only.
 Everything always-loaded (CLAUDE.md chain, memory index, plugin skill descriptions, hooks context)
 is billed every turn of every session:
 
-1. **Installation health**: `claude doctor` if available; version, plugin cache integrity, broken
-   symlinks in skills dirs.
+1. **Installation health**: use the active host's diagnostics when available (`claude doctor` for
+   Claude Code; `codex --version` plus plugin/skill configuration checks for Codex); inspect plugin
+   cache integrity and broken symlinks in skill directories.
 2. **Always-loaded inventory**: user + project CLAUDE.md/AGENTS.md (follow `@includes`), memory
    index, enabled plugins. Estimate each block's size; rank by cost.
-3. **Usage cross-check**: grep recent session transcripts (`~/.claude/projects/<dir>/*.jsonl`) for
-   each plugin/skill actually invoked. Loaded-never-invoked for weeks = disable candidate.
+3. **Usage cross-check**: inspect explicit session roots first, then add recognized default stores
+   unless the caller explicitly limits scope: Claude transcripts (`~/.claude/projects/<dir>/*.jsonl`)
+   and Codex transcripts (`$CODEX_HOME/sessions` and `$CODEX_HOME/archived_sessions`, default
+   `~/.codex/...`). Label each explicit root with its declared host; if none is supplied, infer from a
+   recognized schema or mark it `unknown`. Deduplicate only identical canonical paths or stable IDs
+   within the same host/schema — never merge unrelated hosts merely because IDs match. Do not follow
+   symlinks outside a selected root. A missing or malformed requested store makes the overall audit
+   **partial/incomplete**, never zero usage, while valid stores still proceed; if no recognized store
+   is available, stop and say so. Missing schema fields are `unavailable`, never estimated. Report
+   counts and metadata, not raw prompt content. Loaded-never-invoked for weeks = disable candidate.
 4. **Dedupe**: local memory files repeating checked-in CLAUDE.md facts — keep the checked-in copy,
    delete the memory. Same for AGENTS.md vs copilot-instructions duplication: one canonical file.
 5. **Trim to non-derivable**: a CLAUDE.md line earns its place only if a fresh session could NOT

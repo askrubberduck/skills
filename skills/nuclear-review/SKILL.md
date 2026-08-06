@@ -1,6 +1,6 @@
 ---
 name: nuclear-review
-description: Use when a PR, diff, packet, or trust-touching change hits its review gate, or the user says "redteam", "decorrelated review", or "codex+agy review". Also when a change was authored by a Claude-family agent and needs an independent judge, or when one gate's findings span several files and fix work needs parallel lanes.
+description: Use when a PR, diff, packet, or trust-touching change hits its review gate, or the user says "redteam", "decorrelated review", or "codex+agy review". Also when work from any model family needs an independent judge, or when one gate's findings span several files and fix work needs parallel lanes.
 ---
 
 # Decorrelated Red-Team Review
@@ -8,7 +8,12 @@ description: Use when a PR, diff, packet, or trust-touching change hits its revi
 The doer is never the final judge. The gate is a **different model family** — never a same-family
 second pass. If no decorrelated family is available, the change waits (fail closed).
 
-For packet-sized or trust-touching work, run nuclear-plan BEFORE building —
+Use `$askrubberduck:<name>` as the canonical bundled-skill reference. Before its step starts, resolve
+it with the active host's invocation syntax while retaining the `askrubberduck:` namespace. Use
+`$<name>` or `<name>` only for a deliberate standalone install. If no installed form resolves, stop
+and name the missing skill; never retry under another name after that step's side effects start.
+
+For packet-sized or trust-touching work, run `$askrubberduck:nuclear-plan` BEFORE building —
 gates converge in far fewer rounds when the red team co-authored the plan.
 
 ## Dispatch
@@ -16,16 +21,22 @@ gates converge in far fewer rounds when the red team co-authored the plan.
 1. Resolve target into review material: `gh pr diff <N>` / packet draft / `git diff <ref>`.
    Review the **committed object** (`git show <sha>:path`) or the correct worktree — never a stale
    main checkout or dirty tree; both families produce false rejects from wrong snapshots.
-2. Write one prompt to the session scratchpad: the diff/design, acceptance criteria, and
+2. Record the doer's self-reported model family, then select reviewers relative to it. At least one
+   required reviewer must self-report a different model family. Executable names are not proof:
+   `agy` can host Gemini, Claude, or other models, and a nested `codex` session remains same-family
+   when the doer is OpenAI/GPT. Unknown identity never counts as decorrelated.
+3. Write one prompt to the session scratchpad: the diff/design, acceptance criteria, and
    "verdict line required: APPROVE | REJECT | APPROVE-W-CONDITIONS, with findings list".
    Reviewer default: refute, not bless.
-3. Run from a **neutral cwd** (scratchpad, never the repo — codex in-repo derails into a security
-   scan), stdin closed, `run_in_background: true` (runs take 10–45 min). Absolute paths everywhere.
-   The two CLIs take the prompt **differently**:
+4. Run from a **neutral cwd** (scratchpad, never the repo — reviewers can derail when launched in
+   the target checkout), stdin closed, in the background (runs take 10–45 min). Absolute paths
+   everywhere. Choose only reviewers whose model identity you can verify. Example CLI forms:
    ```bash
    SP=<scratchpad>/<topic>-review
+   # Count this as decorrelated only when the doer is not from the OpenAI/GPT family.
    codex exec --skip-git-repo-check "$(cat $SP/prompt.md)" </dev/null > $SP/codex-rN.out 2>&1
-   agy --model "Gemini 3.1 Pro (High)" --add-dir "$SP" --print-timeout 45m \
+   # Pin an available model from a family different from the doer and verify the self-report.
+   agy --model "<verified-non-doer-model>" --add-dir "$SP" --print-timeout 45m \
        -p "Read $SP/header.md (task) and $SP/change.diff (full diff). ..." \
        </dev/null > $SP/agy-rN.out 2>&1
    ```
@@ -39,20 +50,23 @@ gates converge in far fewer rounds when the red team co-authored the plan.
 
 ## Adjudicate
 
-4. Parse both verdicts. Per finding: **fix**, **reject with recorded reason**, or **escalate** to the
+5. Parse every verdict. Per finding: **fix**, **reject with recorded reason**, or **escalate** to the
    owner (queue in the repo's obligations registry if it has one; present queued decisions via
-   nuclear-decide).
+   `$askrubberduck:nuclear-decide`).
    - On deletion-heavy diffs, check the diff prefix char + post-change file before accepting a
      "fact destroyed" finding — context lines and moved facts are common false BLOCKERs.
    - Family disagreement about framework internals → settle by reading the dependency source, not by vote.
    - Carry settled refutations into the next round's prompt so rounds converge.
-5. Fix pass → invoke `nuclear-proof` on your own fixes, writing its findings to `$SP/proof-rN.md`
+6. Fix pass → invoke `$askrubberduck:nuclear-proof` on your own fixes, writing its findings to
+   `$SP/proof-rN.md`
    → only then re-dispatch both. **No `proof-rN.md`, no dispatch** — a round sent without it is a
    skipped step, not a fast round. Self-refutation costs minutes and saves whole 30-minute rounds;
-   it is doer hygiene and never a substitute for the decorrelated gate. Loop until **both families
-   APPROVE in the same round**.
-6. One CLI down: the remaining decorrelated family alone meets the bar — record the coverage gap.
-   Never substitute a same-family reviewer.
+   it is doer hygiene and never a substitute for the decorrelated gate. Loop until every required,
+   successfully dispatched reviewer **APPROVES in the same round**, subject to the outage rule below.
+7. Completion requires approval from at least one reviewer proven to be from a different model
+   family than the doer. A same-family pass never substitutes. If the only decorrelated reviewer is
+   unavailable or fails, the gate blocks; record an additional reviewer outage only after a proven
+   different-family approval exists.
 
 ## Multi-lane fix-pass (when findings fan wide)
 
@@ -80,9 +94,9 @@ verdict line. Findings weigh functionality/extendability/security — never buil
 
 ## Record
 
-7. Fold verdicts + adjudications + trajectory (`REJECT/REJECT → APPROVE/APPROVE r2`) into the work
+8. Fold verdicts + adjudications + trajectory (`REJECT/REJECT → APPROVE/APPROVE r2`) into the work
    item's review log. **Never commit raw CLI stdout** — extract verdict + findings, keep outputs in
    the scratchpad (a committed 8.7MB stdout blob once forced a git-history rewrite).
-8. For trust-touching changes, include nuclear-break's executed-attack evidence in the
-   review material. On final APPROVE of a mergeable change: nuclear-land ships and
+9. For trust-touching changes, include `$askrubberduck:nuclear-break`'s executed-attack evidence in
+   the review material. On final APPROVE of a mergeable change: `$askrubberduck:nuclear-land` ships and
    records it.

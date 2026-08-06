@@ -1,11 +1,16 @@
 ---
 name: nuclear-run
-description: Full-rigor delivery loop — detailed plan, adversarial critique/red-team of the plan, execute on green via Workflow with per-stage model routing, ponytail simplification lens, verify before claiming done. Use when the user says "nuclear", "wear ponytail + nuclear soul", "plan, critique, red team, execute on green", "nuclear simplification", or invokes /nuclear-run <task>.
+description: Full-rigor delivery loop — detailed plan, adversarial critique/red-team of the plan, execute on green with host-native orchestration, ponytail simplification lens, and verification before claiming done. Use when the user says "nuclear", "wear ponytail + nuclear soul", "plan, critique, red team, execute on green", "nuclear simplification", or invokes /nuclear-run with a task.
 ---
 
 # Nuclear Run
 
 The bundled directive stack the user otherwise types as a preamble. Argument: the task.
+
+Use `$askrubberduck:<name>` as the canonical bundled-skill reference. Before its step starts, resolve
+it with the active host's invocation syntax while retaining the `askrubberduck:` namespace. Use
+`$<name>` or `<name>` only for a deliberate standalone install. If no installed form resolves, stop
+and name the missing skill; never retry under another name after that step's side effects start.
 
 ## Stages
 
@@ -13,23 +18,27 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
    Trace the real flow end to end before planning — laziness shortens the solution, never the reading.
 2. **Plan.** Detailed decomposition: units of work, gates per unit, acceptance evidence.
    Steel-man at least one alternative decomposition before committing; first idea is a candidate, not a decision.
-   Packet-sized or trust-touching: co-author the plan per the `nuclear-plan` skill instead of drafting solo.
+   Packet-sized or trust-touching: co-author the plan via `$askrubberduck:nuclear-plan` instead of
+   drafting solo.
 3. **Critique (adversarial, pre-code).** Red-team the plan: wrong decomposition, missing edge cases,
-   simpler design that deletes a concept. Default the critic toward refute. Run as a Workflow judge
-   stage on the strongest tier (`model:` inherit). Fold findings; loop until the plan survives.
-4. **Execute on green.** Run the build as a Workflow. Per-stage `model:` routing is mandatory:
-   - mechanical stages (investigate, scripted edits, rebases, clerical verify, record commits) → `model: 'sonnet'`
-   - adversarial review, synthesis, trust-critical code → inherit (strongest tier)
+   simpler design that deletes a concept. Default the critic toward refute. Use an isolated judge
+   stage or reviewer session on the strongest available tier. Fold findings; loop until the plan survives.
+4. **Execute on green.** Use the host's native staged or multi-agent orchestration when available;
+   otherwise execute the settled stages sequentially. Route mechanical stages (investigation,
+   scripted edits, rebases, clerical verification, recording) to a cheaper capable worker only when
+   the host exposes trustworthy per-stage routing. Keep adversarial review, synthesis, and
+   trust-critical work on the strongest available tier; otherwise inherit the current model.
    TDD for code units: failing test first, minimal pass, then simplify.
 5. **Ponytail lens throughout.** Delete before add; stdlib/existing helper before new code; smallest
    diff after full understanding. Simplify touched code before building on it; clear superseded paths
    as the last step of each unit. No migrations, no back-compat shims unless the repo demands them.
-6. **Verify.** Run the project's gates (tests/build/vet or doc gates), then invoke `nuclear-proof`
+6. **Verify.** Run the project's gates (tests/build/vet or doc gates), then invoke
+   `$askrubberduck:nuclear-proof`
    on your own diff — it leaves `proof-<unit>.md`; no file, no proof pass happened. Trust-touching
-   work additionally gets the `nuclear-break` attacks executed before the gate. Evidence over
+   work additionally gets the `$askrubberduck:nuclear-break` attacks executed before the gate. Evidence over
    assertion — a failed or unrun check means not done; say so with output.
 7. **Independent review.** Never self-approve. Use the project's review policy — default: the
-   `nuclear-review` skill / two-family decorrelated gate. Fix-pass until the reviewer passes.
+   `$askrubberduck:nuclear-review` / proven different-family gate. Fix-pass until the reviewer passes.
 
 ## Rules
 

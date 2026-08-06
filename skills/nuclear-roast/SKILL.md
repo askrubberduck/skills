@@ -6,8 +6,14 @@ description: Use when the user asks for a "roast", a full critique of the whole 
 # Nuclear Roast
 
 Adversarial critique of the **whole solution** — the fourth critique altitude. Wrong tool if the
-target is one change (nuclear-review), the backlog (nuclear-cut), or your own fresh diff
-(nuclear-proof). Roast reads what exists end to end and argues it should be different or dead.
+target is one change (`$askrubberduck:nuclear-review`), the backlog
+(`$askrubberduck:nuclear-cut`), or your own fresh diff (`$askrubberduck:nuclear-proof`). Roast reads
+what exists end to end and argues it should be different or dead.
+
+Use `$askrubberduck:<name>` as the canonical bundled-skill reference. Before its step starts, resolve
+it with the active host's invocation syntax while retaining the `askrubberduck:` namespace. Use
+`$<name>` or `<name>` only for a deliberate standalone install. If no installed form resolves, stop
+and name the missing skill; never retry under another name after that step's side effects start.
 
 ## Angles (every round covers all)
 
@@ -27,8 +33,9 @@ Critique product and engineering substance ONLY — never market validation, use
 ## Recipe
 
 1. Ground in the real artifacts: canonical docs + actual source, not summaries.
-2. Dispatch decorrelated families (codex + agy) with the full angle list — mechanics, traps, and
-   fail-closed rules per nuclear-review. Add your own pass as a third perspective.
+2. Dispatch independent reviewer families selected relative to the doer's verified model family,
+   with the full angle list and fail-closed rules from `$askrubberduck:nuclear-review`. Add your own
+   pass as a third perspective.
 3. Merge findings; every finding carries evidence (file, doc, observed behavior). The roast does
    NOT judge severity and does not triage — every finding survives to the output; the owner weighs
    them. Refuted findings are recorded with the refutation and carried into the next round's prompt.
@@ -36,7 +43,7 @@ Critique product and engineering substance ONLY — never market validation, use
    full round yields nothing new (loop-until-dry) — one pass is a review, not a roast.
 5. Land the output in the repo's reviews doc or a packet — the ENTIRE finding list, unfiltered and
    unranked, each with evidence and a proposed disposition: fix now / backlog / owner decision
-   (present those via nuclear-decide) / rejected-with-reason.
+   (present those via `$askrubberduck:nuclear-decide`) / rejected-with-reason.
 
 ## Common mistakes
 
@@ -47,4 +54,4 @@ Critique product and engineering substance ONLY — never market validation, use
 - Stopping after round one because it "found plenty" — the second round against settled findings is
   where the deep ones surface.
 - Letting the roast write fixes — output is findings + dispositions; execution goes through the
-  normal pipeline (nuclear-plan / nuclear-review) like any other work.
+  normal pipeline (`$askrubberduck:nuclear-plan` / `$askrubberduck:nuclear-review`) like any other work.

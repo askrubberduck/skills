@@ -1,0 +1,36 @@
+{
+  "name": "askrubberduck",
+  "version": "0.2.0",
+  "description": "askrubberduck skills",
+  "author": {
+    "name": "minuscle",
+    "url": "https://github.com/askrubberduck"
+  },
+  "repository": "https://github.com/askrubberduck/skills",
+  "license": "MIT",
+  "keywords": [
+    "review",
+    "red-team",
+    "planning",
+    "backlog",
+    "git-hygiene",
+    "workflows"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "askrubberduck",
+    "shortDescription": "Rigorous planning, review, and delivery workflows",
+    "longDescription": "Portable, fail-closed workflows for planning, adversarial review, delivery, backlog decisions, and repository hygiene.",
+    "developerName": "minuscle",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use askrubberduck to plan and deliver this change with independent review.",
+      "Use askrubberduck to red-team this diff before it ships.",
+      "Use askrubberduck to scan what work is ready next."
+    ]
+  }
+}

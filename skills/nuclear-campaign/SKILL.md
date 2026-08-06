@@ -9,6 +9,11 @@ Cold-start: one vague directive becomes packets, plans, and parallel builds. Con
 campaign is a different job (polling, takeover, merge chaining) — hand that to the repo's campaign
 driver once this bootstrap ends.
 
+Use `$askrubberduck:<name>` as the canonical bundled-skill reference. Before its step starts, resolve
+it with the active host's invocation syntax while retaining the `askrubberduck:` namespace. Use
+`$<name>` or `<name>` only for a deliberate standalone install. If no installed form resolves, stop
+and name the missing skill; never retry under another name after that step's side effects start.
+
 ## Recipe
 
 1. **Survey** the repo's vision/delivery/decision docs plus open registries; scout the product code
@@ -17,16 +22,16 @@ driver once this bootstrap ends.
 3. **Carve packets** — one packet per independently shippable change, in the repo's work-item
    convention (e.g. `docs/05-work/YYYY-MM-DD-topic/`). No mega-packet; if two changes can ship
    separately, they are two packets.
-4. **Plan each packet** via nuclear-plan before any build starts.
+4. **Plan each packet** via `$askrubberduck:nuclear-plan` before any build starts.
 5. **Launch builds in parallel worktrees** (`.worktrees/<task>/` — never the shared checkout), cheap
-   executor agents for mechanical slices, one session per packet. Apply nuclear-diet
+   executor agents for mechanical slices, one session per packet. Apply `$askrubberduck:nuclear-diet`
    rules to the fleet: batched agent traffic, per-stage routing, no raw output in context.
 6. **Hand off into a running loop, never into silence.** State the campaign roster (packet, worktree,
    branch, state), then in the same turn give the next iteration an owner: invoke the repo's campaign
    driver, or book the wake that will (`/loop`, a scheduled wakeup, cron), roster as its input. The
    bootstrap's context ends at the boundary; the campaign's momentum must not. A roster with nobody
    holding the next iteration is a stalled campaign wearing the word "handoff". When the campaign's
-   packets have merged, nuclear-sweep clears the worktrees they leave behind.
+   packets have merged, `$askrubberduck:nuclear-sweep` clears the worktrees they leave behind.
 
 ## Common mistakes
 
