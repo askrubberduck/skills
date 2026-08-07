@@ -65,7 +65,7 @@ Don't just list the problems in a little apologetic bullet list like a confessio
 
 Then ask yourself: "If the user screen-records themselves trying this and it fails, will I want to crawl into a hole?" If yes, you're not done.
 
-## 6. Now count what your fix ADDED.
+## 6. Did your fix make it CLEARER, or just shorter?
 
 Section 1 asked whether you built what was asked. This asks what your **fix** dragged in, which is
 where complexity actually enters: someone just told you something was wrong, and the fastest way to
@@ -77,8 +77,20 @@ look responsive is to add.
   built-in flag, `-d` instead of `-D` — before defending the clever one.
 - **What outcome dies if this code is deleted?** Not what it does — what dies. No answer is an answer.
 
-State the line ratio. If you added more than you deleted, justify it in one sentence. A fix pass that
-only grows is a loop wearing the costume of progress.
+Then judge the shape, because that is what you actually live with:
+
+- **Concepts, not lines.** Did the count of things a reader must hold go down? Replacing six metadata
+  checks with one built-in flag is a real win; compressing ten lines of prose into five is cosmetic.
+  Both look identical on a diffstat.
+- **Can one path be traced start to finish without jumping?** If executing step 3 means reading two
+  other sections, the structure is wrong however tight the wording.
+- **Is cause near effect?** A guard three files from the thing it guards is a defect with good
+  intentions.
+- **One home per fact.** If you fixed something in two places, you now have two things to keep true.
+
+**Line count is a smell, never a target.** A shrinking diff that tangles the flow is worse than a
+growing one that untangles it — you can read a long straight path, you cannot read a short knot. If
+the only defence of a change is that it removed lines, it has no defence.
 
 ---
 

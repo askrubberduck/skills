@@ -51,4 +51,8 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
   add code, so every fix pass starts with "would deleting this end the finding?" and every unit asks
   what outcome dies if the code is not written. The most reliable code is the code never written;
   that is the spirit, not a tiebreaker for close calls.
+- **Judge the shape, not the diffstat.** Fewer lines is a smell, not a goal. What compounds is how
+  many concepts a reader holds, whether one path traces without jumping, whether cause sits near
+  effect, and whether each fact has one home. A short knot costs more than a long straight path, and
+  the line metric scores the knot as the win — which is exactly why it cannot be the target.
 - Record deferrals and owner decisions in the project's registry (never silently drop).

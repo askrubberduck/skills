@@ -215,6 +215,9 @@ temporary directories during self-test.
   done the whole job for twenty years.
 - **Cut before add** — every finding list treats "delete this" as first-class; every sweep's product
   is deletions. A fix pass that only grows is a loop wearing the costume of progress.
+- **Concepts, not lines** — line count is a smell, never a target. What compounds is how many things
+  a reader must hold, whether one path traces without jumping, whether cause sits near effect. A
+  short knot costs more than a long straight path, and a diffstat scores the knot as the win.
 - **Absolute paths, no `cd` chains** — path boilerplate was the #2 token sink in the sessions these
   skills came from.
 - **Grep-first, delegate large reads** — no >20KB file pulls into the main context; page with

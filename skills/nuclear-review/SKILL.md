@@ -63,8 +63,10 @@ gates converge in far fewer rounds when the red team co-authored the plan.
      built-in flag, a human decision. Measured case: a branch-deletion rule took six rounds and six
      demonstrated false positives across two reviewer families, growing 3 lines to 25, before anyone
      noticed `git branch -d` had done the whole job since 2005.
-   - **Watch the ledger.** A fix pass that adds more lines than it deletes, round after round, is a
-     loop, not convergence. Say the ratio out loud in the round's receipt.
+   - **Count concepts, not lines.** Each round, say what a reader must now hold that they didn't
+     before — a new branch, a new exception, a new place the same fact lives. That number rising every
+     round is the loop; a diffstat is not. Shrinking a diff while tangling the flow is a loss, and it
+     is the loss a line metric scores as a win.
    - On deletion-heavy diffs, check the diff prefix char + post-change file before accepting a
      "fact destroyed" finding — context lines and moved facts are common false BLOCKERs.
    - Family disagreement about framework internals → settle by reading the dependency source, not by vote.
