@@ -13,7 +13,7 @@ from typing import Any, Callable
 
 
 EXPECTED_NAME = "askrubberduck"
-EXPECTED_VERSION = "0.4.5"
+EXPECTED_VERSION = "0.4.6"
 EXPECTED_PLUGIN_DESCRIPTION = "Plan, challenge, ship, and clean up complex work"
 EXPECTED_SKILLS = {
     "nuclear-break",
@@ -120,7 +120,7 @@ README_MARKERS = (
     "agents/openai.yaml",
     "Start a new Codex session",
     "Start a new host session",
-    "v0.4.5",
+    "v0.4.6",
 )
 
 
