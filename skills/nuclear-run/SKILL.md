@@ -24,7 +24,9 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
 4. **Execute on green.** Use the host's native staged or multi-agent orchestration when available;
    otherwise execute the settled stages sequentially. Route mechanical stages (investigation,
    scripted edits, rebases, clerical verification, recording) to a cheaper capable worker only when
-   the host exposes trustworthy per-stage routing. Keep adversarial review, synthesis, and
+   the host exposes trustworthy per-stage routing — trustworthy means the worker's model is
+   pinnable, its self-report verifiable, and its output lands in a gated verification stage; fail
+   any of the three and the stage runs on the inherited model. Keep adversarial review, synthesis, and
    trust-critical work on the strongest available tier; otherwise inherit the current model.
    TDD for code units: failing test first, minimal pass, then simplify.
 5. **Ponytail lens throughout.** Delete before add; stdlib/existing helper before new code; smallest
@@ -38,7 +40,8 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
 6. **Verify.** Run the project's gates (tests/build/vet or doc gates), then invoke
    `nuclear-proof`
    on your own diff — it leaves `proof-<unit>.md`, or `$SP/proof-r1.md` when stage 7's review is
-   next, which is where the gate looks; no file, no proof pass happened. Trust-touching
+   next (`$SP`: `nuclear-review`'s dispatch scratchpad), which is where the gate looks; no file, no
+   proof pass happened. Trust-touching
    work additionally gets the `nuclear-break` attacks executed before the gate. Evidence over
    assertion — a failed or unrun check means not done; say so with output.
 7. **Independent review.** Never self-approve. Use the project's review policy — default: the

@@ -25,7 +25,8 @@ driver once this bootstrap ends.
    been planned, whatever the roster says. Read the committed plan, never the scratchpad: a driver
    wakes in a new session and the scratchpad is already gone.
 5. **Launch builds in parallel worktrees** (`.worktrees/<task>/` — never the shared checkout), cheap
-   executor agents for mechanical slices, one session per packet. Apply `nuclear-diet`
+   executor agents for mechanical slices only — trust-critical slices stay on the strongest
+   available tier (`nuclear-run`'s routing rule) — one session per packet. Apply `nuclear-diet`
    rules to the fleet: batched agent traffic, per-stage routing, no raw output in context.
    Where the host has no subagents, worktrees, or scheduler, run the same packets sequentially in one
    session — the sequencing is the method; parallelism is only how a capable host spends it faster.

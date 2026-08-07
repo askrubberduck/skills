@@ -29,7 +29,9 @@ case"** — unmerged work gets an explicit merge-or-delete decision, not a repri
    exist in exactly one place by definition. Then `git worktree remove <path>`, `git branch -D
    <branch>`, and `git worktree prune` for leftovers.
 4. Scratch dirs: hunt ad-hoc temp dirs outside the sanctioned scratchpad (e.g. `~/<repo>-tmp*`,
-   `/tmp/<repo>*`, review-tmp dirs) and remove them with the same verify-then-delete discipline.
+   `/tmp/<repo>*`, review-tmp dirs). Merge evidence does not exist for a non-git dir, so the verify
+   is step 3's in spirit: list contents recursively first, and any file living nowhere else gets an
+   explicit keep-or-delete decision before `rm`.
 5. `.gitignore` audit: worktree dirs (`.worktrees/`), build output, and local-config paths present
    and ignored; `git status --ignored` sanity check.
 

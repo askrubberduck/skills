@@ -109,8 +109,10 @@ And when it survives you: you are still the doer, not the judge. Trust-touching 
 
 Write what you checked and what you found to `proof-<unit>.md` beside the work — for a review round
 that means the dispatch scratchpad, `$SP/proof-rN.md`, exactly where `nuclear-review` looks; for
-anything else, the packet. Two lines per item is enough: what you attacked,
-what survived, what you fixed. "Nothing found" is a legitimate receipt; no receipt is not.
+anything else, the packet. Enumerate all six sections above, one line each: what you attacked, what
+survived, what you fixed — a section you skipped is named as skipped, never omitted. "Nothing found"
+is a legitimate receipt; no receipt is not, and `nuclear-review` hands the receipt to the reviewer,
+so a hollow one draws its own finding.
 
 An unwritten pass is indistinguishable from a skipped one. Callers that gate on it check for the
 file, not for your confidence: `nuclear-review` blocks every re-dispatch after a fix pass on

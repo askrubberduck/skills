@@ -16,11 +16,14 @@ the other families co-author cut it to 4 and deleted 2 of 4 work items as no-cod
    reviewer CLIs to PRODUCE plans, not review one**: "author the safest build plan, the task
    decomposition, and the traps you'd attack", with the design + seam map provided. At least one
    required co-author must be from a different model family than the doer; a same-family session
-   may add evidence but never counts as decorrelated. Verify each CLI's self-reported model instead
+   may add evidence but never counts as decorrelated. Each required co-author runs the strongest
+   available tier of its family (`nuclear-review`'s reviewer rule — family buys independence, tier
+   buys rigor). Verify each CLI's self-reported model instead
    of inferring family from the executable name. Use the dispatch mechanics, neutral cwd,
    absolute-path/background rules, and model-pinning safeguards from
    `nuclear-review`.
-   Raw plans land as `$SP/plan-<family>.md` — scratchpad only, never committed. **No files, no
+   Raw plans land as `$SP/plan-<family>.md` (`$SP` = the dispatch scratchpad `nuclear-review`
+   defines) — scratchpad only, never committed. **No files, no
    co-authorship** — a synthesis without a proven different-family plan is a solo draft wearing the
    word "synthesized".
 3. **Synthesize** the independent plans + your own analysis into ONE plan. Reconcile

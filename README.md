@@ -153,6 +153,8 @@ flowchart LR
     review --> land
     cut --> decide
     roast -.-> decide
+    roast -.-> plan
+    land -.-> decide
     land -.-> sweep
     campaign -.-> sweep
     learn -.-> proof

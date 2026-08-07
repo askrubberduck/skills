@@ -17,14 +17,17 @@ gates converge in far fewer rounds when the red team co-authored the plan.
    Review the **committed object** (`git show <sha>:path`) or the correct worktree — never a stale
    main checkout or dirty tree; both families produce false rejects from wrong snapshots.
 2. Record the doer's self-reported model family, then select reviewers relative to it. At least one
-   required reviewer must self-report a different model family. Executable names are not proof:
+   required reviewer must self-report a different model family, and each required reviewer runs the
+   **strongest available tier of its family** — decorrelation buys independence, tier buys rigor;
+   two weak families still approve junk. Executable names are not proof:
    `agy` can host Gemini, Claude, or other models, and a nested `codex` session remains same-family
    when the doer is OpenAI/GPT. Unknown identity never counts as decorrelated.
 3. **Before round 1, not only before re-dispatch**: invoke `nuclear-proof` on the diff and write
    `$SP/proof-r1.md`; on packet-sized **or trust-touching** work — the same scope that required
    planning above — confirm the committed plan carries its `nuclear-plan` co-authorship line. **No receipt, no dispatch — at every round.** A first round is the round most
    likely to burn 45 minutes on defects the doer could have found in five.
-4. Write one prompt to the session scratchpad: the diff/design, acceptance criteria, and
+4. Write one prompt to the session scratchpad: the diff/design, acceptance criteria, the round's
+   `proof-rN.md` (a perfunctory receipt is itself a finding), and
    "verdict line required: APPROVE | REJECT | APPROVE-W-CONDITIONS, with findings list".
    Reviewer default: refute, not bless.
 5. Run from a **neutral cwd** (scratchpad, never the repo — reviewers can derail when launched in
