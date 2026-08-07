@@ -6,7 +6,9 @@ description: Clean stale branches, worktrees, checkouts, scratch directories, an
 # Worktree and Branch Hygiene Sweep
 
 Multi-repo cleanup with a hard rule: **verify merged before delete, and keep nothing "just in
-case"** — unmerged work gets an explicit merge-or-delete decision, not a reprieve.
+case"** — unmerged work gets an explicit merge-or-delete decision, not a reprieve. One
+preservation invariant covers every deletion path: an entry marked **keep** relocates to its
+durable home and is verified there before its container is removed.
 
 ## Sweep per repo
 
@@ -26,12 +28,14 @@ case"** — unmerged work gets an explicit merge-or-delete decision, not a repri
    `git status --short --untracked-files=all --ignored`. Plain `git status` hides ignored files, so
    `git worktree remove` exits 0 and takes the `.env`, local config, or credentials living there with
    it. Any `??` or `!!` entry gets an explicit keep-or-delete decision before removal — those files
-   exist in exactly one place by definition. Then `git worktree remove <path>`, `git branch -D
+   exist in exactly one place by definition; the preservation invariant applies. Then — only once
+   nothing in the worktree remains marked keep — `git worktree remove <path>`, `git branch -D
    <branch>`, and `git worktree prune` for leftovers.
 4. Scratch dirs: hunt ad-hoc temp dirs outside the sanctioned scratchpad (e.g. `~/<repo>-tmp*`,
-   `/tmp/<repo>*`, review-tmp dirs). Merge evidence does not exist for a non-git dir, so the verify
-   is step 3's in spirit: list contents recursively first, and any file living nowhere else gets an
-   explicit keep-or-delete decision before `rm`.
+   `/tmp/<repo>*`, stray review-tmp dirs; the sanctioned scratchpad itself is disposable by design
+   and never swept per-file). A non-git dir has no merge evidence, so inventory every entry
+   including dotfiles (`ls -laR`), decide keep-or-delete per entry — unknown means keep. The
+   preservation invariant applies; `rm -rf` the dir only when nothing in it remains marked keep.
 5. `.gitignore` audit: worktree dirs (`.worktrees/`), build output, and local-config paths present
    and ignored; `git status --ignored` sanity check.
 

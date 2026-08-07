@@ -20,8 +20,12 @@ work even starts. Both diets here; the product of the audit is deletions.
 3. **Grep-first; delegate big reads.** Nothing >20KB into the main context: page with offset/limit,
    or send an investigator subagent that returns a summary. Main context is the most expensive place
    to store a file.
-4. **Route by stage, both model AND agent type.** Mechanical work → cheap-model executor agents;
-   general-purpose + strong model only for adversarial/synthesis/trust stages.
+4. **Route by stage, both model AND agent type.** Mechanical work (investigation, scripted edits,
+   rebases, clerical verification, recording) goes to cheap-model executor agents, only with a
+   pinned model whose self-report is verified and a named check that catches the stage's failure —
+   executed and its result recorded before the stage's output is used. Trust-touching work is
+   never mechanical, whatever the stage type. Adversarial, synthesis, and trust-touching stages
+   get general-purpose agents on the strongest tier; everything else inherits the current model.
 5. **Batch agent traffic.** Poll teammates at round boundaries; never relay no-op idle pings into the
    coordinator context. Compress subagent output contracts ("return table, no prose").
 6. **Raw output stays out of git and out of context.** CLI stdout, logs, diffs: extract the decisive

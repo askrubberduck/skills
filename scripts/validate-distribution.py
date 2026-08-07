@@ -13,7 +13,7 @@ from typing import Any, Callable
 
 
 EXPECTED_NAME = "askrubberduck"
-EXPECTED_VERSION = "0.4.7"
+EXPECTED_VERSION = "0.4.8"
 EXPECTED_PLUGIN_DESCRIPTION = "Plan, challenge, ship, and clean up complex work"
 EXPECTED_SKILLS = {
     "nuclear-break",
@@ -64,8 +64,15 @@ REQUIRED_CONTRACTS = {
         "run `nuclear-plan` BEFORE building",
         "Ask what the code is for before you patch it",
         "The growth ratchet",
+        "tier buys rigor",
+        "Record the pinned model id",
+        "never a coverage map",
     ),
-    "nuclear-proof": ("proof-<unit>.md", "blocks every re-dispatch after a fix pass"),
+    "nuclear-proof": (
+        "proof-<unit>.md",
+        "blocks every re-dispatch after a fix pass",
+        "citing its artifact",
+    ),
     "nuclear-break": (
         "break-rN.md",
         "the suite MUST go red",
@@ -97,6 +104,7 @@ REQUIRED_CONTRACTS = {
         "a narrower promise than its name",
         "Do not build a cleverer classifier",
         "--untracked-files=all --ignored",
+        "unknown means keep",
     ),
     "nuclear-run": (
         "proof-<unit>.md",
@@ -104,7 +112,10 @@ REQUIRED_CONTRACTS = {
         "A turn may end for exactly four reasons",
         "an external block",
         "Anything else: keep going",
+        "re-checks its output",
     ),
+    "nuclear-diet": ("a named check that catches the stage's failure",),
+    "nuclear-learn": ("an occurrence it was NOT derived from",),
 }
 README_MARKERS = (
     "codex plugin marketplace add askrubberduck/skills",
@@ -120,7 +131,7 @@ README_MARKERS = (
     "agents/openai.yaml",
     "Start a new Codex session",
     "Start a new host session",
-    "v0.4.7",
+    "v0.4.8",
 )
 
 

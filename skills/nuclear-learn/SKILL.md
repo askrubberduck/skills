@@ -30,9 +30,14 @@ or gets consciously discarded. Lessons that live only in a chat transcript are l
    One occurrence → park it as a note in the nearest existing home, not a new artifact.
 4. **Apply the updates** — write the skill/memory/rule edit now, not a recommendation to write it.
    While in each home, delete what the new lesson supersedes; stale guidance is worse than none.
-5. **Close the loop**: new or edited guidance gets one rep before it's trusted — run it once
-   against a real case from the evidence that spawned it, then attack the result with
-   `nuclear-proof` discipline. Guidance that has never fired is a draft, not a lesson.
+5. **Close the loop**: procedural guidance (a skill, a workflow rule) gets one rep before it's
+   trusted — reserve one occurrence as a holdout BEFORE deriving (derive from the rest; deriving
+   from every occurrence leaves nothing to test with), state the expected outcome, then run the
+   guidance against that holdout — an occurrence it was NOT derived from — and attack the result
+   with `nuclear-proof` discipline; a failed rep sends the guidance back to draft.
+   Directive-derived guidance (step 3's owner-directive path) has no occurrence to reserve — it
+   stays draft until its first real occurrence, which serves as its holdout rep. Memory entries
+   instead record their source occurrence. Guidance that has never fired is a draft, not a lesson.
 
 ## Common mistakes
 

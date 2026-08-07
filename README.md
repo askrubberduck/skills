@@ -161,7 +161,8 @@ flowchart LR
 ```
 
 Solid arrows: the delivery pipeline (discover → plan/build → verify/attack → gate → ship).
-Dotted: supporting handoffs. `nuclear-roast` critiques the whole standing solution,
+Dotted: supporting handoffs. The graph is illustrative — skill bodies are the reference for
+every handoff. `nuclear-roast` critiques the whole standing solution,
 `nuclear-learn` feeds session lessons back into skills and memory, `nuclear-diet` keeps every
 stage cheap.
 
@@ -240,7 +241,7 @@ frontmatter metadata.
 
 ## Status
 
-v0.4.7 — 14 skills. Per-version notes live in
+v0.4.8 — 14 skills. Per-version notes live in
 [Releases](https://github.com/askrubberduck/skills/releases).
 
 Every rule in these skills is here because something measurably failed without it, mined from real

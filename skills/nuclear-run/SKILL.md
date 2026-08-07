@@ -22,12 +22,10 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
    missing edge cases, simpler design that deletes a concept. Default the critic toward refute, use
    the strongest available tier, fold findings, loop until the plan survives.
 4. **Execute on green.** Use the host's native staged or multi-agent orchestration when available;
-   otherwise execute the settled stages sequentially. Route mechanical stages (investigation,
-   scripted edits, rebases, clerical verification, recording) to a cheaper capable worker only when
-   the host exposes trustworthy per-stage routing — trustworthy means the worker's model is
-   pinnable, its self-report verifiable, and its output lands in a gated verification stage; fail
-   any of the three and the stage runs on the inherited model. Keep adversarial review, synthesis, and
-   trust-critical work on the strongest available tier; otherwise inherit the current model.
+   otherwise execute the settled stages sequentially. Route stages per `nuclear-diet` rule 4 —
+   the full cheap-routing precondition lives there; stage 6 additionally re-checks its output
+   (a record is checked by reading it back); any unmet precondition runs the stage on the
+   inherited model.
    TDD for code units: failing test first, minimal pass, then simplify.
 5. **Ponytail lens throughout.** Delete before add; stdlib/existing helper before new code; smallest
    diff after full understanding. Simplify touched code before building on it; clear superseded paths

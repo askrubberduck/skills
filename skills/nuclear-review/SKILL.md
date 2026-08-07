@@ -13,13 +13,25 @@ gates converge in far fewer rounds when the red team co-authored the plan.
 
 ## Dispatch
 
+`$SP` is this dispatch's scratchpad: an absolute path under the host's sanctioned scratchpad root
+(e.g. `<scratchpad-root>/<topic>-review`), created before step 1; every artifact below lands there.
+**Trust-touching** — one spelling, collection-wide — means security-, privacy-, or data-sensitive
+work, or a change to any gate's semantics.
+
 1. Resolve target into review material: `gh pr diff <N>` / packet draft / `git diff <ref>`.
    Review the **committed object** (`git show <sha>:path`) or the correct worktree — never a stale
    main checkout or dirty tree; both families produce false rejects from wrong snapshots.
 2. Record the doer's self-reported model family, then select reviewers relative to it. At least one
    required reviewer must self-report a different model family, and each required reviewer runs the
-   **strongest available tier of its family** — decorrelation buys independence, tier buys rigor;
-   two weak families still approve junk. Executable names are not proof:
+   **strongest tier of its family the host lists and you can pin** — decorrelation buys
+   independence, tier buys rigor; two weak families still approve junk. Record the pinned model id
+   and the listing that ranked it (the command and its output) beside each verdict — a pinned id
+   alone proves what ran, not that nothing stronger was listed. A dispatch that had to fall back
+   below that tier is recorded as downgraded, with the failed stronger dispatch as its evidence —
+   a downgraded verdict is a lesser reviewer, never an outage (step 8's outage still means no
+   verdict at all), and it never closes the gate: the gate waits for a strongest-tier verdict, or
+   the owner's recorded acceptance of the downgrade. Executable
+   names are not proof:
    `agy` can host Gemini, Claude, or other models, and a nested `codex` session remains same-family
    when the doer is OpenAI/GPT. Unknown identity never counts as decorrelated.
 3. **Before round 1, not only before re-dispatch**: invoke `nuclear-proof` on the diff and write
@@ -27,7 +39,9 @@ gates converge in far fewer rounds when the red team co-authored the plan.
    planning above — confirm the committed plan carries its `nuclear-plan` co-authorship line. **No receipt, no dispatch — at every round.** A first round is the round most
    likely to burn 45 minutes on defects the doer could have found in five.
 4. Write one prompt to the session scratchpad: the diff/design, acceptance criteria, the round's
-   `proof-rN.md` (a perfunctory receipt is itself a finding), and
+   receipt from step 3 — attached as the doer's claim to attack, never a coverage map, and a
+   receipt whose sections lack artifacts or skip reasons is itself a finding that blocks APPROVE —
+   the break receipt (step 10) when the work is trust-touching, and
    "verdict line required: APPROVE | REJECT | APPROVE-W-CONDITIONS, with findings list".
    Reviewer default: refute, not bless.
 5. Run from a **neutral cwd** (scratchpad, never the repo — reviewers can derail when launched in
@@ -35,9 +49,9 @@ gates converge in far fewer rounds when the red team co-authored the plan.
    everywhere. Choose only reviewers whose model identity you can verify. Example CLI forms:
    ```bash
    SP=<scratchpad>/<topic>-review
-   # Count this as decorrelated only when the doer is not from the OpenAI/GPT family.
-   codex exec --skip-git-repo-check "$(cat $SP/prompt.md)" </dev/null > $SP/codex-rN.out 2>&1
-   # Pin an available model from a family different from the doer and verify the self-report.
+   # Decorrelated only when the doer is not OpenAI/GPT; pin the strongest model codex lists.
+   codex exec -m "<strongest-listed-model>" --skip-git-repo-check "$(cat $SP/prompt.md)" </dev/null > $SP/codex-rN.out 2>&1
+   # Pin the strongest listed model from a family different from the doer; verify the self-report.
    agy --model "<verified-non-doer-model>" --add-dir "$SP" --print-timeout 45m \
        -p "Read $SP/header.md (task) and $SP/change.diff (full diff). ..." \
        </dev/null > $SP/agy-rN.out 2>&1
