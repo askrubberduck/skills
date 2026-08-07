@@ -74,7 +74,9 @@ look responsive is to add.
 - **Would deleting something have ended the finding instead?** Six patched false positives in one
   rule is not a hardened rule, it's a rule that shouldn't exist.
 - **Did you hand-roll what the platform ships?** Grep for the boring version — the stdlib call, the
-  built-in flag, `-d` instead of `-D` — before defending the clever one.
+  built-in flag — before defending the clever one. Then **prove what the built-in actually
+  guarantees**: `git branch -d` looks like "refuses unmerged branches" and means "merged into HEAD or
+  upstream", which is a different promise. Reaching for the boring version is half the work.
 - **What outcome dies if this code is deleted?** Not what it does — what dies. No answer is an answer.
 
 Then judge the shape, because that is what you actually live with:

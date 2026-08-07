@@ -12,18 +12,21 @@ case"** — unmerged work gets an explicit merge-or-delete decision, not a repri
 
 1. Inventory: `git worktree list`, `git branch -vv`, `git fetch --prune` first so remote state is
    current. Use absolute paths; don't cd back and forth.
-2. Classify with **`git branch -d`** — git's own safe delete. Never reach for `-D` here.
-   - **It deletes** → the branch was fully merged; its commits live in the default branch's history
-     and outlive the ref. Done.
-   - **It refuses** (`not fully merged`) → squash-merged, rebased, cherry-picked, or genuinely
-     unmerged. Open the work item, decide merge-or-delete on its state, record the decision, and only
-     then `-D`.
+2. Classify with `git branch --merged origin/<default>`, delete with **`git branch -d`**, never `-D`.
+   **Both halves are load-bearing.** `-d` alone tests merged-into-**HEAD-or-upstream**, not into the
+   default branch: standing on a feature branch that happens to contain the work, `-d` deletes a
+   branch that never reached the default branch at all (reproduced — `git branch -d feature` succeeds
+   from an `integration` branch while `main` has none of it). `--merged origin/<default>` pins the
+   reference; `-d` is the safe delete that refuses anything that reference misses.
+   - **Listed and `-d` succeeds** → the commits are ancestors of the default branch and outlive the
+     ref. Done.
+   - **Not listed, or `-d` refuses** → squash-merged, rebased, cherry-picked, or genuinely unmerged.
+     Open the work item, decide merge-or-delete on its state, record the decision, then `-D`.
 
    Do not build a cleverer classifier. Six were tried and each had a demonstrated counter-example:
    name-matched PRs, `git cherry` (patch-ids normalize whitespace), empty tree diffs, PRs merged into
-   an unmerged parent, reverted squash merges, and revert-message greps. `-d` encodes the one thing
-   that is actually decidable, and routes everything else to a human decision — which is the correct
-   answer, not a fallback.
+   an unmerged parent, reverted squash merges, and revert-message greps. The built-in pair decides the
+   one thing that is decidable and routes the rest to a human — which is the answer, not a fallback.
 3. Delete — **but check the worktree for untracked and ignored files first**:
    `git status --short --untracked-files=all --ignored`. Plain `git status` hides ignored files, so
    `git worktree remove` exits 0 and takes the `.env`, local config, or credentials living there with

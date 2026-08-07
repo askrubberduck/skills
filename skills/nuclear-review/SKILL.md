@@ -61,7 +61,8 @@ gates converge in far fewer rounds when the red team co-authored the plan.
    - **The growth ratchet.** If one rule draws findings round after round, the rule is wrong, not
      under-patched. Stop fixing and ask what it is replacing that already works — a stdlib call, a
      built-in flag, a human decision. A branch-deletion rule here survived six rounds of patching
-     before anyone noticed `git branch -d` already did the whole job.
+     before anyone checked what `git branch --merged` and `-d` already decided — and then a seventh
+     pass to find that the built-in guarantees something narrower than it looks.
    - **Count concepts, not lines.** Each round, say what a reader must now hold that they didn't
      before — a new branch, a new exception, a new place the same fact lives. That number rising every
      round is the loop; a diffstat is not. Shrinking a diff while tangling the flow is a loss, and it

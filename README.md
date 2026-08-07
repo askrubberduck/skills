@@ -211,8 +211,10 @@ temporary directories during self-test.
 - **The most reliable code is the code never written** — the first move on any finding is "would
   deleting this end it?", not "how do I patch it". A reviewer optimises what you put in front of it
   and will never tell you the mechanism was unnecessary; that question is yours. One rule here took
-  six review rounds and six demonstrated false positives before anyone noticed `git branch -d` had
-  done the whole job for twenty years.
+  six review rounds and six demonstrated false positives before anyone checked what
+  `git branch --merged` and `-d` already decided — then a seventh pass to establish that the built-in
+  guarantees something narrower than it looks. Reach for the boring version first, then prove what it
+  actually promises.
 - **Cut before add** — every finding list treats "delete this" as first-class; every sweep's product
   is deletions. A fix pass that only grows is a loop wearing the costume of progress.
 - **Concepts, not lines** — line count is a smell, never a target. What compounds is how many things
@@ -234,7 +236,7 @@ frontmatter metadata.
 
 ## Status
 
-v0.4.4 — 14 skills. Per-version notes live in
+v0.4.5 — 14 skills. Per-version notes live in
 [Releases](https://github.com/askrubberduck/skills/releases).
 
 Every rule in these skills is here because something measurably failed without it, mined from real
