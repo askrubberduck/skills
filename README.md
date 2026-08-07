@@ -208,8 +208,13 @@ temporary directories during self-test.
 - **The doer is never the final judge** — every gate is decorrelated; a self-pass earns the
   dispatch, never the approval.
 - **Evidence over assertion** — a claim without output is not done; an empty result is never success.
+- **The most reliable code is the code never written** — the first move on any finding is "would
+  deleting this end it?", not "how do I patch it". A reviewer optimises what you put in front of it
+  and will never tell you the mechanism was unnecessary; that question is yours. One rule here took
+  six review rounds and six demonstrated false positives before anyone noticed `git branch -d` had
+  done the whole job for twenty years.
 - **Cut before add** — every finding list treats "delete this" as first-class; every sweep's product
-  is deletions.
+  is deletions. A fix pass that only grows is a loop wearing the costume of progress.
 - **Absolute paths, no `cd` chains** — path boilerplate was the #2 token sink in the sessions these
   skills came from.
 - **Grep-first, delegate large reads** — no >20KB file pulls into the main context; page with
@@ -226,7 +231,7 @@ frontmatter metadata.
 
 ## Status
 
-v0.4.1 — 14 skills. Per-version notes live in
+v0.4.2 — 14 skills. Per-version notes live in
 [Releases](https://github.com/askrubberduck/skills/releases).
 
 Every rule in these skills is here because something measurably failed without it, mined from real

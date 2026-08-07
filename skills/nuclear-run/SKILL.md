@@ -47,4 +47,8 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
   no owner input, run it. Handing an already-made plan back for a "go" is how an autonomous run
   becomes a manual one — it cost ~60 stalled turns in one week of campaign work.
 - Ambiguous scope → cut it; don't add complexity for hypothetical edge cases.
+- **A finding is not a work order.** Under review pressure the fastest way to look responsive is to
+  add code, so every fix pass starts with "would deleting this end the finding?" and every unit asks
+  what outcome dies if the code is not written. The most reliable code is the code never written;
+  that is the spirit, not a tiebreaker for close calls.
 - Record deferrals and owner decisions in the project's registry (never silently drop).

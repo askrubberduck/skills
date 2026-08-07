@@ -12,33 +12,18 @@ case"** — unmerged work gets an explicit merge-or-delete decision, not a repri
 
 1. Inventory: `git worktree list`, `git branch -vv`, `git fetch --prune` first so remote state is
    current. Use absolute paths; don't cd back and forth.
-2. Classify each branch/worktree:
-   - **Merged normally** → `git branch --merged origin/<default>`. The commits reachable from the
-     branch tip are ancestors of the default branch, so **they stay reachable after the ref is gone**
-     — even a later revert cannot lose them, since the objects live in the default branch's own
-     history. One exception, and it is not hypothetical: a branch **reset backwards** still satisfies
-     `--merged`, while the commits it was reset away from survive only in its reflog, which
-     `git branch -D` destroys. If `git reflog show <branch>` holds commits above the tip, decide
-     explicitly instead of deleting.
-   - **Squash-merged, rebased, or cherry-picked** → `--merged` misses these: the default branch holds
-     an equivalent *new* commit, so the branch's own commits go unreachable when the ref does.
-     **Losing them is the intent of a squash merge — what must survive is the content, not the
-     granular history.** Delete automatically only when all three hold:
-     - the PR merged with **base == the default branch** (`gh pr view --json baseRefName,headRefOid`);
-       merged into an unmerged parent it proves nothing about the default branch;
-     - `headRefOid` **equals the branch tip** — otherwise the branch gained commits after that merge,
-       or the name was reused;
-     - **the content is still there**: `git diff origin/<default>..<branch>` adds nothing the default
-       tree lacks. A reverted squash merge fails exactly here, which is the point — ancestry stays
-       true after a revert, content does not.
-     Any of the three failing → the Unmerged path below: decide explicitly and record it.
-     Accepted trade, stated once: this deliberately discards intermediate commits, and a branch that
-     added a file then reverted it *within its own history* diffs clean and gets deleted. That
-     history is what a squash merge exists to drop.
-     `git cherry` remains a **hint, never authorization** — patch-ids normalize whitespace, so
-     upstream `value = "a b"` versus branch `value = "ab"` reads as contained while the trees differ.
-   - **Unmerged** → open the work item it belongs to; decide merge-or-delete on its state
-     (superseded/abandoned = delete; live = finish or hand off). Record the decision.
+2. Classify with **`git branch -d`** — git's own safe delete. Never reach for `-D` here.
+   - **It deletes** → the branch was fully merged; its commits live in the default branch's history
+     and outlive the ref. Done.
+   - **It refuses** (`not fully merged`) → squash-merged, rebased, cherry-picked, or genuinely
+     unmerged. Open the work item, decide merge-or-delete on its state, record the decision, and only
+     then `-D`.
+
+   Do not build a cleverer classifier. Six were tried and each had a demonstrated counter-example:
+   name-matched PRs, `git cherry` (patch-ids normalize whitespace), empty tree diffs, PRs merged into
+   an unmerged parent, reverted squash merges, and revert-message greps. `-d` encodes the one thing
+   that is actually decidable, and routes everything else to a human decision — which is the correct
+   answer, not a fallback.
 3. Delete — **but check the worktree for untracked and ignored files first**:
    `git status --short --untracked-files=all --ignored`. Plain `git status` hides ignored files, so
    `git worktree remove` exits 0 and takes the `.env`, local config, or credentials living there with

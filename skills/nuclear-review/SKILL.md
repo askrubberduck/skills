@@ -49,9 +49,22 @@ gates converge in far fewer rounds when the red team co-authored the plan.
 
 ## Adjudicate
 
-6. Parse every verdict. Per finding: **fix**, **reject with recorded reason**, or **escalate** to the
-   owner (queue in the repo's obligations registry if it has one; present queued decisions via
-   `nuclear-decide`).
+6. Parse every verdict. Per finding there are **four** dispositions, and fixing is not the default:
+   **delete the thing the finding is about**, **fix**, **reject with recorded reason**, or
+   **escalate** to the owner (queue in the repo's obligations registry if it has one; present queued
+   decisions via `nuclear-decide`).
+   - **Ask what the code is for before you patch it.** A finding says "this is broken"; it does not
+     say the thing should exist. The most reliable code is the code never written, so the first
+     question on every finding is whether deleting the feature, flag, branch, or check ends the
+     finding outright. A reviewer optimises what you put in front of it — it will not tell you the
+     whole mechanism was unnecessary.
+   - **The growth ratchet.** If one rule draws findings round after round, the rule is wrong, not
+     under-patched. Stop fixing and ask what it is replacing that already works — a stdlib call, a
+     built-in flag, a human decision. Measured case: a branch-deletion rule took six rounds and six
+     demonstrated false positives across two reviewer families, growing 3 lines to 25, before anyone
+     noticed `git branch -d` had done the whole job since 2005.
+   - **Watch the ledger.** A fix pass that adds more lines than it deletes, round after round, is a
+     loop, not convergence. Say the ratio out loud in the round's receipt.
    - On deletion-heavy diffs, check the diff prefix char + post-change file before accepting a
      "fact destroyed" finding — context lines and moved facts are common false BLOCKERs.
    - Family disagreement about framework internals → settle by reading the dependency source, not by vote.

@@ -13,7 +13,7 @@ from typing import Any, Callable
 
 
 EXPECTED_NAME = "askrubberduck"
-EXPECTED_VERSION = "0.4.1"
+EXPECTED_VERSION = "0.4.2"
 EXPECTED_PLUGIN_DESCRIPTION = "Plan, challenge, ship, and clean up complex work"
 EXPECTED_SKILLS = {
     "nuclear-break",
@@ -73,6 +73,9 @@ REQUIRED_CONTRACTS = {
         # REQUIRED_LINKS stores unique pairs, so a second mention masks deletion of the actual
         # invocation. The instruction itself has to be a contract.
         "run `nuclear-plan` BEFORE building",
+        # Fixing is not the default disposition; deleting the thing is.
+        "Ask what the code is for before you patch it",
+        "The growth ratchet",
     ),
     "nuclear-proof": ("proof-<unit>.md", "blocks every re-dispatch after a fix pass"),
     # A receipt without the attacks is a green suite wearing a certificate: protect every attack.
@@ -106,20 +109,13 @@ REQUIRED_CONTRACTS = {
         # branch-head precondition into a formality.
         "back through the review gate",
     ),
-    # Deleting a branch on a name match destroys commits added after the PR merged, and `git cherry`
-    # normalizes whitespace in patch-ids so it can bless a branch whose tree still differs.
-    # Reachability, not integration, is what makes deletion safe: a true-ancestor branch's objects
-    # survive in the default branch's history, a squash-merged branch's never entered it.
+    # `git branch -d` already refuses everything unsafe; six hand-rolled classifiers each had a
+    # demonstrated counter-example before anyone checked the flag.
     "nuclear-sweep": (
-        "they stay reachable after the ref is gone",
-        "what must survive is the content, not the granular history",
-        "base == the default branch",
-        "equals the branch tip",
-        "the content is still there",
-        "hint, never authorization",
-        # Two paths that destroy files no ref ever protected.
+        "Never reach for `-D` here",
+        "Do not build a cleverer classifier",
+        # The one path that destroys files no ref ever protected.
         "--untracked-files=all --ignored",
-        "reset backwards",
     ),
     "nuclear-run": (
         "proof-<unit>.md",
@@ -145,7 +141,7 @@ README_MARKERS = (
     "agents/openai.yaml",
     "Start a new Codex session",
     "Start a new host session",
-    "v0.4.1",
+    "v0.4.2",
 )
 
 

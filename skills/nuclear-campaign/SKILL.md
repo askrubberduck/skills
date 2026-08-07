@@ -14,6 +14,9 @@ driver once this bootstrap ends.
 1. **Survey** the repo's vision/delivery/decision docs plus open registries; scout the product code
    with read-only subagents. Output: a candidate list of shippable changes with evidence, not ideas.
 2. **Cut pass.** Argue against each candidate (speculative? superseded? mergeable?). Survivors only.
+   For each survivor, name the outcome that dies if it is never built — a candidate with no such
+   answer is a habit, not work. Re-run this pass whenever a packet grows mid-flight: the cut is a
+   standing lens, not a one-time gate at the survey.
 3. **Carve packets** — one packet per independently shippable change, in the repo's work-item
    convention (e.g. `docs/05-work/YYYY-MM-DD-topic/`). No mega-packet; if two changes can ship
    separately, they are two packets.
