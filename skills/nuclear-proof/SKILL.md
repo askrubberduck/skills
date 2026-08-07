@@ -67,21 +67,18 @@ Then ask yourself: "If the user screen-records themselves trying this and it fai
 
 ## 6. Now count what your fix ADDED.
 
-Every fix you just made is new code, and new code is new surface. Read the diff again with one
-question: **for each thing I added, would deleting something have ended the problem instead?**
+Section 1 asked whether you built what was asked. This asks what your **fix** dragged in, which is
+where complexity actually enters: someone just told you something was wrong, and the fastest way to
+look responsive is to add.
 
-- Did you patch a check that shouldn't exist? Six patched false positives in one rule is not a
-  hardened rule, it's a rule that shouldn't be there.
-- Did you hand-roll what the platform ships? The stdlib call, the built-in flag, the `-d` instead of
-  the `-D` — grep for the boring version before you defend the clever one.
-- Did you add a guard for a case the design could make impossible?
-- What is this code FOR? Not what does it do — what outcome dies if you delete it? If you can't name
-  the outcome, that's your answer.
+- **Would deleting something have ended the finding instead?** Six patched false positives in one
+  rule is not a hardened rule, it's a rule that shouldn't exist.
+- **Did you hand-roll what the platform ships?** Grep for the boring version — the stdlib call, the
+  built-in flag, `-d` instead of `-D` — before defending the clever one.
+- **What outcome dies if this code is deleted?** Not what it does — what dies. No answer is an answer.
 
-State the line ratio: if you added more than you deleted, say so and justify it in one sentence. A
-fix pass that only grows is a loop wearing the costume of progress. The most reliable code is the
-code never written, and that applies hardest to code written under review pressure — when someone
-just told you something was wrong and the fastest way to look responsive is to add.
+State the line ratio. If you added more than you deleted, justify it in one sentence. A fix pass that
+only grows is a loop wearing the costume of progress.
 
 ---
 

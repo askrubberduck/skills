@@ -43,16 +43,11 @@ is billed every turn of every session:
    cache integrity and broken symlinks in skill directories.
 2. **Always-loaded inventory**: user + project CLAUDE.md/AGENTS.md (follow `@includes`), memory
    index, enabled plugins. Estimate each block's size; rank by cost.
-3. **Usage cross-check**: inspect explicit session roots first, then add recognized default stores
-   unless the caller explicitly limits scope: Claude transcripts (`~/.claude/projects/<dir>/*.jsonl`)
-   and Codex transcripts (`$CODEX_HOME/sessions` and `$CODEX_HOME/archived_sessions`, default
-   `~/.codex/...`). Label each explicit root with its declared host; if none is supplied, infer from a
-   recognized schema or mark it `unknown`. Deduplicate only identical canonical paths or stable IDs
-   within the same host/schema — never merge unrelated hosts merely because IDs match. Do not follow
-   symlinks outside a selected root. A missing or malformed requested store makes the overall audit
-   **partial/incomplete**, never zero usage, while valid stores still proceed; if no recognized store
-   is available, stop and say so. Missing schema fields are `unavailable`, never estimated. Report
-   counts and metadata, not raw prompt content. Loaded-never-invoked for weeks = disable candidate.
+3. **Usage cross-check**: read the host's transcripts — Claude `~/.claude/projects/<dir>/*.jsonl`,
+   Codex `$CODEX_HOME/sessions` and `archived_sessions` — and count what each always-loaded block was
+   actually used for. Loaded-never-invoked for weeks = disable candidate. Report counts and metadata,
+   never raw prompt content. Can't find a store, or it's malformed? Say so and mark the audit
+   partial — a missing store is never zero usage.
 4. **Dedupe**: local memory files repeating checked-in CLAUDE.md facts — keep the checked-in copy,
    delete the memory. Same for AGENTS.md vs copilot-instructions duplication: one canonical file.
 5. **Trim to non-derivable**: a CLAUDE.md line earns its place only if a fresh session could NOT

@@ -10,18 +10,12 @@ or gets consciously discarded. Lessons that live only in a chat transcript are l
 
 ## Recipe
 
-1. **Gather evidence, don't reminisce.** Inspect explicit session roots first, then add recognized
-   default stores unless the caller explicitly limits scope: Claude transcripts
-   (`~/.claude/projects/<dir>/*.jsonl`) and Codex transcripts (`$CODEX_HOME/sessions` and
-   `$CODEX_HOME/archived_sessions`, default `~/.codex/...`) alongside recorded outcomes, review
-   trajectories, and token stats. Label evidence by its declared host; when an explicit root has no
-   label, infer from a recognized schema or mark it `unknown`. Deduplicate only identical canonical
-   paths or stable IDs within the same host/schema — never merge unrelated hosts merely because IDs
-   match. Do not follow symlinks outside the selected root. A missing, malformed, or unknown requested
-   store makes the overall result **partial/incomplete**, but valid stores still proceed; no recognized
-   store stops the transcript-mining path. Missing schema fields are `unavailable`, never estimated.
-   Extract counts and patterns without copying raw prompts into durable output. Big transcripts are
-   mined by script or subagent — never read raw into the main context.
+1. **Gather evidence, don't reminisce.** Session transcripts — Claude
+   `~/.claude/projects/<dir>/*.jsonl`, Codex `$CODEX_HOME/sessions` and `archived_sessions` —
+   alongside recorded outcomes, review trajectories, and token stats. Extract **counts**: repeated
+   directives, repeated failures, repeated tool patterns. Big transcripts are mined by script or
+   subagent, never read raw into the main context, and no raw prompt text goes into durable output.
+   Missing or malformed store? Say so and mark the result partial.
 2. **Classify each candidate lesson** by its durable home — one authoritative home per lesson:
    - Repeatable multi-step workflow **the user asks for in words** → a **skill** (new, or a section
      of an existing one — prefer extending; a new skill is a cost).

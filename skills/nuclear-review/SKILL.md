@@ -103,10 +103,9 @@ edit the same file. The gate stays singular: lanes fix, the coordinator re-dispa
 
 ## Optional lens: product fit
 
-On request ("critique product match and fit", "strategic scope review") run ONE extra round after
-correctness APPROVE, lens shifted: does the change fit the product's vision and scope, is anything
-shipped that should be cut, is the boundary drawn where users need it. Same dispatch mechanics, same
-verdict line. Findings weigh functionality/extendability/security — never build effort.
+On request, one extra round after correctness APPROVE with the lens shifted: does this fit the
+product's scope, what shipped that should be cut, is the boundary where users need it. Same
+mechanics; weigh functionality/extendability/security, never build effort.
 
 ## Record
 
