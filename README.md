@@ -208,13 +208,15 @@ temporary directories during self-test.
 - **The doer is never the final judge** — every gate is decorrelated; a self-pass earns the
   dispatch, never the approval.
 - **Evidence over assertion** — a claim without output is not done; an empty result is never success.
+- **Sceptical by default** — a reviewer finding is adjudicated against source, your own fix is
+  re-attacked, a built-in is trusted only for what it provably guarantees. The deadliest loop is
+  *obedient* patching: every round of "harden the wheel you invented" feels like progress, and the
+  only exit is the question no reviewer will ask for you — should this wheel exist at all?
 - **The most reliable code is the code never written** — the first move on any finding is "would
-  deleting this end it?", not "how do I patch it". A reviewer optimises what you put in front of it
-  and will never tell you the mechanism was unnecessary; that question is yours. One rule here took
-  six review rounds and six demonstrated false positives before anyone checked what
-  `git branch --merged` and `-d` already decided — then a seventh pass to establish that the built-in
-  guarantees something narrower than it looks. Reach for the boring version first, then prove what it
-  actually promises.
+  deleting this end it?", not "how do I patch it". One rule here took six review rounds and six
+  demonstrated false positives before anyone checked what `git branch --merged` and `-d` already
+  decided — then a seventh pass to establish that the built-in guarantees something narrower than it
+  looks. Reach for the boring version first, then prove what it actually promises.
 - **Cut before add** — every finding list treats "delete this" as first-class; every sweep's product
   is deletions. A fix pass that only grows is a loop wearing the costume of progress.
 - **Concepts, not lines** — line count is a smell, never a target. What compounds is how many things
