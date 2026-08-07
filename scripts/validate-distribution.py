@@ -93,7 +93,8 @@ REQUIRED_CONTRACTS = {
         "back through the review gate",
     ),
     "nuclear-sweep": (
-        "Both halves are load-bearing",
+        "delete only what is provably preserved elsewhere",
+        "a narrower promise than its name",
         "Do not build a cleverer classifier",
         "--untracked-files=all --ignored",
     ),

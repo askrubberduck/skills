@@ -16,9 +16,11 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
    Packet-sized or trust-touching: co-author the plan via `nuclear-plan` instead of
    drafting solo, and **do not enter stage 4 until the committed plan carries its co-authorship
    line** — an uncoauthored plan is the 19-round gate arriving later instead of now.
-3. **Critique (adversarial, pre-code).** Red-team the plan: wrong decomposition, missing edge cases,
-   simpler design that deletes a concept. Default the critic toward refute. Use an isolated judge
-   stage or reviewer session on the strongest available tier. Fold findings; loop until the plan survives.
+3. **Critique (adversarial, pre-code) — for solo-drafted plans only.** When `nuclear-plan` ran in
+   stage 2, its multi-round concurrence loop already **is** this stage; a second gate on a
+   co-authored plan is redundancy, not rigor. Otherwise: red-team the plan — wrong decomposition,
+   missing edge cases, simpler design that deletes a concept. Default the critic toward refute, use
+   the strongest available tier, fold findings, loop until the plan survives.
 4. **Execute on green.** Use the host's native staged or multi-agent orchestration when available;
    otherwise execute the settled stages sequentially. Route mechanical stages (investigation,
    scripted edits, rebases, clerical verification, recording) to a cheaper capable worker only when
