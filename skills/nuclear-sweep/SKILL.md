@@ -40,6 +40,4 @@ A deletion without stated merge evidence is not done.
 
 ## Common mistakes
 
-- Trusting `git branch --merged` on a squash-merge workflow — its misses are the #1 wrong-delete.
-- Deleting a worktree with uncommitted changes — `git status` inside it first; stash nothing, decide.
 - Cleaning only the repo you're in when the setup is multi-repo — sweep all sibling repos asked for.
