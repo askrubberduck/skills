@@ -240,7 +240,7 @@ frontmatter metadata.
 
 ## Status
 
-v0.4.6 — 14 skills. Per-version notes live in
+v0.4.7 — 14 skills. Per-version notes live in
 [Releases](https://github.com/askrubberduck/skills/releases).
 
 Every rule in these skills is here because something measurably failed without it, mined from real
