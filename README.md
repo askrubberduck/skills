@@ -77,10 +77,11 @@ Start a new host session after linking. Standalone names are unqualified: Codex 
 invocation syntax. Do not install both a plugin and standalone links in the same host profile unless
 you intentionally want duplicate skill entries.
 
-The source uses `$askrubberduck:<name>` as maintainer notation for bundled-skill references. Codex
-uses it literally, Claude translates it to `/askrubberduck:<name>`, and Agy or standalone hosts may
-expose the skill unqualified. Each workflow resolves the host's discovered form before starting a
-dependent step and stops if the referenced skill is unavailable.
+The table below is about **what a person types**. Inside skill bodies, one skill refers to another by
+its bare frontmatter name (`nuclear-proof`) — the one name every host lists, and the only one that
+resolves on a standalone install. A namespaced literal in a body hard-fails there
+(`Unknown skill: askrubberduck:nuclear-proof`), and `validate-distribution.py` rejects both a
+namespaced reference and one naming a skill that does not exist.
 
 | Installation | User invocation | Description source |
 |---|---|---|
@@ -225,9 +226,9 @@ frontmatter metadata.
 
 ## Status
 
-v0.4.0 — human-first descriptions across all hosts, dedicated Codex skill cards and
-starter prompts, a native Agy adapter, and explicit namespaced-versus-standalone invocation guidance.
-The same canonical 14-skill tree serves Codex, Claude Code, Agy, and generic Agent Skills clients.
+v0.4.1 — 14 skills. Per-version notes live in
+[Releases](https://github.com/askrubberduck/skills/releases).
 
-v0.3.0 — first-class Codex plugin and marketplace distribution, portable host-native orchestration,
-and Claude/Codex session-store support.
+Every rule in these skills is here because something measurably failed without it, mined from real
+session transcripts rather than imagined failure modes. `scripts/validate-distribution.py --self-test`
+enforces the load-bearing ones and must pass before a change lands.

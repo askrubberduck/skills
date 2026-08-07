@@ -8,12 +8,6 @@ description: Attack a finished build to expose false confidence before review. U
 The breaker EXECUTES hostile intent against the running thing. It never reads-and-opines — that is
 review's job. A claim of robustness without an executed attack behind it is an opinion.
 
-Use `$askrubberduck:<name>` as the canonical bundled-skill reference. Before its step starts, resolve
-it with the active host's discovered invocation syntax. Preserve `askrubberduck:` when the host
-exposes plugin namespaces; use `$<name>` or `<name>` when it exposes skills unqualified or for a
-standalone install. If no installed form resolves, stop and name the missing skill; never retry
-under another name after that step's side effects start.
-
 ## The five attacks
 
 1. **Mutation pass** — delete or invert load-bearing code; the suite MUST go red. Green-after-
@@ -34,11 +28,14 @@ under another name after that step's side effects start.
 - Every finding's evidence is the **reproducing command or input** — paste it, don't describe it.
 - Entire finding list, no severity triage — the owner weighs, the breaker surfaces.
 - **The breaker never fixes.** Doer and judge stay separate: findings route to the normal pipeline
-  (fix → `$askrubberduck:nuclear-review`). Fixing mid-break contaminates both roles.
+  (fix → `nuclear-review`). Fixing mid-break contaminates both roles.
 - "Unbreakable" is only claimable per attack actually executed — list what was run, including the
   attacks that found nothing. Unattempted ≠ survived.
 - Revert every mutation and restore clean state before reporting; a dirty tree after a break run is
   itself a finding against the breaker.
+- **Leave the receipt.** The attack list, each attack's outcome, and the restored-state confirmation
+  go to `break-rN.md` beside the work. Trust-touching changes cannot pass `nuclear-review` without
+  it — an unwritten break run is indistinguishable from one that never happened.
 
 ## Common mistakes
 

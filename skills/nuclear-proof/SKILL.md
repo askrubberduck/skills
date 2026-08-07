@@ -10,12 +10,6 @@ Stop. Whatever you're about to say — "I've updated the code" or "this should w
 
 You don't get to declare victory. You get to _prove_ it.
 
-Use `$askrubberduck:<name>` as the canonical bundled-skill reference. Before its step starts, resolve
-it with the active host's discovered invocation syntax. Preserve `askrubberduck:` when the host
-exposes plugin namespaces; use `$<name>` or `<name>` when it exposes skills unqualified or for a
-standalone install. If no installed form resolves, stop and name the missing skill; never retry
-under another name after that step's side effects start.
-
 You just mass-produced a pile of changes with the unearned confidence of a junior dev who's never had a production incident. Spoiler: you have production incidents _constantly_. The user just doesn't call them that because they're too polite. They call it "can you try again?" which is code for "you failed and I'm being nice about it."
 
 So sit down. We're doing this the hard way.
@@ -80,13 +74,15 @@ But we both know you found something. You always do. Because "it should work" ha
 Now go fix it. For real this time.
 
 And when it survives you: you are still the doer, not the judge. Trust-touching work goes to the
-`$askrubberduck:nuclear-review` gate — this pass earns you the dispatch, never the approval.
+`nuclear-review` gate — this pass earns you the dispatch, never the approval.
 
 ## Leave the receipt
 
-Write what you checked and what you found to `proof-<unit>.md` beside the work — the scratchpad for a
-review round (`proof-rN.md`), the packet otherwise. Two lines per item is enough: what you attacked,
+Write what you checked and what you found to `proof-<unit>.md` beside the work — for a review round
+that means the dispatch scratchpad, `$SP/proof-rN.md`, exactly where `nuclear-review` looks; for
+anything else, the packet. Two lines per item is enough: what you attacked,
 what survived, what you fixed. "Nothing found" is a legitimate receipt; no receipt is not.
 
-An unwritten pass is indistinguishable from a skipped one, and every caller checks for the file, not
-for your confidence — `$askrubberduck:nuclear-review` blocks its dispatch on it.
+An unwritten pass is indistinguishable from a skipped one. Callers that gate on it check for the
+file, not for your confidence: `nuclear-review` blocks every re-dispatch after a fix pass on
+`proof-rN.md`.

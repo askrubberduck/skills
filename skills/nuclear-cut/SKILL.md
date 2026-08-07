@@ -9,12 +9,6 @@ Adversarial sweep over **every** open, blocked, and deferred item with a cut bia
 smaller backlog, not a tidier one. "Cut this" findings are first-class, equal to "do this".
 Differs from a disposition flow (which acts on IDs the owner names) — this one hunts.
 
-Use `$askrubberduck:<name>` as the canonical bundled-skill reference. Before its step starts, resolve
-it with the active host's discovered invocation syntax. Preserve `askrubberduck:` when the host
-exposes plugin namespaces; use `$<name>` or `<name>` when it exposes skills unqualified or for a
-standalone install. If no installed form resolves, stop and name the missing skill; never retry
-under another name after that step's side effects start.
-
 ## Sweep
 
 1. Enumerate all items from the repo's registries (status doc, obligations registry, delivery
@@ -28,7 +22,7 @@ under another name after that step's side effects start.
 3. Act autonomously on everything that doesn't need the owner: land CLOSE/MERGE/UNBLOCK edits in the
    registries with evidence, one commit per batch.
 4. Items needing the owner (sign-offs, policy calls, anything the doer may not close): queue them and
-   run `$askrubberduck:nuclear-decide` — never close an owner-gated item yourself, never drop it
+   run `nuclear-decide` — never close an owner-gated item yourself, never drop it
    silently.
 
 ## Report shape

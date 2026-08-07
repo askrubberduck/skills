@@ -1,9 +1,9 @@
 {
   "name": "askrubberduck",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Plan, challenge, ship, and clean up complex work",
   "author": {
-    "name": "minuscle",
+    "name": "askrubberduck",
     "url": "https://github.com/askrubberduck"
   },
   "repository": "https://github.com/askrubberduck/skills",
@@ -21,7 +21,7 @@
     "displayName": "askrubberduck",
     "shortDescription": "Plan, challenge, ship, and clean up complex work",
     "longDescription": "Turn complex work into reviewed, verified changes with guided planning, independent critique, delivery, decisions, and repository cleanup.",
-    "developerName": "minuscle",
+    "developerName": "askrubberduck",
     "category": "Productivity",
     "capabilities": [
       "Read",

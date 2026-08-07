@@ -8,12 +8,6 @@ description: Turn session and delivery evidence into reusable lessons. Use when 
 The feedback loop: evidence from past work becomes durable updates — a skill, a memory, a rule —
 or gets consciously discarded. Lessons that live only in a chat transcript are lessons lost.
 
-Use `$askrubberduck:<name>` as the canonical bundled-skill reference. Before its step starts, resolve
-it with the active host's discovered invocation syntax. Preserve `askrubberduck:` when the host
-exposes plugin namespaces; use `$<name>` or `<name>` when it exposes skills unqualified or for a
-standalone install. If no installed form resolves, stop and name the missing skill; never retry
-under another name after that step's side effects start.
-
 ## Recipe
 
 1. **Gather evidence, don't reminisce.** Inspect explicit session roots first, then add recognized
@@ -43,7 +37,7 @@ under another name after that step's side effects start.
 4. **Apply the updates** — write the skill/memory/rule edit now, not a recommendation to write it.
    While in each home, delete what the new lesson supersedes; stale guidance is worse than none.
 5. **Close the loop**: new or edited skills get at least a one-rep pressure check
-   (`$askrubberduck:nuclear-proof` discipline applied to authored guidance) before they're trusted.
+   (`nuclear-proof` discipline applied to authored guidance) before they're trusted.
 
 ## Common mistakes
 

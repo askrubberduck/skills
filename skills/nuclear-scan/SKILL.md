@@ -8,12 +8,6 @@ description: Find ready, blocked, and remaining work without changing anything. 
 Read-only. Answers "what's next" from the repo's own registries without a full-doc re-read and
 without acting on anything. Writes (close/approve/park) route to the repo's disposition workflow.
 
-Use `$askrubberduck:<name>` as the canonical bundled-skill reference. Before its step starts, resolve
-it with the active host's discovered invocation syntax. Preserve `askrubberduck:` when the host
-exposes plugin namespaces; use `$<name>` or `<name>` when it exposes skills unqualified or for a
-standalone install. If no installed form resolves, stop and name the missing skill; never retry
-under another name after that step's side effects start.
-
 ## Locate registries (detect, don't configure)
 
 Look for, in order: `STATUS.md`, `OBLIGATIONS.md`, a delivery/backlog doc
@@ -41,8 +35,8 @@ One table, then one sentence of recommendation:
   actions, not pickable work.
 - If the user asked about specific IDs, answer those first, in the order asked.
 - Name the handoff when the scan reveals one: backlog full of stale/blocked rot →
-  `$askrubberduck:nuclear-cut`; pickables ready and the user wants them executed →
-  `$askrubberduck:nuclear-campaign`.
+  `nuclear-cut`; pickables ready and the user wants them executed →
+  `nuclear-campaign`.
   Naming it is the scan's whole write privilege — the skills do the acting.
 
 ## Common mistakes
