@@ -28,6 +28,11 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
 5. **Ponytail lens throughout.** Delete before add; stdlib/existing helper before new code; smallest
    diff after full understanding. Simplify touched code before building on it; clear superseded paths
    as the last step of each unit. No migrations, no back-compat shims unless the repo demands them.
+   **Write for a senior reader.** Code explains itself; comments supplement it. A comment earns its
+   place only for a decision the code cannot show — a non-obvious tradeoff, a constraint on inputs or
+   schema, a trap. Never narrate what the next line does, and never leave the war story of the bug
+   that caused it: that belongs in the commit, and in the code it is dead weight the next edit
+   silently falsifies.
 6. **Verify.** Run the project's gates (tests/build/vet or doc gates), then invoke
    `nuclear-proof`
    on your own diff — it leaves `proof-<unit>.md`, or `$SP/proof-r1.md` when stage 7's review is
