@@ -13,19 +13,41 @@ the repo forgot; a record without a verified merge is fiction.
 - The gate actually passed per the repo's policy, and that policy produced a **proven
   different-family approval** — `nuclear-review` is how this collection produces one; any gate
   yielding the same proof qualifies. "Probably fine" is not a gate state.
-- **The branch head equals the reviewed SHA.** Delegated builders commit on detached HEADs and
-  wrong branches; confirm branch, origin, and PR head all point at what was reviewed.
+- **The branch head equals the candidate SHA** — the exact commit the authorization covers — and
+  the fix passes behind it are **squashed into one candidate commit** before that authorization
+  is given, its message carrying the evidence. Delegated builders commit on detached HEADs and
+  wrong branches; confirm the branch you are landing from — and the PR head where there is one —
+  points at the candidate. The remote default branch is what landing *moves*, so it is never
+  part of this equality check; step 2 is what verifies where it ended up.
 - Re-verify the base: `git fetch`, compare origin/<base> to what was branched from. **If it advanced,
-  integrating it produces a new head that nobody reviewed** — conflict resolutions and semantic
-  merges ride in unexamined. Integrate, re-run the repo's checks, and send the resulting SHA back
-  through the review gate; landing it on the strength of the old approval merges an unreviewed diff.
+  integrating it produces a new head nobody authorized** — conflict resolutions and semantic
+  merges ride in unexamined. Integrate, re-run the repo's checks, and **re-authorize the resulting
+  SHA** the same way this landing was authorized — the review gate, or the owner's renewed written
+  waiver; landing on the strength of the old authorization merges an unexamined diff.
 - CI green on the exact head being merged.
+- **A precondition the owner directs you to waive is waived only in writing before the push** —
+  which precondition, and the owner's decision, recorded where the repo keeps decisions at the
+  moment it is given; step 3's outcome record then **names what was waived**. Waiving is the
+  owner's call on a named precondition, never the doer's, and never a blanket exemption from the
+  rest; a waiver a reviewer discovers afterward is a second violation, not a footnote.
 
 ## Land
 
-1. Merge per the repo's policy (squash-merge the PR, or direct push where that is the standard).
-2. **Confirm the merge landed**: the new SHA is on the default branch and matches what you merged —
-   read it back, don't assume.
+1. Merge per the repo's policy (squash-merge the PR, or direct push where that is the standard),
+   **pinning the base at merge time**: a base that advances between the precondition check and
+   the merge lands a combination nobody reviewed, and no later check can un-land it. The merge
+   must FAIL when the base moved — so **verify your mechanism blocks, never infer it from its
+   name**. Measured: a bare `--force-with-lease` leases against a remote-tracking ref that any
+   background `git fetch` refreshes, and it force-landed over an advanced base and **destroyed
+   the other branch's commit**. Also checked and not pins: the merge-API `sha` (matches the PR
+   head), a merge queue (lands a combination), require-branches-up-to-date (needs a defined check;
+   admins bypass). What blocked: `--force-with-lease=<ref>:<recorded-base-sha>`, value spelled out.
+2. **Confirm the merge landed**: the new SHA is on the default branch and **its tree matches the
+   candidate tree** — read it back, don't assume. This is the backstop for whatever step 1's
+   pinning could not prevent: on a mismatch the landed commit goes through the gate before it is
+   recorded. This check runs **after** the branch has already moved, so where a push triggers
+   deployment the hold has to exist before step 1 — a promise to quarantine afterwards is one
+   this step cannot keep.
 3. Record the outcome where the repo keeps truth: shipped log / status doc / delivery board — with
    PR number, merged SHA, and what changed. One recorded outcome per landing.
 4. Close or queue obligations the change touched — the doer never closes an item that needs the

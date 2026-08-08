@@ -26,6 +26,9 @@ review's job. A claim of robustness without an executed attack behind it is an o
 ## Contract
 
 - Every finding's evidence is the **reproducing command or input** — paste it, don't describe it.
+- Measure the artifact's exit status **directly, never through a pipe**: `cmd | head` reports the
+  tail's status, bash `PIPESTATUS` is zsh `pipestatus`, and grep exits 1 on zero matches — three
+  measured ways a break run reported green while the artifact was red.
 - Entire finding list, no severity triage — the owner weighs, the breaker surfaces.
 - **The breaker never fixes.** Doer and judge stay separate: findings route to the normal pipeline
   (fix → `nuclear-review`). Fixing mid-break contaminates both roles.

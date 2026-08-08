@@ -15,7 +15,7 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
    Steel-man at least one alternative decomposition before committing; first idea is a candidate, not a decision.
    Packet-sized or trust-touching: co-author the plan via `nuclear-plan` instead of
    drafting solo, and **do not enter stage 4 until the committed plan carries its co-authorship
-   line** — an uncoauthored plan is the 19-round gate arriving later instead of now.
+   line** — an uncoauthored plan is the rejections arriving later instead of now.
 3. **Critique (adversarial, pre-code) — for solo-drafted plans only.** When `nuclear-plan` ran in
    stage 2, its multi-round concurrence loop already **is** this stage; a second gate on a
    co-authored plan is redundancy, not rigor. Otherwise: red-team the plan — wrong decomposition,
@@ -53,14 +53,19 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
   handoff whose next step is already dispatched or scheduled and named. Anything else: keep going.
 - **"Say the word and I'll…" is a bug, not politeness.** If you can name the next step and it needs
   no owner input, run it. Handing an already-made plan back for a "go" is how an autonomous run
-  becomes a manual one — it cost ~60 stalled turns in one week of campaign work.
+  becomes a manual one.
+- **Mid-flight input is an extra command, not a new job.** An instruction arriving while work runs
+  joins the queue; it neither cancels what is in flight nor becomes the whole task. Finish the
+  running step, apply the addition, report both. The only input that stops work is one that says so.
+- **Close every turn against the ask.** Before reporting, reconcile item by item: what was
+  requested, what was delivered, what was not. **An unreconciled turn is an unverified claim** —
+  naming a gap costs a sentence, and leaving one unnamed is how "done" becomes false.
 - Ambiguous scope → cut it; don't add complexity for hypothetical edge cases.
 - **A finding is not a work order.** Under review pressure the fastest way to look responsive is to
   add code, so every fix pass starts with "would deleting this end the finding?" and every unit asks
   what outcome dies if the code is not written. The most reliable code is the code never written;
   that is the spirit, not a tiebreaker for close calls.
-- **Judge the shape, not the diffstat.** Fewer lines is a smell, not a goal. What compounds is how
-  many concepts a reader holds, whether one path traces without jumping, whether cause sits near
-  effect, and whether each fact has one home. A short knot costs more than a long straight path, and
-  the line metric scores the knot as the win — which is exactly why it cannot be the target.
+- **Judge the shape, not the diffstat** — `nuclear-proof`'s §6 test: concepts a reader holds, one
+  path traceable without jumping, cause near effect, one home per fact. Fewer lines is a smell,
+  never the goal.
 - Record deferrals and owner decisions in the project's registry (never silently drop).

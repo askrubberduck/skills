@@ -34,7 +34,7 @@ driver once this bootstrap ends.
    branch, state), then in the same turn give the next iteration an owner: invoke the repo's campaign
    driver, or book the wake that will (`/loop`, a scheduled wakeup, cron), roster as its input. The
    bootstrap's context ends at the boundary; the campaign's momentum must not. A roster with nobody
-   holding the next iteration is a stalled campaign wearing the word "handoff". When the campaign's
+   holding the next iteration is a stalled campaign, whatever it is called. When the campaign's
    packets have merged, `nuclear-sweep` clears the worktrees they leave behind.
 
 ## Common mistakes

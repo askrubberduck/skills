@@ -13,7 +13,7 @@ from typing import Any, Callable
 
 
 EXPECTED_NAME = "askrubberduck"
-EXPECTED_VERSION = "0.4.8"
+EXPECTED_VERSION = "0.4.9"
 EXPECTED_PLUGIN_DESCRIPTION = "Plan, challenge, ship, and clean up complex work"
 EXPECTED_SKILLS = {
     "nuclear-break",
@@ -67,14 +67,26 @@ REQUIRED_CONTRACTS = {
         "tier buys rigor",
         "Record the pinned model id",
         "never a coverage map",
+        "the last released tag to the exact candidate commit",
+        "both full SHAs stated in the prompt",
+        "only a BLOCKER holds the gate",
+        "a NEW WORK ITEM, not a new gate condition",
+        "A round that produces no BLOCKER closes the gate",
+        "Split verdicts go to an orchestrator",
+        "reviewed under the PRE-change rules",
+        "adjudicated against the repo's own conventions first",
+        "reject with recorded reason when the conventions",
     ),
     "nuclear-proof": (
         "proof-<unit>.md",
         "blocks every re-dispatch after a fix pass",
         "citing its artifact",
+        "defect ledger",
+        "The second occurrence is the signal to repair the method",
     ),
     "nuclear-break": (
         "break-rN.md",
+        "directly, never through a pipe",
         "the suite MUST go red",
         "duplicate, and concurrent inputs",
         "take each named invariant",
@@ -97,7 +109,14 @@ REQUIRED_CONTRACTS = {
         "One recorded outcome per landing",
         "merged SHA",
         "proven different-family approval",
-        "back through the review gate",
+        "re-authorize the resulting SHA",
+        "names what was waived",
+        "in writing before the push",
+        "squashed into one candidate commit",
+        "its tree matches the candidate tree",
+        "pinning the base at merge time",
+        "never infer it from its name",
+        "destroyed the other branch's commit",
     ),
     "nuclear-sweep": (
         "delete only what is provably preserved elsewhere",
@@ -113,9 +132,14 @@ REQUIRED_CONTRACTS = {
         "an external block",
         "Anything else: keep going",
         "re-checks its output",
+        "Mid-flight input is an extra command, not a new job",
+        "An unreconciled turn is an unverified claim",
     ),
     "nuclear-diet": ("a named check that catches the stage's failure",),
-    "nuclear-learn": ("an occurrence it was NOT derived from",),
+    "nuclear-learn": (
+        "an occurrence it was NOT derived from",
+        "Classes compound; instances do not",
+    ),
 }
 README_MARKERS = (
     "codex plugin marketplace add askrubberduck/skills",
@@ -131,7 +155,7 @@ README_MARKERS = (
     "agents/openai.yaml",
     "Start a new Codex session",
     "Start a new host session",
-    "v0.4.8",
+    "v0.4.9",
 )
 
 

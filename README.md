@@ -216,17 +216,15 @@ temporary directories during self-test.
   *obedient* patching: every round of "harden the wheel you invented" feels like progress, and the
   only exit is the question no reviewer will ask for you — should this wheel exist at all?
 - **The most reliable code is the code never written** — the first move on any finding is "would
-  deleting this end it?", not "how do I patch it". One rule here took six review rounds and six
-  demonstrated false positives before anyone checked what `git branch --merged` and `-d` already
-  decided — then a seventh pass to establish that the built-in guarantees something narrower than it
-  looks. Reach for the boring version first, then prove what it actually promises.
+  deleting this end it?", not "how do I patch it". Reach for the boring version first, then prove
+  what it actually promises; a built-in's guarantee is routinely narrower than its name.
 - **Cut before add** — every finding list treats "delete this" as first-class; every sweep's product
-  is deletions. A fix pass that only grows is a loop wearing the costume of progress.
+  is deletions. A fix pass that only grows is not progress.
 - **Concepts, not lines** — line count is a smell, never a target. What compounds is how many things
-  a reader must hold, whether one path traces without jumping, whether cause sits near effect. A
-  short knot costs more than a long straight path, and a diffstat scores the knot as the win.
-- **Absolute paths, no `cd` chains** — path boilerplate was the #2 token sink in the sessions these
-  skills came from.
+  a reader must hold, whether one path traces without jumping, whether cause sits near effect.
+- **A rule states what must hold, not how it was learned** — the incident that produced a rule is
+  not the rule, and belongs in the release notes.
+- **Absolute paths, no `cd` chains** — path boilerplate is a top token sink.
 - **Grep-first, delegate large reads** — no >20KB file pulls into the main context; page with
   offset/limit or send an investigator subagent.
 - **Never commit raw CLI stdout** — extract verdicts/findings; raw outputs stay in the scratchpad.
@@ -236,12 +234,12 @@ temporary directories during self-test.
 
 ## Credits
 
-`nuclear-proof` adapts Josh Pigford's (Shpigford) "but-for-real" skill; author retained in its
-frontmatter metadata.
+`nuclear-proof` began as an adaptation of Josh Pigford's (Shpigford) "but-for-real" skill. It has
+since been rewritten and no longer carries his text; the section arc is the surviving debt.
 
 ## Status
 
-v0.4.8 — 14 skills. Per-version notes live in
+v0.4.9 — 14 skills. Per-version notes live in
 [Releases](https://github.com/askrubberduck/skills/releases).
 
 Every rule in these skills is here because something measurably failed without it, mined from real

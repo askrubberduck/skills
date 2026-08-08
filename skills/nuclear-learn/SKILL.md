@@ -21,9 +21,10 @@ or gets consciously discarded. Lessons that live only in a chat transcript are l
      of an existing one — prefer extending; a new skill is a cost).
    - Behavior that must fire on **repo state** rather than phrasing — a campaign left open, a gate
      pending, a stale base — → the checked-in instructions doc. **A skill description matches words;
-     it cannot see state.** A driver skill triggered on "continue campaign" sat at zero invocations
-     for a month while the owner typed "continue" eleven times.
+     it cannot see state.**
    - Fact, preference, or project state → **memory**.
+   - A **defect class** the doer repeated → the repo's defect ledger, which `nuclear-proof` reads
+     before every pass. Classes compound; instances do not.
    - Rule that must bind every turn → the checked-in instructions doc (CLAUDE.md/AGENTS.md).
    - One-off, derivable, or already recorded → **discard, say so**.
 3. **Evidence bar**: 2+ independent occurrences or an explicit owner directive → build it.

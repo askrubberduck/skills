@@ -6,8 +6,7 @@ description: Catch architectural and implementation risks before coding begins. 
 # Plan Co-Authoring with the Red Team
 
 Decorrelated rigor arrives either as *co-authorship* now or as *rejections* later. Do NOT draft a
-plan same-family and send it out for adversarial review — that path produced 19-round gates; letting
-the other families co-author cut it to 4 and deleted 2 of 4 work items as no-code-needed.
+plan same-family and send it out for adversarial review; let the other families co-author it.
 
 ## Recipe
 
@@ -24,8 +23,7 @@ the other families co-author cut it to 4 and deleted 2 of 4 work items as no-cod
    `nuclear-review`.
    Raw plans land as `$SP/plan-<family>.md` (`$SP` = the dispatch scratchpad `nuclear-review`
    defines) — scratchpad only, never committed. **No files, no
-   co-authorship** — a synthesis without a proven different-family plan is a solo draft wearing the
-   word "synthesized".
+   co-authorship** — a synthesis without a proven different-family plan is a solo draft.
 3. **Synthesize** the independent plans + your own analysis into ONE plan. Reconcile
    disagreements by READING SOURCE (`git show <sha>:path`), never by vote.
 4. Apply a cut pass: any task the synthesis shows unnecessary dies here — cheapest build is the one
@@ -42,9 +40,7 @@ the other families co-author cut it to 4 and deleted 2 of 4 work items as no-cod
 
 ## Red flags
 
-- "The plan is simple, review after building is enough" — that's how 19-round gates start.
-- A skill named inside another skill's step is an **instruction to invoke it**, not a citation. A week
-  of packet-sized campaign work with zero `nuclear-plan` invocations is what that
-  failure looks like.
+- "The plan is simple, review after building is enough" — that is how long gates start.
+- A skill named inside another skill's step is an **instruction to invoke it**, not a citation.
 - A refuted attack is not a defended design; N red-teamed mutations are not coverage of the N+1th.
 - One option enumerated is no decision made — synthesis needs real alternatives to reconcile.

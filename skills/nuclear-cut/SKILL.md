@@ -32,8 +32,8 @@ per-item verdict list with evidence links.
 
 ## Common mistakes
 
-- Parking instead of cutting — "deferred" items that fail the critique die; a parked corpse is
-  backlog debt with better manners.
+- Parking instead of cutting — "deferred" items that fail the critique die; parking one is still
+  backlog debt.
 - Closing on assumption — CLOSE NOW requires evidence (the commit, the shipped PR, the doc) that the
   need is met, not a recollection.
 - Sweeping only the obligations registry — blocked delivery items and stale active-work dirs are the

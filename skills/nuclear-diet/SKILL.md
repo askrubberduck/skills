@@ -5,9 +5,9 @@ description: Reduce agent context, memory, and token costs without losing essent
 
 # Nuclear Diet
 
-Context cost has two bodies: what sessions burn at runtime (cache-read of marathon sessions was
-93%+ of a measured 7.3B-token fortnight) and what the installed config bills every turn before
-work even starts. Both diets here; the product of the audit is deletions.
+Context cost has two bodies: what sessions burn at runtime — cache-read of a marathon session
+dominates it — and what the installed config bills every turn before work even starts. Both diets
+here; the product of the audit is deletions.
 
 ## The six runtime rules
 
@@ -15,7 +15,7 @@ work even starts. Both diets here; the product of the audit is deletions.
    `/compact`. Every turn re-bills the whole window; a forced auto-compaction pays a summarization
    tax AND loses state. One session per packet.
 2. **Absolute paths, once.** No `cd` chains, no re-declared `VAR=/long/path` boilerplate per Bash
-   call (measured: 1500+ redeclarations of one 80-char path in a fortnight). Long scratchpad root →
+   call. Long scratchpad root →
    `ln -s` a short alias once.
 3. **Grep-first; delegate big reads.** Nothing >20KB into the main context: page with offset/limit,
    or send an investigator subagent that returns a summary. Main context is the most expensive place

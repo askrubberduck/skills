@@ -20,7 +20,10 @@ work, or a change to any gate's semantics.
 
 1. Resolve target into review material: `gh pr diff <N>` / packet draft / `git diff <ref>`.
    Review the **committed object** (`git show <sha>:path`) or the correct worktree — never a stale
-   main checkout or dirty tree; both families produce false rejects from wrong snapshots.
+   main checkout or dirty tree; both families produce false rejects from wrong snapshots. A
+   release candidate's packet spans the last released tag to the exact candidate commit, both
+   full SHAs stated in the prompt; a PR review keeps its own base. A range guessed from adjacent
+   commits reviews the wrong object.
 2. Record the doer's self-reported model family, then select reviewers relative to it. At least one
    required reviewer must self-report a different model family, and each required reviewer runs the
    **strongest tier of its family the host lists and you can pin** — decorrelation buys
@@ -36,8 +39,7 @@ work, or a change to any gate's semantics.
    when the doer is OpenAI/GPT. Unknown identity never counts as decorrelated.
 3. **Before round 1, not only before re-dispatch**: invoke `nuclear-proof` on the diff and write
    `$SP/proof-r1.md`; on packet-sized **or trust-touching** work — the same scope that required
-   planning above — confirm the committed plan carries its `nuclear-plan` co-authorship line. **No receipt, no dispatch — at every round.** A first round is the round most
-   likely to burn 45 minutes on defects the doer could have found in five.
+   planning above — confirm the committed plan carries its `nuclear-plan` co-authorship line. **No receipt, no dispatch — at every round**, the first included.
 4. Write one prompt to the session scratchpad: the diff/design, acceptance criteria, the round's
    receipt from step 3 — attached as the doer's claim to attack, never a coverage map, and a
    receipt whose sections lack artifacts or skip reasons is itself a finding that blocks APPROVE —
@@ -75,11 +77,14 @@ work, or a change to any gate's semantics.
      question on every finding is whether deleting the feature, flag, branch, or check ends the
      finding outright. A reviewer optimises what you put in front of it — it will not tell you the
      whole mechanism was unnecessary.
+   - **A finding demanding a new artifact** — a plan file, scaffolding, a doc tree — is
+     adjudicated against the repo's own conventions first: reject with recorded reason when the
+     conventions already carry the evidence. Committing ceremony to satisfy a reviewer is not
+     compliance, it is obedient patching.
    - **The growth ratchet.** If one rule draws findings round after round, the rule is wrong, not
      under-patched. Stop fixing and ask what it is replacing that already works — a stdlib call, a
-     built-in flag, a human decision. A branch-deletion rule here survived six rounds of patching
-     before anyone checked what `git branch --merged` and `-d` already decided — and then a seventh
-     pass to find that the built-in guarantees something narrower than it looks.
+     built-in flag, a human decision — then prove what that built-in actually guarantees, which is
+     routinely narrower than its name.
    - **Count concepts, not lines.** Each round, say what a reader must now hold that they didn't
      before — a new branch, a new exception, a new place the same fact lives. That number rising every
      round is the loop; a diffstat is not. Shrinking a diff while tangling the flow is a loss, and it
@@ -103,22 +108,32 @@ work, or a change to any gate's semantics.
    still be a proven different family. A same-family pass never substitutes, and an unverified model
    identity is not a family.
 
+## When the gate does not converge
+
+Decorrelation buys independent judgement, not agreement.
+
+- **Rank every finding** BLOCKER / SHOULD / NOTE — **only a BLOCKER holds the gate**; the rest land
+  as follow-up items. A reviewer that does not rank has not finished the review.
+- **Criteria are frozen before round 1**, from the work item, never composed by the doer at
+  dispatch. One discovered mid-gate is **a NEW WORK ITEM, not a new gate condition** — adding one
+  mid-flight moves the target, and a moving target cannot converge.
+- **Judge the change, not the paperwork.** A defect in a receipt or commit message is a NOTE unless
+  it makes an artifact claim unverifiable.
+- **A round that produces no BLOCKER closes the gate.** Say the severity trend aloud each round;
+  falling severity with rising round count is the signal to stop, not to go again.
+- **Split verdicts go to an orchestrator**, not another round: after two rounds of APPROVE against
+  REJECT on the same object, a third party adjudicates each disputed finding against the frozen
+  criteria and records why. Adjudication, never a vote, never the doer breaking its own tie.
+- **A change to a gate's own rules is reviewed under the PRE-change rules**; the new ones bind the
+  next candidate. Otherwise the doer is judged by a standard it is still writing.
+
 ## Multi-lane fix-pass (when findings fan wide)
 
-When one round's findings span several files/modules and a single fix agent would serialize them,
-fan the fix pass across N parallel lanes by **file ownership** — one lane owns a file, no two lanes
-edit the same file. The gate stays singular: lanes fix, the coordinator re-dispatches the review.
-
-1. Partition findings by owned file set, not by finding type; a finding touching two lanes' files
-   goes to exactly one lane, named in both briefs.
-2. Brief each lane with only its findings plus the shared invariants (perimeter/LOC budget, test
-   suite, naming). Full finding list to every lane = N× tokens for zero extra coverage.
-3. Re-pin the shared budget every round ("LOC 30418, +13 all yours") — drift is additive and
-   invisible per lane.
-4. Crossed reports ("already fixed" / "still broken" about another lane's file) may be reading
-   pre-fix code — settle by reading the current tree, never by lane vote.
-5. Poll lanes at round boundaries; an idle ping with no new state gets no reply. Lanes never talk
-   to the gate or self-approve; round ends when every lane is landed + green → ONE re-dispatch.
+Fan the fix across N lanes by **file ownership** — one lane owns a file, a finding spanning two
+goes to exactly one, named in both briefs. Brief each lane with its findings plus the shared
+invariants only; the full list to every lane is N× tokens for no extra coverage. Crossed reports
+("already fixed" / "still broken") are settled by reading the current tree, never by lane vote.
+The gate stays singular: lanes never self-approve, and the round ends with ONE re-dispatch.
 
 ## Optional lens: product fit
 
@@ -130,7 +145,7 @@ mechanics; weigh functionality/extendability/security, never build effort.
 
 9. Fold verdicts + adjudications + trajectory (`REJECT/REJECT → APPROVE/APPROVE r2`) into the work
    item's review log. **Never commit raw CLI stdout** — extract verdict + findings, keep outputs in
-   the scratchpad (a committed 8.7MB stdout blob once forced a git-history rewrite).
+   the scratchpad.
 10. Trust-touching changes ship `nuclear-break`'s `break-rN.md` with the review material; without
    that receipt the attacks are unproven and the gate does not close. On final APPROVE of a
    mergeable change: `nuclear-land` ships and records it.
