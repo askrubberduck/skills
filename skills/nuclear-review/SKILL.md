@@ -48,17 +48,12 @@ work, or a change to any gate's semantics.
    Reviewer default: refute, not bless.
 5. Run from a **neutral cwd** (scratchpad, never the repo — reviewers can derail when launched in
    the target checkout), stdin closed, in the background (runs take 10–45 min). Absolute paths
-   everywhere. Choose only reviewers whose model identity you can verify. Example CLI forms:
+   everywhere. Choose only reviewers whose model identity you can verify. Minimum shapes:
    ```bash
-   SP=<scratchpad>/<topic>-review
-   # Decorrelated only when the doer is not OpenAI/GPT; pin the strongest model codex lists.
-   codex exec -m "<strongest-listed-model>" --skip-git-repo-check "$(cat $SP/prompt.md)" </dev/null > $SP/codex-rN.out 2>&1
-   # Pin the strongest listed model from a family different from the doer; verify the self-report.
-   agy --model "<verified-non-doer-model>" --add-dir "$SP" --print-timeout 45m \
-       -p "Read $SP/header.md (task) and $SP/change.diff (full diff). ..." \
-       </dev/null > $SP/agy-rN.out 2>&1
+   codex exec -m <strongest-listed> --skip-git-repo-check "$(cat $SP/prompt.md)" </dev/null > $SP/codex-rN.out 2>&1
+   agy --model <verified-non-doer> --add-dir "$SP" --print-timeout 45m -p "..." </dev/null > $SP/agy-rN.out 2>&1
    ```
-   **agy traps — each yields a plausible EMPTY review at exit 0:**
+   **Traps — each yields a plausible EMPTY review at exit 0:**
    - agy is a model HOST: unpinned it may serve a **Claude** model, silently breaking decorrelation.
      Always pin `--model`; it self-reports, so decorrelation is verifiable.
    - `--print "<text>"` silently drops the prompt — use `-p`.

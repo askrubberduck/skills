@@ -11,8 +11,8 @@ Differs from a disposition flow (which acts on IDs the owner names) — this one
 
 ## Sweep
 
-1. Enumerate all items from the repo's registries (status doc, obligations registry, delivery
-   backlog, active work dirs). Grep-first; read only surviving items in full.
+1. Enumerate all items from the repo's registries — `nuclear-scan` owns the locator; use it rather
+   than re-deriving where they live. Grep-first; read only surviving items in full.
 2. Per item, argue **against its existence** before anything else. Verdict, one of:
    - **CLOSE NOW** — already satisfied, obsolete, or superseded; close with evidence.
    - **CUT** — the need was speculative or the product moved past it; delete, don't park.
