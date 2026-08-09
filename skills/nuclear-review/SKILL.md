@@ -1,6 +1,6 @@
 ---
 name: nuclear-review
-description: Find release-blocking risks through an independent cross-model change review. Use when a PR or diff is ready to review, a security-, privacy-, or data-sensitive change reaches its release gate, the user asks for a red-team or independent second opinion, or findings span several files and need separate fixes.
+description: Find release-blocking risks through an independent cross-model change review. Use when a PR or diff is ready to review, a security-, privacy-, or data-sensitive change reaches its release gate, the user says "gate it" or asks for a red-team or independent second opinion, or findings span several files and need separate fixes.
 ---
 
 # Decorrelated Red-Team Review

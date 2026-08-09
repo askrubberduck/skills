@@ -1,6 +1,6 @@
 ---
 name: nuclear-land
-description: Merge approved work, update project records, and clean up its branch and worktree. Use when a change has passed its review gate, the user asks to land or merge it, a gate-passed PR is ready, or merged work was never recorded in status or outcome documentation.
+description: Merge approved work, update project records, and clean up its branch and worktree. Use when a change has passed its review gate, the user says to land, merge, push, ship, tag, cut a release, or "merge and release", a gate-passed PR is ready, or merged work was never recorded in status or outcome documentation.
 ---
 
 # Nuclear Land
