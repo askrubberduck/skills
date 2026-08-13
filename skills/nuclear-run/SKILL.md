@@ -42,8 +42,29 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
    proof pass happened. Trust-touching
    work additionally gets the `nuclear-break` attacks executed before the gate. Evidence over
    assertion — a failed or unrun check means not done; say so with output.
-7. **Independent review.** Never self-approve. Use the project's review policy — default: the
-   `nuclear-review` / proven different-family gate. Fix-pass until the reviewer passes.
+7. **Independent superreview.** Never self-approve. Use the project's review policy — default: the
+   `nuclear-review` / proven different-family gate. `nuclear-review` executes one review, adjudicates
+   its reviewers, and returns one authoritative `APPROVE | REJECT | NOTE`; this stage acts on that
+   result without reinterpreting the raw reviewer votes.
+
+   **a. Prepare and invoke.** Produce `$SP/proof-rN.md` via `nuclear-proof`; for trust-touching work,
+   also produce `$SP/break-rN.md` via `nuclear-break`. Confirm any required committed plan evidence,
+   then invoke `nuclear-review`. The review checks these artifacts but never creates them.
+
+   **b. Act on the superreview result.**
+   - `APPROVE`: for a mergeable change, invoke `nuclear-land` to ship and record it.
+   - `REJECT`: execute each substantiated blocker by deleting the unnecessary thing, fixing the
+     defect, or escalating a genuine owner decision through `nuclear-decide`. Never treat a raw
+     reviewer claim that the superreview dismissed as a work order.
+   - `NOTE`: record and surface what stood out. It neither authorizes landing nor rejects the
+     candidate. If a gate decision is required, resolve the missing criterion, evidence, or owner
+     decision before requesting another review.
+
+   When confirmed blockers fan wide, split remediation by **file ownership** — one lane owns a file,
+   and a finding spanning two files belongs to exactly one lane named in both briefs. Lanes never
+   self-approve. After a material change, rerun verification and `nuclear-proof`, then request a new
+   superreview of the new candidate. Never re-dispatch an unchanged candidate or loop to manufacture
+   reviewer unanimity.
 
 ## Rules
 

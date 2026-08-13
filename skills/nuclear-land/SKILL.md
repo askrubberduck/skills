@@ -10,9 +10,10 @@ the repo forgot; a record without a verified merge is fiction.
 
 ## Preconditions (fail closed — any miss stops the landing)
 
-- The gate actually passed per the repo's policy, and that policy produced a **proven
-  different-family approval** — `nuclear-review` is how this collection produces one; any gate
-  yielding the same proof qualifies. "Probably fine" is not a gate state.
+- The gate actually returned **`APPROVE`** per the repo's policy, and its receipt records the
+  required decorrelated reviewer identities, evidence, and adjudication — `nuclear-review` is how
+  this collection produces that authorization; any gate yielding the same proof qualifies.
+  `NOTE`, a raw reviewer approval, and "probably fine" are not gate-passed states.
 - **The branch head equals the candidate SHA** — the exact commit the authorization covers — and
   the fix passes behind it are **squashed into one candidate commit** before that authorization
   is given, its message carrying the evidence. Delegated builders commit on detached HEADs and

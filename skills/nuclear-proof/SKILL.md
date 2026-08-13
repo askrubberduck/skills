@@ -79,13 +79,15 @@ approval — you remain the doer, not the judge, and trust-touching work goes to
 
 ## Leave the receipt
 
-Write what you checked and found to `proof-<unit>.md` beside the work — for a review round that
+Write what you checked and found to `proof-<unit>.md` beside the work — for a review invocation that
 means the dispatch scratchpad, `$SP/proof-rN.md`, exactly where `nuclear-review` looks; otherwise
 the packet. One line per numbered section — what you attacked, what survived, what you fixed —
 each line citing its artifact (file:line, test name, command run), or the word skipped with the
 reason; a skip without a reason is an omission. "Nothing found" plus the artifact showing the
-attack ran is a legitimate receipt; no receipt is not. `nuclear-review` hands the receipt to the
-reviewer as a claim to attack, where missing artifacts block APPROVE.
+attack ran is a legitimate receipt; no receipt is not. `nuclear-review` hands the receipt to its
+reviewers as a claim to attack; a missing artifact makes the associated claim unverifiable.
 
 An unwritten pass is indistinguishable from a skipped one. Callers check for the file, not for
-your confidence: `nuclear-review` blocks every re-dispatch after a fix pass on `proof-rN.md`.
+your confidence: `nuclear-review` refuses every dispatch without `proof-rN.md`, including a new
+review after a material fix. Producing it is the caller's job (`nuclear-run` stage 7a); refusing
+without it is the gate's.

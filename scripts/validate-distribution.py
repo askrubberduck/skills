@@ -13,7 +13,7 @@ from typing import Any, Callable
 
 
 EXPECTED_NAME = "askrubberduck"
-EXPECTED_VERSION = "0.5.1"
+EXPECTED_VERSION = "0.6.0"
 EXPECTED_PLUGIN_DESCRIPTION = "Plan, challenge, ship, and clean up complex work"
 EXPECTED_SKILLS = {
     "nuclear-break",
@@ -36,50 +36,51 @@ EXPECTED_SKILLS = {
 REQUIRED_LINKS = {
     "nuclear-break": {"nuclear-review"},
     "nuclear-campaign": {"nuclear-diet", "nuclear-plan", "nuclear-sweep"},
-    "nuclear-cut": {"nuclear-decide"},
+    "nuclear-cut": {"nuclear-decide", "nuclear-scan"},
     "nuclear-land": {"nuclear-decide", "nuclear-review", "nuclear-sweep"},
     "nuclear-learn": {"nuclear-proof"},
     "nuclear-plan": {"nuclear-review"},
-    "nuclear-proof": {"nuclear-review"},
-    "nuclear-review": {"nuclear-break", "nuclear-decide", "nuclear-land", "nuclear-plan", "nuclear-proof"},
+    "nuclear-proof": {"nuclear-review", "nuclear-run"},
+    "nuclear-review": {"nuclear-break", "nuclear-plan", "nuclear-proof"},
     "nuclear-roast": {"nuclear-cut", "nuclear-decide", "nuclear-plan", "nuclear-proof", "nuclear-review"},
-    "nuclear-run": {"nuclear-break", "nuclear-plan", "nuclear-proof", "nuclear-review"},
+    "nuclear-run": {"nuclear-break", "nuclear-decide", "nuclear-diet", "nuclear-land", "nuclear-plan", "nuclear-proof", "nuclear-review"},
     "nuclear-scan": {"nuclear-campaign", "nuclear-cut"},
 }
 REQUIRED_CONTRACTS = {
     "nuclear-review": (
-        "proof-r1.md",
         "$SP/proof-rN.md",
-        "No `proof-rN.md`, no dispatch",
         "break-rN.md",
         "co-authorship line",
-        "two reviewers from two different model families",
-        "APPROVES in the same round",
-        "A REJECT is never an outage",
-        "A same-family pass never substitutes",
+        "two required reviewers from two different model families",
+        "APPROVE | REJECT | NOTE",
         "No receipt, no dispatch",
-        "a dispatch that was attempted",
+        "PRE-change rules",
+        "A REJECT is never an outage",
+        "same-family pass",
+        "a dispatch attempted",
         "produced no verdict",
-        "evidence recorded beside the verdict",
-        "run `nuclear-plan` BEFORE building",
-        "Ask what the code is for before you patch it",
-        "The growth ratchet",
+        "`NOTE` neither authorizes nor rejects the candidate",
+        "Reviewer unanimity is neither required nor sufficient",
+        "Only a substantiated `BLOCKER` justifies `REJECT`",
+        "one authoritative result",
+        "dismissed with a recorded reason",
+        "repository's own conventions",
+        "Ask what the code is for",
+        "growth ratchet",
+        "Count concepts, not lines",
         "tier buys rigor",
         "Record the pinned model id",
-        "never a coverage map",
-        "the last released tag to the exact candidate commit",
+        "never as a coverage map",
+        "last released tag to the",
         "both full SHAs stated in the prompt",
-        "only a BLOCKER holds the gate",
-        "a NEW WORK ITEM, not a new gate condition",
-        "A round that produces no BLOCKER closes the gate",
-        "Split verdicts go to an orchestrator",
-        "reviewed under the PRE-change rules",
-        "adjudicated against the repo's own conventions first",
-        "reject with recorded reason when the conventions",
+        "does not loop until they approve",
+        "Never edit the candidate",
+        "the calling agent or workflow owns that execution",
+        "Never commit raw CLI stdout",
     ),
     "nuclear-proof": (
         "proof-<unit>.md",
-        "blocks every re-dispatch after a fix pass",
+        "refuses every dispatch without `proof-rN.md`",
         "citing its artifact",
         "defect ledger",
         "The second occurrence is the signal to repair the method",
@@ -108,7 +109,8 @@ REQUIRED_CONTRACTS = {
     "nuclear-land": (
         "One recorded outcome per landing",
         "merged SHA",
-        "proven different-family approval",
+        "required decorrelated reviewer identities",
+        "`NOTE`, a raw reviewer approval",
         "re-authorize the resulting SHA",
         "names what was waived",
         "in writing before the push",
@@ -128,6 +130,10 @@ REQUIRED_CONTRACTS = {
     "nuclear-run": (
         "proof-<unit>.md",
         "co-authorship line",
+        "one authoritative `APPROVE | REJECT | NOTE`",
+        "`NOTE`: record and surface",
+        "Never re-dispatch an unchanged candidate",
+        "loop to manufacture",
         "A turn may end for exactly four reasons",
         "an external block",
         "Anything else: keep going",
@@ -155,7 +161,7 @@ README_MARKERS = (
     "agents/openai.yaml",
     "Start a new Codex session",
     "Start a new host session",
-    "v0.5.1",
+    "v0.6.0",
 )
 
 
@@ -527,11 +533,11 @@ def self_test(root: Path) -> list[str]:
             ),
         ),
         (
-            "dropped proof-r1 contract",
+            "dropped per-review proof contract",
             lambda copy: (copy / "skills" / "nuclear-review" / "SKILL.md").write_text(
                 (copy / "skills" / "nuclear-review" / "SKILL.md")
                 .read_text()
-                .replace("`$SP/proof-r1.md`", "a receipt", 1)
+                .replace("`$SP/proof-rN.md`", "a receipt", 1)
             ),
         ),
         (
@@ -539,7 +545,7 @@ def self_test(root: Path) -> list[str]:
             lambda copy: (copy / "skills" / "nuclear-review" / "SKILL.md").write_text(
                 (copy / "skills" / "nuclear-review" / "SKILL.md")
                 .read_text()
-                .replace("`break-rN.md`", "its evidence", 1)
+                .replace("`$SP/break-rN.md`", "its evidence", 1)
             ),
         ),
         (
@@ -558,11 +564,11 @@ def self_test(root: Path) -> list[str]:
             ),
         ),
         (
-            "deleted plan-handoff instruction masked by a later mention",
+            "deleted committed plan evidence check",
             lambda copy: (copy / "skills" / "nuclear-review" / "SKILL.md").write_text(
                 (copy / "skills" / "nuclear-review" / "SKILL.md")
                 .read_text()
-                .replace("run `nuclear-plan` BEFORE building", "plan somehow", 1)
+                .replace("committed `nuclear-plan` co-authorship line", "plan evidence", 1)
             ),
         ),
         (
@@ -570,7 +576,7 @@ def self_test(root: Path) -> list[str]:
             lambda copy: (copy / "skills" / "nuclear-review" / "SKILL.md").write_text(
                 (copy / "skills" / "nuclear-review" / "SKILL.md")
                 .read_text()
-                .replace("a dispatch that was attempted", "a dispatch", 1)
+                .replace("a dispatch attempted", "a dispatch", 1)
             ),
         ),
         (
@@ -594,7 +600,7 @@ def self_test(root: Path) -> list[str]:
             lambda copy: (copy / "skills" / "nuclear-review" / "SKILL.md").write_text(
                 (copy / "skills" / "nuclear-review" / "SKILL.md")
                 .read_text()
-                .replace("produced **no verdict**", "was unhelpful", 1)
+                .replace("produced no verdict", "was unhelpful", 1)
             ),
         ),
         (
@@ -623,11 +629,11 @@ def self_test(root: Path) -> list[str]:
             ),
         ),
         (
-            "deleted land different-family precondition",
+            "deleted land decorrelated-review precondition",
             lambda copy: (copy / "skills" / "nuclear-land" / "SKILL.md").write_text(
                 (copy / "skills" / "nuclear-land" / "SKILL.md")
                 .read_text()
-                .replace("proven\n  different-family approval", "approval", 1)
+                .replace("required decorrelated reviewer identities", "review details", 1)
             ),
         ),
         (
@@ -635,15 +641,15 @@ def self_test(root: Path) -> list[str]:
             lambda copy: (copy / "skills" / "nuclear-review" / "SKILL.md").write_text(
                 (copy / "skills" / "nuclear-review" / "SKILL.md")
                 .read_text()
-                .replace("A same-family pass never substitutes", "Approval stands", 1)
+                .replace("same-family pass", "same-family approval", 1)
             ),
         ),
         (
-            "deleted review quorum gate",
+            "deleted reviewer diversity requirement",
             lambda copy: (copy / "skills" / "nuclear-review" / "SKILL.md").write_text(
                 (copy / "skills" / "nuclear-review" / "SKILL.md")
                 .read_text()
-                .replace("two reviewers from two different model families", "reviewers", 1)
+                .replace("two required reviewers from two different", "reviewers from", 1)
             ),
         ),
         (

@@ -1,4 +1,4 @@
 interface:
   display_name: "Nuclear Review"
-  short_description: "Get an independent cross-model change review"
-  default_prompt: "Use $askrubberduck:nuclear-review to get an independent cross-model review before this change ships."
+  short_description: "Get one evidence-backed cross-model superreview"
+  default_prompt: "Use $askrubberduck:nuclear-review to run one independent superreview and return an evidence-backed APPROVE, REJECT, or NOTE."

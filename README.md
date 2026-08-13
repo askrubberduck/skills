@@ -146,11 +146,13 @@ flowchart LR
     run --> plan
     run --> proof
     run --> break
-    plan <--> review
+    run --> review
+    plan --> review
     proof --> review
     break --> review
-    review --> decide
-    review --> land
+    review -. verdict .-> run
+    run --> decide
+    run --> land
     cut --> decide
     roast -.-> decide
     roast -.-> plan
@@ -161,8 +163,10 @@ flowchart LR
 ```
 
 Solid arrows: the delivery pipeline (discover → plan/build → verify/attack → gate → ship).
-Dotted: supporting handoffs. The graph is illustrative — skill bodies are the reference for
-every handoff. `nuclear-roast` critiques the whole standing solution,
+The review-to-run verdict is a return, not an approval loop: `nuclear-review` judges once;
+`nuclear-run` may remediate and request a new review only for a materially changed candidate.
+Other dotted arrows are supporting handoffs. The graph is illustrative — skill bodies are the
+reference for every handoff. `nuclear-roast` critiques the whole standing solution,
 `nuclear-learn` feeds session lessons back into skills and memory, `nuclear-diet` keeps every
 stage cheap.
 
@@ -180,7 +184,7 @@ stage cheap.
 | `nuclear-learn` | Turn session and delivery evidence into reusable lessons |
 | `nuclear-plan` | Catch architectural and implementation risks before coding begins |
 | `nuclear-proof` | Give completed work a skeptical second pass before anyone trusts it |
-| `nuclear-review` | Find release-blocking risks through an independent cross-model change review |
+| `nuclear-review` | Run one independent cross-model superreview and synthesize an evidence-backed APPROVE, REJECT, or NOTE |
 | `nuclear-roast` | Critique an entire product, solution, or architecture from multiple angles |
 | `nuclear-run` | Plan, implement, test, and independently review a high-risk change |
 | `nuclear-scan` | Find ready, blocked, and remaining work without changing anything |
@@ -239,7 +243,7 @@ since been rewritten and no longer carries his text; the section arc is the surv
 
 ## Status
 
-v0.5.1 — 14 skills. Per-version notes live in
+v0.6.0 — 14 skills. Per-version notes live in
 [Releases](https://github.com/askrubberduck/skills/releases).
 
 Every rule in these skills is here because something measurably failed without it, mined from real

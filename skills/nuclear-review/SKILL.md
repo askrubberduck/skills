@@ -1,146 +1,126 @@
 ---
 name: nuclear-review
-description: Find release-blocking risks through an independent cross-model change review. Use when a PR or diff is ready to review, a security-, privacy-, or data-sensitive change reaches its release gate, the user says "gate it" or asks for a red-team or independent second opinion, or findings span several files and need separate fixes.
+description: Run one independent cross-model superreview and synthesize an evidence-backed APPROVE, REJECT, or NOTE. Use when a PR or diff is ready to review, a security-, privacy-, or data-sensitive change reaches its release gate, the user says "gate it" or asks for a red-team or independent second opinion. It reviews and judges; it does not fix, repeat, or land.
 ---
 
-# Decorrelated Red-Team Review
+# Decorrelated Superreview
 
-The doer is never the final judge. The gate is a **different model family** — never a same-family
-second pass. If no decorrelated family is available, the change waits (fail closed).
+The doer is never the final judge. Use a **different model family**, never a same-family second
+pass. If no decorrelated family is available, fail closed.
 
-For packet-sized or trust-touching work, run `nuclear-plan` BEFORE building —
-gates converge in far fewer rounds when the red team co-authored the plan.
+**One invocation, one judgment.** A superreview may consult several independent reviewers, but it
+does not loop until they approve and it is not a vote. Inspect their claims, adjudicate the evidence,
+and return one authoritative result. Never edit the candidate, produce its prerequisite artifacts,
+repeat the review after fixes, or land it; the calling agent or workflow owns that execution.
 
-## Dispatch
+## Prepare the review
 
-`$SP` is this dispatch's scratchpad: an absolute path under the host's sanctioned scratchpad root
-(e.g. `<scratchpad-root>/<topic>-review`), created before step 1; every artifact below lands there.
-**Trust-touching** — one spelling, collection-wide — means security-, privacy-, or data-sensitive
-work, or a change to any gate's semantics.
+`$SP` is this review's scratchpad: an absolute path under the host's sanctioned scratchpad root
+(for example, `<scratchpad-root>/<topic>-review`), created before step 1. Keep every dispatch
+artifact there. `rN` numbers review invocations, not an internal approval loop.
 
-1. Resolve target into review material: `gh pr diff <N>` / packet draft / `git diff <ref>`.
-   Review the **committed object** (`git show <sha>:path`) or the correct worktree — never a stale
-   main checkout or dirty tree; both families produce false rejects from wrong snapshots. A
-   release candidate's packet spans the last released tag to the exact candidate commit, both
-   full SHAs stated in the prompt; a PR review keeps its own base. A range guessed from adjacent
-   commits reviews the wrong object.
-2. Record the doer's self-reported model family, then select reviewers relative to it. At least one
-   required reviewer must self-report a different model family, and each required reviewer runs the
-   **strongest tier of its family the host lists and you can pin** — decorrelation buys
-   independence, tier buys rigor; two weak families still approve junk. Record the pinned model id
-   and the listing that ranked it (the command and its output) beside each verdict — a pinned id
-   alone proves what ran, not that nothing stronger was listed. A dispatch that had to fall back
-   below that tier is recorded as downgraded, with the failed stronger dispatch as its evidence —
-   a downgraded verdict is a lesser reviewer, never an outage (step 8's outage still means no
-   verdict at all), and it never closes the gate: the gate waits for a strongest-tier verdict, or
-   the owner's recorded acceptance of the downgrade. Executable
-   names are not proof:
-   `agy` can host Gemini, Claude, or other models, and a nested `codex` session remains same-family
-   when the doer is OpenAI/GPT. Unknown identity never counts as decorrelated.
-3. **Before round 1, not only before re-dispatch**: invoke `nuclear-proof` on the diff and write
-   `$SP/proof-r1.md`; on packet-sized **or trust-touching** work — the same scope that required
-   planning above — confirm the committed plan carries its `nuclear-plan` co-authorship line. **No receipt, no dispatch — at every round**, the first included.
-4. Write one prompt to the session scratchpad: the diff/design, acceptance criteria, the round's
-   receipt from step 3 — attached as the doer's claim to attack, never a coverage map, and a
-   receipt whose sections lack artifacts or skip reasons is itself a finding that blocks APPROVE —
-   the break receipt (step 10) when the work is trust-touching, and
-   "verdict line required: APPROVE | REJECT | APPROVE-W-CONDITIONS, with findings list".
-   Reviewer default: refute, not bless.
-5. Run from a **neutral cwd** (scratchpad, never the repo — reviewers can derail when launched in
-   the target checkout), stdin closed, in the background (runs take 10–45 min). Absolute paths
-   everywhere. Choose only reviewers whose model identity you can verify. Minimum shapes:
-   ```bash
-   codex exec -m <strongest-listed> --skip-git-repo-check "$(cat $SP/prompt.md)" </dev/null > $SP/codex-rN.out 2>&1
-   agy --model <verified-non-doer> --add-dir "$SP" --print-timeout 45m -p "..." </dev/null > $SP/agy-rN.out 2>&1
-   ```
-   **Traps — each yields a plausible EMPTY review at exit 0:**
-   - agy is a model HOST: unpinned it may serve a **Claude** model, silently breaking decorrelation.
-     Always pin `--model`; it self-reports, so decorrelation is verifiable.
-   - `--print "<text>"` silently drops the prompt — use `-p`.
-   - Large inlined diffs die on timeout — pass by file, absolute paths (agy ignores cwd).
-   Sanity-check a new invocation form with `-p "What is 2+2?"`. Zero-byte, greeting-only, or
-   timed-out output is a **failed dispatch, never an implicit APPROVE**.
+**Trust-touching** means security-, privacy-, or data-sensitive work, or a change to any gate's
+semantics.
 
-## Adjudicate
+1. Resolve the exact review target: `gh pr diff <N>`, packet draft, committed object, or an
+   intentionally captured worktree diff. A release candidate spans the last released tag to the
+   exact candidate commit, with both full SHAs stated in the prompt; a PR keeps its own base. Never
+   guess a range from adjacent commits or review a different checkout.
+2. Take acceptance criteria from the work item, PR, or user's request; never invent them at
+   dispatch. Freeze them for this invocation.
+3. Check, but do not produce, the candidate's evidence:
+   - `$SP/proof-rN.md` from `nuclear-proof` for every review;
+   - the committed `nuclear-plan` co-authorship line for packet-sized or trust-touching work;
+   - `$SP/break-rN.md` from `nuclear-break` for trust-touching work.
 
-6. Parse every verdict. Per finding there are **four** dispositions, and fixing is not the default:
-   **delete the thing the finding is about**, **fix**, **reject with recorded reason**, or
-   **escalate** to the owner (queue in the repo's obligations registry if it has one; present queued
-   decisions via `nuclear-decide`).
-   - **Ask what the code is for before you patch it.** A finding says "this is broken"; it does not
-     say the thing should exist. The most reliable code is the code never written, so the first
-     question on every finding is whether deleting the feature, flag, branch, or check ends the
-     finding outright. A reviewer optimises what you put in front of it — it will not tell you the
-     whole mechanism was unnecessary.
-   - **A finding demanding a new artifact** — a plan file, scaffolding, a doc tree — is
-     adjudicated against the repo's own conventions first: reject with recorded reason when the
-     conventions already carry the evidence. Committing ceremony to satisfy a reviewer is not
-     compliance, it is obedient patching.
-   - **The growth ratchet.** If one rule draws findings round after round, the rule is wrong, not
-     under-patched. Stop fixing and ask what it is replacing that already works — a stdlib call, a
-     built-in flag, a human decision — then prove what that built-in actually guarantees, which is
-     routinely narrower than its name.
-   - **Count concepts, not lines.** Each round, say what a reader must now hold that they didn't
-     before — a new branch, a new exception, a new place the same fact lives. That number rising every
-     round is the loop; a diffstat is not. Shrinking a diff while tangling the flow is a loss, and it
-     is the loss a line metric scores as a win.
-   - On deletion-heavy diffs, check the diff prefix char + post-change file before accepting a
-     "fact destroyed" finding — context lines and moved facts are common false BLOCKERs.
-   - Family disagreement about framework internals → settle by reading the dependency source, not by vote.
-   - Carry settled refutations into the next round's prompt so rounds converge.
-7. Fix pass → invoke `nuclear-proof` on your own fixes, writing its findings to
-   `$SP/proof-rN.md`
-   → only then re-dispatch every required reviewer. **No `proof-rN.md`, no dispatch** — a round sent
-   without it is a skipped step, not a fast round. Self-refutation costs minutes and saves whole
-   30-minute rounds; it is doer hygiene and never a substitute for the decorrelated gate.
-8. **The required set is two reviewers from two different model families, at least one of them
-   different from the doer's.** Name them before round 1; the gate closes only when every one of
-   them APPROVES in the same round. One reviewer is the **outage exception, not the standard**, and
-   "outage" means exactly one thing: a dispatch that was attempted and produced **no verdict** —
-   zero-byte output, greeting-only, timeout, crash — with that evidence recorded beside the verdict.
-   **A REJECT is never an outage.** A reviewer that answered and refused is the gate working; routing
-   around it is not an exception, it is the doer overruling its own judge. The remaining approval must
-   still be a proven different family. A same-family pass never substitutes, and an unverified model
-   identity is not a family.
+   **No receipt, no dispatch.** A change to this gate's own semantics is reviewed under the
+   PRE-change rules; the new rules bind the next candidate.
+4. Record the doer's self-reported model family. Name two required reviewers from two different
+   model families, with at least one proven different from the doer. Each runs the **strongest tier
+   of its family the host lists and you can pin**: decorrelation buys independence; tier buys rigor.
+   Record the pinned model id plus the listing command and output that ranked it. Executable names
+   are not identities: `agy` can host Claude, Gemini, or another family, while nested `codex`
+   remains OpenAI/GPT when the doer is OpenAI/GPT. Unknown identity never counts as decorrelated.
+5. Write one prompt to `$SP` containing the target, frozen criteria, and receipts as claims to
+   attack, never as a coverage map. Require the result contract below. Missing receipt evidence is
+   itself a finding. Reviewer default: refute, not bless.
 
-## When the gate does not converge
+## Run the reviewers
 
-Decorrelation buys independent judgement, not agreement.
+Run from a neutral scratch directory, never the target checkout. Close stdin, use absolute paths,
+and run in the background because reviews can take 10–45 minutes. Minimum shapes:
 
-- **Rank every finding** BLOCKER / SHOULD / NOTE — **only a BLOCKER holds the gate**; the rest land
-  as follow-up items. A reviewer that does not rank has not finished the review.
-- **Criteria are frozen before round 1**, from the work item, never composed by the doer at
-  dispatch. One discovered mid-gate is **a NEW WORK ITEM, not a new gate condition** — adding one
-  mid-flight moves the target, and a moving target cannot converge.
-- **Judge the change, not the paperwork.** A defect in a receipt or commit message is a NOTE unless
-  it makes an artifact claim unverifiable.
-- **A round that produces no BLOCKER closes the gate.** Say the severity trend aloud each round;
-  falling severity with rising round count is the signal to stop, not to go again.
-- **Split verdicts go to an orchestrator**, not another round: after two rounds of APPROVE against
-  REJECT on the same object, a third party adjudicates each disputed finding against the frozen
-  criteria and records why. Adjudication, never a vote, never the doer breaking its own tie.
-- **A change to a gate's own rules is reviewed under the PRE-change rules**; the new ones bind the
-  next candidate. Otherwise the doer is judged by a standard it is still writing.
+```bash
+codex exec -m <strongest-listed> --skip-git-repo-check "$(cat $SP/prompt.md)" </dev/null > $SP/codex-rN.out 2>&1
+agy --model <verified-non-doer> --add-dir "$SP" --print-timeout 45m -p "..." </dev/null > $SP/agy-rN.out 2>&1
+```
 
-## Multi-lane fix-pass (when findings fan wide)
+Sanity-check a new invocation form with `-p "What is 2+2?"`. These traps can yield plausible empty
+reviews at exit 0:
 
-Fan the fix across N lanes by **file ownership** — one lane owns a file, a finding spanning two
-goes to exactly one, named in both briefs. Brief each lane with its findings plus the shared
-invariants only; the full list to every lane is N× tokens for no extra coverage. Crossed reports
-("already fixed" / "still broken") are settled by reading the current tree, never by lane vote.
-The gate stays singular: lanes never self-approve, and the round ends with ONE re-dispatch.
+- An unpinned `agy` invocation can silently use the wrong model family. Always pin `--model`.
+- `--print "<text>"` can drop the prompt; use `-p`.
+- Large inlined diffs can time out; pass them by absolute file path.
+
+A zero-byte, greeting-only, timed-out, or crashed dispatch is an outage: a dispatch attempted that
+produced no verdict. Record its evidence. **A REJECT is never an outage**, and a same-family pass
+never substitutes for a required reviewer.
+
+## Reviewer result contract
+
+Require each reviewer to return `APPROVE | REJECT | NOTE` and findings ranked
+`BLOCKER | SHOULD | NOTE`:
+
+- `APPROVE` claims no release-blocking defect was found.
+- `REJECT` claims at least one finding is release-blocking.
+- `NOTE` says something material stands out without making a gate decision. It neither authorizes
+  nor rejects, is not `APPROVE-W-CONDITIONS`, and is not an outage.
+
+These are inputs to the superreview, not votes. A reviewer that does not rank its findings has not
+finished; use whatever evidence is present, but record the malformed result.
+
+## Adjudicate the claims
+
+Treat every verdict and finding as a claim, not a fact. For each finding, inspect the current target
+and classify it as a substantiated `BLOCKER`, retained `SHOULD`, retained `NOTE`, or dismissed with
+a recorded reason.
+
+- Check the repository's own conventions before accepting a demand for a new artifact. Existing
+  evidence beats reviewer-invented ceremony.
+- Ask what the code is for before recommending a patch. If removing the feature, flag, branch, or
+  check ends the defect without losing a required outcome, recommend deletion.
+- On deletion-heavy diffs, inspect the diff prefix and post-change file before accepting a claim
+  that a fact disappeared; context lines and moved facts create false blockers.
+- Resolve disagreement about framework behavior by reading the dependency source, not by vote.
+- If supplied history shows the same rule drawing repeated findings, apply the growth ratchet: ask
+  whether that rule should exist rather than proposing another patch.
+- Count concepts, not lines: identify any new branch, exception, or second home for the same fact.
+- Judge the change, not paperwork. A receipt or commit-message defect is a `NOTE` unless it makes
+  the underlying artifact claim unverifiable.
+
+## Synthesize one result
+
+Return exactly one superreview result:
+
+- `APPROVE` — a gate decision was requested and no substantiated `BLOCKER` remains.
+- `REJECT` — at least one substantiated `BLOCKER` remains.
+- `NOTE` — something material stands out, but no gate decision was requested or the available
+  criteria and evidence do not support one. `NOTE` neither authorizes nor rejects the candidate.
+
+Only a substantiated `BLOCKER` justifies `REJECT`; `SHOULD` and finding-level `NOTE` items do not.
+Reviewer unanimity is neither required nor sufficient. A false `REJECT` may be dismissed with
+evidence, and an `APPROVE` cannot erase a defect the superreview substantiates. A release workflow
+may land only `APPROVE`; a superreview `NOTE` is a non-decision, not a hidden pass or failure.
+
+Report the authoritative result, each reviewer's pinned model id and family, each raw verdict, every
+finding's adjudicated classification and evidence, any outage or downgrade, and the exact target and
+criteria reviewed. Never commit raw CLI stdout; keep it in `$SP`.
+
+Then stop. Persisting the result, executing a fix or deletion, resolving an owner decision,
+reviewing a materially changed candidate, and landing belong to the calling agent or workflow.
 
 ## Optional lens: product fit
 
-On request, one extra round after correctness APPROVE with the lens shifted: does this fit the
-product's scope, what shipped that should be cut, is the boundary where users need it. Same
-mechanics; weigh functionality/extendability/security, never build effort.
-
-## Record
-
-9. Fold verdicts + adjudications + trajectory (`REJECT/REJECT → APPROVE/APPROVE r2`) into the work
-   item's review log. **Never commit raw CLI stdout** — extract verdict + findings, keep outputs in
-   the scratchpad.
-10. Trust-touching changes ship `nuclear-break`'s `break-rN.md` with the review material; without
-   that receipt the attacks are unproven and the gate does not close. On final APPROVE of a
-   mergeable change: `nuclear-land` ships and records it.
+When the user requests product-fit review, use the same single invocation and judgment with this
+lens: does the change fit the product's scope, what should be cut, and is the boundary where users
+need it? Weigh functionality, extendability, and security; never weigh sunk implementation effort.
