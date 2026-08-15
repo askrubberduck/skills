@@ -10,7 +10,14 @@ plan same-family and send it out for adversarial review; let the other families 
 
 ## Recipe
 
-1. **Investigate the real code seams first.** Ground everything in actual source, never a summary.
+1. **Start from a framed design, never a fresh guess.** Read `design-<unit>.md` beside the work
+   item: it carries the seam map, the requirements, the rejected alternatives, and the pinned
+   source this plan decomposes. Always reach it by running `nuclear-frame` and waiting: its
+   preflight owns freshness and returns a settled artifact untouched, so re-deciding here would be a
+   second, weaker copy of that test — digests cannot see a changed ask. Then check what this plan
+   will actually touch: **anything you are about to decompose that the frame never looked at means
+   the frame is incomplete, not merely stale** — re-frame rather than filling the gap here. **No framed design, no dispatch** — a plan whose architecture
+   was invented in the same turn as its task list has nothing decorrelated about it.
 2. **Establish the doer's model family from self-reported runtime metadata, then ask independent
    reviewer CLIs to PRODUCE plans, not review one**: "author the safest build plan, the task
    decomposition, and the traps you'd attack", with the design + seam map provided. At least one

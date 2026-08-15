@@ -1,0 +1,14 @@
+# The repository documented both gates as things to run before publishing, and nothing ran them.
+# A gate that depends on someone remembering is not a gate.
+name: gate
+on: [push, pull_request]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python3 scripts/render-catalog.py --check
+      - run: python3 scripts/validate-distribution.py --self-test

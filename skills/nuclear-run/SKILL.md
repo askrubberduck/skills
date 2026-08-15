@@ -9,8 +9,10 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
 
 ## Stages
 
-1. **Ground.** Read the project's quality bar first: `SOUL.md`, `CLAUDE.md`/`AGENTS.md` if present.
-   Trace the real flow end to end before planning — laziness shortens the solution, never the reading.
+1. **Ground.** Run `nuclear-frame`: it reads the project's quality bar, traces the real flow end to
+   end, and settles the shape before anything is planned or written. Laziness shortens the
+   solution, never the reading. Its `READY` artifact comes back here; this stage decides what
+   follows, and a `CUT` verdict ends the run.
 2. **Plan.** Detailed decomposition: units of work, gates per unit, acceptance evidence.
    Steel-man at least one alternative decomposition before committing; first idea is a candidate, not a decision.
    Packet-sized or trust-touching: co-author the plan via `nuclear-plan` instead of

@@ -90,6 +90,20 @@ namespaced reference and one naming a skill that does not exist.
 | Agy plugin | `/nuclear-run`; namespaced only when needed | `SKILL.md` |
 | Standalone Agent Skills | Unqualified, using the host's syntax | `SKILL.md` |
 
+### Updating an existing install
+
+New skills added after you installed are **not** picked up automatically. The symlink form links
+each skill individually, so a `git pull` that adds one leaves it invisible until you relink:
+
+```bash
+git -C askrubberduck-skills pull
+ln -sfn "$PWD"/askrubberduck-skills/skills/* ~/.claude/skills/    # or ~/.agents/skills/
+```
+
+Plugin installs update through their host instead — `codex plugin marketplace upgrade` for Codex,
+`/plugin` for Claude Code, `agy plugin install` again for Agy. Start a new session afterwards either
+way; hosts read the skill set at startup.
+
 ### Agents without native skill discovery
 
 Paste the block from [`AGENTS-CATALOG.md`](AGENTS-CATALOG.md) into the repo's `AGENTS.md` — any
@@ -106,9 +120,11 @@ None of these are required — the collection is self-contained — but they com
 - **[rtk](https://www.rtk-ai.app/)** — hook-level CLI proxy that shrinks dev-command output before
   it reaches the context; the runtime complement to `nuclear-diet`'s rules.
 
-Hard prerequisites are only `git` + `gh`, and at least one reviewer CLI whose self-reported model
-family differs from the doer (for example Gemini when the doer is OpenAI/GPT, or Codex when the doer
-is not OpenAI/GPT). Without a proven decorrelated family, `nuclear-review` fails closed by design.
+Hard prerequisites are `git` + `gh`, and **two reviewer CLIs from two different model families**,
+at least one proven different from the doer — that is the quorum `nuclear-review` enforces, not one.
+For example Gemini and Codex when the doer is Claude. A machine with a single reviewer satisfies
+neither the gate nor this list: without a proven decorrelated family, `nuclear-review` fails closed
+by design. Executable names are not identities; pin the model and verify what it reports.
 
 ## The graph
 
@@ -117,8 +133,9 @@ flowchart LR
     subgraph discover
         scan[nuclear-scan]
     end
-    subgraph build["plan + build"]
+    subgraph build["frame + plan + build"]
         campaign[nuclear-campaign]
+        frame[nuclear-frame]
         plan[nuclear-plan]
         run[nuclear-run]
     end
@@ -143,6 +160,9 @@ flowchart LR
     scan --> cut
     campaign --> plan
     campaign -.-> diet
+    frame -.-> decide
+    run --> frame
+    plan --> frame
     run --> plan
     run --> proof
     run --> break
@@ -162,11 +182,16 @@ flowchart LR
     learn -.-> proof
 ```
 
-Solid arrows: the delivery pipeline (discover → plan/build → verify/attack → gate → ship).
+Solid arrows: the delivery pipeline (discover → frame/plan/build → verify/attack → gate → ship).
+`nuclear-frame` owns everything before planning — the seam map, the requirements, the rejected
+alternatives — and hands its artifact back to whoever called it; it never advances a stage itself.
 The review-to-run verdict is a return, not an approval loop: `nuclear-review` judges once;
 `nuclear-run` may remediate and request a new review only for a materially changed candidate.
-Other dotted arrows are supporting handoffs. The graph is illustrative — skill bodies are the
-reference for every handoff. `nuclear-roast` critiques the whole standing solution,
+Other dotted arrows are supporting handoffs. **The graph is a subset drawn for orientation, not a
+map of every edge** — several real handoffs are omitted to keep it readable, and it is maintained by
+hand while the real edge set is derived from the skill bodies into `REQUIRED_LINKS` by
+`scripts/render-required-links.py`. Where the two disagree, the bodies and that table are
+authoritative. `nuclear-roast` critiques the whole standing solution,
 `nuclear-learn` feeds session lessons back into skills and memory, `nuclear-diet` keeps every
 stage cheap.
 
@@ -180,6 +205,7 @@ stage cheap.
 | `nuclear-cut` | Shrink a backlog by removing obsolete work, merging duplicates, and unblocking viable items |
 | `nuclear-decide` | Resolve owner decisions and sign-offs one at a time |
 | `nuclear-diet` | Reduce agent context, memory, and token costs without losing essential guidance |
+| `nuclear-frame` | Analyze a system and settle its target design before planning begins |
 | `nuclear-land` | Merge approved work, update project records, and clean up its branch and worktree |
 | `nuclear-learn` | Turn session and delivery evidence into reusable lessons |
 | `nuclear-plan` | Catch architectural and implementation risks before coding begins |
@@ -206,7 +232,7 @@ python3 scripts/validate-distribution.py --self-test
 ```
 
 The validator checks the Codex, Claude, and Agy manifests; every Codex skill interface; the canonical
-14-skill set; human-first descriptions; cross-skill resolution; install documentation; generated
+15-skill set; human-first descriptions; cross-skill resolution; install documentation; generated
 catalog freshness; and known corruption cases. It performs no network access and writes only to
 temporary directories during self-test.
 
@@ -243,7 +269,7 @@ since been rewritten and no longer carries his text; the section arc is the surv
 
 ## Status
 
-v0.6.1 — 14 skills. Per-version notes live in
+v0.7.0 — 15 skills. Per-version notes live in
 [Releases](https://github.com/askrubberduck/skills/releases).
 
 Every rule in these skills is here because something measurably failed without it, mined from real
