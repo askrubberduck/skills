@@ -26,6 +26,14 @@ the repo forgot; a record without a verified merge is fiction.
   SHA** the same way this landing was authorized — the review gate, or the owner's renewed written
   waiver; landing on the strength of the old authorization merges an unexamined diff.
 - CI green on the exact head being merged.
+- **Where this landing is a repository's first push to a public remote — or the one that flips it
+  public — scan the whole shipped tree *and* its commit messages for internal identifiers** before
+  the push: private repo and product names, machine-local paths (`~/code/docs/<project>`), internal
+  URLs. Derive the list from the machine rather than guessing — the other remotes, the sibling
+  private repos, the codenames in the history. Measured: an internal docs path shipped in a public
+  README, and product codenames survived in comments after the files carrying them were renamed.
+  A leaked reference is public the moment it pushes; a later deletion leaves it in the history and
+  in every clone.
 - **A precondition the owner directs you to waive is waived only in writing before the push** —
   which precondition, and the owner's decision, recorded where the repo keeps decisions at the
   moment it is given; step 3's outcome record then **names what was waived**. Waiving is the
@@ -34,7 +42,12 @@ the repo forgot; a record without a verified merge is fiction.
 
 ## Land
 
-1. Merge per the repo's policy (squash-merge the PR, or direct push where that is the standard),
+1. Merge per the repo's policy — **read that policy off the base's own history, never from habit**:
+   where the last 20 commits on `origin/<base>` carry no merge commit, the branch is flat and this
+   landing is not the one that mints the first — rebase or squash, one commit per packet; a stray
+   merge in an otherwise flat log is not a licence, match the dominant shape. Measured:
+   four `--no-ff` merges landed a campaign onto a flat `main`, breaking a convention that no config
+   enforced and no reviewer flagged. Squash-merge the PR, or direct push where that is the standard,
    **pinning the base at merge time**: a base that advances between the precondition check and
    the merge lands a combination nobody reviewed, and no later check can un-land it. The merge
    must FAIL when the base moved — so **verify your mechanism blocks, never infer it from its

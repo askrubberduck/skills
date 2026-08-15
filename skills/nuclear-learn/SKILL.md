@@ -13,9 +13,14 @@ or gets consciously discarded. Lessons that live only in a chat transcript are l
 1. **Gather evidence, don't reminisce.** Session transcripts — Claude
    `~/.claude/projects/<dir>/*.jsonl`, Codex `$CODEX_HOME/sessions` and `archived_sessions` —
    alongside recorded outcomes, review trajectories, and token stats. Extract **counts**: repeated
-   directives, repeated failures, repeated tool patterns. Big transcripts are mined by script or
-   subagent, never read raw into the main context, and no raw prompt text goes into durable output.
-   Missing or malformed store? Say so and mark the result partial.
+   directives, repeated failures, repeated tool patterns. Filter by event timestamp, not file mtime,
+   and count independent owner/root tasks, not JSONL files: deduplicate canonical session IDs; fold
+   subagents, workflow journals, forwarded copies, retries, and cross-host reviewer executions into
+   their parent task when lineage is available; report roots and delegated logs separately. Generated
+   prompts, task notifications, and tool results are tool evidence, never owner directives. Big
+   transcripts are mined by script or subagent, never read raw into the main context, and no raw
+   prompt text goes into durable output. Missing or malformed store? Say so and mark the result
+   partial.
 2. **Classify each candidate lesson** by its durable home — one authoritative home per lesson:
    - Repeatable multi-step workflow **the user asks for in words** → a **skill** (new, or a section
      of an existing one — prefer extending; a new skill is a cost).
