@@ -1,4 +1,3 @@
-# The repository documented both gates as things to run before publishing, and nothing ran them.
 # A gate that depends on someone remembering is not a gate.
 name: gate
 on: [push, pull_request]

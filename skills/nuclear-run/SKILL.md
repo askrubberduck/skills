@@ -39,20 +39,18 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
    schema, a trap. Never narrate what the next line does, and never leave the war story of the bug
    that caused it: that belongs in the commit, and in the code it is dead weight the next edit
    silently falsifies.
-6. **Verify.** Run the project's gates (tests/build/vet or doc gates), then invoke
-   `nuclear-proof`
+6. **Verify.** Run the project's gates (tests/build/vet or doc gates), then invoke `nuclear-proof`
    on your own diff — it leaves `proof-<unit>.md`, or `$SP/proof-r1.md` when stage 7's review is
    next (`$SP`: `nuclear-review`'s dispatch scratchpad), which is where the gate looks; no file, no
-   proof pass happened. Trust-touching
-   work additionally gets the `nuclear-break` attacks executed before the gate. Evidence over
-   assertion — a failed or unrun check means not done; say so with output.
+   proof pass happened. Trust-touching work additionally gets the `nuclear-break` attacks executed
+   before the gate. Evidence over assertion — a failed or unrun check means not done; say so with
+   output.
 7. **Independent superreview.** Never self-approve — which forbids granting yourself the verdict,
    not doing the thinking: stage 6 exists because the doer is expected to have questioned and
-   validated the change before anyone else reads it.
-   Use the project's review policy — default: the
-   `nuclear-review` / proven different-family gate. `nuclear-review` executes one review, adjudicates
-   its reviewers, and returns one authoritative `APPROVE | REJECT | NOTE`; this stage acts on that
-   result without reinterpreting the raw reviewer votes.
+   validated the change before anyone else reads it. Use the project's review policy — default:
+   the `nuclear-review` / proven different-family gate. `nuclear-review` executes one review,
+   adjudicates its reviewers, and returns one authoritative `APPROVE | REJECT | NOTE`; this stage
+   acts on that result without reinterpreting the raw reviewer votes.
 
    **a. Prepare and invoke.** Commit the candidate first and record its SHA — the review names an
    exact target and landing requires that SHA, so a review of an uncommitted worktree cannot be

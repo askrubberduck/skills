@@ -51,8 +51,6 @@ namespaced `/askrubberduck:nuclear-run`. The third route is enabling the skills 
 account, which is the only one that also reaches Cowork sessions; those uploads accept only the six
 Agent Skills frontmatter fields, which every skill here already satisfies.
 
-Working in this repo with the plugin also installed gives you both `/nuclear-run` and
-`/askrubberduck:nuclear-run` — the duplicate-entry case the standalone section warns about.
 
 ### Codex CLI and the Codex app (recommended)
 
@@ -74,8 +72,8 @@ codex plugin marketplace add askrubberduck/skills --ref "$release_tag"
 codex plugin add askrubberduck@askrubberduck
 ```
 
-This pins the latest published release, which may trail `master`. Start a new Codex session after
-installation. Plugin skill names are qualified, for example `$askrubberduck:nuclear-run`.
+Start a new Codex session after installation. Plugin skill names are qualified, for example
+`$askrubberduck:nuclear-run`.
 
 ### Agy
 
@@ -283,12 +281,8 @@ temporary directories during self-test.
   a reader must hold, whether one path traces without jumping, whether cause sits near effect.
 - **A rule states what must hold, not how it was learned** — the incident that produced a rule is
   not the rule, and belongs in the release notes.
-- **Absolute paths, no `cd` chains** — path boilerplate is a top token sink.
-- **Grep-first, delegate large reads** — no >20KB file pulls into the main context; page with
-  offset/limit or send an investigator subagent.
-- **Never commit raw CLI stdout** — extract verdicts/findings; raw outputs stay in the scratchpad.
-- **End the session at stage boundaries** — plan→build→review transitions are compaction points;
-  marathon sessions re-bill the whole window every turn.
+- **Token discipline** — absolute paths, grep-first, raw output out of git, sessions end at stage
+  boundaries; the runtime rules live in `nuclear-diet`.
 - **Fail closed** — a missing reviewer, empty output, or unverified claim is never an implicit pass.
 
 ## Credits

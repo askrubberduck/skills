@@ -31,9 +31,6 @@ EXPECTED_SKILLS = {
     "nuclear-scan",
     "nuclear-sweep",
 }
-# Any skill can be where an unsupervised run begins, so the stopping discipline cannot live in one
-# body. What matters is that the fifteen copies agree, which is checkable without a sixteenth copy
-# here — and keeping the text out of this file keeps the skills tree the only place it is edited.
 README_MARKERS = (
     "codex plugin marketplace add askrubberduck/skills",
     "codex plugin add askrubberduck@askrubberduck",
@@ -46,7 +43,7 @@ README_MARKERS = (
     "agy plugin validate",
     "agy plugin install",
     "agents/openai.yaml",
-    "v0.8.0",
+    f"v{EXPECTED_VERSION}",
 )
 
 
@@ -72,22 +69,6 @@ def require_text(errors: list[str], label: str, value: Any) -> None:
     # Hosts render this string; none of them care what it says, so the wording stays editable.
     if not isinstance(value, str) or not value.strip():
         errors.append(f"{label}: missing description")
-
-
-def require_contained_path(root: Path, label: str, raw_path: Any, errors: list[str]) -> Path | None:
-    if not isinstance(raw_path, str) or not raw_path:
-        errors.append(f"{label}: missing path")
-        return None
-    candidate = (root / raw_path).resolve()
-    try:
-        candidate.relative_to(root.resolve())
-    except ValueError:
-        errors.append(f"{label}: path escapes repository root: {raw_path!r}")
-        return None
-    if not candidate.exists():
-        errors.append(f"{label}: path does not exist: {raw_path!r}")
-        return None
-    return candidate
 
 
 def render_expected(root: Path) -> tuple[str, str]:
@@ -124,7 +105,6 @@ def validate(root: Path) -> list[str]:
         require_equal(errors, f"{label} license", manifest.get("license"), "MIT")
 
     require_equal(errors, "Codex skills path", codex.get("skills"), "./skills/")
-    require_contained_path(root, "Codex skills path", codex.get("skills"), errors)
     for forbidden in ("mcpServers", "apps", "hooks"):
         if forbidden in codex:
             errors.append(f"Codex manifest: unrequested capability {forbidden!r}")
@@ -171,11 +151,6 @@ def validate(root: Path) -> list[str]:
         else:
             require_equal(errors, "Codex marketplace source kind", source.get("source"), "local")
             require_equal(errors, "Codex marketplace source path", source.get("path"), "./")
-            plugin_root = require_contained_path(
-                root, "Codex marketplace source path", source.get("path"), errors
-            )
-            if plugin_root and plugin_root != root.resolve():
-                errors.append("Codex marketplace source path: must resolve to the repository root")
         require_equal(
             errors,
             "Codex marketplace policy",
@@ -340,9 +315,35 @@ def rewrite_json(path: Path, mutate: Callable[[dict[str, Any]], None]) -> None:
 
 
 
+def replace_in(copy: Path, relative: str, old: str, new: str) -> None:
+    path = copy / relative
+    path.write_text(path.read_text().replace(old, new, 1))
+
+
 def self_test(root: Path) -> list[str]:
     failures: list[str] = []
+    run_skill = "skills/nuclear-run/SKILL.md"
+    review_skill = "skills/nuclear-review/SKILL.md"
+    replacements = [
+        ("dangling cross-skill reference", run_skill, "`nuclear-proof`", "`nuclear-proofread`"),
+        ("namespaced cross-skill reference", run_skill, "`nuclear-proof`", "`$askrubberduck:nuclear-proof`"),
+        ("slash-namespaced cross-skill reference", run_skill, "`nuclear-proof`", "`/askrubberduck:nuclear-proof`"),
+        ("bare-namespaced cross-skill reference", run_skill, "`nuclear-proof`", "askrubberduck:nuclear-proof"),
+        ("dollar-prefixed dangling reference", run_skill, "`nuclear-proof`", "`$nuclear-proofread`"),
+        ("host-prefixed skill reference", "skills/nuclear-campaign/SKILL.md", "`nuclear-diet`", "`$nuclear-diet`"),
+        ("collapsed code fence", review_skill, "```bash", "``bash"),
+        (
+            "agent-only description",
+            "skills/nuclear-scan/SKILL.md",
+            "description: Find ready, blocked, and remaining work without changing anything.",
+            "description: Use when work status needs scanning.",
+        ),
+    ]
     cases: list[tuple[str, Callable[[Path], None]]] = [
+        (label, lambda copy, r=rel, o=old, n=new: replace_in(copy, r, o, n))
+        for label, rel, old, new in replacements
+    ]
+    cases += [
         (
             "version mismatch",
             lambda copy: rewrite_json(
@@ -358,90 +359,17 @@ def self_test(root: Path) -> list[str]:
             ),
         ),
         (
-            "dangling cross-skill reference",
-            lambda copy: (copy / "skills" / "nuclear-run" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-run" / "SKILL.md")
-                .read_text()
-                .replace("`nuclear-proof`", "`nuclear-proofread`", 1)
-            ),
-        ),
-        (
-            "namespaced cross-skill reference",
-            lambda copy: (copy / "skills" / "nuclear-run" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-run" / "SKILL.md")
-                .read_text()
-                .replace("`nuclear-proof`", "`$askrubberduck:nuclear-proof`", 1)
-            ),
-        ),
-        (
-            "slash-namespaced cross-skill reference",
-            lambda copy: (copy / "skills" / "nuclear-run" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-run" / "SKILL.md")
-                .read_text()
-                .replace("`nuclear-proof`", "`/askrubberduck:nuclear-proof`", 1)
-            ),
-        ),
-        (
-            "bare-namespaced cross-skill reference",
-            lambda copy: (copy / "skills" / "nuclear-run" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-run" / "SKILL.md")
-                .read_text()
-                .replace("`nuclear-proof`", "askrubberduck:nuclear-proof", 1)
-            ),
-        ),
-        (
-            "dollar-prefixed dangling reference",
-            lambda copy: (copy / "skills" / "nuclear-run" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-run" / "SKILL.md")
-                .read_text()
-                .replace("`nuclear-proof`", "`$nuclear-proofread`", 1)
-            ),
-        ),
-        (
-            "host-prefixed skill reference",
-            lambda copy: (copy / "skills" / "nuclear-campaign" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-campaign" / "SKILL.md")
-                .read_text()
-                .replace("`nuclear-diet`", "`$nuclear-diet`", 1)
-            ),
-        ),
-        (
             "collapsed fence with trailing space",
-            lambda copy: (copy / "skills" / "nuclear-review" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-review" / "SKILL.md")
-                .read_text()
-                .replace("```bash", "``bash ", 1)
-                .replace("\n   ```\n", "\n   `` \n", 1)
-            ),
-        ),
-        (
-            "collapsed code fence",
-            lambda copy: (copy / "skills" / "nuclear-review" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-review" / "SKILL.md")
-                .read_text()
-                .replace("```bash", "``bash", 1)
+            lambda copy: (
+                replace_in(copy, review_skill, "```bash", "``bash "),
+                replace_in(copy, review_skill, "\n   ```\n", "\n   `` \n"),
             ),
         ),
         (
             "malformed manifest",
             lambda copy: (copy / ".codex-plugin" / "plugin.json").write_text("{\n"),
         ),
-        (
-            "missing Agy adapter",
-            lambda copy: (copy / "plugin.json").unlink(),
-        ),
-        (
-            "agent-only description",
-            lambda copy: (copy / "skills" / "nuclear-scan" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-scan" / "SKILL.md")
-                .read_text()
-                .replace(
-                    "description: Find ready, blocked, and remaining work without changing anything.",
-                    "description: Use when work status needs scanning.",
-                    1,
-                )
-            ),
-        ),
+        ("missing Agy adapter", lambda copy: (copy / "plugin.json").unlink()),
         (
             "malformed Codex skill interface",
             lambda copy: (
