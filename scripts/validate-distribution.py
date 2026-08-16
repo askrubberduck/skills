@@ -372,6 +372,23 @@ def validate(root: Path) -> list[str]:
     skill_root = root / "skills"
     found_skills = {path.parent.name for path in skill_root.glob("*/SKILL.md")}
     require_equal(errors, "skill directory set", found_skills, EXPECTED_SKILLS)
+
+    # Cloud sessions clone the repo and read `.claude/skills/`; they never see `~/.claude/skills/`.
+    # A skill added to `skills/` without its link is invisible to every cloud session on this repo,
+    # and nothing but this check would say so.
+    link_root = root / ".claude" / "skills"
+    linked_skills = {path.name for path in link_root.iterdir()} if link_root.is_dir() else set()
+    require_equal(errors, "project skill link set", linked_skills, EXPECTED_SKILLS)
+    for name in sorted(linked_skills):
+        link = link_root / name
+        if not link.is_symlink():
+            errors.append(f".claude/skills/{name}: must be a symlink into skills/, not a copy")
+        elif str(link.readlink()) != f"../../skills/{name}":
+            errors.append(
+                f".claude/skills/{name}: links to {str(link.readlink())!r}, expected "
+                f"'../../skills/{name}'"
+            )
+
     for name in sorted(found_skills):
         path = skill_root / name / "SKILL.md"
         text = path.read_text()
@@ -832,6 +849,10 @@ def self_test(root: Path) -> list[str]:
                 copy / "skills" / "nuclear-run" / "agents" / "openai.yaml"
             ).write_text("interface:\n"),
         ),
+        (
+            "skill left out of the cloud-session links",
+            lambda copy: (copy / ".claude" / "skills" / "nuclear-run").unlink(),
+        ),
     ]
     for label, mutate in cases:
         with tempfile.TemporaryDirectory(prefix="askrubberduck-validator-") as directory:
@@ -839,6 +860,7 @@ def self_test(root: Path) -> list[str]:
             shutil.copytree(
                 root,
                 copy,
+                symlinks=True,
                 ignore=shutil.ignore_patterns(".git", "graphify-out", "__pycache__"),
             )
             before = _fingerprint(copy)
@@ -852,10 +874,14 @@ def self_test(root: Path) -> list[str]:
 
 
 def _fingerprint(root: Path) -> dict[str, str]:
+    # Symlinks are recorded by target, not followed: rglob does not descend into them, so a
+    # deleted or repointed link would otherwise look like a mutation that changed nothing.
     return {
-        str(path.relative_to(root)): path.read_text(errors="replace")
+        str(path.relative_to(root)): (
+            f"symlink:{path.readlink()}" if path.is_symlink() else path.read_text(errors="replace")
+        )
         for path in sorted(root.rglob("*"))
-        if path.is_file()
+        if path.is_symlink() or path.is_file()
     }
 
 

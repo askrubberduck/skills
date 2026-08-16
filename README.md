@@ -24,6 +24,36 @@ Start a new Claude Code session after installing so it refreshes skill discovery
 Plugin skills are namespaced slash commands, for example `/askrubberduck:nuclear-run`. The local
 symlink install is standalone and therefore exposes `/nuclear-run` instead.
 
+#### Cloud sessions
+
+Both installs above are invisible to a cloud session — Claude Code on the web, `claude --cloud`, and
+routines run in a fresh container that clones the repo and never reads `~/.claude/`. A cloud session
+loads project skills from the cloned `.claude/skills/`, so this repo links its own skills there:
+open a cloud session on this repo and `/nuclear-cut` works with no setup, resolved from the checked
+out branch rather than the published release. `validate-distribution.py` fails if a skill in
+`skills/` has no link, because a missing one is silent.
+
+To get the skills in a **different** repo's cloud sessions, declare the plugin in that repo's
+`.claude/settings.json`. Repo-declared plugins install at session start; plugins enabled only in
+your user settings do not transfer:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "askrubberduck": { "source": { "source": "github", "repo": "askrubberduck/skills" } }
+  },
+  "enabledPlugins": { "askrubberduck@askrubberduck": true }
+}
+```
+
+That form installs the published default branch, needs network access to GitHub, and exposes the
+namespaced `/askrubberduck:nuclear-run`. The third route is enabling the skills on your claude.ai
+account, which is the only one that also reaches Cowork sessions; those uploads accept only the six
+Agent Skills frontmatter fields, which every skill here already satisfies.
+
+Working in this repo with the plugin also installed gives you both `/nuclear-run` and
+`/askrubberduck:nuclear-run` — the duplicate-entry case the standalone section warns about.
+
 ### Codex CLI and the Codex app (recommended)
 
 Install the repository as a plugin. This keeps the full collection versioned as one unit and is the
