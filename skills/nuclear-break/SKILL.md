@@ -29,9 +29,12 @@ review's job. A claim of robustness without an executed attack behind it is an o
 - Measure the artifact's exit status **directly, never through a pipe**: `cmd | head` reports the
   tail's status, bash `PIPESTATUS` is zsh `pipestatus`, and grep exits 1 on zero matches — three
   measured ways a break run reported green while the artifact was red.
-- Entire finding list, no severity triage — the owner weighs, the breaker surfaces.
+- Entire finding list, no severity triage — the owner weighs, the breaker surfaces. No triage is
+  not no validation: a finding whose reproducing command does not reproduce is not a finding, and
+  reporting it unchecked spends someone else's round.
 - **The breaker never fixes.** Doer and judge stay separate: findings route to the normal pipeline
-  (fix → `nuclear-review`). Fixing mid-break contaminates both roles.
+  (fix → `nuclear-review`). Fixing mid-break contaminates both roles. Separation bars the fix, not
+  the thinking — the breaker still questions every attack it runs and every result it gets.
 - "Unbreakable" is only claimable per attack actually executed — list what was run, including the
   attacks that found nothing. Unattempted ≠ survived.
 - Revert every mutation and restore clean state before reporting; a dirty tree after a break run is

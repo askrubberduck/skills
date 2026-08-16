@@ -46,6 +46,9 @@ Critique product and engineering substance ONLY — never market validation, use
 - Findings without evidence — a vibe is not a finding; cite the file or the behavior.
 - Trimming the list to "the important ones" or severity-sorting it — the owner judges weight; the
   roast only surfaces. A dropped finding is a silent decision the roast had no right to make.
+- Reading "surfaces everything" as "checks nothing" — weighing is the owner's, validating is the
+  roast's. A claim it could not substantiate is reported as unsubstantiated, never laundered into
+  the list as a finding.
 - Stopping after round one because it "found plenty" — the second round against settled findings is
   where the deep ones surface.
 - Letting the roast write fixes — output is findings + dispositions; execution goes through the

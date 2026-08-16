@@ -77,6 +77,12 @@ growing one that untangles it. "It removed lines" is not a defence.
 Finding nothing is a legitimate outcome; say so. This pass earns you the dispatch, never the
 approval — you remain the doer, not the judge, and trust-touching work goes to `nuclear-review`.
 
+**Not the judge is a limit on authority, never on scrutiny.** The doer is expected to validate the
+work, question the solution, and attack its own reasoning as hard as any reviewer would; the one
+thing the doer may not do is authorize the result. Saving the hard questions for the gate is how a
+candidate arrives unvalidated and the round gets spent rediscovering what the doer already
+suspected.
+
 ## Leave the receipt
 
 Write what you checked and found to `proof-<unit>.md` beside the work — for a review invocation that

@@ -6,7 +6,9 @@ description: Run one independent cross-model superreview and synthesize an evide
 # Decorrelated Superreview
 
 The doer is never the final judge. Use a **different model family**, never a same-family second
-pass. If no decorrelated family is available, fail closed.
+pass. If no decorrelated family is available, fail closed. *Final* carries the weight: this gate
+takes the doer's authority to approve, never the doer's duty to validate and question the candidate
+first — an unscrutinized candidate wastes the round.
 
 **One invocation, one judgment.** A superreview may consult several independent reviewers, but it
 does not loop until they approve and it is not a vote. Inspect their claims, adjudicate the evidence,

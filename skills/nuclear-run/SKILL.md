@@ -44,7 +44,10 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
    proof pass happened. Trust-touching
    work additionally gets the `nuclear-break` attacks executed before the gate. Evidence over
    assertion — a failed or unrun check means not done; say so with output.
-7. **Independent superreview.** Never self-approve. Use the project's review policy — default: the
+7. **Independent superreview.** Never self-approve — which forbids granting yourself the verdict,
+   not doing the thinking: stage 6 exists because the doer is expected to have questioned and
+   validated the change before anyone else reads it.
+   Use the project's review policy — default: the
    `nuclear-review` / proven different-family gate. `nuclear-review` executes one review, adjudicates
    its reviewers, and returns one authoritative `APPROVE | REJECT | NOTE`; this stage acts on that
    result without reinterpreting the raw reviewer votes.
