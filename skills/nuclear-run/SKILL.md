@@ -16,7 +16,9 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
 2. **Plan.** Detailed decomposition: units of work, gates per unit, acceptance evidence.
    Steel-man at least one alternative decomposition before committing; first idea is a candidate, not a decision.
    Packet-sized or trust-touching: co-author the plan via `nuclear-plan` instead of
-   drafting solo, and **do not enter stage 4 until the committed plan carries its co-authorship
+   drafting solo. In doubt about the size, default up — the solo path is bought with one committed
+   line, `solo-drafted because: …`; a routing choice without a receipt is the doer grading its own
+   rigor. **Do not enter stage 4 until the committed plan carries its co-authorship
    line** — an uncoauthored plan is the rejections arriving later instead of now.
 3. **Critique (adversarial, pre-code) — for solo-drafted plans only.** When `nuclear-plan` ran in
    stage 2, its multi-round concurrence loop already **is** this stage; a second gate on a
@@ -102,7 +104,9 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
   is about, and a side effect landed while the instruction queued cannot be taken back.
 - **Close every turn against the ask.** Before reporting, reconcile item by item: what was
   requested, what was delivered, what was not. **An unreconciled turn is an unverified claim** —
-  naming a gap costs a sentence, and leaving one unnamed is how "done" becomes false.
+  naming a gap costs a sentence, and leaving one unnamed is how "done" becomes false. The
+  close-out also names the open owner-decision count when it is non-zero — a queue nobody
+  surfaces is how decisions rot.
 - Ambiguous scope → cut it; don't add complexity for hypothetical edge cases.
 - **A finding is not a work order.** Under review pressure the fastest way to look responsive is to
   add code, so every fix pass starts with "would deleting this end the finding?" and every unit asks
