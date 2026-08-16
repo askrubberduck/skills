@@ -43,9 +43,12 @@ review's job. A claim of robustness without an executed attack behind it is an o
 - Record the tree's exact pre-attack state and restore *that*, not "clean" — the candidate under
   review is allowed to be a dirty worktree, so a clean tree is the wrong target and a mismatch is
   itself a finding against the breaker.
-- **Leave the receipt.** The attack list, each attack's outcome, and the restored-state confirmation
-  go to `break-rN.md`. It lives beside the work; when a review is what consumes it, write it to that
-  review's `$SP` too, which is the only place `nuclear-review` looks. Trust-touching changes cannot
+- **Leave the receipt.** The attack list — each attack carrying the command run and its observed
+  output, no-finding attacks under the same bar as findings — and the restored-state confirmation
+  go to `break-rN.md`. An attack listed without its artifact is claimable without execution, which
+  is exactly the overclaim this receipt exists to prevent. It lives beside the work; when a
+  review is what consumes it, write it to that review's `$SP` too, which is the only place
+  `nuclear-review` looks. Trust-touching changes cannot
   pass that gate without it — an unwritten break run is indistinguishable from one that never
   happened.
 

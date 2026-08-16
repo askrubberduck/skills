@@ -26,8 +26,8 @@ driver once this bootstrap ends.
    wakes in a new session and the scratchpad is already gone.
 5. **Launch builds in parallel worktrees** (`.worktrees/<task>/` — never the shared checkout), cheap
    executor agents for mechanical slices, one session per packet. Apply `nuclear-diet`
-   rules to the fleet — its rule 4 decides which slices route cheap, which demand the strongest
-   tier, and which inherit — batched agent traffic, no raw output in context.
+   rules to the fleet — its stage-routing rule decides which slices route cheap, which demand the
+   strongest tier, and which inherit — batched agent traffic, no raw output in context.
    Where the host has no subagents, worktrees, or scheduler, run the same packets sequentially in one
    session — the sequencing is the method; parallelism is only how a capable host spends it faster.
 6. **Hand off into a running loop, never into silence.** State the campaign roster (packet, worktree,

@@ -13,7 +13,10 @@ so on a committed candidate it reports nothing and proves nothing.
 
 Your memory is not your context window. Read the repo's **defect ledger**
 (`docs/defect-classes.md`, or wherever the repo keeps it; create it on first use). Every class
-recorded there is one you attack by default, without a reviewer teaching it to you again.
+recorded there is one you attack by default, without a reviewer teaching it to you again. A repo
+whose conventions bar such a file and name no other home makes the ledger's location an owner
+decision — queue it via `nuclear-decide`, state that the pass ran ledgerless, and never resolve
+the conflict by silently skipping the ledger or silently creating the file.
 
 Append the moment a class fires **twice**. **The second occurrence is the signal to repair the
 method**, not the instance. Seed entries, all one class — an operation that silently does not do
@@ -98,5 +101,5 @@ reviewers as a claim to attack; a missing artifact makes the associated claim un
 
 An unwritten pass is indistinguishable from a skipped one. Callers check for the file, not for
 your confidence: `nuclear-review` refuses every dispatch without `proof-rN.md`, including a new
-review after a material fix. Producing it is the caller's job (`nuclear-run` stage 7a); refusing
+review after a material fix. Producing it is the caller's job; refusing
 without it is the gate's.

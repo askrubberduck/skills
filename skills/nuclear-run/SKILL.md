@@ -24,8 +24,8 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
    missing edge cases, simpler design that deletes a concept. Default the critic toward refute, use
    the strongest available tier, fold findings, loop until the plan survives.
 4. **Execute on green.** Use the host's native staged or multi-agent orchestration when available;
-   otherwise execute the settled stages sequentially. Route stages per `nuclear-diet` rule 4 —
-   the full cheap-routing precondition lives there; stage 6 additionally re-checks its output
+   otherwise execute the settled stages sequentially. Route stages per `nuclear-diet`'s stage-routing
+   rule — the full cheap-routing precondition lives there; stage 6 additionally re-checks its output
    (a record is checked by reading it back); any unmet precondition runs the stage on the
    inherited model.
    TDD for code units: failing test first, minimal pass, then simplify.
@@ -73,7 +73,10 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
    collides on the index and on test output, and the result is neither lane's. Lanes never
    self-approve. After a material change, rerun verification and `nuclear-proof`, then request a new
    superreview of the new candidate. Never re-dispatch an unchanged candidate or loop to manufacture
-   reviewer unanimity.
+   reviewer unanimity. **The loop has a stopping rule**: when a fix pass introduces new
+   substantiated blockers for the second consecutive round, the loop is diverging, not converging —
+   stop dispatching and take the convergence failure to the owner via `nuclear-decide` instead of
+   buying the next round.
 
 ## Rules
 

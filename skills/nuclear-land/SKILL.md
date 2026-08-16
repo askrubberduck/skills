@@ -46,7 +46,11 @@ the repo forgot; a record without a verified merge is fiction.
 
 ## Land
 
-1. Merge per the repo's policy — **read that policy off the base's own history, never from habit**:
+1. Merge per the repo's policy — **ask the remote for its enforced policy first, the base's history
+   only for its shape, never habit**. Server-side rules are the actual policy where the host exposes
+   them (`gh api repos/<owner>/<repo>/rulesets`, branch protection); history is a proxy. Measured: a
+   direct push bypassed an *active* `pull_request` rule via admin rights while every documented
+   precondition passed — the repo stated its policy and the tooling never asked. For the shape:
    where the last 20 commits on `origin/<base>` carry no merge commit, the branch is flat and this
    landing is not the one that mints the first — rebase or squash, one commit per packet; a stray
    merge in an otherwise flat log is not a licence, match the dominant shape. Measured:
@@ -61,11 +65,13 @@ the repo forgot; a record without a verified merge is fiction.
    head), a merge queue (lands a combination), require-branches-up-to-date (needs a defined check;
    admins bypass). What blocked: `--force-with-lease=<ref>:<recorded-base-sha>`, value spelled out.
 2. **Confirm the merge landed**: the new SHA is on the default branch and **its tree matches the
-   candidate tree** — read it back, don't assume. This is the backstop for whatever step 1's
-   pinning could not prevent: on a mismatch the landed commit goes through the gate before it is
-   recorded. This check runs **after** the branch has already moved, so where a push triggers
-   deployment the hold has to exist before step 1 — a promise to quarantine afterwards is one
-   this step cannot keep.
+   candidate tree** — read it back, don't assume. Read the push's full output too, not its exit
+   status: the remote prints policy objections ("Changes must be made through a pull request")
+   even when the ref moves, and an objection inside a green push is a finding, never noise. This
+   is the backstop for whatever step 1's pinning could not prevent: on a mismatch the landed
+   commit goes through the gate before it is recorded. This check runs **after** the branch has
+   already moved, so where a push triggers deployment the hold has to exist before step 1 — a
+   promise to quarantine afterwards is one this step cannot keep.
 3. Record the outcome where the repo keeps truth: shipped log / status doc / delivery board — with
    PR number, merged SHA, and what changed. One recorded outcome per landing.
 4. Close or queue obligations the change touched — the doer never closes an item that needs the

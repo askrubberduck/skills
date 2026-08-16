@@ -35,8 +35,11 @@ semantics.
    - the committed `nuclear-plan` co-authorship line for packet-sized or trust-touching work;
    - `$SP/break-rN.md` from `nuclear-break` for trust-touching work.
 
-   **No receipt, no dispatch.** A change to this gate's own semantics is reviewed under the
-   PRE-change rules; the new rules bind the next candidate.
+   **No receipt, no dispatch — and presence is not verification**: spot-check each receipt by
+   re-running or inspecting at least one claim's cited command or artifact; a claim that does not
+   check out is a finding against the receipt. Measured: three receipts in one build overclaimed
+   and every one passed a presence check. A change to this gate's own semantics is reviewed under
+   the PRE-change rules; the new rules bind the next candidate.
 4. Record the doer's self-reported model family. Name two required reviewers from two different
    model families, with at least one proven different from the doer. Each runs the **strongest tier
    of its family the host lists and you can pin**: decorrelation buys independence; tier buys rigor.

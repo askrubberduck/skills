@@ -23,12 +23,13 @@ here; the product of the audit is deletions.
 3. **Grep-first; delegate big reads.** Nothing >20KB into the main context: page with offset/limit,
    or send an investigator subagent that returns a summary. Main context is the most expensive place
    to store a file.
-4. **Route by stage, both model AND agent type.** Mechanical work (investigation, scripted edits,
-   rebases, clerical verification, recording) goes to cheap-model executor agents, only with a
-   pinned model whose self-report is verified and a named check that catches the stage's failure —
-   executed and its result recorded before the stage's output is used. Trust-touching work is
-   never mechanical, whatever the stage type. Adversarial, synthesis, and trust-touching stages
-   get general-purpose agents on the strongest tier; everything else inherits the current model.
+4. **Stage routing: route by stage, both model AND agent type.** Mechanical work (investigation,
+   scripted edits, rebases, clerical verification, recording) goes to cheap-model executor
+   agents, only with a pinned model whose self-report is verified and a named check that catches
+   the stage's failure — executed and its result recorded before the stage's output is used.
+   Trust-touching work is never mechanical, whatever the stage type. Adversarial, synthesis, and
+   trust-touching stages get general-purpose agents on the strongest tier; everything else
+   inherits the current model.
 5. **Batch agent traffic.** Poll teammates at round boundaries; never relay no-op idle pings into the
    coordinator context. Compress subagent output contracts ("return table, no prose").
 6. **Raw output stays out of git and out of context.** CLI stdout, logs, diffs: extract the decisive
@@ -50,11 +51,11 @@ is billed every turn of every session:
    cache integrity and broken symlinks in skill directories.
 2. **Always-loaded inventory**: user + project CLAUDE.md/AGENTS.md (follow `@includes`), memory
    index, enabled plugins. Estimate each block's size; rank by cost.
-3. **Usage cross-check**: read the host's transcripts — Claude `~/.claude/projects/<dir>/*.jsonl`,
-   Codex `$CODEX_HOME/sessions` and `archived_sessions` — and count what each always-loaded block was
-   actually used for. Loaded-never-invoked for weeks = disable candidate. Report counts and metadata,
-   never raw prompt content. Can't find a store, or it's malformed? Say so and mark the audit
-   partial — a missing store is never zero usage.
+3. **Usage cross-check**: read the host's transcripts — `nuclear-learn` step 1 owns the
+   transcript-store locations; use those rather than re-deriving them — and count what each
+   always-loaded block was actually used for. Loaded-never-invoked for weeks = disable
+   candidate. Report counts and metadata, never raw prompt content. Can't find a store, or it's
+   malformed? Say so and mark the audit partial — a missing store is never zero usage.
 4. **Dedupe**: local memory files repeating checked-in CLAUDE.md facts — keep the checked-in copy,
    delete the memory. Same for AGENTS.md vs copilot-instructions duplication: one canonical file.
 5. **Trim to non-derivable**: a CLAUDE.md line earns its place only if a fresh session could NOT
