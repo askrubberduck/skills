@@ -13,7 +13,7 @@ from typing import Any, Callable
 
 
 EXPECTED_NAME = "askrubberduck"
-EXPECTED_VERSION = "0.7.0"
+EXPECTED_VERSION = "0.8.0"
 EXPECTED_SKILLS = {
     "nuclear-break",
     "nuclear-campaign",
@@ -46,7 +46,7 @@ README_MARKERS = (
     "agy plugin validate",
     "agy plugin install",
     "agents/openai.yaml",
-    "v0.7.0",
+    "v0.8.0",
 )
 
 
