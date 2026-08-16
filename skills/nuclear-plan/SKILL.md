@@ -41,7 +41,10 @@ plan same-family and send it out for adversarial review; let the other families 
    **The committed plan carries its own co-authorship line**: which families authored, which
    disagreed, and how each disagreement was settled. That line is the durable evidence — the
    scratchpad dies with the session, so anything gating on co-authorship reads the committed plan,
-   never `$SP`. A plan without it is unplanned work with a plan-shaped file.
+   never `$SP`. A plan without it is unplanned work with a plan-shaped file. The line is written by
+   the doer, so make it checkable rather than claimable: name each pinned model id, quote the
+   sentence that carried each disagreement, and state what the other family actually argued. A line
+   that names families and nothing they said is a line anyone could have typed without dispatching.
 6. Keep the binding decorrelated CODE gate after the build (`nuclear-review`). Co-authored
    plans make it converge; they don't replace it.
 

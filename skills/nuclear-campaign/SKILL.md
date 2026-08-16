@@ -37,6 +37,13 @@ driver once this bootstrap ends.
    holding the next iteration is a stalled campaign, whatever it is called. When the campaign's
    packets have merged, `nuclear-sweep` clears the worktrees they leave behind.
 
+   The gap between packets is where a long campaign quietly dies, so between them the turn
+   continues: dispatch the next one. A packet that hits an obstacle is re-routed or re-scoped and
+   the route recorded, never abandoned — only a refused authorization is an answer rather than an
+   obstacle. When a packet's execution disproves the campaign shape, re-frame it in writing rather
+   than bending the remaining packets around the damage; the campaign may argue its own goal, never
+   substitute one.
+
 ## Common mistakes
 
 - Building the first candidate before the cut pass — the survey exists to kill work, not queue it.

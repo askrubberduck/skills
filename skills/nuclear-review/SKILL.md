@@ -87,6 +87,12 @@ Treat every verdict and finding as a claim, not a fact. For each finding, inspec
 and classify it as a substantiated `BLOCKER`, retained `SHOULD`, retained `NOTE`, or dismissed with
 a recorded reason.
 
+**When the actor adjudicating is the actor that built the candidate, adjudication is the weak
+point** — the reviewers are decorrelated but the synthesis is not, and dismissing a true finding
+looks identical to dismissing a false one. Say so in the report, dismiss only on evidence a third
+party can re-check from the artifacts, and let a finding you cannot settle stand rather than fall.
+A tie goes to the reviewer.
+
 - Check the repository's own conventions before accepting a demand for a new artifact. Existing
   evidence beats reviewer-invented ceremony.
 - Ask what the code is for before recommending a patch. If removing the feature, flag, branch, or
@@ -117,6 +123,11 @@ may land only `APPROVE`; a superreview `NOTE` is a non-decision, not a hidden pa
 Report the authoritative result, each reviewer's pinned model id and family, each raw verdict, every
 finding's adjudicated classification and evidence, any outage or downgrade, and the exact target and
 criteria reviewed. Never commit raw CLI stdout; keep it in `$SP`.
+
+**Write that report where the landing gate can read it** — beside the work, in the repo's own
+convention for review records, never only into the caller's context or `$SP`. A verdict that exists
+only in a session transcript cannot be checked later, and `nuclear-land` needs the authorization
+itself, not a recollection that one was granted.
 
 Then stop. Persisting the result, executing a fix or deletion, resolving an owner decision,
 reviewing a materially changed candidate, and landing belong to the calling agent or workflow.

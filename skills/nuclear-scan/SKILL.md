@@ -41,6 +41,5 @@ One table, then one sentence of recommendation:
 
 ## Common mistakes
 
-- Re-deriving the whole backlog for a two-ID ping — scan only what was asked.
 - Treating "in review" as pickable — a change at its gate belongs to the reviewer, not a new doer.
 - Mutating anything. This skill never edits registries; it hands off to disposition/close flows.

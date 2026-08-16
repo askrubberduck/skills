@@ -52,9 +52,11 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
    its reviewers, and returns one authoritative `APPROVE | REJECT | NOTE`; this stage acts on that
    result without reinterpreting the raw reviewer votes.
 
-   **a. Prepare and invoke.** Produce `$SP/proof-rN.md` via `nuclear-proof`; for trust-touching work,
-   also produce `$SP/break-rN.md` via `nuclear-break`. Confirm any required committed plan evidence,
-   then invoke `nuclear-review`. The review checks these artifacts but never creates them.
+   **a. Prepare and invoke.** Commit the candidate first and record its SHA — the review names an
+   exact target and landing requires that SHA, so a review of an uncommitted worktree cannot be
+   landed. Produce `$SP/proof-rN.md` via `nuclear-proof`; for trust-touching work, also produce
+   `$SP/break-rN.md` via `nuclear-break`. Confirm any required committed plan evidence, then invoke
+   `nuclear-review`. The review checks these artifacts but never creates them.
 
    **b. Act on the superreview result.**
    - `APPROVE`: for a mergeable change, invoke `nuclear-land` to ship and record it.
@@ -66,23 +68,35 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
      decision before requesting another review.
 
    When confirmed blockers fan wide, split remediation by **file ownership** — one lane owns a file,
-   and a finding spanning two files belongs to exactly one lane named in both briefs. Lanes never
+   and a finding spanning two files belongs to exactly one lane named in both briefs. Concurrent
+   lanes get a worktree each; one checkout shared by lanes that each rebuild and run the suite
+   collides on the index and on test output, and the result is neither lane's. Lanes never
    self-approve. After a material change, rerun verification and `nuclear-proof`, then request a new
    superreview of the new candidate. Never re-dispatch an unchanged candidate or loop to manufacture
    reviewer unanimity.
 
 ## Rules
 
-- **Turn-end test.** A turn may end for exactly four reasons: (a) a decision genuinely the owner's —
-  one where no defensible default exists; (b) an external block (spend limit, missing credential,
-  denied permission, a reviewer still running); (c) the work is complete and recorded; (d) a context
-  handoff whose next step is already dispatched or scheduled and named. Anything else: keep going.
-- **"Say the word and I'll…" is a bug, not politeness.** If you can name the next step and it needs
-  no owner input, run it. Handing an already-made plan back for a "go" is how an autonomous run
+- **A turn ends for five reasons and no others**: a decision genuinely the owner's, where no
+  defensible default exists; an owner instruction to stop, retarget, or narrow scope; an external
+  block — spend limit, missing credential, refused authorization; the work complete and recorded; or
+  a handoff whose next step is dispatched or scheduled and named, a running dispatch counting only
+  with a named waiter, deadline, or resume. Anything else: keep going. "Say the word and I'll…" is a
+  bug, not politeness — handing an already-made plan back for a "go" is how an autonomous run
   becomes a manual one.
+- **An obstacle is a stage, not an exit.** An unreadable path, a missing tool, an assumption that
+  did not hold: route around it and record the route. A refused authorization is the exception —
+  that is an answer, and no alternative route may shed the authorization the first one needed.
+- **Stage 1's design is a claim like any other.** When execution disproves it, re-run
+  `nuclear-frame` naming the contradiction instead of improvising against it; it returns here and
+  that stage resumes. An outcome the evidence no longer supports is worth challenging in writing —
+  a recorded re-frame, or an entry in the owner's registry. Argue the goal; never swap it.
 - **Mid-flight input is an extra command, not a new job.** An instruction arriving while work runs
   joins the queue; it neither cancels what is in flight nor becomes the whole task. Finish the
-  running step, apply the addition, report both. The only input that stops work is one that says so.
+  running step, apply the addition, report both. **Input that narrows, redirects, or withdraws
+  authority is the exception and takes effect immediately** — "not production", "don't merge",
+  "stop" — whether or not it is phrased as a command, because the running step is exactly what it
+  is about, and a side effect landed while the instruction queued cannot be taken back.
 - **Close every turn against the ask.** Before reporting, reconcile item by item: what was
   requested, what was delivered, what was not. **An unreconciled turn is an unverified claim** —
   naming a gap costs a sentence, and leaving one unnamed is how "done" becomes false.

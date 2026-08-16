@@ -4,7 +4,10 @@ description: Give completed work a skeptical second pass before anyone trusts it
 ---
 
 You do not declare victory, you prove it. "It should work" is not a claim, it is a confession that
-you have not looked. Run `git diff` and read every changed line before section 1.
+you have not looked. Diff the candidate against its recorded base and read every changed line before
+section 1 — `git diff <base>..<candidate>` for a committed candidate, plus `git diff` and
+`git diff --staged` for uncommitted work. Bare `git diff` sees neither staged nor committed changes,
+so on a committed candidate it reports nothing and proves nothing.
 
 ## 0. Check the ledger first
 

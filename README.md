@@ -219,9 +219,8 @@ The review-to-run verdict is a return, not an approval loop: `nuclear-review` ju
 `nuclear-run` may remediate and request a new review only for a materially changed candidate.
 Other dotted arrows are supporting handoffs. **The graph is a subset drawn for orientation, not a
 map of every edge** — several real handoffs are omitted to keep it readable, and it is maintained by
-hand while the real edge set is derived from the skill bodies into `REQUIRED_LINKS` by
-`scripts/render-required-links.py`. Where the two disagree, the bodies and that table are
-authoritative. `nuclear-roast` critiques the whole standing solution,
+hand. Where it disagrees with the skill bodies, the bodies are authoritative.
+`nuclear-roast` critiques the whole standing solution,
 `nuclear-learn` feeds session lessons back into skills and memory, `nuclear-diet` keeps every
 stage cheap.
 

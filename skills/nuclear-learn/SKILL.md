@@ -36,6 +36,9 @@ or gets consciously discarded. Lessons that live only in a chat transcript are l
    One occurrence → park it as a note in the nearest existing home, not a new artifact.
 4. **Apply the updates** — write the skill/memory/rule edit now, not a recommendation to write it.
    While in each home, delete what the new lesson supersedes; stale guidance is worse than none.
+   Policy files are the limit, and the limit is authority rather than effort: an edit to a skill, a
+   gate, or an instruction file is trust-touching, so it travels the same plan and review path as
+   any other change to them — derive it, write it up, hand it on, never land it unreviewed.
 5. **Close the loop**: procedural guidance (a skill, a workflow rule) gets one rep before it's
    trusted — reserve one occurrence as a holdout BEFORE deriving (derive from the rest; deriving
    from every occurrence leaves nothing to test with), state the expected outcome, then run the
@@ -49,7 +52,6 @@ or gets consciously discarded. Lessons that live only in a chat transcript are l
 
 - Saving what the repo already records (git history, code structure) — memory duplicating the repo
   rots; link, don't copy.
-- Minting a new skill for every lesson — most lessons are one line in an existing skill.
 - Mining only failures — validated approaches that WORKED are equally worth encoding (with their
   evidence), or they'll be re-derived at full cost next time.
 - A retro that ends in chat — if nothing was written to a durable home, the learn didn't happen.

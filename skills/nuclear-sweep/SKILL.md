@@ -13,7 +13,8 @@ durable home and is verified there before its container is removed.
 ## Sweep per repo
 
 1. Inventory: `git worktree list`, `git branch -vv`, `git fetch --prune` first so remote state is
-   current. Use absolute paths; don't cd back and forth.
+   current. Use absolute paths; don't cd back and forth. An unreachable remote or an unreadable
+   worktree is recorded and the sweep carries on around it.
 2. Classify by one invariant: **delete only what is provably preserved elsewhere**.
    - **Preserved** — the branch's commits are reachable from `origin/<default>`
      (`git branch --merged origin/<default>`, then `-d`, never `-D`; `-d` alone checks
@@ -28,9 +29,12 @@ durable home and is verified there before its container is removed.
    `git status --short --untracked-files=all --ignored`. Plain `git status` hides ignored files, so
    `git worktree remove` exits 0 and takes the `.env`, local config, or credentials living there with
    it. Any `??` or `!!` entry gets an explicit keep-or-delete decision before removal — those files
-   exist in exactly one place by definition; the preservation invariant applies. Then — only once
-   nothing in the worktree remains marked keep — `git worktree remove <path>`, `git branch -D
-   <branch>`, and `git worktree prune` for leftovers.
+   exist in exactly one place by definition; the preservation invariant applies, so **unknown means
+   keep, and only the owner may decide to delete one**. Uncommitted work is the case with no second
+   copy to recover from, which is why this decision is never the doer's however obvious it looks;
+   queue it via `nuclear-decide` and keep the file meanwhile. Then — only once nothing in the
+   worktree remains marked keep — `git worktree remove <path>`, `git branch -D <branch>`, and
+   `git worktree prune` for leftovers.
 4. Scratch dirs: hunt ad-hoc temp dirs outside the sanctioned scratchpad (e.g. `~/<repo>-tmp*`,
    `/tmp/<repo>*`, stray review-tmp dirs; the sanctioned scratchpad itself is disposable by design
    and never swept per-file). A non-git dir has no merge evidence, so inventory every entry

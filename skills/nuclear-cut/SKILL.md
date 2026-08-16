@@ -19,11 +19,12 @@ Differs from a disposition flow (which acts on IDs the owner names) — this one
    - **MERGE** — duplicate or subset of another item; fold and close.
    - **UNBLOCK** — the stated blocker no longer holds (verify, don't assume); make it pickable.
    - **KEEP** — survives the critique; record the one-sentence justification that saved it.
-3. Act autonomously on everything that doesn't need the owner: land CLOSE/MERGE/UNBLOCK edits in the
-   registries with evidence, one commit per batch.
+3. Act autonomously on everything that doesn't need the owner: land CLOSE/CUT/MERGE/UNBLOCK edits in
+   the registries with evidence, one commit per batch. CUT deletes; a cut item counted in the report
+   but left standing in the registry is the rot this skill exists to remove.
 4. Items needing the owner (sign-offs, policy calls, anything the doer may not close): queue them and
    run `nuclear-decide` — never close an owner-gated item yourself, never drop it
-   silently.
+   silently. Queuing one is not a reason to stop; the sweep continues past it.
 
 ## Report shape
 

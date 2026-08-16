@@ -39,6 +39,10 @@ the repo forgot; a record without a verified merge is fiction.
   moment it is given; step 3's outcome record then **names what was waived**. Waiving is the
   owner's call on a named precondition, never the doer's, and never a blanket exemption from the
   rest; a waiver a reviewer discovers afterward is a second violation, not a footnote.
+- **A registry entry is not an authorization unless it says who authorized it.** The doer writes to
+  the same decision log the owner does — re-frames, challenges, queued questions all land there — so
+  an entry read as a waiver carries the owner's own words and when they were given. An unattributed
+  entry is the doer's note, and reading one as permission is how a run authorizes itself in writing.
 
 ## Land
 
@@ -73,6 +77,5 @@ the repo forgot; a record without a verified merge is fiction.
 
 - Recording the outcome before step 2's read-back — squash merges mint a new SHA; record the one
   that actually landed, not the branch head.
-- Landing two changes in one record — one packet, one landing, one recorded outcome.
 - Leaving the worktree "for reference" — the record is the reference; the worktree is debt.
 - Skipping the base re-verify because the branch is "fresh" — fresh was true when you last fetched.

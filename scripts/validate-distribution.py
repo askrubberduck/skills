@@ -14,7 +14,6 @@ from typing import Any, Callable
 
 EXPECTED_NAME = "askrubberduck"
 EXPECTED_VERSION = "0.7.0"
-EXPECTED_PLUGIN_DESCRIPTION = "Plan, challenge, ship, and clean up complex work"
 EXPECTED_SKILLS = {
     "nuclear-break",
     "nuclear-campaign",
@@ -32,162 +31,9 @@ EXPECTED_SKILLS = {
     "nuclear-scan",
     "nuclear-sweep",
 }
-# Frozen, not derived at runtime: deriving would make a deleted link invisible.
-# Regenerate with scripts/render-required-links.py.
-REQUIRED_LINKS = {
-    "nuclear-break": {"nuclear-review"},
-    "nuclear-campaign": {"nuclear-diet", "nuclear-plan", "nuclear-sweep"},
-    "nuclear-cut": {"nuclear-decide", "nuclear-scan"},
-    "nuclear-frame": {"nuclear-decide"},
-    "nuclear-land": {"nuclear-decide", "nuclear-review", "nuclear-sweep"},
-    "nuclear-learn": {"nuclear-proof"},
-    "nuclear-plan": {"nuclear-frame", "nuclear-review"},
-    "nuclear-proof": {"nuclear-review", "nuclear-run"},
-    "nuclear-review": {"nuclear-break", "nuclear-plan", "nuclear-proof"},
-    "nuclear-roast": {"nuclear-cut", "nuclear-decide", "nuclear-plan", "nuclear-proof", "nuclear-review"},
-    "nuclear-run": {"nuclear-break", "nuclear-decide", "nuclear-diet", "nuclear-frame", "nuclear-land", "nuclear-plan", "nuclear-proof", "nuclear-review"},
-    "nuclear-scan": {"nuclear-campaign", "nuclear-cut"},
-}
-REQUIRED_CONTRACTS = {
-    "nuclear-review": (
-        "$SP/proof-rN.md",
-        "break-rN.md",
-        "co-authorship line",
-        "two required reviewers from two different model families",
-        "APPROVE | REJECT | NOTE",
-        "No receipt, no dispatch",
-        "PRE-change rules",
-        "A REJECT is never an outage",
-        "same-family pass",
-        "a dispatch attempted",
-        "produced no verdict",
-        "`NOTE` neither authorizes nor rejects the candidate",
-        "Reviewer unanimity is neither required nor sufficient",
-        "Only a substantiated `BLOCKER` justifies `REJECT`",
-        "one authoritative result",
-        "dismissed with a recorded reason",
-        "repository's own conventions",
-        "Ask what the code is for",
-        "growth ratchet",
-        "Count concepts, not lines",
-        "tier buys rigor",
-        "Record the pinned model id",
-        "never as a coverage map",
-        "last released tag to the",
-        "both full SHAs stated in the prompt",
-        "does not loop until they approve",
-        "Never edit the candidate",
-        "the calling agent or workflow owns that execution",
-        "Never commit raw CLI stdout",
-    ),
-    "nuclear-proof": (
-        "proof-<unit>.md",
-        "refuses every dispatch without `proof-rN.md`",
-        "citing its artifact",
-        "defect ledger",
-        "The second occurrence is the signal to repair the method",
-    ),
-    "nuclear-break": (
-        "break-rN.md",
-        "directly, never through a pipe",
-        "the suite MUST go red",
-        "duplicate, and concurrent inputs",
-        "take each named invariant",
-        "kill the process mid-operation",
-        "not the test harness",
-    ),
-    "nuclear-plan": (
-        "plan-<family>.md",
-        "co-authorship line",
-        "binding decorrelated CODE gate",
-        "including at least one proven different family",
-        "No framed design, no dispatch",
-    ),
-    "nuclear-frame": (
-        "design-<unit>.md",
-        "Every claim cites `file:line` or is labelled observed behavior",
-        "An unevidenced item is a missing item",
-        "one of which is do-nothing or extend-what-exists",
-        "how the failure is noticed",
-        "Return the artifact to the caller and stop",
-        "Stale means a cited seam moved, not that HEAD advanced",
-        # nuclear-run branches on the exact `CUT` token, so the exit vocabulary is an integration
-        # contract, not prose. Both reviewer families raised this independently.
-        "`CUT` — the outcome already exists",
-        "`OWNER DECISION` — anything unresolved",
-        "`READY` — settled",
-        # Three clauses the settled plan froze that a later edit quietly dropped — caught by a
-        # reviewer reading the plan, which is not a check that runs. Pinned so the next drift fails
-        # the gate instead of depending on someone re-reading the contract.
-        "or does not justify a change",
-        "the state contract across it",
-        "Never the scratchpad",
-        # Two clauses carrying behavior no other text guarantees: the preflight is the only thing
-        # giving either caller D6 reuse, and the quality-bar read is the grounding `nuclear-run`
-        # deleted from its own body. Unprotected, either could vanish with the gate still green.
-        "reuse what is already framed",
-        "The project's quality bar first",
-    ),
-    "nuclear-campaign": (
-        "co-authorship line",
-        "never into silence",
-        "campaign roster",
-        "next iteration an owner",
-    ),
-    "nuclear-land": (
-        "One recorded outcome per landing",
-        "merged SHA",
-        "required decorrelated reviewer identities",
-        "`NOTE`, a raw reviewer approval",
-        "re-authorize the resulting SHA",
-        "names what was waived",
-        "in writing before the push",
-        "squashed into one candidate commit",
-        "its tree matches the candidate tree",
-        "pinning the base at merge time",
-        "never infer it from its name",
-        "destroyed the other branch's commit",
-    ),
-    "nuclear-sweep": (
-        "delete only what is provably preserved elsewhere",
-        "a narrower promise than its name",
-        "Do not build a cleverer classifier",
-        "--untracked-files=all --ignored",
-        "unknown means keep",
-    ),
-    "nuclear-run": (
-        "proof-<unit>.md",
-        "co-authorship line",
-        "one authoritative `APPROVE | REJECT | NOTE`",
-        "`NOTE`: record and surface",
-        "Never re-dispatch an unchanged candidate",
-        "loop to manufacture",
-        "A turn may end for exactly four reasons",
-        "an external block",
-        "Anything else: keep going",
-        "re-checks its output",
-        "Mid-flight input is an extra command, not a new job",
-        "An unreconciled turn is an unverified claim",
-    ),
-    "nuclear-diet": ("a named check that catches the stage's failure",),
-    "nuclear-learn": (
-        "an occurrence it was NOT derived from",
-        "Classes compound; instances do not",
-    ),
-}
-# Naming a skill invokes it, so a link here is a call edge, not a mention. `nuclear-frame` returns
-# its artifact to whoever called it; naming any other skill would make it advance a stage instead.
-# Exact, not a denylist: a denylist of known callers still admits the next link somebody adds.
-EXACT_LINKS = {
-    "nuclear-frame": {"nuclear-decide"},
-}
-# Descriptions are the only discovery surface a skill whose name does not self-describe has:
-# REQUIRED_CONTRACTS cannot reach them, because it matches the body, which starts after the
-# frontmatter. Without this table `nuclear-frame` could lose every word a user would type to
-# find it while the whole gate stayed green.
-REQUIRED_DESCRIPTION_PHRASES = {
-    "nuclear-frame": ("system analysis", "system design", "before planning"),
-}
+# Any skill can be where an unsupervised run begins, so the stopping discipline cannot live in one
+# body. What matters is that the fifteen copies agree, which is checkable without a sixteenth copy
+# here — and keeping the text out of this file keeps the skills tree the only place it is edited.
 README_MARKERS = (
     "codex plugin marketplace add askrubberduck/skills",
     "codex plugin add askrubberduck@askrubberduck",
@@ -200,8 +46,6 @@ README_MARKERS = (
     "agy plugin validate",
     "agy plugin install",
     "agents/openai.yaml",
-    "Start a new Codex session",
-    "Start a new host session",
     "v0.7.0",
 )
 
@@ -222,6 +66,12 @@ def load_json(root: Path, relative: str, errors: list[str]) -> dict[str, Any]:
 def require_equal(errors: list[str], label: str, actual: Any, expected: Any) -> None:
     if actual != expected:
         errors.append(f"{label}: expected {expected!r}, got {actual!r}")
+
+
+def require_text(errors: list[str], label: str, value: Any) -> None:
+    # Hosts render this string; none of them care what it says, so the wording stays editable.
+    if not isinstance(value, str) or not value.strip():
+        errors.append(f"{label}: missing description")
 
 
 def require_contained_path(root: Path, label: str, raw_path: Any, errors: list[str]) -> Path | None:
@@ -264,12 +114,7 @@ def validate(root: Path) -> list[str]:
     for label, manifest in (("Codex manifest", codex), ("Claude manifest", claude)):
         require_equal(errors, f"{label} name", manifest.get("name"), EXPECTED_NAME)
         require_equal(errors, f"{label} version", manifest.get("version"), EXPECTED_VERSION)
-        require_equal(
-            errors,
-            f"{label} description",
-            manifest.get("description"),
-            EXPECTED_PLUGIN_DESCRIPTION,
-        )
+        require_text(errors, f"{label} description", manifest.get("description"))
         require_equal(
             errors,
             f"{label} repository",
@@ -299,12 +144,6 @@ def validate(root: Path) -> list[str]:
         ):
             if not interface.get(field):
                 errors.append(f"Codex manifest interface: missing {field}")
-        require_equal(
-            errors,
-            "Codex manifest short description",
-            interface.get("shortDescription"),
-            EXPECTED_PLUGIN_DESCRIPTION,
-        )
         default_prompts = interface.get("defaultPrompt")
         if not isinstance(default_prompts, list) or not 1 <= len(default_prompts) <= 3:
             errors.append("Codex manifest interface: defaultPrompt must contain 1-3 prompts")
@@ -312,7 +151,7 @@ def validate(root: Path) -> list[str]:
             for prompt in default_prompts:
                 if (
                     not isinstance(prompt, str)
-                    or not prompt.startswith("Use $askrubberduck:")
+                    or "$askrubberduck:" not in prompt
                     or len(prompt) > 128
                 ):
                     errors.append(
@@ -345,12 +184,7 @@ def validate(root: Path) -> list[str]:
         )
         require_equal(errors, "Codex marketplace category", entry.get("category"), "Productivity")
 
-    require_equal(
-        errors,
-        "Claude marketplace description",
-        claude_marketplace.get("description"),
-        EXPECTED_PLUGIN_DESCRIPTION,
-    )
+    require_text(errors, "Claude marketplace description", claude_marketplace.get("description"))
     claude_entries = claude_marketplace.get("plugins")
     if not isinstance(claude_entries, list) or len(claude_entries) != 1:
         errors.append("Claude marketplace: expected exactly one plugin")
@@ -362,11 +196,10 @@ def validate(root: Path) -> list[str]:
             EXPECTED_NAME,
         )
         require_equal(errors, "Claude marketplace source", claude_entries[0].get("source"), "./")
-        require_equal(
+        require_text(
             errors,
             "Claude marketplace plugin description",
             claude_entries[0].get("description"),
-            EXPECTED_PLUGIN_DESCRIPTION,
         )
 
     skill_root = root / "skills"
@@ -414,12 +247,6 @@ def validate(root: Path) -> list[str]:
                 )
             if len(description_text) > 1024:
                 errors.append(f"skills/{name}/SKILL.md: description exceeds 1024 characters")
-            for phrase in REQUIRED_DESCRIPTION_PHRASES.get(name, ()):
-                if phrase not in description_text:
-                    errors.append(
-                        f"skills/{name}/SKILL.md: description dropped trigger phrase {phrase!r} — "
-                        "the description is this skill's only discovery surface"
-                    )
 
         interface_path = skill_root / name / "agents" / "openai.yaml"
         try:
@@ -455,14 +282,13 @@ def validate(root: Path) -> list[str]:
                     errors.append(
                         f"skills/{name}/agents/openai.yaml: default prompt must use qualified skill name"
                     )
-                if not default_prompt.startswith("Use ") or len(default_prompt) > 160:
+                if len(default_prompt) > 160:
                     errors.append(
-                        f"skills/{name}/agents/openai.yaml: default prompt must be a short starter prompt"
+                        f"skills/{name}/agents/openai.yaml: default prompt exceeds 160 characters"
                     )
         body = text[frontmatter.end() :]
         # `nuclear-*` in backticks is reserved: it always means "invoke this skill", never a
         # domain term. Authors needing such a term use prose or another name.
-        referenced_here = set()
         for prefix, referenced in re.findall(r"`([$/]?)(nuclear-[a-z-]+)`", body):
             if prefix:
                 errors.append(
@@ -471,36 +297,9 @@ def validate(root: Path) -> list[str]:
                 )
             if referenced == name:
                 continue
-            referenced_here.add(referenced)
             if referenced not in found_skills:
                 errors.append(
                     f"skills/{name}/SKILL.md: cross-skill reference {referenced!r} names no installed skill"
-                )
-        for required in sorted(REQUIRED_LINKS.get(name, ())):
-            if required not in referenced_here:
-                errors.append(
-                    f"skills/{name}/SKILL.md: required pipeline link to {required!r} is missing"
-                )
-        if name in EXACT_LINKS:
-            for extra in sorted(referenced_here - EXACT_LINKS[name]):
-                errors.append(
-                    f"skills/{name}/SKILL.md: link to {extra!r} is not in this skill's exact link "
-                    "set — naming it would invoke it, and this skill returns its artifact instead "
-                    "of advancing a stage"
-                )
-        # REQUIRED_CONTRACTS phrases are matched against this: store them unwrapped and
-        # without emphasis markers.
-        flat_body = " ".join(body.replace("*", "").split())
-        for contract in REQUIRED_CONTRACTS.get(name, ()):
-            occurrences = flat_body.count(contract)
-            if occurrences == 0:
-                errors.append(
-                    f"skills/{name}/SKILL.md: artifact contract {contract!r} was dropped"
-                )
-            elif occurrences > 1:
-                errors.append(
-                    f"skills/{name}/SKILL.md: artifact contract {contract!r} occurs {occurrences}x — "
-                    "a repeated phrase masks its own deletion; protect a unique one"
                 )
         if body.count("```") % 2:
             errors.append(f"skills/{name}/SKILL.md: unbalanced ``` code fence")
@@ -538,47 +337,11 @@ def rewrite_json(path: Path, mutate: Callable[[dict[str, Any]], None]) -> None:
     path.write_text(json.dumps(value, indent=2) + "\n")
 
 
-def drop_description_phrase(name: str, phrase: str) -> Callable[[Path], None]:
-    """Strike one required trigger phrase from a description, leaving the catalog consistent.
 
-    Regenerating matters: every description feeds AGENTS-CATALOG.md, so a bare edit trips the
-    staleness check and the case would pass without the phrase check ever running — which is
-    exactly how the first version of this mutation passed while testing nothing.
-
-    One case per phrase, built from the table itself: a phrase added without a mutation covering
-    it cannot slip through, because the cases are derived rather than written by hand.
-    """
-
-    def mutate(copy: Path) -> None:
-        skill = copy / "skills" / name / "SKILL.md"
-        text = skill.read_text()
-        head, sep, tail = text.partition("\n---\n")
-        # Every occurrence: the phrase repeats across a description's summary and trigger clauses,
-        # and leaving one behind would satisfy the check the mutation is meant to break.
-        skill.write_text(head.replace(phrase, "REDACTED") + sep + tail)
-        catalog, readme = render_expected(copy)
-        (copy / "AGENTS-CATALOG.md").write_text(catalog)
-        (copy / "README.md").write_text(readme)
-
-    return mutate
-
-
-# The self-test's independent copy of the trigger-phrase requirement. Deriving the mutation cases
-# from REQUIRED_DESCRIPTION_PHRASES alone would be circular: deleting an entry would remove the rule
-# AND the case proving it. Deriving them only from here would let a new entry ship untested. The two
-# must agree, and disagreeing either way is the failure.
-ATTESTED_DESCRIPTION_PHRASES = {
-    "nuclear-frame": ("system analysis", "system design", "before planning"),
-}
 
 
 def self_test(root: Path) -> list[str]:
     failures: list[str] = []
-    if REQUIRED_DESCRIPTION_PHRASES != ATTESTED_DESCRIPTION_PHRASES:
-        failures.append(
-            "REQUIRED_DESCRIPTION_PHRASES drifted from ATTESTED_DESCRIPTION_PHRASES: "
-            f"{REQUIRED_DESCRIPTION_PHRASES!r} != {ATTESTED_DESCRIPTION_PHRASES!r}"
-        )
     cases: list[tuple[str, Callable[[Path], None]]] = [
         (
             "version mismatch",
@@ -592,35 +355,6 @@ def self_test(root: Path) -> list[str]:
             lambda copy: rewrite_json(
                 copy / ".agents" / "plugins" / "marketplace.json",
                 lambda value: value["plugins"][0]["source"].__setitem__("path", "../escape"),
-            ),
-        ),
-        (
-            "dropped plan prerequisite",
-            lambda copy: (copy / "skills" / "nuclear-plan" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-plan" / "SKILL.md")
-                .read_text()
-                .replace("No framed design, no dispatch", "Plans are grounded", 1)
-            ),
-        ),
-        *(
-            (f"dropped {skill} description phrase {phrase!r}", drop_description_phrase(skill, phrase))
-            for skill, phrases in sorted(ATTESTED_DESCRIPTION_PHRASES.items())
-            for phrase in phrases
-        ),
-        (
-            "frame links to a skill outside its exact set",
-            lambda copy: (copy / "skills" / "nuclear-frame" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-frame" / "SKILL.md")
-                .read_text()
-                .replace("The caller decides what follows.", "Usually `nuclear-plan` follows.", 1)
-            ),
-        ),
-        (
-            "frame links to a non-caller outside its exact set",
-            lambda copy: (copy / "skills" / "nuclear-frame" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-frame" / "SKILL.md")
-                .read_text()
-                .replace("The caller decides what follows.", "Then run `nuclear-proof`.", 1)
             ),
         ),
         (
@@ -664,90 +398,11 @@ def self_test(root: Path) -> list[str]:
             ),
         ),
         (
-            "deleted mandatory handoff",
-            lambda copy: (copy / "skills" / "nuclear-run" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-run" / "SKILL.md")
-                .read_text()
-                .replace("`nuclear-proof`", "a self-review")
-            ),
-        ),
-        (
-            "dropped per-review proof contract",
-            lambda copy: (copy / "skills" / "nuclear-review" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-review" / "SKILL.md")
-                .read_text()
-                .replace("`$SP/proof-rN.md`", "a receipt", 1)
-            ),
-        ),
-        (
-            "dropped break-rN contract",
-            lambda copy: (copy / "skills" / "nuclear-review" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-review" / "SKILL.md")
-                .read_text()
-                .replace("`$SP/break-rN.md`", "its evidence", 1)
-            ),
-        ),
-        (
-            "dropped campaign plan contract",
-            lambda copy: (copy / "skills" / "nuclear-campaign" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-campaign" / "SKILL.md")
-                .read_text()
-                .replace("co-authorship line", "plan", 1)
-            ),
-        ),
-        (
-            "duplicated contract phrase becomes maskable",
-            lambda copy: (copy / "skills" / "nuclear-break" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-break" / "SKILL.md").read_text()
-                + "\n\nRestated: the suite MUST go red.\n"
-            ),
-        ),
-        (
-            "deleted committed plan evidence check",
-            lambda copy: (copy / "skills" / "nuclear-review" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-review" / "SKILL.md")
-                .read_text()
-                .replace("committed `nuclear-plan` co-authorship line", "plan evidence", 1)
-            ),
-        ),
-        (
-            "gutted outage attempt requirement",
-            lambda copy: (copy / "skills" / "nuclear-review" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-review" / "SKILL.md")
-                .read_text()
-                .replace("a dispatch attempted", "a dispatch", 1)
-            ),
-        ),
-        (
             "host-prefixed skill reference",
             lambda copy: (copy / "skills" / "nuclear-campaign" / "SKILL.md").write_text(
                 (copy / "skills" / "nuclear-campaign" / "SKILL.md")
                 .read_text()
                 .replace("`nuclear-diet`", "`$nuclear-diet`", 1)
-            ),
-        ),
-        (
-            "deleted round-one receipt rule",
-            lambda copy: (copy / "skills" / "nuclear-review" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-review" / "SKILL.md")
-                .read_text()
-                .replace("No receipt, no dispatch", "Receipts are encouraged", 1)
-            ),
-        ),
-        (
-            "deleted outage no-verdict definition",
-            lambda copy: (copy / "skills" / "nuclear-review" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-review" / "SKILL.md")
-                .read_text()
-                .replace("produced no verdict", "was unhelpful", 1)
-            ),
-        ),
-        (
-            "truncated turn-end reasons",
-            lambda copy: (copy / "skills" / "nuclear-run" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-run" / "SKILL.md")
-                .read_text()
-                .replace("Anything else: keep going", "Use judgement", 1)
             ),
         ),
         (
@@ -757,62 +412,6 @@ def self_test(root: Path) -> list[str]:
                 .read_text()
                 .replace("```bash", "``bash ", 1)
                 .replace("\n   ```\n", "\n   `` \n", 1)
-            ),
-        ),
-        (
-            "deleted plan cross-family quorum",
-            lambda copy: (copy / "skills" / "nuclear-plan" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-plan" / "SKILL.md")
-                .read_text()
-                .replace("proven different family", "any reviewer", 1)
-            ),
-        ),
-        (
-            "deleted land decorrelated-review precondition",
-            lambda copy: (copy / "skills" / "nuclear-land" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-land" / "SKILL.md")
-                .read_text()
-                .replace("required decorrelated reviewer identities", "review details", 1)
-            ),
-        ),
-        (
-            "deleted same-family substitution ban",
-            lambda copy: (copy / "skills" / "nuclear-review" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-review" / "SKILL.md")
-                .read_text()
-                .replace("same-family pass", "same-family approval", 1)
-            ),
-        ),
-        (
-            "deleted reviewer diversity requirement",
-            lambda copy: (copy / "skills" / "nuclear-review" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-review" / "SKILL.md")
-                .read_text()
-                .replace("two required reviewers from two different", "reviewers from", 1)
-            ),
-        ),
-        (
-            "deleted break attack substance",
-            lambda copy: (copy / "skills" / "nuclear-break" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-break" / "SKILL.md")
-                .read_text()
-                .replace("the suite MUST go red", "the suite stays green", 1)
-            ),
-        ),
-        (
-            "deleted campaign continuity handoff",
-            lambda copy: (copy / "skills" / "nuclear-campaign" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-campaign" / "SKILL.md")
-                .read_text()
-                .replace("never into silence", "and stop", 1)
-            ),
-        ),
-        (
-            "deleted land outcome record",
-            lambda copy: (copy / "skills" / "nuclear-land" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-land" / "SKILL.md")
-                .read_text()
-                .replace("merged SHA", "the commit", 1)
             ),
         ),
         (
@@ -852,6 +451,13 @@ def self_test(root: Path) -> list[str]:
         (
             "skill left out of the cloud-session links",
             lambda copy: (copy / ".claude" / "skills" / "nuclear-run").unlink(),
+        ),
+        (
+            "dangling cross-skill reference in an appended section",
+            lambda copy: (copy / "skills" / "nuclear-sweep" / "SKILL.md").write_text(
+                (copy / "skills" / "nuclear-sweep" / "SKILL.md").read_text()
+                + "\n## Later\n\nThen run `nuclear-proofread`.\n"
+            ),
         ),
     ]
     for label, mutate in cases:

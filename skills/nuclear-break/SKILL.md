@@ -37,11 +37,17 @@ review's job. A claim of robustness without an executed attack behind it is an o
   the thinking — the breaker still questions every attack it runs and every result it gets.
 - "Unbreakable" is only claimable per attack actually executed — list what was run, including the
   attacks that found nothing. Unattempted ≠ survived.
-- Revert every mutation and restore clean state before reporting; a dirty tree after a break run is
+- **Attack a disposable copy, never the candidate checkout.** Attack 1 deletes load-bearing code; a
+  crash mid-attack in the shared tree leaves corruption for the next stage to read as the candidate.
+  Work in a worktree or clone, and restore by discarding it.
+- Record the tree's exact pre-attack state and restore *that*, not "clean" — the candidate under
+  review is allowed to be a dirty worktree, so a clean tree is the wrong target and a mismatch is
   itself a finding against the breaker.
 - **Leave the receipt.** The attack list, each attack's outcome, and the restored-state confirmation
-  go to `break-rN.md` beside the work. Trust-touching changes cannot pass `nuclear-review` without
-  it — an unwritten break run is indistinguishable from one that never happened.
+  go to `break-rN.md`. It lives beside the work; when a review is what consumes it, write it to that
+  review's `$SP` too, which is the only place `nuclear-review` looks. Trust-touching changes cannot
+  pass that gate without it — an unwritten break run is indistinguishable from one that never
+  happened.
 
 ## Common mistakes
 

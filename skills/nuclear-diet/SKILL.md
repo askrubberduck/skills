@@ -13,7 +13,10 @@ here; the product of the audit is deletions.
 
 1. **End the session at stage boundaries.** Plan→build, build→review, packet→packet: new session or
    `/compact`. Every turn re-bills the whole window; a forced auto-compaction pays a summarization
-   tax AND loses state. One session per packet.
+   tax AND loses state. One session per packet. Two conditions first, because a boundary is a
+   handoff and not an exit: the next step is named and dispatched or scheduled, and **anything the
+   next stage must read has left the scratchpad** — `$SP` dies with the session, and the review gate
+   refuses to dispatch without receipts a new session can no longer see. Unmet, the boundary waits.
 2. **Absolute paths, once.** No `cd` chains, no re-declared `VAR=/long/path` boilerplate per Bash
    call. Long scratchpad root →
    `ln -s` a short alias once.

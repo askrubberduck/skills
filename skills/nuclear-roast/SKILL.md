@@ -43,7 +43,6 @@ Critique product and engineering substance ONLY — never market validation, use
 ## Common mistakes
 
 - Roasting the latest diff — wrong altitude; the roast reads the whole standing solution.
-- Findings without evidence — a vibe is not a finding; cite the file or the behavior.
 - Trimming the list to "the important ones" or severity-sorting it — the owner judges weight; the
   roast only surfaces. A dropped finding is a silent decision the roast had no right to make.
 - Reading "surfaces everything" as "checks nothing" — weighing is the owner's, validating is the
