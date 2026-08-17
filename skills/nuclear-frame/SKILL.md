@@ -72,8 +72,11 @@ that re-frames in full.
    who would attack them, abuse cases, data classes, retention. Criteria invented later are criteria
    nobody agreed to.
 5. **Unknowns, and which would change the design if false.** Including what a leaned-on built-in
-   guarantees versus what its name suggests. A question needing a person is an unknown; unresolved,
-   it belongs in item 10.
+   guarantees versus what its name suggests — and for a third-party SDK, framework, or API, that
+   answer is read from its official documentation at the version the project pins, never recalled.
+   A remembered API is an assumption wearing a fact's clothes: it was true of some version, and
+   which one is exactly what is unknown. A question needing a person is an unknown; unresolved, it
+   belongs in item 10.
 
 ## Design — choose what should be true
 

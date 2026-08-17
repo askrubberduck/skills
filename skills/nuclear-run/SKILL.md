@@ -39,7 +39,9 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
    schema, a trap. Never narrate what the next line does, and never leave the war story of the bug
    that caused it: that belongs in the commit, and in the code it is dead weight the next edit
    silently falsifies.
-6. **Verify.** Run the project's gates (tests/build/vet or doc gates), then invoke `nuclear-proof`
+6. **Verify.** Run the project's gates (tests/build/vet or doc gates) — a gate that takes minutes
+   runs in the background, so the turn keeps working while it does; a blocked loop is the cost, and
+   an unread result is the trap — then invoke `nuclear-proof`
    on your own diff — it leaves `proof-<unit>.md`, or `$SP/proof-r1.md` when stage 7's review is
    next (`$SP`: `nuclear-review`'s dispatch scratchpad), which is where the gate looks; no file, no
    proof pass happened. Trust-touching work additionally gets the `nuclear-break` attacks executed
