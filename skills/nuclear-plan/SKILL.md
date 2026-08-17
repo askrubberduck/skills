@@ -20,7 +20,8 @@ plan same-family and send it out for adversarial review; let the other families 
    was invented in the same turn as its task list has nothing decorrelated about it.
 2. **Establish the doer's model family from self-reported runtime metadata, then ask independent
    reviewer CLIs to PRODUCE plans, not review one**: "author the safest build plan, the task
-   decomposition, and the traps you'd attack", with the design + seam map provided. At least one
+   decomposition, the simpler design that deletes a concept, and the traps you'd attack", with the
+   design + seam map provided. At least one
    required co-author must be from a different model family than the doer; a same-family session
    may add evidence but never counts as decorrelated. Each required co-author meets
    `nuclear-review`'s reviewer bar — family and tier, pinned model id recorded beside its plan.
@@ -34,7 +35,8 @@ plan same-family and send it out for adversarial review; let the other families 
 3. **Synthesize** the independent plans + your own analysis into ONE plan. Reconcile
    disagreements by READING SOURCE (`git show <sha>:path`), never by vote.
 4. Apply a cut pass: any task the synthesis shows unnecessary dies here — cheapest build is the one
-   not built.
+   not built. Same blade for the design: an abstraction with one implementation, or a second home
+   for a fact that already has one, dies with it.
 5. Fix-pass the draft **in place**, multi-round (r1, r2, …), until every required co-author,
    including at least one proven different family, concurs. The draft is a working doc — no commit
    per round; commit the settled plan once.
