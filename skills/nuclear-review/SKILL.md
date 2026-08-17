@@ -110,6 +110,9 @@ A tie goes to the reviewer.
 - If supplied history shows the same rule drawing repeated findings, apply the growth ratchet: ask
   whether that rule should exist rather than proposing another patch.
 - Count concepts, not lines: identify any new branch, exception, or second home for the same fact.
+- A comment that states something false about the code is a defect, ranked on what it misleads
+  about. A demand for explanatory comments is not: where the code is unclear the fix is the code,
+  and `nuclear-dry` sets what the surviving comments carry.
 - Judge the change, not paperwork. A receipt or commit-message defect is a `NOTE` unless it makes
   the underlying artifact claim unverifiable.
 

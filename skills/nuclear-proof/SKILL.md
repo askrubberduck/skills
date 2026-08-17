@@ -75,7 +75,9 @@ Then judge the shape:
   by one built-in flag is a win; ten lines of prose compressed to five is cosmetic.
 - **One path traceable start to finish** without jumping between sections.
 - **Cause near effect** — a guard far from the thing it guards is still a defect.
-- **One home per fact.** Fixed in two places means two things to keep true.
+- **One home per fact.** Fixed in two places means two things to keep true. A comment restating
+  the code is that duplication in prose — run `nuclear-dry` over the diff; nothing checks a
+  comment, so a stale one ships.
 
 **Line count is a smell, never a target.** A shrinking diff that tangles the flow is worse than a
 growing one that untangles it. "It removed lines" is not a defence.

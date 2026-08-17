@@ -34,11 +34,9 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
 5. **Ponytail lens throughout.** Delete before add; stdlib/existing helper before new code; smallest
    diff after full understanding. Simplify touched code before building on it; clear superseded paths
    as the last step of each unit. No migrations, no back-compat shims unless the repo demands them.
-   **Write for a senior reader.** Code explains itself; comments supplement it. A comment earns its
-   place only for a decision the code cannot show — a non-obvious tradeoff, a constraint on inputs or
-   schema, a trap. Never narrate what the next line does, and never leave the war story of the bug
-   that caused it: that belongs in the commit, and in the code it is dead weight the next edit
-   silently falsifies.
+   **Write for a senior reader.** Code explains itself; comments supplement it. Run
+   `nuclear-dry` over each unit's diff before stage 6 — it settles what a comment must carry and
+   where the prose that does not belong in code goes instead.
 6. **Verify.** Run the project's gates (tests/build/vet or doc gates) — a gate that takes minutes
    runs in the background, so the turn keeps working while it does; a blocked loop is the cost, and
    an unread result is the trap — then invoke `nuclear-proof`

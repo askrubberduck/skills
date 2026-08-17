@@ -182,6 +182,7 @@ flowchart LR
     roast[nuclear-roast]
     sweep[nuclear-sweep]
     diet[nuclear-diet]
+    dry[nuclear-dry]
     learn[nuclear-learn]
 
     scan --> campaign
@@ -199,6 +200,7 @@ flowchart LR
     proof --> review
     break --> review
     review -. verdict .-> run
+    run -.-> dry
     run --> decide
     run --> land
     cut --> decide
@@ -220,7 +222,7 @@ map of every edge** — several real handoffs are omitted to keep it readable, a
 hand. Where it disagrees with the skill bodies, the bodies are authoritative.
 `nuclear-roast` critiques the whole standing solution,
 `nuclear-learn` feeds session lessons back into skills and memory, `nuclear-diet` keeps every
-stage cheap.
+stage cheap, and `nuclear-dry` keeps the prose inside the code load-bearing.
 
 ## Skills
 
@@ -232,6 +234,7 @@ stage cheap.
 | `nuclear-cut` | Shrink a backlog by removing obsolete work, merging duplicates, and unblocking viable items |
 | `nuclear-decide` | Resolve owner decisions and sign-offs one at a time |
 | `nuclear-diet` | Reduce agent context, memory, and token costs without losing essential guidance |
+| `nuclear-dry` | Cut comment and docstring noise so only unobvious decisions, contracts, and traps survive |
 | `nuclear-frame` | Analyze a system and settle its target design before planning begins |
 | `nuclear-land` | Merge approved work, update project records, and clean up its branch and worktree |
 | `nuclear-learn` | Turn session and delivery evidence into reusable lessons |
@@ -259,7 +262,7 @@ python3 scripts/validate-distribution.py --self-test
 ```
 
 The validator checks the Codex, Claude, and Agy manifests; every Codex skill interface; the canonical
-15-skill set; human-first descriptions; cross-skill resolution; install documentation; generated
+16-skill set; human-first descriptions; cross-skill resolution; install documentation; generated
 catalog freshness; and known corruption cases. It performs no network access and writes only to
 temporary directories during self-test.
 
@@ -292,7 +295,7 @@ since been rewritten and no longer carries his text; the section arc is the surv
 
 ## Status
 
-v0.8.2 — 15 skills. Per-version notes live in
+v0.8.2 — 16 skills. Per-version notes live in
 [Releases](https://github.com/askrubberduck/skills/releases).
 
 Every rule in these skills is here because something measurably failed without it, mined from real

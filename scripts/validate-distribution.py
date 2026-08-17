@@ -20,6 +20,7 @@ EXPECTED_SKILLS = {
     "nuclear-cut",
     "nuclear-decide",
     "nuclear-diet",
+    "nuclear-dry",
     "nuclear-frame",
     "nuclear-land",
     "nuclear-learn",
@@ -185,7 +186,12 @@ def validate(root: Path) -> list[str]:
     # A skill added to `skills/` without its link is invisible to every cloud session on this repo,
     # and nothing but this check would say so.
     link_root = root / ".claude" / "skills"
-    linked_skills = {path.name for path in link_root.iterdir()} if link_root.is_dir() else set()
+    # Dotted entries are host state (agent frameworks write into `.claude/`), never a skill link.
+    linked_skills = (
+        {path.name for path in link_root.iterdir() if not path.name.startswith(".")}
+        if link_root.is_dir()
+        else set()
+    )
     require_equal(errors, "project skill link set", linked_skills, EXPECTED_SKILLS)
     for name in sorted(linked_skills):
         link = link_root / name
@@ -379,6 +385,18 @@ def self_test(root: Path) -> list[str]:
         (
             "skill left out of the cloud-session links",
             lambda copy: (copy / ".claude" / "skills" / "nuclear-run").unlink(),
+        ),
+        (
+            # Pins the dotted-entry skip fail-closed: skipping a dotted name must never hide
+            # a skill whose real link is gone.
+            "skill hidden behind a dotted copy",
+            lambda copy: (
+                (copy / ".claude" / "skills" / "nuclear-run").unlink(),
+                shutil.copytree(
+                    copy / "skills" / "nuclear-run",
+                    copy / ".claude" / "skills" / ".nuclear-run",
+                ),
+            ),
         ),
         (
             "dangling cross-skill reference in an appended section",
