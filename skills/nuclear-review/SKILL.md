@@ -103,6 +103,10 @@ A tie goes to the reviewer.
 - On deletion-heavy diffs, inspect the diff prefix and post-change file before accepting a claim
   that a fact disappeared; context lines and moved facts create false blockers.
 - Resolve disagreement about framework behavior by reading the dependency source, not by vote.
+- Disagreement about what *should* be — a design intent, a public boundary, a policy — has no
+  source to read: route it to the owner via `nuclear-decide` instead of settling it as the doer.
+  Measured: three such disagreements in one build, each settled by the party the gate exists to
+  check.
 - If supplied history shows the same rule drawing repeated findings, apply the growth ratchet: ask
   whether that rule should exist rather than proposing another patch.
 - Count concepts, not lines: identify any new branch, exception, or second home for the same fact.
