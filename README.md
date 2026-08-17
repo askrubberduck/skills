@@ -238,8 +238,10 @@ stage cheap, and `nuclear-dry` keeps the prose inside the code load-bearing.
 | `nuclear-frame` | Analyze a system and settle its target design before planning begins |
 | `nuclear-land` | Merge approved work, update project records, and clean up its branch and worktree |
 | `nuclear-learn` | Turn session and delivery evidence into reusable lessons |
+| `nuclear-pingpong` | Alternate test-writing and implementation between two decorrelated model families, one failing test per rally |
 | `nuclear-plan` | Catch architectural and implementation risks before coding begins |
 | `nuclear-proof` | Give completed work a skeptical second pass before anyone trusts it |
+| `nuclear-race` | Race two decorrelated model families independently against the same frozen problem, then adjudicate on executed evidence |
 | `nuclear-review` | Run one independent cross-model superreview and synthesize an evidence-backed APPROVE, REJECT, or NOTE |
 | `nuclear-roast` | Critique an entire product, solution, or architecture from multiple angles |
 | `nuclear-run` | Plan, implement, test, and independently review a high-risk change |

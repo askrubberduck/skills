@@ -1,0 +1,4 @@
+interface:
+  display_name: "Nuclear Pingpong"
+  short_description: "Cross-model TDD, one failing test per rally"
+  default_prompt: "Use $askrubberduck:nuclear-pingpong to drive this task with cross-model TDD, one failing test per rally."
