@@ -1,0 +1,4 @@
+interface:
+  display_name: "Duck Learn"
+  short_description: "Turn delivery evidence into reusable lessons"
+  default_prompt: "Use $askrubberduck:duck-learn to extract reusable lessons from these sessions and outcomes."

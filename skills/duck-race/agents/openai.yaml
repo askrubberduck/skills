@@ -1,0 +1,4 @@
+interface:
+  display_name: "Duck Race"
+  short_description: "Race two model families on the same frozen problem"
+  default_prompt: "Use $askrubberduck:duck-race to race two decorrelated attempts at this task and adjudicate on executed evidence."

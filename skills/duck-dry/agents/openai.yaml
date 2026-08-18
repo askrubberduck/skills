@@ -1,0 +1,4 @@
+interface:
+  display_name: "Duck Dry"
+  short_description: "Cut comment noise down to load-bearing facts"
+  default_prompt: "Use $askrubberduck:duck-dry to cut the comment noise in this diff down to what the code cannot carry."

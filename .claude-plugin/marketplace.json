@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "askrubberduck",
-  "description": "Plan, challenge, ship, and clean up complex work",
+  "description": "Plan, challenge, ship, and clean up complex work; the duck is cynical, dry, and straightforward",
   "owner": {
     "name": "askrubberduck",
     "url": "https://github.com/askrubberduck"
@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "askrubberduck",
-      "description": "Plan, challenge, ship, and clean up complex work",
+      "description": "Plan, challenge, ship, and clean up complex work; the duck is cynical, dry, and straightforward",
       "source": "./",
       "category": "productivity"
     }

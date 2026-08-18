@@ -1,4 +1,0 @@
-interface:
-  display_name: "Nuclear Plan"
-  short_description: "Catch plan risks before implementation begins"
-  default_prompt: "Use $askrubberduck:nuclear-plan to catch risks in this implementation plan before coding."

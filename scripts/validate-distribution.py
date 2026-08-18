@@ -13,36 +13,36 @@ from typing import Any, Callable
 
 
 EXPECTED_NAME = "askrubberduck"
-EXPECTED_VERSION = "0.10.1"
+EXPECTED_VERSION = "1.0.0"
 EXPECTED_SKILLS = {
-    "nuclear-break",
-    "nuclear-campaign",
-    "nuclear-cut",
-    "nuclear-decide",
-    "nuclear-diet",
-    "nuclear-dry",
-    "nuclear-frame",
-    "nuclear-land",
-    "nuclear-learn",
-    "nuclear-pingpong",
-    "nuclear-plan",
-    "nuclear-proof",
-    "nuclear-race",
-    "nuclear-review",
-    "nuclear-roast",
-    "nuclear-run",
-    "nuclear-scan",
-    "nuclear-sweep",
+    "duck-break",
+    "duck-campaign",
+    "duck-cut",
+    "duck-decide",
+    "duck-diet",
+    "duck-dry",
+    "duck-frame",
+    "duck-land",
+    "duck-learn",
+    "duck-pingpong",
+    "duck-plan",
+    "duck-proof",
+    "duck-race",
+    "duck-review",
+    "duck-roast",
+    "duck-run",
+    "duck-scan",
+    "duck-sweep",
 }
 README_MARKERS = (
     "codex plugin marketplace add askrubberduck/skills",
     "codex plugin add askrubberduck@askrubberduck",
     "gh release view --repo askrubberduck/skills",
     "~/.agents/skills",
-    "$askrubberduck:nuclear-run",
-    "$nuclear-run",
-    "/askrubberduck:nuclear-run",
-    "/nuclear-run",
+    "$askrubberduck:duck-run",
+    "$duck-run",
+    "/askrubberduck:duck-run",
+    "/duck-run",
     "agy plugin validate",
     "agy plugin install",
     "agents/openai.yaml",
@@ -207,13 +207,33 @@ def validate(root: Path) -> list[str]:
 
     for name in sorted(found_skills):
         path = skill_root / name / "SKILL.md"
-        text = path.read_text()
+        # Bytes, not text mode: universal-newline translation rewrites a lone '\r' to '\n'
+        # on read, so text mode can never see the byte that breaks real hosts' parsers.
+        text = path.read_bytes().decode("utf-8", errors="replace")
         frontmatter = re.match(r"^---\n(.*?)\n---\n", text, re.S)
         if not frontmatter:
             errors.append(f"skills/{name}/SKILL.md: missing frontmatter")
             continue
+        # The whole frontmatter shape is validated, not just the first match per key:
+        # YAML is last-key-wins, so a duplicate 'description:' or an indented continuation
+        # line changes what a host loads while first-match regexes keep validating the
+        # original. Exactly two single-line keys, nothing else.
+        fm_lines = frontmatter.group(1).split("\n")
+        for key in ("name", "description"):
+            if sum(1 for line in fm_lines if line.startswith(f"{key}:")) != 1:
+                errors.append(
+                    f"skills/{name}/SKILL.md: frontmatter must declare {key} exactly once"
+                )
+        for line in fm_lines:
+            if not line.startswith(("name:", "description:")):
+                errors.append(
+                    f"skills/{name}/SKILL.md: unexpected frontmatter line "
+                    "(continuation lines and extra keys are rejected)"
+                )
+                break
         declared = re.search(r"^name:\s*(\S+)", frontmatter.group(1), re.M)
-        description = re.search(r"^description:\s*(.+)", frontmatter.group(1), re.M)
+        # Spaces only: \s would eat leading control characters the guard below must see.
+        description = re.search(r"^description:[ ]*(.+)", frontmatter.group(1), re.M)
         if not declared or declared.group(1) != name:
             errors.append(f"skills/{name}/SKILL.md: frontmatter name must match directory")
         if not description or not description.group(1).strip():
@@ -230,6 +250,31 @@ def validate(root: Path) -> list[str]:
                 )
             if len(description_text) > 1024:
                 errors.append(f"skills/{name}/SKILL.md: description exceeds 1024 characters")
+            # Hosts parse frontmatter with real YAML parsers (Psych, PyYAML); a ': ' becomes a
+            # mapping, ' #' truncates, and a leading indicator character errors or nils the
+            # description — each drops the skill silently. Enumerating bad characters lost three
+            # review rounds, so this is a whitelist: a single-line scalar that starts with a
+            # letter and avoids ': ', ' #', and a trailing ':' is valid under the YAML plain-
+            # scalar grammar; everything outside that proven subset is rejected.
+            # The raw capture, never stripped first: str.strip() removes \x0b/\x0c-class
+            # whitespace, hiding trailing control characters from the scan below.
+            raw = description.group(1)
+            # Whitelist closure, not a blacklist: a block-context plain scalar fails only on
+            # (a) an indicator as first character — the letter rule; (b) ': ' or a trailing
+            # ':' — banned; (c) ' #' — banned; (d) tabs, control characters, and the Unicode
+            # line breaks NEL/LS/PS — all non-printable per str.isprintable, banned wholesale.
+            # What remains is printable content no YAML parser misreads.
+            if (
+                not raw[:1].isalpha()
+                or any(not char.isprintable() for char in raw)
+                or ": " in raw
+                or " #" in raw
+                or raw.rstrip(" ").endswith(":")
+            ):
+                errors.append(
+                    f"skills/{name}/SKILL.md: description is not a YAML-safe plain scalar "
+                    "(start with a letter; printable characters only, no ': ', no ' #', no trailing ':')"
+                )
 
         interface_path = skill_root / name / "agents" / "openai.yaml"
         try:
@@ -270,9 +315,9 @@ def validate(root: Path) -> list[str]:
                         f"skills/{name}/agents/openai.yaml: default prompt exceeds 160 characters"
                     )
         body = text[frontmatter.end() :]
-        # `nuclear-*` in backticks is reserved: it always means "invoke this skill", never a
+        # `duck-*` in backticks is reserved: it always means "invoke this skill", never a
         # domain term. Authors needing such a term use prose or another name.
-        for prefix, referenced in re.findall(r"`([$/]?)(nuclear-[a-z-]+)`", body):
+        for prefix, referenced in re.findall(r"`([$/]?)(duck-[a-z-]+)`", body):
             if prefix:
                 errors.append(
                     f"skills/{name}/SKILL.md: host-prefixed reference {prefix + referenced!r} — "
@@ -330,23 +375,135 @@ def replace_in(copy: Path, relative: str, old: str, new: str) -> None:
 
 def self_test(root: Path) -> list[str]:
     failures: list[str] = []
-    run_skill = "skills/nuclear-run/SKILL.md"
-    review_skill = "skills/nuclear-review/SKILL.md"
+    run_skill = "skills/duck-run/SKILL.md"
+    review_skill = "skills/duck-review/SKILL.md"
     replacements = [
-        ("dangling cross-skill reference", run_skill, "`nuclear-proof`", "`nuclear-proofread`"),
-        ("namespaced cross-skill reference", run_skill, "`nuclear-proof`", "`$askrubberduck:nuclear-proof`"),
-        ("slash-namespaced cross-skill reference", run_skill, "`nuclear-proof`", "`/askrubberduck:nuclear-proof`"),
-        ("bare-namespaced cross-skill reference", run_skill, "`nuclear-proof`", "askrubberduck:nuclear-proof"),
-        ("dollar-prefixed dangling reference", run_skill, "`nuclear-proof`", "`$nuclear-proofread`"),
-        ("host-prefixed skill reference", "skills/nuclear-campaign/SKILL.md", "`nuclear-diet`", "`$nuclear-diet`"),
+        ("dangling cross-skill reference", run_skill, "`duck-proof`", "`duck-proofread`"),
+        ("namespaced cross-skill reference", run_skill, "`duck-proof`", "`$askrubberduck:duck-proof`"),
+        ("slash-namespaced cross-skill reference", run_skill, "`duck-proof`", "`/askrubberduck:duck-proof`"),
+        ("bare-namespaced cross-skill reference", run_skill, "`duck-proof`", "askrubberduck:duck-proof"),
+        ("dollar-prefixed dangling reference", run_skill, "`duck-proof`", "`$duck-proofread`"),
+        ("host-prefixed skill reference", "skills/duck-campaign/SKILL.md", "`duck-diet`", "`$duck-diet`"),
         ("collapsed code fence", review_skill, "```bash", "``bash"),
         (
+            "YAML-breaking description colon",
+            "skills/duck-scan/SKILL.md",
+            "description: Find ready, blocked, and remaining work",
+            "description: Find ready: blocked and remaining work",
+        ),
+        (
+            "YAML-nil description leading hash",
+            "skills/duck-scan/SKILL.md",
+            "description: Find ready, blocked, and remaining work",
+            "description: # Find ready, blocked, and remaining work",
+        ),
+        (
+            "YAML-breaking description leading indicator",
+            "skills/duck-scan/SKILL.md",
+            "description: Find ready, blocked, and remaining work",
+            "description: ] Find ready, blocked, and remaining work",
+        ),
+        (
+            "quoted description",
+            "skills/duck-scan/SKILL.md",
+            "description: Find ready, blocked, and remaining work",
+            'description: "Find ready, blocked, and remaining work',
+        ),
+        (
+            "YAML-breaking description tab separator",
+            "skills/duck-scan/SKILL.md",
+            "description: Find ready, blocked, and remaining work",
+            "description: Find ready:\tblocked, and remaining work",
+        ),
+        (
+            "YAML-truncating description tab comment",
+            "skills/duck-scan/SKILL.md",
+            "description: Find ready, blocked, and remaining work",
+            "description: Find ready\t#blocked, and remaining work",
+        ),
+        (
+            "YAML-breaking description carriage return",
+            "skills/duck-scan/SKILL.md",
+            "description: Find ready, blocked, and remaining work",
+            "description: Find ready\r- blocked, and remaining work",
+        ),
+        (
+            "duplicate description key",
+            "skills/duck-scan/SKILL.md",
+            "name: duck-scan",
+            "name: duck-scan\ndescription: hidden duplicate wins in last-key-wins parsers",
+        ),
+        (
+            "frontmatter continuation line",
+            "skills/duck-scan/SKILL.md",
+            "description: Find ready, blocked, and remaining work",
+            "description: Find ready,\n  blocked, and remaining work",
+        ),
+        (
+            # At the true end of the line: an inline control character never met the r7
+            # str.strip() bug, so only a trailing one proves the raw-capture fix holds.
+            "YAML-rejected trailing vertical tab",
+            "skills/duck-scan/SKILL.md",
+            "or asks whether a named work item is ready.",
+            "or asks whether a named work item is ready.\x0b",
+        ),
+        (
+            "YAML-rejected NEL line break",
+            "skills/duck-scan/SKILL.md",
+            "description: Find ready, blocked, and remaining work",
+            "description: Find ready\u0085- blocked, and remaining work",
+        ),
+        (
+            "YAML-breaking description dash",
+            "skills/duck-scan/SKILL.md",
+            "description: Find ready, blocked, and remaining work",
+            "description: - Find ready, blocked, and remaining work",
+        ),
+        (
+            "YAML-truncating description comment",
+            "skills/duck-scan/SKILL.md",
+            "description: Find ready, blocked, and remaining work",
+            "description: Find ready #blocked and remaining work",
+        ),
+        (
             "agent-only description",
-            "skills/nuclear-scan/SKILL.md",
-            "description: Find ready, blocked, and remaining work without changing anything.",
+            "skills/duck-scan/SKILL.md",
+            "description: Find ready, blocked, and remaining work without changing anything; looking is free.",
             "description: Use when work status needs scanning.",
         ),
     ]
+    expected_errors = {
+        "dangling cross-skill reference": "names no installed skill",
+        "namespaced cross-skill reference": "does not resolve on standalone installs",
+        "slash-namespaced cross-skill reference": "does not resolve on standalone installs",
+        "bare-namespaced cross-skill reference": "does not resolve on standalone installs",
+        "dollar-prefixed dangling reference": "bodies use the bare frontmatter name",
+        "host-prefixed skill reference": "bodies use the bare frontmatter name",
+        "collapsed code fence": "collapsed code fence",
+        "YAML-breaking description colon": "not a YAML-safe plain scalar",
+        "YAML-breaking description dash": "not a YAML-safe plain scalar",
+        "YAML-nil description leading hash": "not a YAML-safe plain scalar",
+        "YAML-breaking description leading indicator": "not a YAML-safe plain scalar",
+        "quoted description": "not a YAML-safe plain scalar",
+        "YAML-breaking description tab separator": "not a YAML-safe plain scalar",
+        "YAML-truncating description tab comment": "not a YAML-safe plain scalar",
+        "YAML-breaking description carriage return": "not a YAML-safe plain scalar",
+        "YAML-rejected trailing vertical tab": "not a YAML-safe plain scalar",
+        "YAML-rejected NEL line break": "not a YAML-safe plain scalar",
+        "duplicate description key": "exactly once",
+        "frontmatter continuation line": "unexpected frontmatter line",
+        "YAML-truncating description comment": "not a YAML-safe plain scalar",
+        "agent-only description": "agent-only trigger copy",
+        "version mismatch": "version",
+        "escaping marketplace path": "Codex marketplace source path",
+        "collapsed fence with trailing space": "collapsed code fence",
+        "malformed manifest": "invalid or unreadable JSON",
+        "missing Agy adapter": "Agy manifest",
+        "malformed Codex skill interface": "expected display name",
+        "skill left out of the cloud-session links": "project skill link set",
+        "skill hidden behind a dotted copy": "project skill link set",
+        "dangling cross-skill reference in an appended section": "names no installed skill",
+    }
     cases: list[tuple[str, Callable[[Path], None]]] = [
         (label, lambda copy, r=rel, o=old, n=new: replace_in(copy, r, o, n))
         for label, rel, old, new in replacements
@@ -381,30 +538,30 @@ def self_test(root: Path) -> list[str]:
         (
             "malformed Codex skill interface",
             lambda copy: (
-                copy / "skills" / "nuclear-run" / "agents" / "openai.yaml"
+                copy / "skills" / "duck-run" / "agents" / "openai.yaml"
             ).write_text("interface:\n"),
         ),
         (
             "skill left out of the cloud-session links",
-            lambda copy: (copy / ".claude" / "skills" / "nuclear-run").unlink(),
+            lambda copy: (copy / ".claude" / "skills" / "duck-run").unlink(),
         ),
         (
             # Pins the dotted-entry skip fail-closed: skipping a dotted name must never hide
             # a skill whose real link is gone.
             "skill hidden behind a dotted copy",
             lambda copy: (
-                (copy / ".claude" / "skills" / "nuclear-run").unlink(),
+                (copy / ".claude" / "skills" / "duck-run").unlink(),
                 shutil.copytree(
-                    copy / "skills" / "nuclear-run",
-                    copy / ".claude" / "skills" / ".nuclear-run",
+                    copy / "skills" / "duck-run",
+                    copy / ".claude" / "skills" / ".duck-run",
                 ),
             ),
         ),
         (
             "dangling cross-skill reference in an appended section",
-            lambda copy: (copy / "skills" / "nuclear-sweep" / "SKILL.md").write_text(
-                (copy / "skills" / "nuclear-sweep" / "SKILL.md").read_text()
-                + "\n## Later\n\nThen run `nuclear-proofread`.\n"
+            lambda copy: (copy / "skills" / "duck-sweep" / "SKILL.md").write_text(
+                (copy / "skills" / "duck-sweep" / "SKILL.md").read_text()
+                + "\n## Later\n\nThen run `duck-proofread`.\n"
             ),
         ),
     ]
@@ -422,8 +579,17 @@ def self_test(root: Path) -> list[str]:
             if _fingerprint(copy) == before:
                 failures.append(f"self-test mutation changed nothing: {label}")
                 continue
-            if not validate(copy):
+            errors = validate(copy)
+            if not errors:
                 failures.append(f"self-test did not reject: {label}")
+                continue
+            expected = expected_errors.get(label)
+            if expected is None:
+                failures.append(f"self-test case has no expected error: {label}")
+            elif not any(expected in error for error in errors):
+                failures.append(
+                    f"self-test rejected for the wrong reason: {label} (wanted {expected!r})"
+                )
     return failures
 
 

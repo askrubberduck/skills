@@ -1,0 +1,4 @@
+interface:
+  display_name: "Duck Frame"
+  short_description: "Ground a system and settle its design pre-plan"
+  default_prompt: "Use $askrubberduck:duck-frame to analyze this system and settle its target design before planning."

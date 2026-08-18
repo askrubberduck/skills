@@ -1,0 +1,4 @@
+interface:
+  display_name: "Duck Diet"
+  short_description: "Reduce context, memory, and token costs"
+  default_prompt: "Use $askrubberduck:duck-diet to audit and reduce this agent setup's context and token costs."

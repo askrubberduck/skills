@@ -1,0 +1,4 @@
+interface:
+  display_name: "Duck Review"
+  short_description: "Get one evidence-backed cross-model superreview"
+  default_prompt: "Use $askrubberduck:duck-review to run one independent superreview and return an evidence-backed APPROVE, REJECT, or NOTE."

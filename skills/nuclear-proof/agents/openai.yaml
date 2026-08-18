@@ -1,4 +1,0 @@
-interface:
-  display_name: "Nuclear Proof"
-  short_description: "Verify completed work against concrete evidence"
-  default_prompt: "Use $askrubberduck:nuclear-proof to verify this completed work against concrete evidence before review."

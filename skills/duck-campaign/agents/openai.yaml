@@ -1,0 +1,4 @@
+interface:
+  display_name: "Duck Campaign"
+  short_description: "Split large initiatives into shippable workstreams"
+  default_prompt: "Use $askrubberduck:duck-campaign to split this initiative into prioritized, shippable workstreams."
