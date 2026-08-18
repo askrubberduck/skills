@@ -35,6 +35,12 @@ semantics.
    - the committed `duck-plan` co-authorship line for packet-sized or trust-touching work;
    - `$SP/break-rN.md` from `duck-break` for trust-touching work.
 
+   For a third or later round on the same work (N≥3 in `rN`), the dispatch also carries the
+   caller's committed loop diagnosis (`loop-diagnosis: …`): which breaker exit was weighed —
+   `duck-frame` re-frame, `duck-plan` replan, `duck-race`, `duck-pingpong`, `duck-decide` —
+   and why another review round is the right spend. No diagnosis, no dispatch: the gate does
+   not sell round N+1 to a caller that has not judged its own loop.
+
    **No receipt, no dispatch — and presence is not verification**: spot-check each receipt by
    re-running or inspecting at least one claim's cited command or artifact; a claim that does not
    check out is a finding against the receipt. Measured: three receipts in one build overclaimed
@@ -108,7 +114,11 @@ A tie goes to the reviewer.
   Measured: three such disagreements in one build, each settled by the party the gate exists to
   check.
 - If supplied history shows the same rule drawing repeated findings, apply the growth ratchet: ask
-  whether that rule should exist rather than proposing another patch.
+  whether that rule should exist rather than proposing another patch. When two consecutive rounds'
+  substantiated blockers target code introduced by remediation rather than the original candidate,
+  say so in the report and recommend the caller's circuit breaker — rebuild the contested unit
+  under `duck-race`, or lock findings in as failing tests under `duck-pingpong` — instead of
+  implicitly inviting the next round.
 - Count concepts, not lines: identify any new branch, exception, or second home for the same fact,
   any abstraction with a single implementation, and any unit that took on a second job.
 - A comment that states something false about the code is a defect, ranked on what it misleads
