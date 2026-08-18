@@ -26,6 +26,12 @@ the repo forgot; a record without a verified merge is fiction.
   SHA** the same way this landing was authorized — the review gate, or the owner's renewed written
   waiver; landing on the strength of the old authorization merges an unexamined diff.
 - CI green on the exact head being merged.
+- **The PR description meets the comment bar** (`nuclear-dry`): only what the diff cannot carry —
+  intent, the gate verdict with its receipt paths, constraints and known limits. Narration,
+  process story, and prose restating the diff are removed before merge; a squash merge promotes
+  the description into the commit body, so slop here ships into history. Evidence beats
+  adjectives: a claim in the description without its receipt is the overclaim the gate exists to
+  stop.
 - **Where this landing is a repository's first push to a public remote — or the one that flips it
   public — scan the whole shipped tree *and* its commit messages for internal identifiers** before
   the push: private repo and product names, machine-local paths (`~/code/docs/<project>`), internal
