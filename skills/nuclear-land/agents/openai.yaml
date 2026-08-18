@@ -1,4 +1,0 @@
-interface:
-  display_name: "Nuclear Land"
-  short_description: "Merge approved work and clean up delivery state"
-  default_prompt: "Use $askrubberduck:nuclear-land to merge this approved work, update project records, and clean up."

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Nuclear Diet"
-  short_description: "Reduce context, memory, and token costs"
-  default_prompt: "Use $askrubberduck:nuclear-diet to audit and reduce this agent setup's context and token costs."

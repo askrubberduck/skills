@@ -1,4 +1,0 @@
-interface:
-  display_name: "Nuclear Race"
-  short_description: "Race two model families on the same frozen problem"
-  default_prompt: "Use $askrubberduck:nuclear-race to race two decorrelated attempts at this task and adjudicate on executed evidence."

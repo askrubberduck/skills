@@ -1,4 +1,0 @@
-interface:
-  display_name: "Nuclear Sweep"
-  short_description: "Clean branches, worktrees, checkouts, and ignore rules"
-  default_prompt: "Use $askrubberduck:nuclear-sweep to clean stale branches, worktrees, checkouts, and ignore rules."

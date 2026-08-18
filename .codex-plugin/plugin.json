@@ -1,7 +1,7 @@
 {
   "name": "askrubberduck",
-  "version": "0.10.1",
-  "description": "Plan, challenge, ship, and clean up complex work",
+  "version": "1.0.0",
+  "description": "Plan, challenge, ship, and clean up complex work; the duck is cynical, dry, and straightforward",
   "author": {
     "name": "askrubberduck",
     "url": "https://github.com/askrubberduck"
@@ -19,8 +19,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "askrubberduck",
-    "shortDescription": "Plan, challenge, ship, and clean up complex work",
-    "longDescription": "Turn complex work into reviewed, verified changes with guided planning, independent critique, delivery, decisions, and repository cleanup.",
+    "shortDescription": "Plan, challenge, ship, and clean up complex work; the duck is cynical, dry, and straightforward",
+    "longDescription": "The duck listens, judges, and does not flatter: guided planning, independent critique, delivery, decisions, and repository cleanup. Every claim needs evidence; every gate is decorrelated.",
     "developerName": "askrubberduck",
     "category": "Productivity",
     "capabilities": [
@@ -28,9 +28,9 @@
       "Write"
     ],
     "defaultPrompt": [
-      "Use $askrubberduck:nuclear-run to plan and deliver this change with independent review.",
-      "Use $askrubberduck:nuclear-review to red-team this diff before it ships.",
-      "Use $askrubberduck:nuclear-scan to find what work is ready next."
+      "Use $askrubberduck:duck-run to plan and deliver this change with independent review.",
+      "Use $askrubberduck:duck-review to red-team this diff before it ships.",
+      "Use $askrubberduck:duck-scan to find what work is ready next."
     ]
   }
 }

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Nuclear Frame"
-  short_description: "Ground a system and settle its design pre-plan"
-  default_prompt: "Use $askrubberduck:nuclear-frame to analyze this system and settle its target design before planning."

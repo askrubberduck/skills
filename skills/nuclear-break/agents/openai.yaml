@@ -1,4 +1,0 @@
-interface:
-  display_name: "Nuclear Break"
-  short_description: "Execute hostile runtime attacks before review"
-  default_prompt: "Use $askrubberduck:nuclear-break to execute hostile runtime attacks against this finished build."

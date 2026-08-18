@@ -1,0 +1,4 @@
+interface:
+  display_name: "Duck Proof"
+  short_description: "Verify completed work against concrete evidence"
+  default_prompt: "Use $askrubberduck:duck-proof to verify this completed work against concrete evidence before review."
