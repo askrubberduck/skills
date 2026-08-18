@@ -301,7 +301,7 @@ since been rewritten and no longer carries his text; the section arc is the surv
 
 ## Status
 
-v0.10.0 — 18 skills. Per-version notes live in
+v0.10.1 — 18 skills. Per-version notes live in
 [Releases](https://github.com/askrubberduck/skills/releases).
 
 Every rule in these skills is here because something measurably failed without it, mined from real
