@@ -13,7 +13,7 @@ from typing import Any, Callable
 
 
 EXPECTED_NAME = "askrubberduck"
-EXPECTED_VERSION = "0.9.0"
+EXPECTED_VERSION = "0.10.0"
 EXPECTED_SKILLS = {
     "nuclear-break",
     "nuclear-campaign",

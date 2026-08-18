@@ -166,6 +166,8 @@ flowchart LR
         frame[nuclear-frame]
         plan[nuclear-plan]
         run[nuclear-run]
+        race[nuclear-race]
+        pingpong[nuclear-pingpong]
     end
     subgraph verify["self-verify + attack"]
         proof[nuclear-proof]
@@ -196,6 +198,8 @@ flowchart LR
     run --> proof
     run --> break
     run --> review
+    race --> proof
+    pingpong --> proof
     plan --> review
     proof --> review
     break --> review
@@ -297,7 +301,7 @@ since been rewritten and no longer carries his text; the section arc is the surv
 
 ## Status
 
-v0.9.0 — 16 skills. Per-version notes live in
+v0.10.0 — 18 skills. Per-version notes live in
 [Releases](https://github.com/askrubberduck/skills/releases).
 
 Every rule in these skills is here because something measurably failed without it, mined from real
