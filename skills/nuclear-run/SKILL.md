@@ -112,6 +112,5 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
   what outcome dies if the code is not written. The most reliable code is the code never written;
   that is the spirit, not a tiebreaker for close calls.
 - **Judge the shape, not the diffstat** — `nuclear-proof`'s §6 test: concepts a reader holds, one
-  path traceable without jumping, cause near effect, one home per fact. Fewer lines is a smell,
-  never the goal.
+  path traceable without jumping, cause near effect. Fewer lines is a smell, never the goal.
 - Record deferrals and owner decisions in the project's registry (never silently drop).

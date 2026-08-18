@@ -17,8 +17,9 @@ one set of blind spots write both sides of the proof.
 1. Freeze the spec to `$SP/spec.md`: task, acceptance criteria, base commit SHA. Both paddles play
    from these bytes; discovered ambiguity is resolved in writing there, visible to both.
 2. One shared worktree — turns are sequential, so race-style isolation buys nothing.
-3. Paddles: the doer (this session's family) and a **proven different family**, `codex exec` by
-   default, model pinned. The rival is stateless between turns: every dispatch replays context —
+3. Paddles: the doer (this session's family) and a **proven different family** — `codex exec` by
+   default when the doer is not OpenAI/GPT; a doer of that family plays a different proven family
+   instead — model pinned. The rival is stateless between turns: every dispatch replays context —
    spec path, current diff path, relevant file paths — by file, never inlined.
 
 ## The rally
@@ -39,12 +40,14 @@ A rally is one red-green pair. Serve alternates each rally.
 Rival dispatch per turn:
 
 ```bash
-codex exec -C "$WT" -m <pinned> "$(cat $SP/turn.md)" </dev/null > $SP/rival-tN.out 2>&1
+codex exec -C "$WT" -s workspace-write -m <pinned> "$(cat $SP/turn.md)" </dev/null > $SP/rival-tN.out 2>&1
 ```
 
 `turn.md` states the role for this turn (serve or return), the spec path, and the current state.
-Sanity-check a new invocation form first; a zero-byte or crashed dispatch is an outage — record it
-and re-dispatch, never play both sides of a rally to keep the game moving.
+The write sandbox is load-bearing: the default is read-only, and a paddle that cannot write
+returns an empty turn at exit 0. Sanity-check a new invocation form first; a zero-byte or crashed
+dispatch is an outage — record it and re-dispatch, never play both sides of a rally to keep the
+game moving.
 
 ## Stop
 
@@ -57,8 +60,11 @@ The output is a tested candidate, not an approved one: it enters the normal pipe
 
 ## Contract
 
-- Rally log `$SP/pingpong-rN.md` is the receipt: per rally — server, red proof, green proof,
-  objections; plus the final full-suite run. A rally without both proofs did not happen.
+- Rally log `$SP/pingpong-rN.md` is the receipt. Header: both paddles' pinned model ids — a log
+  without identities cannot prove the game was cross-family at all. Per rally — server, red
+  proof, green proof, objections, and the served test file's hash at handoff and again at green:
+  unequal hashes are the returner's void condition caught after the fact. Plus the final
+  full-suite run. A rally without both proofs did not happen.
 - One test per serve. Batching tests hides which failure drove which code — the rally structure is
   the audit trail.
 - Never commit raw CLI stdout; keep it in `$SP`.

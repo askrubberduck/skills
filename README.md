@@ -264,7 +264,7 @@ python3 scripts/validate-distribution.py --self-test
 ```
 
 The validator checks the Codex, Claude, and Agy manifests; every Codex skill interface; the canonical
-16-skill set; human-first descriptions; cross-skill resolution; install documentation; generated
+skill set; human-first descriptions; cross-skill resolution; install documentation; generated
 catalog freshness; and known corruption cases. It performs no network access and writes only to
 temporary directories during self-test.
 
