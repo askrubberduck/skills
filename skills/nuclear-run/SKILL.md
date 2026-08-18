@@ -31,6 +31,9 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
    (a record is checked by reading it back); any unmet precondition runs the stage on the
    inherited model.
    TDD for code units: failing test first, minimal pass, then simplify.
+   Draft commits already meet the prose bar `nuclear-land` enforces at merge (`nuclear-dry`):
+   subject names the change, body only what the diff cannot carry. Draft slop is not free —
+   it leaks through cherry-picks and is the raw material the squash message gets built from.
 5. **Ponytail lens throughout.** Delete before add; stdlib/existing helper before new code; one
    home per fact; smallest
    diff after full understanding. Simplify touched code before building on it; clear superseded paths
