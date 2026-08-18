@@ -1,6 +1,6 @@
 ---
 name: duck-pingpong
-description: Alternate test-writing and implementation between two decorrelated model families that don't trust each other, one failing test per rally. Use when the user says "ping-pong" or "duck pingpong", wants TDD across two models, a spec is clear but its edge cases are not, or generated tests keep passing without catching real defects.
+description: Alternate test-writing and implementation between two decorrelated model families that don't trust each other, one failing test per rally. Use when the user says "ping-pong" or "duck pingpong", wants TDD across two models, a spec is clear but its edge cases are not, generated tests keep passing without catching real defects, or a stuck review loop needs its findings locked in as failing tests.
 ---
 
 # Duck Pingpong

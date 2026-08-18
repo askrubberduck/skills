@@ -1,6 +1,6 @@
 ---
 name: duck-race
-description: Race two decorrelated model families against the same frozen problem and let executed evidence pick the winner. Use when the user says "race it" or "duck race", wants two models tackling the same problem at once, a task has several plausible implementations worth comparing, or single-attempt builds of similar work kept failing review.
+description: Race two decorrelated model families against the same frozen problem and let executed evidence pick the winner. Use when the user says "race it" or "duck race", wants two models tackling the same problem at once, a task has several plausible implementations worth comparing, single-attempt builds of similar work kept failing review, or a review-fix loop keeps faulting the fixes instead of the original change.
 ---
 
 # Duck Race

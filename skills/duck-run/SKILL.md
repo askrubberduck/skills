@@ -76,10 +76,24 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
    collides on the index and on test output, and the result is neither lane's. Lanes never
    self-approve. After a material change, rerun verification and `duck-proof`, then request a new
    superreview of the new candidate. Never re-dispatch an unchanged candidate or loop to manufacture
-   reviewer unanimity. **The loop has a stopping rule**: when a fix pass introduces new
-   substantiated blockers for the second consecutive round, the loop is diverging, not converging —
-   stop dispatching and take the convergence failure to the owner via `duck-decide` instead of
-   buying the next round.
+   reviewer unanimity. **The loop has a circuit breaker**: when a fix pass introduces new
+   substantiated blockers for the second consecutive round, the loop is diverging, not
+   converging. Stop dispatching reviews and judge the loop's shape before spending anything
+   else. The diagnosis is a judgment, not a routing table — recorded in one committed line
+   (`loop-diagnosis: <shape> → <exit>, because …`) — and it picks the exit from the whole
+   toolbox:
+   - Blockers contradict the settled design: re-run `duck-frame` naming the contradiction —
+     the same rule this run already applies to any disproved stage-1 claim.
+   - Blockers cluster on unit seams or the decomposition itself: replan via `duck-plan`.
+   - Blockers attack remediation-born code under settled criteria — the review is red-teaming
+     its own byproducts and iteration cannot terminate it: rebuild the contested unit via
+     `duck-race`, where executed evidence adjudicates and review becomes selection instead of
+     iteration, or lock each finding class in as a failing test via `duck-pingpong`, so a
+     regression is executable instead of prose.
+   - Blockers dispute scope or design intent: `duck-decide`; a written owner freeze is a valid
+     exit.
+   Buying round N+1 bare is not on the list, and the breaker is not self-graded: `duck-review`
+   refuses a third round's dispatch that carries no recorded diagnosis.
 
 ## Rules
 
