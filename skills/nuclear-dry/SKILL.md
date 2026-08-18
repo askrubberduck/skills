@@ -66,7 +66,10 @@ below it.
 ## A true fact is moved, never dropped
 
 - The war story of the bug — symptom, wrong hypothesis, what finally caught it — belongs in the
-  commit message; in the code it is dead weight the next edit silently falsifies.
+  bug's work-item record; in the code it is dead weight the next edit silently falsifies, and in
+  the commit message it is storytelling. **Commit messages and PR descriptions carry the same bar
+  as comments: only what the diff cannot** — intent, constraint, trap, receipt — never narration,
+  process story, or a restated diff.
 - The rejected *design* — the shape the change did not take, and why — belongs in the design
   record beside the work item.
 - Usage a caller needs before reading the code belongs in the published docs.
