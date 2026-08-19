@@ -19,7 +19,7 @@ traced path needs and stop; skip vendored, generated, and binary trees. An uncle
 never widened into a whole-repo read.
 
 One claim is one sentence. In the analysis half, **every claim cites `file:line`, cites a doc at
-the version the project pins, or is labelled observed behavior**, and an observation carries the
+the version the project pins, or is labeled observed behavior**, and an observation carries the
 command and its output. Design claims instead
 name the analysis item they rest on and the alternative they beat. A person-sourced requirement
 cites who and when. **An unevidenced item is a missing item.** Every item is answered — there is no
@@ -58,7 +58,7 @@ that re-frames in full.
    cannot prove nothing shipped satisfies an outcome.
 2. **Pinned source.** The commit SHA the analysis read, plus the list of cited files. No git and
    no host tool: say so, pin what identifies the source. **Anything not established
-   by a citation or an observation is labelled an assumption**, listed apart from the facts. Prefer
+   by a citation or an observation is labeled an assumption**, listed apart from the facts. Prefer
    a clean tree; on a dirty one say so — an uncommitted cited file is pinned by nothing, and reuse
    of the artifact then rests on trust.
 3. **Current shape.** Entry point to observable effect, read from source: components, dependencies,
@@ -98,7 +98,7 @@ that re-frames in full.
     `OWNER DECISION`, never averaged into `READY`:
     - `CUT` — the outcome already exists per item 1's search, **or does not justify a change**. The
       second needs a requirement from item 4 supplying the bar it fails, cited; absent that, worth
-      is not the doer's judgement and this is an `OWNER DECISION`.
+      is not the doer's judgment and this is an `OWNER DECISION`.
     - `OWNER DECISION` — anything unresolved a person must settle: a public boundary or name, a
       policy, a cost or schedule tradeoff, a conflicting requirement, evidence unobtainable. A
       recommendation is not by itself unresolved — an internal, reversible shape the evidence
