@@ -1,7 +1,7 @@
 {
   "name": "askrubberduck",
-  "version": "1.1.0",
-  "description": "Plan, challenge, ship, and clean up complex work; the duck is cynical, dry, and straightforward",
+  "version": "1.1.1",
+  "description": "Plan, challenge, ship, and clean up complex work; the duck is skeptical, dry, and straightforward",
   "author": {
     "name": "askrubberduck",
     "url": "https://github.com/askrubberduck"
@@ -19,7 +19,7 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "askrubberduck",
-    "shortDescription": "Plan, challenge, ship, and clean up complex work; the duck is cynical, dry, and straightforward",
+    "shortDescription": "Plan, challenge, ship, and clean up complex work; the duck is skeptical, dry, and straightforward",
     "longDescription": "The duck listens, judges, and does not flatter: guided planning, independent critique, delivery, decisions, and repository cleanup. Every claim needs evidence; every gate is decorrelated.",
     "developerName": "askrubberduck",
     "category": "Productivity",

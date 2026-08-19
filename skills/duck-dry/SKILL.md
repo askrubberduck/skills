@@ -49,7 +49,7 @@ a license, and no comment-quality argument touches it.
 
 ## One of three dispositions per comment
 
-1. **Delete** — it restates the code, narrates the next line, banners a section, apologises for or
+1. **Delete** — it restates the code, narrates the next line, banners a section, apologizes for or
    praises itself, records history ("changed from", "previously", "new:", "as requested in review"),
    or is commented-out code. Deleting is the whole fix.
 2. **Fix the code** — the comment exists because a name, a signature, or a boundary is unclear.

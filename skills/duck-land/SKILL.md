@@ -56,7 +56,7 @@ the repo forgot; a record without a verified merge is fiction.
    precondition passed — the repo stated its policy and the tooling never asked. For the shape:
    where the last 20 commits on `origin/<base>` carry no merge commit, the branch is flat and this
    landing is not the one that mints the first — rebase or squash, one commit per packet; a stray
-   merge in an otherwise flat log is not a licence, match the dominant shape. Measured:
+   merge in an otherwise flat log is not a license, match the dominant shape. Measured:
    four `--no-ff` merges landed a campaign onto a flat `main`, breaking a convention that no config
    enforced and no reviewer flagged. Squash-merge the PR, or direct push where that is the standard,
    **pinning the base at merge time**: a base that advances between the precondition check and

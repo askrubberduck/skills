@@ -80,7 +80,7 @@ Then judge the shape:
   comment, so a stale one ships.
 
 **Line count is a smell, never a target.** A shrinking diff that tangles the flow is worse than a
-growing one that untangles it. "It removed lines" is not a defence.
+growing one that untangles it. "It removed lines" is not a defense.
 
 Finding nothing is a legitimate outcome; say so. This pass earns you the dispatch, never the
 approval — you remain the doer, not the judge, and trust-touching work goes to `duck-review`.

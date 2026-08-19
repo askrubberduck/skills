@@ -1,10 +1,92 @@
 # askrubberduck skills
 
-Ask the duck. The duck is cynical, sarcastic, dry, and straightforward — it listens to your
-plan, assumes it is wrong somewhere, and makes you prove otherwise. Portable process skills mined
-from real agent sessions: decorrelated review gates, plan co-authoring, backlog scans, git
-hygiene, decision facilitation. No repo-specific paths — each
-skill detects the host repo's registries (STATUS/OBLIGATIONS/backlog docs) or asks once. Once.
+Ask the duck. It listens to your plan, assumes it is wrong somewhere, and makes you prove
+otherwise. The skills are dry, straightforward, and skeptical to a fault.
+
+## What you get
+
+Your agent is relentlessly agreeable. It will tell you the plan is sound, the change is done, and
+the tests pass, and roughly two of those will be true. These are the skills that disagree with it:
+
+- **The plan gets argued with before it becomes code.** `duck-frame` settles the shape and
+  `duck-plan` co-authors the decomposition, both before anyone writes a line worth throwing away.
+- **"Done" is a claim, not a status.** `duck-proof` makes the work show its output. `duck-break`
+  goes looking for the ways it isn't finished, which your users would otherwise do for free.
+- **Nothing approves itself.** `duck-review` hands the verdict to a second model family that owes
+  you nothing and has not spent the last hour convincing itself the change is fine.
+- **What piled up gets cleared, not admired.** `duck-scan`, `duck-cut`, and `duck-decide` work
+  the backlog; `duck-sweep` clears the branches and worktrees left behind. None of it sorts
+  itself.
+
+Every rule is here because something measurably failed without it.
+
+No repo-specific paths — each skill detects the host repo's registries (STATUS/OBLIGATIONS/
+backlog docs) or asks once. Once.
+
+## The soul — carried by every skill
+
+- **The doer is never the final judge** — every gate is decorrelated; a self-pass earns the
+  dispatch, never the approval.
+- **Evidence over assertion** — a claim without output is not done; an empty result is never success.
+- **Skeptical by default** — a reviewer finding is adjudicated against source, your own fix is
+  re-attacked, a built-in is trusted only for what it provably guarantees. The deadliest loop is
+  *obedient* patching: every round of "harden the wheel you invented" feels like progress, and the
+  only exit is the question no reviewer will ask for you — should this wheel exist at all?
+- **The most reliable code is the code never written** — the first move on any finding is "would
+  deleting this end it?", not "how do I patch it". Reach for the boring version first, then prove
+  what it actually promises; a built-in's guarantee is routinely narrower than its name.
+- **Cut before add** — every finding list treats "delete this" as first-class; every sweep's product
+  is deletions. A fix pass that only grows is not progress.
+- **Concepts, not lines** — line count is a smell, never a target. What compounds is how many things
+  a reader must hold, whether one path traces without jumping, whether cause sits near effect.
+- **A rule states what must hold, not how it was learned** — the incident that produced a rule is
+  not the rule, and belongs in the release notes.
+- **Token discipline** — absolute paths, grep-first, raw output out of git, sessions end at stage
+  boundaries; the runtime rules live in `duck-diet`.
+- **Fail closed** — a missing reviewer, empty output, or unverified claim is never an implicit pass.
+
+## Skills
+
+<!-- skills-table:start -->
+| Skill | What it does |
+|---|---|
+| `duck-break` | Attack a 'finished' build to find out how finished it actually is |
+| `duck-campaign` | Carve a grand vision into prioritized workstreams that can ship without waiting on each other |
+| `duck-cut` | Shrink a backlog the honest way — obsolete work out, duplicates merged, viable items unblocked |
+| `duck-decide` | Walk the owner through the decisions they have been ducking, one at a time |
+| `duck-diet` | Put agent context, memory, and token costs on a diet without starving the essential guidance |
+| `duck-dry` | Strip comment and docstring noise until only unobvious decisions, contracts, and traps survive |
+| `duck-frame` | Settle a system's target design before planning begins, because 'we'll figure out the architecture later' means never |
+| `duck-land` | Merge approved work, update project records, and clean up the branch and worktree; landed means nothing left behind |
+| `duck-learn` | Turn session and delivery evidence into reusable lessons, so each mistake is only paid for once |
+| `duck-pingpong` | Alternate test-writing and implementation between two decorrelated model families that don't trust each other, one failing test per rally |
+| `duck-plan` | Catch architectural and implementation risks before the code catches them for you |
+| `duck-proof` | Give 'completed' work a skeptical second pass before anyone trusts it; 'it should work' is not evidence |
+| `duck-race` | Race two decorrelated model families against the same frozen problem and let executed evidence pick the winner |
+| `duck-review` | Run one independent cross-model superreview and deliver an evidence-backed APPROVE, REJECT, or NOTE; no participation trophies |
+| `duck-roast` | Roast an entire product, solution, or architecture from every angle until only the defensible parts remain |
+| `duck-run` | Plan, implement, test, and independently review a high-risk change; trust is not part of the pipeline |
+| `duck-scan` | Find ready, blocked, and remaining work without changing anything; looking is free |
+| `duck-sweep` | Clean out stale branches, worktrees, checkouts, scratch directories, and ignore rules; the pond stays clean |
+<!-- skills-table:end -->
+
+## The map
+
+Who hands what to whom.
+
+```
+  duck-frame --> build --> duck-proof --> duck-review --> duck-land
+                   ^                           |
+                   +--------- REJECT ----------+
+```
+
+`duck-run` drives that line, and pulls in `duck-plan` and `duck-break` when the work warrants
+them — the thresholds live in the bodies, not here. Swap `build` for `duck-race` or
+`duck-pingpong` when one attempt is not enough. `duck-scan` and `duck-campaign` sit upstream,
+deciding what is worth building rather than how it ships.
+
+Callable at any point, off the line: `duck-cut`, `duck-decide`, `duck-roast`, `duck-sweep`,
+`duck-diet`, `duck-dry`, `duck-learn`. Where the map disagrees with a skill's body, the body wins.
 
 ## Install
 
@@ -56,11 +138,9 @@ account, which is the only one that also reaches Cowork sessions; those uploads 
 Agent Skills frontmatter fields, which every skill here already satisfies — the duck travels
 light.
 
-
 ### Codex CLI and the Codex app (recommended)
 
-Install the repository as a plugin. This keeps the full collection versioned as one unit,
-which is the point of a collection:
+Install the repository as a plugin, which keeps the collection versioned as one unit:
 
 ```bash
 codex plugin marketplace add askrubberduck/skills
@@ -161,113 +241,10 @@ neither the gate nor this list: without a proven decorrelated family, `duck-revi
 by design. Executable names are not identities; pin the model and verify what it reports — the duck has
 been lied to before.
 
-## The graph
-
-```mermaid
-flowchart LR
-    subgraph discover
-        scan[duck-scan]
-    end
-    subgraph build["frame + plan + build"]
-        campaign[duck-campaign]
-        frame[duck-frame]
-        plan[duck-plan]
-        run[duck-run]
-        race[duck-race]
-        pingpong[duck-pingpong]
-    end
-    subgraph verify["self-verify + attack"]
-        proof[duck-proof]
-        break[duck-break]
-    end
-    subgraph gate["decorrelated gate"]
-        review[duck-review]
-        decide[duck-decide]
-    end
-    subgraph ship
-        land[duck-land]
-    end
-    cut[duck-cut]
-    roast[duck-roast]
-    sweep[duck-sweep]
-    diet[duck-diet]
-    dry[duck-dry]
-    learn[duck-learn]
-
-    scan --> campaign
-    scan --> cut
-    campaign --> plan
-    campaign -.-> diet
-    frame -.-> decide
-    run --> frame
-    plan --> frame
-    run --> plan
-    run --> proof
-    run --> break
-    run --> review
-    race --> proof
-    pingpong --> proof
-    plan --> review
-    proof --> review
-    break --> review
-    review -. verdict .-> run
-    run -.-> dry
-    run --> decide
-    run --> land
-    cut --> decide
-    roast -.-> decide
-    roast -.-> plan
-    land -.-> decide
-    land -.-> sweep
-    campaign -.-> sweep
-    learn -.-> proof
-```
-
-Solid arrows: the delivery pipeline (discover → frame/plan/build → verify/attack → gate → ship).
-`duck-frame` owns everything before planning — the seam map, the requirements, the rejected
-alternatives — and hands its artifact back to whoever called it; it never advances a stage itself.
-The review-to-run verdict is a return, not an approval loop: `duck-review` judges once;
-`duck-run` may remediate and request a new review only for a materially changed candidate.
-Other dotted arrows are supporting handoffs. **The graph is a subset drawn for orientation, not a
-map of every edge** — several real handoffs are omitted to keep it readable, and it is maintained by
-hand. Where it disagrees with the skill bodies, the bodies are authoritative.
-`duck-roast` critiques the whole standing solution,
-`duck-learn` feeds session lessons back into skills and memory, `duck-diet` keeps every
-stage cheap, and `duck-dry` keeps the prose inside the code load-bearing.
-
-## Skills
-
-<!-- skills-table:start -->
-| Skill | What it does |
-|---|---|
-| `duck-break` | Attack a 'finished' build to find out how finished it actually is |
-| `duck-campaign` | Carve a grand vision into prioritized workstreams that can ship without waiting on each other |
-| `duck-cut` | Shrink a backlog the honest way — obsolete work out, duplicates merged, viable items unblocked |
-| `duck-decide` | Walk the owner through the decisions they have been ducking, one at a time |
-| `duck-diet` | Put agent context, memory, and token costs on a diet without starving the essential guidance |
-| `duck-dry` | Strip comment and docstring noise until only unobvious decisions, contracts, and traps survive |
-| `duck-frame` | Settle a system's target design before planning begins, because 'we'll figure out the architecture later' means never |
-| `duck-land` | Merge approved work, update project records, and clean up the branch and worktree; landed means nothing left behind |
-| `duck-learn` | Turn session and delivery evidence into reusable lessons, so each mistake is only paid for once |
-| `duck-pingpong` | Alternate test-writing and implementation between two decorrelated model families that don't trust each other, one failing test per rally |
-| `duck-plan` | Catch architectural and implementation risks before the code catches them for you |
-| `duck-proof` | Give 'completed' work a skeptical second pass before anyone trusts it; 'it should work' is not evidence |
-| `duck-race` | Race two decorrelated model families against the same frozen problem and let executed evidence pick the winner |
-| `duck-review` | Run one independent cross-model superreview and deliver an evidence-backed APPROVE, REJECT, or NOTE; no participation trophies |
-| `duck-roast` | Roast an entire product, solution, or architecture from every angle until only the defensible parts remain |
-| `duck-run` | Plan, implement, test, and independently review a high-risk change; trust is not part of the pipeline |
-| `duck-scan` | Find ready, blocked, and remaining work without changing anything; looking is free |
-| `duck-sweep` | Clean out stale branches, worktrees, checkouts, scratch directories, and ignore rules; the pond stays clean |
-<!-- skills-table:end -->
-
-The README uses each frontmatter description's first sentence; `AGENTS-CATALOG.md` keeps the full
-capability-and-trigger description. Codex UI copy lives in `skills/<name>/agents/openai.yaml`.
-After editing frontmatter, run `python3 scripts/render-catalog.py`.
-
 ## Release validation
 
-Before publishing or tagging a release, run the deterministic distribution checks from the repository
-root:
+Both checks must pass before a change lands, and again before publishing or tagging. Run them from
+the repository root:
 
 ```bash
 python3 scripts/render-catalog.py --check
@@ -278,32 +255,12 @@ The validator checks the Codex, Claude, and Agy manifests; every Codex skill int
 canonical skill set; human-first, YAML-safe descriptions; cross-skill resolution; install
 documentation; generated catalog freshness; and known corruption cases. It performs no network
 access and writes only to temporary directories during self-test. It has rejected this
-collection's own releases, which is exactly the job.
+collection's own releases, which is exactly the job — the duck does not trust this README either.
 
-## The soul — carried by every skill
-
-The duck's temperament — cynical, sarcastic, dry, straightforward — is not decoration; it is the
-review posture. Every rule below is that temperament applied:
-
-- **The doer is never the final judge** — every gate is decorrelated; a self-pass earns the
-  dispatch, never the approval.
-- **Evidence over assertion** — a claim without output is not done; an empty result is never success.
-- **Sceptical by default** — a reviewer finding is adjudicated against source, your own fix is
-  re-attacked, a built-in is trusted only for what it provably guarantees. The deadliest loop is
-  *obedient* patching: every round of "harden the wheel you invented" feels like progress, and the
-  only exit is the question no reviewer will ask for you — should this wheel exist at all?
-- **The most reliable code is the code never written** — the first move on any finding is "would
-  deleting this end it?", not "how do I patch it". Reach for the boring version first, then prove
-  what it actually promises; a built-in's guarantee is routinely narrower than its name.
-- **Cut before add** — every finding list treats "delete this" as first-class; every sweep's product
-  is deletions. A fix pass that only grows is not progress.
-- **Concepts, not lines** — line count is a smell, never a target. What compounds is how many things
-  a reader must hold, whether one path traces without jumping, whether cause sits near effect.
-- **A rule states what must hold, not how it was learned** — the incident that produced a rule is
-  not the rule, and belongs in the release notes.
-- **Token discipline** — absolute paths, grep-first, raw output out of git, sessions end at stage
-  boundaries; the runtime rules live in `duck-diet`.
-- **Fail closed** — a missing reviewer, empty output, or unverified claim is never an implicit pass.
+The skills table above renders each frontmatter description's first sentence; `AGENTS-CATALOG.md`
+keeps the full capability-and-trigger text, and Codex UI copy lives in
+`skills/<name>/agents/openai.yaml`. After editing frontmatter, run
+`python3 scripts/render-catalog.py`.
 
 ## Credits
 
@@ -312,10 +269,4 @@ since been rewritten and no longer carries his text; the section arc is the surv
 
 ## Status
 
-v1.1.0 — 18 skills, one duck. Per-version notes live in
-[Releases](https://github.com/askrubberduck/skills/releases).
-
-Every rule in these skills is here because something measurably failed without it, mined from real
-session transcripts rather than imagined failure modes. `scripts/validate-distribution.py --self-test`
-enforces the load-bearing ones and must pass before a change lands. The duck does not trust this
-README either; that is what the validator is for.
+v1.1.1, one duck — [release notes](https://github.com/askrubberduck/skills/releases).
