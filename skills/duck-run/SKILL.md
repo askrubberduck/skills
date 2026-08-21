@@ -12,11 +12,18 @@ The bundled directive stack the user otherwise types as a preamble. Argument: th
 Provision a dedicated worktree for this run — `.worktrees/<task>/` **at the repo root**, never the
 shared checkout — then switch to it before proceeding: a run that mutates the shared checkout
 collides with parallel runs and breaks campaign isolation. Every worktree this run later spawns
-(stage 8's remediation lanes, a `duck-race` racer) is a sibling under that same root, never a child
+(Superreview's remediation lanes, a `duck-race` racer) is a sibling under that root, never a child
 of this one. Step back out to the root checkout before `duck-land` runs, because it deletes this
 worktree and cannot delete the directory it is standing in. No `git`, or a host without worktrees?
 Say so and take the next isolation the host has — a clone, or a dedicated branch when nothing else
-runs against that checkout. Sharing a live checkout with another run is the one option ruled out.
+runs against that checkout. Sharing a live checkout with another run is the one option ruled
+out. The short path below is the one exemption, and it is bought with a committed line.
+
+**Short path.** Work that moves no seam — no boundary between components, no public surface,
+nothing trust-touching — takes `duck-frame`'s short form, skips the worktree, and runs Execute
+through Verify in one pass. What it never skips is Superreview: the gate is the last thing to go,
+not the first. Bought with one committed line, `short-path because: …`, because the judgment that
+work is small is itself a claim to attack.
 
 ## Stages
 1. **Ground.** Run `duck-frame`: it reads the project's quality bar, traces the real flow end to
@@ -32,17 +39,19 @@ runs against that checkout. Sharing a live checkout with another run is the one 
    Packet-sized or trust-touching: co-author the plan via `duck-plan` instead of
    drafting solo. In doubt about the size, default up — the solo path is bought with one committed
    line, `solo-drafted because: …`; a routing choice without a receipt is the doer grading its own
-   rigor. **Do not enter stage 4 without a settled plan** — either a committed plan carrying a
-   `duck-plan` co-authorship line, or a solo-drafted plan that has survived stage 3's adversarial
-   critique. An unsettled plan is the rejections arriving later instead of now.
+   rigor. **Do not reach Execute without a settled plan** — either a committed plan carrying a
+   `duck-plan` co-authorship line, or a solo-drafted plan that has survived Critique. An unsettled
+   plan is the rejections arriving later instead of now. A plan that already carries that line —
+   one a campaign committed, say — **is** settled: it does not get re-planned here, and Critique is
+   for solo drafts only.
 3. **Critique (adversarial, pre-code) — for solo-drafted plans only.** When `duck-plan` ran in
-   stage 2, its multi-round concurrence loop already **is** this stage; a second gate on a
+   Plan, its multi-round concurrence loop already **is** this stage; a second gate on a
    co-authored plan is redundancy, not rigor. Otherwise: red-team the plan — wrong decomposition,
    missing edge cases, simpler design that deletes a concept. Default the critic toward refute, use
    the strongest available tier, fold findings, loop until the plan survives.
 4. **Execute on green.** Use the host's native staged or multi-agent orchestration when available;
    otherwise execute the settled stages sequentially. Route stages per `duck-diet`'s stage-routing
-   rule — the full cheap-routing precondition lives there; stage 7 additionally re-checks its
+   rule — the full cheap-routing precondition lives there; Verify additionally re-checks its
    output (a record is checked by reading it back); any unmet precondition runs the stage on the
    inherited model.
    TDD for code units: failing test first, minimal pass, then simplify.
@@ -53,17 +62,17 @@ runs against that checkout. Sharing a live checkout with another run is the one 
    it; clear superseded paths as the last step of each unit. No migrations, no back-compat shims
    unless the repo demands them.
 6. **Dry it — write for a senior reader.** Code explains itself; comments supplement it. Run
-   `duck-dry` over each unit's diff before stage 7: it settles what a comment must carry, and where
+   `duck-dry` over each unit's diff before Verify: it settles what a comment must carry, and where
    the prose that does not belong in code goes instead.
 7. **Verify.** Run the project's gates (tests/build/vet or doc gates) — a gate that takes minutes
    runs in the background, so the turn keeps working while it does; a blocked loop is the cost, and
    an unread result is the trap — then invoke `duck-proof` on your own diff. It leaves
-   `proof-<unit>.md`, or `$SP/proof-r1.md` when stage 8's review is next (`$SP`: `duck-review`'s
+   `proof-<unit>.md`, or `$SP/proof-r1.md` when Superreview is next (`$SP`: `duck-review`'s
    dispatch scratchpad), which is where the gate looks; no file, no proof pass happened.
    Trust-touching work additionally gets the `duck-break` attacks executed before the gate. Evidence
    over assertion — a failed or unrun check means not done; say so with output.
 8. **Independent superreview.** Never self-approve — which forbids granting yourself the verdict,
-   not doing the thinking: stage 7 exists because the doer is expected to have questioned and
+   not doing the thinking: Verify exists because the doer is expected to have questioned and
    validated the change before anyone else reads it. Use the project's review policy — default:
    the `duck-review` / proven different-family gate. `duck-review` executes one review,
    adjudicates its reviewers, and returns one authoritative `APPROVE | REJECT | NOTE`; this stage
@@ -88,8 +97,13 @@ runs against that checkout. Sharing a live checkout with another run is the one 
    file, and a finding spanning two files belongs to exactly one lane named in both briefs.
    Concurrent lanes get a worktree each; one checkout shared by lanes that each rebuild and run the
    suite collides on the index and on test output, and the result is neither lane's. Lanes never
-   self-approve. After a material change, rerun verification and `duck-proof`, then request a new
-   superreview of the new candidate. Never re-dispatch an unchanged candidate or loop to
+   self-approve. **Lanes converge before the next review, never after it**: each rebases onto the
+   candidate branch in turn, the file-ownership split guaranteeing no lane rewrites another's work,
+   and the merged result becomes the new candidate. It gets one verification run of its own —
+   per-lane green does not compose, exactly as it does not for `duck-race`'s merged candidate. A
+   lane whose worktree still exists is a lane that has not landed. After a material change, rerun
+   verification and `duck-proof`, then request a new superreview of the new candidate.
+   Never re-dispatch an unchanged candidate or loop to
    manufacture reviewer unanimity. **The loop has a circuit breaker**: when a fix pass introduces
    new substantiated blockers for the second consecutive round, the loop is diverging, not
    converging. Stop dispatching reviews and judge the loop's shape before spending anything else.
@@ -100,9 +114,9 @@ runs against that checkout. Sharing a live checkout with another run is the one 
    - Blockers cluster on unit seams or the decomposition itself: replan via `duck-plan`.
    - Blockers attack remediation-born code under settled criteria — the review is red-teaming
      its own byproducts and iteration cannot terminate it: rebuild the contested unit via
-     `duck-race`, where executed evidence adjudicates and review becomes selection instead of
-     iteration, or lock each finding class in as a failing test via `duck-pingpong`, so a
-     regression is executable instead of prose.
+     `duck-race`'s race mode, where executed evidence adjudicates and review becomes selection
+     instead of iteration, or lock each finding class in as a failing test via its rally mode, so
+     a regression is executable instead of prose.
    - Blockers dispute scope or design intent: `duck-decide`; a written owner freeze is a valid
      exit.
    Buying round N+1 bare is not on the list, and the breaker is not self-graded: `duck-review`

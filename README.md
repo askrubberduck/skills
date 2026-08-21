@@ -45,6 +45,19 @@ backlog docs) or asks once. Once.
   boundaries; the runtime rules live in `duck-diet`.
 - **Fail closed** — a missing reviewer, empty output, or unverified claim is never an implicit pass.
 
+### Which of these are checked, and which are discipline
+
+Honesty about the boundary, because a rule that reads like a guarantee and isn't is worse than no
+rule. **Checked mechanically**, by `validate-distribution.py` or by a named command a skill makes
+you run: the distribution's structure, every cross-skill reference, generated-file freshness, that
+a reviewer's model pin was recognised by its harness, and that a required receipt exists.
+
+**Everything else is discipline** — an agent applying rules to itself. Nothing at runtime proves a
+decorrelated family actually reviewed your work, that a co-authorship line reflects a dispatch that
+happened, or that a receipt's claims were executed rather than typed. The gates make the correct
+path the described path and put the evidence where a later reader can re-check it; they do not stop
+an agent that skips them. Read the receipts, not the reassurance.
+
 ## Skills
 
 <!-- skills-table:start -->
@@ -59,15 +72,15 @@ backlog docs) or asks once. Once.
 | `duck-frame` | Settle a system's target design before planning begins, because 'we'll figure out the architecture later' means never |
 | `duck-land` | Merge approved work, update project records, and clean up the branch and worktree; landed means nothing left behind |
 | `duck-learn` | Turn session and delivery evidence into reusable lessons, so each mistake is only paid for once |
-| `duck-pingpong` | Alternate test-writing and implementation between two decorrelated model families that don't trust each other, one failing test per rally |
 | `duck-plan` | Catch architectural and implementation risks before the code catches them for you |
 | `duck-proof` | Give 'completed' work a skeptical second pass before anyone trusts it; 'it should work' is not evidence |
-| `duck-race` | Race two decorrelated model families against the same frozen problem and let executed evidence pick the winner |
+| `duck-race` | Put two decorrelated model families on the same problem and let executed evidence pick the result |
 | `duck-review` | Run one independent cross-model superreview and deliver an evidence-backed APPROVE, REJECT, or NOTE; no participation trophies |
 | `duck-roast` | Roast an entire product, solution, or architecture from every angle until only the defensible parts remain |
 | `duck-run` | Plan, implement, test, and independently review a high-risk change; trust is not part of the pipeline |
 | `duck-scan` | Find ready, blocked, and remaining work without changing anything; looking is free |
 | `duck-sweep` | Clean out stale branches, worktrees, checkouts, scratch directories, and ignore rules; the pond stays clean |
+| `duck-why` | Name the cause of a failure before anyone writes a fix, because the symptom is not the defect |
 <!-- skills-table:end -->
 
 ## The map
@@ -81,8 +94,9 @@ Who hands what to whom.
 ```
 
 `duck-run` drives that line, and pulls in `duck-plan` and `duck-break` when the work warrants
-them — the thresholds live in the bodies, not here. Swap `build` for `duck-race` or
-`duck-pingpong` when one attempt is not enough. `duck-scan` and `duck-campaign` sit upstream,
+them — the thresholds live in the bodies, not here. Swap `build` for `duck-race` when one
+attempt is not enough — race mode for which implementation, rally mode for which edge cases.
+`duck-scan` and `duck-campaign` sit upstream,
 deciding what is worth building rather than how it ships.
 
 Callable at any point, off the line: `duck-cut`, `duck-decide`, `duck-roast`, `duck-sweep`,
@@ -269,4 +283,4 @@ since been rewritten and no longer carries his text; the section arc is the surv
 
 ## Status
 
-v1.1.1, one duck — [release notes](https://github.com/askrubberduck/skills/releases).
+v2.0.0, one duck — [release notes](https://github.com/askrubberduck/skills/releases).

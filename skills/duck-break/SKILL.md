@@ -19,7 +19,10 @@ review's job. A claim of robustness without an executed attack behind it is an o
    authorization) and actively try to violate it from outside, as a hostile caller would. An
    invariant nobody attacked is a hope.
 4. **Crash consistency** — kill the process mid-operation, restart, inspect state. Recovery paths
-   are claims until executed.
+   are claims until executed. Start the target in **its own process group** and kill the group, not
+   the pid: a killed parent leaves its children running, and the survivors hold the ports and locks
+   the restart needs, so the recovery you then measure is not the one the product performs. Confirm
+   no survivors before the next attack.
 5. **Run the real artifact** — the built binary/app on its critical paths, not the test harness.
    The suite passing and the product working are different facts.
 
@@ -39,7 +42,12 @@ review's job. A claim of robustness without an executed attack behind it is an o
   attacks that found nothing. Unattempted ≠ survived.
 - **Attack a disposable copy, never the candidate checkout.** Attack 1 deletes load-bearing code; a
   crash mid-attack in the shared tree leaves corruption for the next stage to read as the candidate.
-  Work in a worktree or clone, and restore by discarding it.
+- **A dirty candidate does not survive `git worktree add` or `git clone`** — both carry committed
+  state only, so the copy silently holds the base commit and every attack passes against code that
+  is not the candidate. Measured: an uncommitted marker present in the source was absent in the
+  worktree copy. Either commit the candidate first and copy that, or copy the working tree itself
+  (`cp -a`, `rsync`), and **verify the copy carries the change before attacking** — grep it for
+  something only the candidate has. An unverified copy is an unrun attack list.
 - Record the tree's exact pre-attack state and restore *that*, not "clean" — the candidate under
   review is allowed to be a dirty worktree, so a clean tree is the wrong target and a mismatch is
   itself a finding against the breaker.

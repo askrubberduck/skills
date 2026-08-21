@@ -19,10 +19,15 @@ durable home and is verified there before its container is removed.
    - **Preserved** — the branch's commits are reachable from `origin/<default>`
      (`git branch --merged origin/<default>`, then `-d`, never `-D`; `-d` alone checks
      HEAD-or-upstream, a narrower promise than its name). These outlive their ref. Delete.
-   - **Not preserved** — squash-merged, rebased, or cherry-picked: the default branch holds an
-     equivalent *new* commit, never these objects, and no merge metadata proves otherwise — PR
-     records, `git cherry`, tree diffs, and revert greps have all produced false positives that end
-     in destroyed work. Do not build a cleverer classifier; route to a decision instead.
+   - **Preserved by record** — squash-merged, rebased, or cherry-picked, *and* the project's
+     outcome record names the landed SHA for this branch (`duck-land` writes it there for exactly
+     this reason). The record is evidence the objects cannot supply. Confirm the named SHA is on
+     `origin/<default>`, then delete.
+   - **Not preserved** — squash-merged, rebased, or cherry-picked with **no such record**: the
+     default branch holds an equivalent *new* commit, never these objects, and no merge metadata
+     recovers the link — PR records, `git cherry`, tree diffs, and revert greps have all produced
+     false positives that end in destroyed work. Do not build a cleverer classifier; route to a
+     decision instead.
    - **Unproven** → the Unmerged path: open the work item, decide merge-or-delete on its state,
      record the decision, then `-D`.
 3. Delete — **but check the worktree for untracked and ignored files first**:

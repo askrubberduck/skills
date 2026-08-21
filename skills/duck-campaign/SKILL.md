@@ -50,9 +50,11 @@ driver once this bootstrap ends.
    The gap between packets is where a long campaign quietly dies, so between them the turn
    continues: dispatch the next one. A packet that hits an obstacle is re-routed or re-scoped and
    the route recorded, never abandoned — only a refused authorization is an answer rather than an
-   obstacle. When a packet's execution disproves the campaign shape, re-frame it in writing rather
-   than bending the remaining packets around the damage; the campaign may argue its own goal, never
-   substitute one.
+   obstacle. **A packet that raises an owner decision queues it and the campaign moves to the next
+   packet**; it does not sit on the queued question. Independent workstreams that stop for one
+   packet's unanswered decision are not independent, whatever the roster says. When a packet's
+   execution disproves the campaign shape, re-frame it in writing rather than bending the remaining
+   packets around the damage; the campaign may argue its own goal, never substitute one.
 
 ## Common mistakes
 

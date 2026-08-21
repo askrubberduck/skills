@@ -1,0 +1,4 @@
+interface:
+  display_name: "Duck Why"
+  short_description: "Name the cause, not the symptom"
+  default_prompt: "Use $askrubberduck:duck-why to find why this is failing, before fixing it."
