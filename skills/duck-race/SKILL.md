@@ -30,9 +30,10 @@ assumptions; rally turns them into tests. Pick by which of those the work needs.
    CLI errors with its roster. A harness that accepts garbage has a meaningless pin, and unknown
    identity never counts as decorrelated.
 3. Sanity-check a new invocation form with a trivial prompt first. A zero-byte, greeting-only,
-   timed-out, or crashed dispatch is an outage, not a forfeit: record it and re-dispatch. Pass the
-   problem **by file path**, never inlined into the command — an inlined corpus is the shape that
-   degrades a dispatch into confident nonsense at exit 0.
+   timed-out, or crashed dispatch is an outage, not a forfeit: record it and re-dispatch. The
+   problem statement travels as the command's argument, but **anything it refers to — a diff, a
+   corpus, the files to change — is named by absolute path for the participant to open, never
+   pasted in.** Pasted material degrades a dispatch into confident nonsense at exit 0.
 
 ## Race mode
 

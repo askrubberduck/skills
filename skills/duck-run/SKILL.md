@@ -130,7 +130,7 @@ work is small is itself a claim to attack.
 - **An obstacle is a stage, not an exit.** An unreadable path or a failed assumption means route
   around it and record the route. A refused authorization is the exception — that is a hard stop,
   and no alternative route may shed the authorization the first one needed.
-- **Stage 1's design is a claim like any other.** When execution disproves it, re-run `duck-frame`
+- **Ground's design is a claim like any other.** When execution disproves it, re-run `duck-frame`
   naming the contradiction instead of improvising against it. Argue the goal; never swap it.
 - **Mid-flight input is an extra command, not a new job.** Finish the running step, apply the
   addition, report both. **Exceptions that take effect immediately:** input that narrows, redirects,

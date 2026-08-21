@@ -77,12 +77,14 @@ codex exec -m <strongest-listed> --skip-git-repo-check "$(cat $SP/prompt.md)" </
 agy --model <verified-non-doer> --add-dir "$SP" --print-timeout 45m -p "..." </dev/null > $SP/agy-rN.out 2>&1
 ```
 
-**Pass every input by absolute path and let the reviewer read it; never inline a corpus into the
-command.** Delivery is not a performance detail, it is a verdict-integrity control. Measured: the
-same pinned model, same target, same instructions, disagreed on 28 of 41 verdicts between an
-inlined run and one reading the same bytes from disk — every flip toward the finding standing. The
-inlined run quoted the corpus fluently and was wrong. Inlining also forces a no-tools constraint,
-which is the prompt shape that provokes the shell-attempt outage.
+**The prompt is an argument; the material under review is a path inside it.** Hand the reviewer
+your instructions on the command line, and have those instructions name the diff, corpus, or files
+by absolute path for the reviewer to open — never paste that material into the command. Delivery is
+not a performance detail, it is a verdict-integrity control. Measured: the same pinned model, same
+target, same instructions, disagreed on 28 of 41 verdicts between a run with the corpus pasted into
+the prompt and one where the prompt named it on disk — every flip toward the finding standing. The
+pasted run quoted the corpus fluently and was wrong. Pasting also forces a no-tools constraint,
+which is the prompt shape that provokes the permission-denied outage.
 
 Sanity-check a new invocation form with `-p "Reply with exactly: OK"`. These traps yield plausible
 reviews at exit 0:
