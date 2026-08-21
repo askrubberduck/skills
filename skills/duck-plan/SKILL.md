@@ -33,7 +33,11 @@ plan same-family and send it out for adversarial review; let the other families 
    defines) — scratchpad only, never committed. **No files, no
    co-authorship** — a synthesis without a proven different-family plan is a solo draft.
 3. **Synthesize** the independent plans + your own analysis into ONE plan. Reconcile
-   disagreements by READING SOURCE (`git show <sha>:path`), never by vote.
+   disagreements about what *is* by READING SOURCE (`git show <sha>:path`), never by vote.
+   **Disagreement about what *should* be — a design intent, a public boundary, a policy — has no
+   source to read**: route it to the owner via `duck-decide` rather than settling it as the doer.
+   Co-authored plans produce exactly this kind of disagreement by design; deciding it yourself
+   discards the reason the other family was asked.
 4. Apply a cut pass: any task the synthesis shows unnecessary dies here — cheapest build is the one
    not built. Same blade for the design: an abstraction with one implementation, or a second home
    for a fact that already has one, dies with it.

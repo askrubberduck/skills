@@ -22,15 +22,22 @@ here; the product of the audit is deletions.
 3. **Grep-first; delegate big reads.** Nothing >20KB into the main context: page with offset/limit,
    or send an investigator subagent that returns a summary. Main context is the most expensive place
    to store a file.
-4. **Stage routing: route by stage, both model AND agent type.** Mechanical work (investigation,
-   scripted edits, rebases, clerical verification, recording) goes to cheap-model executor
-   agents, only with a pinned model whose self-report is verified and a named check that catches
-   the stage's failure — executed and its result recorded before the stage's output is used.
-   Trust-touching work is never mechanical, whatever the stage type. Adversarial, synthesis, and
-   trust-touching stages get general-purpose agents on the strongest tier; everything else
-   inherits the current model.
-5. **Batch agent traffic.** Poll teammates at round boundaries; never relay no-op idle pings into the
-   coordinator context. Compress subagent output contracts ("return table, no prose").
+4. **Stage routing: start cheap, bounce up on failure.** Route by stage, both model AND agent type.
+   - **Mechanical work** (investigation, scripted edits, rebases, clerical verification, recording)
+     defaults to cheap-model executor agents — but only with a pinned model whose self-report is
+     verified, and a named gate (tests, compiler, a dedicated check script) that catches the stage's
+     failure, executed and its result recorded before the stage's output is used. No pin or no gate,
+     no cheap tier.
+   - **Bounce up on failure.** A cheap agent that fails its gate, or fails to converge on a second
+     attempt at the same slice, has answered the routing question: re-dispatch that slice to the
+     strongest tier, or to an agent with elevated reasoning limits, carrying the failure context
+     with it. A passing gate proves cheap was sufficient, never that it was best — the bounce is
+     what stops a wrong cheap route from becoming the answer.
+   - **Strong by default.** Trust-touching, adversarial, and synthesis stages are never mechanical,
+     whatever the stage type: they get general-purpose agents on the strongest tier. Everything else
+     inherits the current model.
+5. **Batch agent traffic.** Poll teammates at round boundaries; never relay no-op idle pings into
+   the coordinator context. Compress subagent output contracts ("return table, no prose").
 6. **Raw output stays out of git and out of context.** CLI stdout, logs, diffs: extract the decisive
    lines; full text lives in the scratchpad only.
 

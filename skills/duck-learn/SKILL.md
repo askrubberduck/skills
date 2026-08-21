@@ -11,7 +11,9 @@ or gets consciously discarded. Lessons that live only in a chat transcript are l
 ## Recipe
 
 1. **Gather evidence, don't reminisce.** Session transcripts — Claude
-   `~/.claude/projects/<dir>/*.jsonl`, Codex `$CODEX_HOME/sessions` and `archived_sessions` —
+   `~/.claude/projects/<dir>/*.jsonl`, Codex `$CODEX_HOME/sessions` and `archived_sessions`, which
+   are the hosts whose stores are known, not the whole set: another host has its store located
+   before the mine, or the result is partial and says so —
    alongside recorded outcomes, review trajectories, and token stats. Extract **counts**: repeated
    directives, repeated failures, repeated tool patterns. Count independent owner tasks, not files:
    fold every derived log — subagents, retries, forwarded copies — into its parent, by event
@@ -32,7 +34,9 @@ or gets consciously discarded. Lessons that live only in a chat transcript are l
    - Rule that must bind every turn → the checked-in instructions doc (CLAUDE.md/AGENTS.md).
    - One-off, derivable, or already recorded → **discard, say so**.
 3. **Evidence bar**: 2+ independent occurrences or an explicit owner directive → build it.
-   One occurrence → park it as a note in the nearest existing home, not a new artifact.
+   One occurrence → park it as a note in the nearest existing home, not a new artifact. The bar
+   governs whether the evidence justifies building, not how many occurrences step 5 may derive
+   from: at exactly two, one is held out and the guidance is derived from the other.
 4. **Apply the updates** — write the skill/memory/rule edit now, not a recommendation to write it.
    While in each home, delete what the new lesson supersedes; stale guidance is worse than none.
    Policy files are the limit, and the limit is authority rather than effort: an edit to a skill, a

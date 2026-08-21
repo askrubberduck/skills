@@ -51,9 +51,12 @@ the repo forgot; a record without a verified merge is fiction.
 
 1. Merge per the repo's policy — **ask the remote for its enforced policy first, the base's history
    only for its shape, never habit**. Server-side rules are the actual policy where the host exposes
-   them (`gh api repos/<owner>/<repo>/rulesets`, branch protection); history is a proxy. Measured: a
-   direct push bypassed an *active* `pull_request` rule via admin rights while every documented
-   precondition passed — the repo stated its policy and the tooling never asked. For the shape:
+   them (`gh api repos/<owner>/<repo>/rulesets`, branch protection); history is a proxy. Measured:
+   a landing satisfied every documented precondition and still violated the repo's own stated
+   policy, because the tooling never asked the remote what that policy was. A rule the remote
+   enforces is the policy whether or not your account can get past it; **a landing this run cannot
+   make within the rules is an owner decision, never a route around them** — `duck-decide`. For
+   the shape:
    where the last 20 commits on `origin/<base>` carry no merge commit, the branch is flat and this
    landing is not the one that mints the first — rebase or squash, one commit per packet; a stray
    merge in an otherwise flat log is not a license, match the dominant shape. Measured:
@@ -62,11 +65,12 @@ the repo forgot; a record without a verified merge is fiction.
    **pinning the base at merge time**: a base that advances between the precondition check and
    the merge lands a combination nobody reviewed, and no later check can un-land it. The merge
    must FAIL when the base moved — so **verify your mechanism blocks, never infer it from its
-   name**. Measured: a bare `--force-with-lease` leases against a remote-tracking ref that any
-   background `git fetch` refreshes, and it force-landed over an advanced base and **destroyed
-   the other branch's commit**. Also checked and not pins: the merge-API `sha` (matches the PR
-   head), a merge queue (lands a combination), require-branches-up-to-date (needs a defined check;
-   admins bypass). What blocked: `--force-with-lease=<ref>:<recorded-base-sha>`, value spelled out.
+   name.** Prove it on a moved base before trusting it: advance the base, run the mechanism, and
+   require it to refuse. Measured: a mechanism whose name promised exactly this protection leased
+   against a ref that a background fetch refreshed, landed over an advanced base anyway, and
+   **destroyed the other branch's commit** — and three further candidates read as pins while
+   pinning nothing. The one that held pinned an explicitly recorded base SHA rather than a ref
+   whose value could move underneath it.
 2. **Confirm the merge landed**: the new SHA is on the default branch and **its tree matches the
    candidate tree** — read it back, don't assume. Read the push's full output too, not its exit
    status: the remote prints policy objections ("Changes must be made through a pull request")
@@ -79,8 +83,11 @@ the repo forgot; a record without a verified merge is fiction.
    PR number, merged SHA, and what changed. One recorded outcome per landing.
 4. Close or queue obligations the change touched — the doer never closes an item that needs the
    owner's sign-off; queue those (`duck-decide` presents them).
-5. Clean up: delete the merged branch and its worktree (`duck-sweep` discipline —
-   verify merged, then delete). End the session at this boundary; landing is a stage transition.
+5. Clean up: delete the merged branch and its worktree. Step 2's read-back is what makes this
+   safe and what `duck-sweep` cannot derive on its own — a squash leaves no metadata linking the
+   branch to the commit that replaced it, so **record the landed SHA in step 3's outcome entry**
+   and delete against that, not against a classifier's guess. End the session at this boundary;
+   landing is a stage transition.
 
 ## Common mistakes
 

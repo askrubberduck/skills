@@ -37,7 +37,7 @@ semantics.
 
    For a third or later round on the same work (N≥3 in `rN`), the dispatch also carries the
    caller's committed loop diagnosis (`loop-diagnosis: …`): which breaker exit was weighed —
-   `duck-frame` re-frame, `duck-plan` replan, `duck-race`, `duck-pingpong`, `duck-decide` —
+   `duck-frame` re-frame, `duck-plan` replan, `duck-race` in either mode, `duck-decide` —
    and why another review round is the right spend. No diagnosis, no dispatch: the gate does
    not sell round N+1 to a caller that has not judged its own loop.
 
@@ -50,8 +50,19 @@ semantics.
    model families, with at least one proven different from the doer. Each runs the **strongest tier
    of its family the host lists and you can pin**: decorrelation buys independence; tier buys rigor.
    Record the pinned model id plus the listing command and output that ranked it. Executable names
-   are not identities: `agy` can host Claude, Gemini, or another family, while nested `codex`
-   remains OpenAI/GPT when the doer is OpenAI/GPT. Unknown identity never counts as decorrelated.
+   are not identities: one harness routinely hosts several families — `agy` serves Gemini, Claude,
+   and GPT-OSS from the same binary — while nested `codex` remains OpenAI/GPT when the doer is
+   OpenAI/GPT. Unknown identity never counts as decorrelated.
+
+   **Prove the pin took, do not trust the self-report.** A model asked what it is answers from its
+   prompt; that claim is unfalsifiable. The harness is not: send a deliberately invalid `--model`
+   and require the CLI to error with its roster. A harness that accepts garbage has a meaningless
+   pin, and one that rejects it has told you the accepted value was recognised. Record that
+   exchange beside the pinned id.
+
+   Give each reviewer **its own scratchpad directory**. Reviewers that share one can read — and
+   overwrite — each other's output before synthesis reads it, which buys correlation in the one
+   place the gate is paying for independence.
 5. Write one prompt to `$SP` containing the target, frozen criteria, and receipts as claims to
    attack, never as a coverage map. Require the result contract below. Missing receipt evidence is
    itself a finding. Reviewer default: refute, not bless.
@@ -66,16 +77,28 @@ codex exec -m <strongest-listed> --skip-git-repo-check "$(cat $SP/prompt.md)" </
 agy --model <verified-non-doer> --add-dir "$SP" --print-timeout 45m -p "..." </dev/null > $SP/agy-rN.out 2>&1
 ```
 
-Sanity-check a new invocation form with `-p "What is 2+2?"`. These traps can yield plausible empty
+**Pass every input by absolute path and let the reviewer read it; never inline a corpus into the
+command.** Delivery is not a performance detail, it is a verdict-integrity control. Measured: the
+same pinned model, same target, same instructions, disagreed on 28 of 41 verdicts between an
+inlined run and one reading the same bytes from disk — every flip toward the finding standing. The
+inlined run quoted the corpus fluently and was wrong. Inlining also forces a no-tools constraint,
+which is the prompt shape that provokes the shell-attempt outage.
+
+Sanity-check a new invocation form with `-p "Reply with exactly: OK"`. These traps yield plausible
 reviews at exit 0:
 
-- An unpinned `agy` invocation can silently use the wrong model family. Always pin `--model`.
-- `--print "<text>"` can drop the prompt; use `-p`.
-- Large inlined diffs can time out; pass them by absolute file path.
+- An unpinned invocation can silently use the wrong model family. Always pin `--model`, and prove
+  the pin per step 4.
+- The prompt must be an **argument**. `--print "<text>"` can drop it, and a prompt redirected on
+  **stdin** is discarded entirely — the reviewer answers with a greeting at exit 0.
+- Large inlined inputs time out, and short ones degrade the verdict. Pass them by path.
 
 A zero-byte, greeting-only, timed-out, or crashed dispatch is an outage: a dispatch attempted that
-produced no verdict. Record its evidence. **A REJECT is never an outage**, and a same-family pass
-never substitutes for a required reviewer.
+produced no verdict. **A degraded dispatch is the harder case — full length, well formed, and
+wrong.** Nothing in the exit status distinguishes it, so before trusting any result, read three of
+its justifications and confirm each quote actually supports its verdict; one that cites the claim
+under attack as proof of that claim is a malformed result, recorded as such and not counted.
+**A REJECT is never an outage**, and a same-family pass never substitutes for a required reviewer.
 
 ## Reviewer result contract
 
@@ -117,8 +140,8 @@ A tie goes to the reviewer.
   whether that rule should exist rather than proposing another patch. When two consecutive rounds'
   substantiated blockers target code introduced by remediation rather than the original candidate,
   say so in the report and recommend the caller's circuit breaker — rebuild the contested unit
-  under `duck-race`, or lock findings in as failing tests under `duck-pingpong` — instead of
-  implicitly inviting the next round.
+  under `duck-race`'s race mode, or lock findings in as failing tests under its rally mode —
+  instead of implicitly inviting the next round.
 - Count concepts, not lines: identify any new branch, exception, or second home for the same fact,
   any abstraction with a single implementation, and any unit that took on a second job.
 - A comment that states something false about the code is a defect, ranked on what it misleads
@@ -131,7 +154,11 @@ A tie goes to the reviewer.
 
 Return exactly one superreview result:
 
-- `APPROVE` — a gate decision was requested and no substantiated `BLOCKER` remains.
+- `APPROVE` — a gate decision was requested, **both required reviewers returned a verdict**, and no
+  substantiated `BLOCKER` remains. An outage on a required reviewer bars `APPROVE`: it produced no
+  findings, which is not the same as finding nothing. Re-dispatch it, or return `NOTE` and say which
+  family is missing. Measured: a v1.0.0 release gate approved on a single family because the other
+  outaged for the third time that gate and nothing barred the verdict.
 - `REJECT` — at least one substantiated `BLOCKER` remains.
 - `NOTE` — something material stands out, but no gate decision was requested or the available
   criteria and evidence do not support one. `NOTE` neither authorizes nor rejects the candidate.
