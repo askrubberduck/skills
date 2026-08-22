@@ -1,6 +1,6 @@
 ---
 name: duck-diet
-description: Put agent context, memory, and token costs on a diet without starving the essential guidance. Use when the user asks for minimum tokens, session-cost analysis, an agent setup health check, CLAUDE.md, AGENTS.md, or memory trimming, or before a long campaign or multi-agent run.
+description: Put agent context, memory, and token costs on a diet without starving the essential guidance. Use when the user asks for minimum tokens, session-cost analysis, an agent setup health check, CLAUDE.md, AGENTS.md, or memory trimming, when picking which model tier or agent type a stage runs on, or before a long campaign or multi-agent run.
 ---
 
 # Duck Diet

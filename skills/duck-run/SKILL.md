@@ -1,6 +1,6 @@
 ---
 name: duck-run
-description: Plan, implement, test, and independently review a high-risk change; trust is not part of the pipeline. Use when the user requests end-to-end delivery with adversarial plan critique, says "duck it" or "plan, critique, red team, execute on green", asks for a duck run or duck simplification, says "wear ponytail + duck soul", or invokes duck-run with a task.
+description: Frame, plan, implement, verify, independently review, and land a high-risk change; trust is not part of the pipeline. Use when the user requests end-to-end delivery with adversarial plan critique, says "duck it" or "plan, critique, red team, execute on green", asks for a duck run or duck simplification, says "wear ponytail + duck soul", or invokes duck-run with a task.
 ---
 
 # Duck Run

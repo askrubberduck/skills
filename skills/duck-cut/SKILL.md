@@ -1,6 +1,6 @@
 ---
 name: duck-cut
-description: Shrink a backlog the honest way — obsolete work out, duplicates merged, viable items unblocked. Use when the user asks to cut or clean a backlog, critique open or blocked work, finish every viable item autonomously, or when open, blocked, and deferred work keeps accumulating.
+description: Shrink a backlog the honest way — obsolete work out, duplicates merged, viable items unblocked. Use when the user asks to cut or clean a backlog, critique open or blocked work, autonomously close, cut, merge, or unblock every item that does not need the owner, or when open, blocked, and deferred work keeps accumulating.
 ---
 
 # Obligations Critique Sweep

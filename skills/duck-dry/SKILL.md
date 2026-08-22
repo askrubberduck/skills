@@ -1,6 +1,6 @@
 ---
 name: duck-dry
-description: Strip comment and docstring noise until only unobvious decisions, contracts, and traps survive. Use when generated code or tests carry narration, storytelling, or change history in comments, when a comment restates the line under it, before committing or reviewing generated code, or the user asks to dry, prune, or de-slop comments.
+description: Strip comments, docstrings, commit messages, and PR descriptions until only unobvious decisions, contracts, and traps survive. Use when generated code or tests carry narration, storytelling, or change history in comments, when a comment restates the line under it, when a commit message or PR description narrates instead of carrying what the diff cannot, before committing or reviewing generated code, or the user asks to dry, prune, or de-slop comments or commit prose.
 ---
 
 # Dry the Comments

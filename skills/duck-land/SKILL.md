@@ -1,6 +1,6 @@
 ---
 name: duck-land
-description: Merge approved work, update project records, and clean up the branch and worktree; landed means nothing left behind. Use when a change has passed its review gate, the user says to land, merge, push, ship, tag, cut a release, or "merge and release", a gate-passed PR is ready, or merged work was never recorded in status or outcome documentation.
+description: Merge approved work, update project records, and clean up the branch and worktree; landed means nothing left behind. Use when a change has passed its review gate, the user says to land, merge, push, or ship, a gate-passed PR is ready, or merged work was never recorded in status or outcome documentation.
 ---
 
 # Duck Land

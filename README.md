@@ -64,11 +64,11 @@ an agent that skips them. Read the receipts, not the reassurance.
 | Skill | What it does |
 |---|---|
 | `duck-break` | Attack a 'finished' build to find out how finished it actually is |
-| `duck-campaign` | Carve a grand vision into prioritized workstreams that can ship without waiting on each other |
+| `duck-campaign` | Carve a grand vision into independent workstreams that ship without waiting on each other |
 | `duck-cut` | Shrink a backlog the honest way — obsolete work out, duplicates merged, viable items unblocked |
 | `duck-decide` | Walk the owner through the decisions they have been ducking, one at a time |
 | `duck-diet` | Put agent context, memory, and token costs on a diet without starving the essential guidance |
-| `duck-dry` | Strip comment and docstring noise until only unobvious decisions, contracts, and traps survive |
+| `duck-dry` | Strip comments, docstrings, commit messages, and PR descriptions until only unobvious decisions, contracts, and traps survive |
 | `duck-frame` | Settle a system's target design before planning begins, because 'we'll figure out the architecture later' means never |
 | `duck-land` | Merge approved work, update project records, and clean up the branch and worktree; landed means nothing left behind |
 | `duck-learn` | Turn session and delivery evidence into reusable lessons, so each mistake is only paid for once |
@@ -77,7 +77,7 @@ an agent that skips them. Read the receipts, not the reassurance.
 | `duck-race` | Put two decorrelated model families on the same problem and let executed evidence pick the result |
 | `duck-review` | Run one independent cross-model superreview and deliver an evidence-backed APPROVE, REJECT, or NOTE; no participation trophies |
 | `duck-roast` | Roast an entire product, solution, or architecture from every angle until only the defensible parts remain |
-| `duck-run` | Plan, implement, test, and independently review a high-risk change; trust is not part of the pipeline |
+| `duck-run` | Frame, plan, implement, verify, independently review, and land a high-risk change; trust is not part of the pipeline |
 | `duck-scan` | Find ready, blocked, and remaining work without changing anything; looking is free |
 | `duck-sweep` | Clean out stale branches, worktrees, checkouts, scratch directories, and ignore rules; the pond stays clean |
 | `duck-why` | Name the cause of a failure before anyone writes a fix, because the symptom is not the defect |
@@ -283,4 +283,4 @@ since been rewritten and no longer carries his text; the section arc is the surv
 
 ## Status
 
-v2.0.1, one duck — [release notes](https://github.com/askrubberduck/skills/releases).
+v2.0.2, one duck — [release notes](https://github.com/askrubberduck/skills/releases).
