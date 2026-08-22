@@ -132,8 +132,9 @@ Who hands what to whom.
 
 ## Install
 
-No repo-specific paths — each skill detects the host repo's registries (STATUS/OBLIGATIONS/
-backlog docs) or asks once. Once.
+Every route needs a new host session; hosts read skills at startup. Skills that need a project
+registry — `STATUS.md`, `OBLIGATIONS.md`, a backlog doc — detect it or ask once. No paths are
+hardcoded.
 
 ### Claude Code
 
@@ -142,31 +143,23 @@ backlog docs) or asks once. Once.
 /plugin install askrubberduck@askrubberduck
 ```
 
-Or symlink for local use:
+Or symlink a clone:
 
 ```bash
+git clone https://github.com/askrubberduck/skills askrubberduck-skills
 mkdir -p ~/.claude/skills
-ln -s "$(pwd)/skills/"* ~/.claude/skills/
+ln -s "$PWD"/askrubberduck-skills/skills/* ~/.claude/skills/
 ```
-
-Start a new Claude Code session after installing — hosts read skills at startup, not at the
-moment you start wishing they had.
-Plugin skills are namespaced slash commands, for example `/askrubberduck:duck-run`. The local
-symlink install is standalone and therefore exposes `/duck-run` instead.
 
 #### Cloud sessions
 
-Both installs above are invisible to a cloud session — Claude Code on the web, `claude --cloud`, and
-routines run in a fresh container that clones the repo and never reads `~/.claude/`. The duck does not follow
-you to the cloud; the repo carries it there. A cloud session loads project skills from the cloned
-`.claude/skills/`, so this repo links its own skills there:
-open a cloud session on this repo and `/duck-cut` works with no setup, resolved from the checked
-out branch rather than the published release. `validate-distribution.py` fails if a skill in
-`skills/` has no link, because a missing one is silent — and silent is how skills die.
+Neither install reaches the cloud. Claude Code on the web, `claude --cloud`, and routines run a
+fresh container that clones the repo and never reads `~/.claude/`. Cloud sessions load project
+skills from the cloned `.claude/skills/`; this repo symlinks its own skills there, so a cloud
+session on this repo runs `/duck-cut` from the checked-out branch with no setup.
 
-To get the skills in a **different** repo's cloud sessions, declare the plugin in that repo's
-`.claude/settings.json`. Repo-declared plugins install at session start; plugins enabled only in
-your user settings do not transfer:
+For a different repo, declare the plugin in that repo's `.claude/settings.json`. Repo-declared
+plugins install at session start; plugins enabled only in user settings do not transfer:
 
 ```json
 {
@@ -177,15 +170,12 @@ your user settings do not transfer:
 }
 ```
 
-That form installs the published default branch, needs network access to GitHub, and exposes the
-namespaced `/askrubberduck:duck-run`. The third route is enabling the skills on your claude.ai
-account, which is the only one that also reaches Cowork sessions; those uploads accept only the six
-Agent Skills frontmatter fields, which every skill here already satisfies — the duck travels
-light.
+That form tracks the published default branch and needs network access to GitHub.
+
+The third route is enabling the skills on your claude.ai account — the only one that reaches Cowork.
+Every skill here carries `name` and `description` only, so all 18 upload as-is.
 
 ### Codex CLI and the Codex app (recommended)
-
-Install the repository as a plugin, which keeps the collection versioned as one unit:
 
 ```bash
 codex plugin marketplace add askrubberduck/skills
@@ -193,8 +183,7 @@ codex plugin add askrubberduck@askrubberduck
 codex plugin list
 ```
 
-For a reproducible install, resolve and pin the latest published release rather than following
-`master` — "latest" is a moving target, and moving targets are how surprises ship:
+Pin a release instead of tracking `master`:
 
 ```bash
 release_tag="$(gh release view --repo askrubberduck/skills --json tagName --jq .tagName)"
@@ -202,12 +191,7 @@ codex plugin marketplace add askrubberduck/skills --ref "$release_tag"
 codex plugin add askrubberduck@askrubberduck
 ```
 
-Start a new Codex session after installation. Plugin skill names are qualified, for example
-`$askrubberduck:duck-run`.
-
 ### Agy
-
-Agy can install the same canonical tree as a native plugin through the root `plugin.json` adapter:
 
 ```bash
 git clone https://github.com/askrubberduck/skills askrubberduck-skills
@@ -216,13 +200,10 @@ agy plugin install ./askrubberduck-skills
 agy plugin list
 ```
 
-Start Agy and invoke `/duck-run <task>`. If Agy qualifies the command to avoid a collision, select
-the `/askrubberduck:duck-run` form shown by its command picker.
-
 ### Standalone Agent Skills
 
-For Codex IDE, Agy, Cursor, Copilot, and other hosts that support Agent Skills but not this repository's
-plugin format, install the canonical `skills/` directories into the cross-runtime discovery path:
+For hosts that read Agent Skills but not this repository's plugin format — Codex IDE, Agy, Cursor,
+Copilot:
 
 ```bash
 git clone https://github.com/askrubberduck/skills askrubberduck-skills
@@ -230,16 +211,10 @@ mkdir -p ~/.agents/skills
 ln -s "$PWD"/askrubberduck-skills/skills/* ~/.agents/skills/
 ```
 
-Start a new host session after linking. Standalone names are unqualified: Codex commonly exposes
-`$duck-run`, while Claude and Agy expose `/duck-run`; other clients may use a picker or another
-invocation syntax. Do not install both a plugin and standalone links in the same host profile unless
-you enjoy explaining duplicate skill entries to yourself later.
+Do not add standalone links to a profile that already has the plugin; the host then lists every
+skill twice.
 
-The table below is about **what a person types**. Inside skill bodies, one skill refers to another by
-its bare frontmatter name (`duck-proof`) — the one name every host lists, and the only one that
-resolves on a standalone install. A namespaced literal in a body hard-fails there
-(`Unknown skill: askrubberduck:duck-proof`), and `validate-distribution.py` rejects both a
-namespaced reference and one naming a skill that does not exist.
+### Invocation
 
 | Installation | User invocation | Description source |
 |---|---|---|
@@ -248,25 +223,31 @@ namespaced reference and one naming a skill that does not exist.
 | Agy plugin | `/duck-run`; namespaced only when needed | `SKILL.md` |
 | Standalone Agent Skills | Unqualified, using the host's syntax | `SKILL.md` |
 
+The table is what a person types. Inside a skill body, name another skill by its bare frontmatter
+name (`duck-proof`) — the only form that resolves standalone; a namespaced literal fails there with
+`Unknown skill: askrubberduck:duck-proof`.
+
 ### Updating an existing install
 
-New skills added after you installed are **not** picked up automatically — nothing here updates
-itself, and the duck considers that a feature. The symlink form links each skill individually, so a `git pull` that adds one leaves it invisible until you relink:
+Nothing here updates itself. The symlink forms link each skill individually, so a `git pull` that
+adds a skill leaves it invisible until you relink:
 
 ```bash
 git -C askrubberduck-skills pull
 ln -sfn "$PWD"/askrubberduck-skills/skills/* ~/.claude/skills/    # or ~/.agents/skills/
 ```
 
-Plugin installs update through their host instead — `codex plugin marketplace upgrade` for Codex,
-`/plugin` for Claude Code, `agy plugin install` again for Agy. Start a new session afterwards either
-way; hosts read the skill set at startup.
+Plugins update through the host — `/plugin` for Claude Code, `agy plugin install` again for Agy, and
+for Codex:
+
+```bash
+codex plugin marketplace upgrade
+codex plugin add askrubberduck@askrubberduck
+```
 
 ### Agents without native skill discovery
 
-Paste the block from [`AGENTS-CATALOG.md`](AGENTS-CATALOG.md) into the repo's `AGENTS.md` — any
-agent that can read files will then load the right `SKILL.md` on demand. Reading files is the one
-capability the duck assumes.
+Paste the block from [`AGENTS-CATALOG.md`](AGENTS-CATALOG.md) into the repo's `AGENTS.md`.
 
 ## Works well with
 
