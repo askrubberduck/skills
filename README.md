@@ -3,62 +3,109 @@
 Ask the duck. It listens to your plan, assumes it is wrong somewhere, and makes you prove
 otherwise. The skills are dry, straightforward, and skeptical to a fault.
 
-## What you get
-
 Your agent is relentlessly agreeable. It will tell you the plan is sound, the change is done, and
-the tests pass, and roughly two of those will be true. These are the skills that disagree with it:
-
-- **The plan gets argued with before it becomes code.** `duck-frame` settles the shape and
-  `duck-plan` co-authors the decomposition, both before anyone writes a line worth throwing away.
-- **"Done" is a claim, not a status.** `duck-proof` makes the work show its output. `duck-break`
-  goes looking for the ways it isn't finished, which your users would otherwise do for free.
-- **Nothing approves itself.** `duck-review` hands the verdict to a second model family that owes
-  you nothing and has not spent the last hour convincing itself the change is fine.
-- **What piled up gets cleared, not admired.** `duck-scan`, `duck-cut`, and `duck-decide` work
-  the backlog; `duck-sweep` clears the branches and worktrees left behind. None of it sorts
-  itself.
-
-Every rule is here because something measurably failed without it.
-
-No repo-specific paths — each skill detects the host repo's registries (STATUS/OBLIGATIONS/
-backlog docs) or asks once. Once.
+the tests pass, and roughly two of those will be true. These are the skills that disagree with it.
 
 ## The soul — carried by every skill
 
-- **The doer is never the final judge** — every gate is decorrelated; a self-pass earns the
-  dispatch, never the approval.
-- **Evidence over assertion** — a claim without output is not done; an empty result is never success.
-- **Skeptical by default** — a reviewer finding is adjudicated against source, your own fix is
-  re-attacked, a built-in is trusted only for what it provably guarantees. The deadliest loop is
-  *obedient* patching: every round of "harden the wheel you invented" feels like progress, and the
-  only exit is the question no reviewer will ask for you — should this wheel exist at all?
-- **The most reliable code is the code never written** — the first move on any finding is "would
-  deleting this end it?", not "how do I patch it". Reach for the boring version first, then prove
-  what it actually promises; a built-in's guarantee is routinely narrower than its name.
-- **Cut before add** — every finding list treats "delete this" as first-class; every sweep's product
-  is deletions. A fix pass that only grows is not progress.
-- **Concepts, not lines** — line count is a smell, never a target. What compounds is how many things
-  a reader must hold, whether one path traces without jumping, whether cause sits near effect.
-- **A rule states what must hold, not how it was learned** — the incident that produced a rule is
-  not the rule, and belongs in the release notes.
-- **Token discipline** — absolute paths, grep-first, raw output out of git, sessions end at stage
-  boundaries; the runtime rules live in `duck-diet`.
+- **The doer is never the final judge** — a self-pass earns the dispatch, never the approval.
+- **Evidence over assertion** — a claim without output is not done.
+- **Skeptical by default** — every finding is adjudicated against source, your own fix included.
+- **The most reliable code is the code never written** — would deleting this end it?
+- **Cut before add** — a fix pass that only grows is not progress.
+- **Concepts, not lines** — line count is a smell, never a target.
+- **Token discipline** — nothing raw is dumped into your context; the rules live in `duck-diet`.
 - **Fail closed** — a missing reviewer, empty output, or unverified claim is never an implicit pass.
 
-### Which of these are checked, and which are discipline
+## The map
 
-Honesty about the boundary, because a rule that reads like a guarantee and isn't is worse than no
-rule. **Checked mechanically**, by `validate-distribution.py` or by a named command a skill makes
-you run: the distribution's structure, every cross-skill reference, generated-file freshness, that
-a reviewer's model pin was recognised by its harness, and that a required receipt exists.
+Who hands what to whom.
 
-**Everything else is discipline** — an agent applying rules to itself. Nothing at runtime proves a
-decorrelated family actually reviewed your work, that a co-authorship line reflects a dispatch that
-happened, or that a receipt's claims were executed rather than typed. The gates make the correct
-path the described path and put the evidence where a later reader can re-check it; they do not stop
-an agent that skips them. Read the receipts, not the reassurance.
+### duck-run — one change, from unframed to landed
+
+```
+                  +---------------+
+                  |   duck-frame  |
+                  +-------+-------+
+                          |          ..CUT..>  the cheapest run ends here
+                  +-------v-------+
+                  |   duck-plan   |  co-authored, or a solo draft that survives Critique
+                  +-------+-------+
+                          |
+                  +-------v-------+
+   +------------->|     build     |  TDD per unit; duck-diet routes the stage
+   |              +-------+-------+
+   |                      |
+   |              +-------v-------+
+   |              |    duck-dry   |  every unit's diff
+   |              +-------+-------+
+   |                      |
+   |              +-------v-------+
+   |              |   duck-proof  |  ..>  duck-break first when trust-touching
+   |              +-------+-------+
+   |                      |
+   |              +-------v-------+
+   |              |  duck-review  |  the doer never votes
+   |              +-------+-------+
+   |                      |
+   +- duck-why <- REJECT -+          ..>  a diverging loop exits to
+                          |               duck-frame | duck-plan | duck-race | duck-decide
+                          |          APPROVE
+                  +-------v-------+
+                  |   duck-land   |
+                  +---------------+
+```
+
+### duck-campaign — a backlog, carved into packets that each run that line
+
+```
+                  +---------------+
+                  |   duck-scan   |  candidates, with evidence
+                  +-------+-------+
+                          |
+                  +-------v-------+
+   +------------->|    duck-cut   |  standing lens: re-cut whenever a packet grows
+   |              +-------+-------+
+   |                      |
+   |              +-------v-------+
+   |              |   duck-frame  |  the system every packet lands in
+   |              +-------+-------+
+   |                      |          ..CUT..>  the cheapest campaign ends here
+   |              +-------v-------+
+   |              | carve packets |  one independently shippable change each
+   |              +-------+-------+
+   |                      |
+   |              +-------v-------+
+   |              |   duck-plan   |  every packet, before any build starts
+   |              +-------+-------+
+   |                      |
+   |             +--------+--------+
+   |             |                 |
+   |       +-----v----+      +-----v----+
+   |       | duck-run |  ... | duck-run |  parallel; duck-diet routes the fleet
+   |       | packet 1 |      | packet N |
+   |       +-----+----+      +-----+----+
+   |             |                 |
+   |             +--------+--------+
+   |                      |
+   +----------------------+          roster not empty:  a driver or booked wake
+                          |             holds the next iteration
+                          |          roster empty:
+                  +-------v-------+
+                  |   duck-sweep  |  nothing left behind
+                  +---------------+
+```
+
+- `build` becomes `duck-race` when one attempt is not enough — race mode for which implementation,
+  rally mode for which edge cases.
+- A packet arrives at `duck-run` already planned, so it is never planned twice.
+- On neither line: `duck-roast` at a milestone, `duck-learn` after one, `duck-scan` to look without
+  touching anything.
+- Where a body disagrees with the map, the body wins.
 
 ## Skills
+
+`AGENTS-CATALOG.md` carries the full trigger text.
 
 <!-- skills-table:start -->
 | Skill | What it does |
@@ -83,26 +130,10 @@ an agent that skips them. Read the receipts, not the reassurance.
 | `duck-why` | Name the cause of a failure before anyone writes a fix, because the symptom is not the defect |
 <!-- skills-table:end -->
 
-## The map
-
-Who hands what to whom.
-
-```
-  duck-frame --> build --> duck-proof --> duck-review --> duck-land
-                   ^                           |
-                   +--------- REJECT ----------+
-```
-
-`duck-run` drives that line, and pulls in `duck-plan` and `duck-break` when the work warrants
-them — the thresholds live in the bodies, not here. Swap `build` for `duck-race` when one
-attempt is not enough — race mode for which implementation, rally mode for which edge cases.
-`duck-scan` and `duck-campaign` sit upstream,
-deciding what is worth building rather than how it ships.
-
-Callable at any point, off the line: `duck-cut`, `duck-decide`, `duck-roast`, `duck-sweep`,
-`duck-diet`, `duck-dry`, `duck-learn`. Where the map disagrees with a skill's body, the body wins.
-
 ## Install
+
+No repo-specific paths — each skill detects the host repo's registries (STATUS/OBLIGATIONS/
+backlog docs) or asks once. Once.
 
 ### Claude Code
 
@@ -254,27 +285,6 @@ For example Gemini and Codex when the doer is Claude. A machine with a single re
 neither the gate nor this list: without a proven decorrelated family, `duck-review` fails closed
 by design. Executable names are not identities; pin the model and verify what it reports — the duck has
 been lied to before.
-
-## Release validation
-
-Both checks must pass before a change lands, and again before publishing or tagging. Run them from
-the repository root:
-
-```bash
-python3 scripts/render-catalog.py --check
-python3 scripts/validate-distribution.py --self-test
-```
-
-The validator checks the Codex, Claude, and Agy manifests; every Codex skill interface; the
-canonical skill set; human-first, YAML-safe descriptions; cross-skill resolution; install
-documentation; generated catalog freshness; and known corruption cases. It performs no network
-access and writes only to temporary directories during self-test. It has rejected this
-collection's own releases, which is exactly the job — the duck does not trust this README either.
-
-The skills table above renders each frontmatter description's first sentence; `AGENTS-CATALOG.md`
-keeps the full capability-and-trigger text, and Codex UI copy lives in
-`skills/<name>/agents/openai.yaml`. After editing frontmatter, run
-`python3 scripts/render-catalog.py`.
 
 ## Credits
 

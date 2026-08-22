@@ -86,9 +86,11 @@ work is small is itself a claim to attack.
 
    **b. Act on the superreview result.**
    - `APPROVE`: for a mergeable change, invoke `duck-land` to ship and record it.
-   - `REJECT`: execute each substantiated blocker by deleting the unnecessary thing, fixing the
-     defect, or escalating a genuine owner decision through `duck-decide`. Never treat a raw
-     reviewer claim that the superreview dismissed as a work order.
+   - `REJECT`: name each substantiated blocker's cause before touching it — `duck-why` when the
+     blocker reports a symptom and the defect behind it is not already obvious from the diff. Then
+     execute by deleting the unnecessary thing, fixing the defect, or escalating a genuine owner
+     decision through `duck-decide`. Never treat a raw reviewer claim that the superreview
+     dismissed as a work order.
    - `NOTE`: record and surface what stood out. It neither authorizes landing nor rejects the
      candidate. If a gate decision is required, resolve the missing criterion, evidence, or owner
      decision before requesting another review.
