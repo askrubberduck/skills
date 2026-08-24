@@ -29,8 +29,12 @@ assumptions; rally turns them into tests. Pick by which of those the work needs.
    pin took before spending a round, by sending a deliberately invalid `--model` and confirming the
    CLI errors with its roster. A harness that accepts garbage has a meaningless pin, and unknown
    identity never counts as decorrelated.
-3. Sanity-check a new invocation form with a trivial prompt first. A zero-byte, greeting-only,
-   timed-out, or crashed dispatch is an outage, not a forfeit: record it and re-dispatch. The
+3. Confirm the owner has authorized sending this repository to the rival's vendor, per
+   `duck-review`'s export precondition — a rival dispatch ships the same material a review does.
+   Sanity-check a new invocation form with a trivial prompt first; a greeting needs no tool call, so
+   it proves the transport and not the participant's ability to read anything. A zero-byte,
+   greeting-only, timed-out, or crashed dispatch is an outage, not a forfeit: record it and
+   re-dispatch. The
    problem statement travels as the command's argument, but **anything it refers to — a diff, a
    corpus, the files to change — is named by absolute path for the participant to open, never
    pasted in.** Pasted material degrades a dispatch into confident nonsense at exit 0.

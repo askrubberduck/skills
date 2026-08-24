@@ -53,12 +53,12 @@ review's job. A claim of robustness without an executed attack behind it is an o
   itself a finding against the breaker.
 - **Leave the receipt.** The attack list — each attack carrying the command run and its observed
   output, no-finding attacks under the same bar as findings — and the restored-state confirmation
-  go to `break-rN.md`. An attack listed without its artifact is claimable without execution, which
-  is exactly the overclaim this receipt exists to prevent. It lives beside the work; when a
-  review is what consumes it, write it to that review's `$SP` too, which is the only place
-  `duck-review` looks. Trust-touching changes cannot
-  pass that gate without it — an unwritten break run is indistinguishable from one that never
-  happened.
+  go to `break-rN.md`, in the project's durable records home — the same location `duck-proof`
+  resolves for its own receipt, and the only place `duck-review` looks. Never the scratchpad and
+  never a commit on the candidate branch. An attack listed without its artifact is claimable
+  without execution, which is exactly the overclaim this receipt exists to prevent. Trust-touching
+  changes cannot pass that gate without it — an unwritten break run is indistinguishable from one
+  that never happened.
 
 ## Common mistakes
 

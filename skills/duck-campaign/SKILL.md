@@ -5,9 +5,10 @@ description: Carve a grand vision into independent workstreams that ship without
 
 # Campaign Bootstrap
 
-Cold-start: one vague directive becomes packets, plans, and parallel builds. Continuing an existing
-campaign is a different job (polling, takeover, merge chaining) — hand that to the repo's campaign
-driver once this bootstrap ends.
+One vague directive becomes packets, plans, parallel builds — and this skill keeps driving them
+until the roster is empty. Bootstrap and continuation are one job here: polling, takeover, and merge
+chaining have no separate owner, because a campaign whose next iteration belongs to something else
+is a campaign that stalls the first time that something else is not there.
 
 ## Recipe
 
@@ -39,13 +40,20 @@ driver once this bootstrap ends.
    one session — the sequencing is the method, parallelism is only how a capable host spends it
    faster. Apply `duck-diet` to the fleet either way: batched agent traffic, no raw output in
    context.
-7. **Hand off into a running loop, never into silence.** State the campaign roster (packet,
-   worktree, branch, state), then in the same turn give the next iteration an owner: invoke the
-   repo's campaign driver, or book the wake that will (`/loop`, a scheduled wakeup, cron), roster
-   as its input. The bootstrap's context ends at the boundary; the campaign's momentum must not. A
-   roster with nobody holding the next iteration is a stalled campaign, whatever it is called. Each
-   packet's landing removes its own worktree; `duck-sweep` at the end clears whatever landing left
-   behind.
+7. **Drive the roster to empty; never hand off into silence.** State the roster (packet, worktree,
+   branch, state) where a new session can read it — the durable records home, never the scratchpad —
+   then take the next iteration yourself.
+
+   **The loop ends and resumes a session per packet; it is not one long session.** `duck-diet`'s
+   rule stands unchanged and this skill is not an exception to it: at each packet boundary the
+   roster is written, the session ends, and the next one is booked (`/loop`, a scheduled wakeup,
+   cron) with the roster as its input. What the loop owns is that the booking happens — the failure
+   this step exists to prevent is a roster with nobody holding the next iteration, not a session
+   that ended. A campaign that keeps one session alive across every packet has broken the rule, not
+   applied it.
+
+   Each packet's landing removes its own worktree; `duck-sweep` at the end clears whatever landing
+   left behind.
 
    The gap between packets is where a long campaign quietly dies, so between them the turn
    continues: dispatch the next one. A packet that hits an obstacle is re-routed or re-scoped and
@@ -59,8 +67,8 @@ driver once this bootstrap ends.
 ## Common mistakes
 
 - Building the first candidate before the cut pass — the survey exists to kill work, not queue it.
-- One marathon session bootstrapping AND driving AND reviewing — each packet gets its own session;
-  the bootstrap session ends at handoff.
+- One marathon session bootstrapping AND driving AND reviewing — each packet gets its own session.
+  Owning the loop means booking the next session, never holding the current one open.
 - Packets carved by code area instead of shippable outcome — a packet that can't ship alone is
   not one.
 - Skipping plan co-authoring because the campaign is "mostly mechanical" — the mechanical slices

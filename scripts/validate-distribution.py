@@ -68,6 +68,31 @@ def check_codex(codex: dict[str, Any], errors: list[str]) -> None:
         errors.append(f"{where}: defaultPrompt must contain 1-3 prompts")
 
 
+def check_versions(manifests: dict[str, Any], readme: str, errors: list[str]) -> None:
+    """Three files carry the release version and nothing compared them until a roast noticed."""
+    declared = {
+        relative: manifests[relative].get("version")
+        for relative in (".claude-plugin/plugin.json", ".codex-plugin/plugin.json")
+    }
+    status = re.search(r"^v(\d+\.\d+\.\d+)", readme, re.M)
+    declared["README.md"] = status.group(1) if status else None
+    if len(set(declared.values())) != 1 or None in declared.values():
+        errors.append(f"release version disagrees across files: {declared}")
+
+
+# Every skill that shows a reviewer dispatch must also carry the rule that keeps the dispatch
+# honest: material goes by path, never pasted into the command. Measured at 28-of-41 flipped
+# verdicts when it was not followed, so a dispatch example without the rule beside it is a defect.
+DISPATCH = re.compile(r"^\s*(codex exec|agy )", re.M)
+BY_PATH = "by absolute path"
+
+
+def check_dispatch_rule(name: str, body: str, errors: list[str]) -> None:
+    if DISPATCH.search(body) and BY_PATH not in body:
+        errors.append(f"skills/{name}/SKILL.md: shows a reviewer dispatch but never states the "
+                      f"by-path rule ({BY_PATH!r})")
+
+
 def check_skill_tree(root: Path, errors: list[str]) -> set[str]:
     """The skill set is whatever is on disk. The invariant is that every one of them is linked."""
     found = {path.parent.name for path in (root / "skills").glob("*/SKILL.md")}
@@ -143,6 +168,7 @@ def check_skill(root: Path, name: str, found: set[str], errors: list[str]) -> No
                       "does not resolve on standalone installs")
     if body.count("```") % 2:
         errors.append(f"{where}: unbalanced ``` code fence")
+    check_dispatch_rule(name, body, errors)
 
 
 def check_generated(root: Path, readme: str, errors: list[str]) -> None:
@@ -168,6 +194,7 @@ def validate(root: Path) -> list[str]:
     found = check_skill_tree(root, errors)
     for name in sorted(found):
         check_skill(root, name, found, errors)
+    check_versions(manifests, readme, errors)
     check_generated(root, readme, errors)
     return sorted(errors)
 
@@ -230,6 +257,11 @@ CASES: list[tuple[str, str, Callable[[Path], None]]] = [
      lambda c: (c / "skills/duck-review/SKILL.md").write_text(
          (c / "skills/duck-review/SKILL.md").read_text() + "\n```bash\nstray\n")),
     ("stale generated catalog", "stale", lambda c: (c / "AGENTS-CATALOG.md").write_text("# stale\n")),
+    ("release version disagrees", "release version disagrees",
+     lambda c: rewrite_json(c / ".claude-plugin/plugin.json",
+                            lambda m: m.__setitem__("version", "9.9.9"))),
+    ("dispatch without the by-path rule", "never states the by-path rule",
+     lambda c: edit(c, "skills/duck-race/SKILL.md", "by absolute path", "somehow")),
 ]
 
 

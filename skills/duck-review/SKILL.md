@@ -24,16 +24,29 @@ artifact there. `rN` numbers review invocations, not an internal approval loop.
 **Trust-touching** means security-, privacy-, or data-sensitive work, or a change to any gate's
 semantics.
 
+**Establish that the export is authorized before spending a round.** This gate works by sending the
+candidate's contents to model vendors outside the machine it runs on; that is what decorrelation
+buys and it is not a transport detail. Confirm the owner has authorized sending *this repository* to
+the named external families, and record where that authorization lives, in the durable records home
+beside the receipts. A host that refuses the dispatch on those grounds has asked the owner's
+question, not thrown an error — measured: `Rejected("… can transmit private repository contents to
+an untrusted third-party destination; the user authorized the roast workflow but did not
+specifically authorize exporting this repository data")`. Route it to `duck-decide`, never to a
+re-dispatch: an authorization question answered by retrying is the failure this precondition exists
+to prevent. No authorization, no dispatch — which is this gate failing closed as designed, and the
+exit is stated to the caller rather than left to be discovered.
+
 1. Resolve the exact review target: `gh pr diff <N>`, packet draft, committed object, or an
    intentionally captured worktree diff. A release candidate spans the last released tag to the
    exact candidate commit, with both full SHAs stated in the prompt; a PR keeps its own base. Never
    guess a range from adjacent commits or review a different checkout.
 2. Take acceptance criteria from the work item, PR, or user's request; never invent them at
    dispatch. Freeze them for this invocation.
-3. Check, but do not produce, the candidate's evidence:
-   - `$SP/proof-rN.md` from `duck-proof` for every review;
+3. Check, but do not produce, the candidate's evidence, in the project's durable records home —
+   never the scratchpad, which the session that wrote it has usually already ended:
+   - `proof-rN.md` from `duck-proof` for every review;
    - the committed `duck-plan` co-authorship line for packet-sized or trust-touching work;
-   - `$SP/break-rN.md` from `duck-break` for trust-touching work.
+   - `break-rN.md` from `duck-break` for trust-touching work.
 
    For a third or later round on the same work (N≥3 in `rN`), the dispatch also carries the
    caller's committed loop diagnosis (`loop-diagnosis: …`): which breaker exit was weighed —
@@ -54,11 +67,15 @@ semantics.
    and GPT-OSS from the same binary — while nested `codex` remains OpenAI/GPT when the doer is
    OpenAI/GPT. Unknown identity never counts as decorrelated.
 
-   **Prove the pin took, do not trust the self-report.** A model asked what it is answers from its
-   prompt; that claim is unfalsifiable. The harness is not: send a deliberately invalid `--model`
-   and require the CLI to error with its roster. A harness that accepts garbage has a meaningless
-   pin, and one that rejects it has told you the accepted value was recognised. Record that
-   exchange beside the pinned id.
+   **The harness's roster is the family of record.** A model asked what it is answers from its
+   prompt, and that claim is unfalsifiable. Print the harness's roster, find the pinned id in it,
+   and take the family the roster attributes to that id; if it matches the doer's, the reviewer is
+   not decorrelated whatever the binary is called. Record that roster line beside the pinned id.
+   A harness that prints no roster establishes no family — measured, `codex` warns "Defaulting to
+   fallback metadata" and proceeds — and an absent roster is the unknown identity this step already
+   refuses to count, never a passed check. Sending a deliberately invalid `--model` to see whether
+   the harness rejects it is discipline this gate names and does not enforce; the soul says which
+   controls are checked and which are not.
 
    Give each reviewer **its own scratchpad directory**. Reviewers that share one can read — and
    overwrite — each other's output before synthesis reads it, which buys correlation in the one
@@ -174,8 +191,9 @@ Report the authoritative result, each reviewer's pinned model id and family, eac
 finding's adjudicated classification and evidence, any outage or downgrade, and the exact target and
 criteria reviewed. Never commit raw CLI stdout; keep it in `$SP`.
 
-**Write that report where the landing gate can read it** — beside the work, in the repo's own
-convention for review records, never only into the caller's context or `$SP`. A verdict that exists
+**Write that report where the landing gate can read it** — the same durable records home as the
+receipts, never only into the caller's context or `$SP`, and never as a commit on the candidate
+branch, which would advance the head past the SHA this report authorizes. A verdict that exists
 only in a session transcript cannot be checked later, and `duck-land` needs the authorization
 itself, not a recollection that one was granted.
 

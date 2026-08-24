@@ -25,12 +25,12 @@ plan same-family and send it out for adversarial review; let the other families 
    required co-author must be from a different model family than the doer; a same-family session
    may add evidence but never counts as decorrelated. Each required co-author meets
    `duck-review`'s reviewer bar — family and tier, pinned model id recorded beside its plan.
-   Verify each CLI's self-reported model instead
-   of inferring family from the executable name. Use the dispatch mechanics, neutral cwd,
-   absolute-path/background rules, and model-pinning safeguards from
-   `duck-review`.
+   Take each CLI's family from its harness roster rather than from the executable name. Use the
+   dispatch mechanics, neutral cwd, absolute-path/background rules, and the export authorization
+   `duck-review` requires before any dispatch leaves the machine.
    Raw plans land as `$SP/plan-<family>.md` (`$SP` = the dispatch scratchpad `duck-review`
-   defines) — scratchpad only, never committed. **No files, no
+   defines) — scratchpad only, never committed; unlike a receipt, a raw co-author plan is working
+   material the committed co-authorship line supersedes. **No files, no
    co-authorship** — a synthesis without a proven different-family plan is a solo draft.
 3. **Synthesize** the independent plans + your own analysis into ONE plan. Reconcile
    disagreements about what *is* by READING SOURCE (`git show <sha>:path`), never by vote.
