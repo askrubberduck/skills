@@ -39,6 +39,13 @@ A comment earns its place by carrying one of these, and says only it:
 
 What survives is dry: present tense, one or two lines, the fact and not the journey to it.
 
+## Say it once
+
+The largest single win in a swept file is rarely a bad comment — it is one good fact restated on
+five declarations. State it where the reader first hits it and delete the other four; a fact with
+five homes decays in four of them. Hunt for this deliberately, because every copy reads fine alone
+and only the sweep ever sees them together.
+
 ## Load-bearing comments are code
 
 Some comments are parsed by a tool, not read by a person: shebangs, encoding cookies, linter and
@@ -63,6 +70,15 @@ a license, and no comment-quality argument touches it.
 There is no fourth option. Rewording slop into fluent slop is still a second home for the line
 below it.
 
+## A comment that contradicts the code is a bug report
+
+When the two disagree one of them is wrong, and which one is not yet known — a doc naming a helper
+that no longer exists, a claim of sorted output over an unsorted return, a doc block left above the
+wrong function by a rename. Resolve it against the code and fix whichever lost. Deleting the
+comment quietly discards the only evidence that something is off, and a sweep surfaces these in
+bulk because nothing else in the toolchain reads comments; route them out rather than swallowing
+them in the deletion count.
+
 ## A true fact is moved, never dropped
 
 - The war story of the bug — symptom, wrong hypothesis, what finally caught it — belongs in the
@@ -75,6 +91,13 @@ below it.
 - Usage a caller needs before reading the code belongs in the published docs.
 - What a test is for belongs in its name.
 - A deferral belongs in the project's registry, with the marker the repo already greps for.
+- **One exception to "only what the diff cannot": a deletion nobody could search for.** When a
+  commit removes a record — a backlog item under `duck-cut`, a registry entry — the removed text
+  goes in the message. The diff carries it, but only to a reader who already knows it existed, and
+  that is the one case where restating the diff buys retrievability instead of duplicating it.
+- An id is not the fact it tagged. Strip `#NNN`, a ticket key, or an internal plan reference and
+  the sentence around it often points at nothing — "the plan above names the four cases" now names
+  none. Restate what the tag guarded in its own terms, or cut the sentence with it.
 
 ## Tests get the same pass, harder
 
@@ -88,10 +111,34 @@ never in a comment beside it.
 ## Then prove nothing broke
 
 A comment sweep is not free. Run the project's gates — lint, type check, the whole suite, and the
-doc build if it publishes from docstrings. Read the diff: every changed line is a comment line
-unless a disposition 2 code fix was the point and is stated. A deleted directive surfaces as a new
-lint or type error, never as a worse comment, so an unrun gate after a sweep is an unverified claim
-like any other. The diff plus the green gates is the receipt; there is no artifact to write.
+doc build if it publishes from docstrings. A deleted directive surfaces as a new lint or type
+error, never as a worse comment, so an unrun gate after a sweep is an unverified claim like any
+other.
+
+**Reading the diff is not the proof.** A sweep is the one diff a reviewer skims, so establish
+comment-only mechanically: strip comments from both revisions and diff what is left, ignoring
+whitespace. Every non-comment line must be byte-identical unless a code change was the point and is
+stated — a disposition 2 fix, or a fact moved into a string the code already prints. Strip with
+something that parses the language — its own AST printer, a tree-sitter comment query — never a
+regex on `//` or `#`: it eats URLs and string contents, failing on the string case below. Run it
+per file across the whole sweep; it is the only thing that catches a code edit riding among prose
+deletions.
+
+Three ways a comment edit silently becomes a code edit, each of which reads as pure deletion:
+
+- **The formatter realigns.** A comment between aligned fields — in a struct, a composite literal,
+  a `var`/`const` block, any run the formatter pads into columns — separates two alignment groups.
+  Delete it and the formatter re-aligns every name around it. The strip-and-diff above cannot see
+  this, because it ignores whitespace; run the formatter's own check as a second gate and put a
+  blank line back where the comment was if it complains.
+- **Declarations get merged.** Hoisting two constants into one block so they can share a comment is
+  a refactor wearing a comment edit's clothes.
+- **A string is not a comment.** Prose inside an assertion message, an error constructor, or a test
+  name reads exactly like a comment in a diff and is code. Editing one — moving a skip's why into
+  the skip reason, renaming a test to carry its intent — is a stated code change, never a silent
+  one riding in the deletion count.
+
+The diff, the mechanical check, and the green gates are the receipt; there is no artifact to write.
 
 ## While writing, not after
 
@@ -109,3 +156,5 @@ iterate over…"), no docstring restating the signature above it.
 - Cutting a line that reads like an owner's decision or a policy. That is not the doer's to delete;
   ask.
 - Reporting a comment count as the result. The result is what the code no longer needs explained.
+- Reading a low deletion count as proof a file is done. A file whose survivors are all traps is
+  done; a file nobody opened is not. Tell them apart by which comments were actually read.

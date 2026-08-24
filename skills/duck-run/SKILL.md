@@ -67,8 +67,8 @@ work is small is itself a claim to attack.
 7. **Verify.** Run the project's gates (tests/build/vet or doc gates) — a gate that takes minutes
    runs in the background, so the turn keeps working while it does; a blocked loop is the cost, and
    an unread result is the trap — then invoke `duck-proof` on your own diff. It leaves
-   `proof-<unit>.md`, or `$SP/proof-r1.md` when Superreview is next (`$SP`: `duck-review`'s
-   dispatch scratchpad), which is where the gate looks; no file, no proof pass happened.
+   `proof-<unit>.md`, or `proof-r1.md` when Superreview is next, in the project's durable records
+   home — never the scratchpad, which is where the gate looks; no file, no proof pass happened.
    Trust-touching work additionally gets the `duck-break` attacks executed before the gate. Evidence
    over assertion — a failed or unrun check means not done; say so with output.
 8. **Independent superreview.** Never self-approve — which forbids granting yourself the verdict,
@@ -80,9 +80,13 @@ work is small is itself a claim to attack.
 
    **a. Prepare and invoke.** Commit the candidate first and record its SHA — the review names an
    exact target and landing requires that SHA, so a review of an uncommitted worktree cannot be
-   landed. Produce `$SP/proof-rN.md` via `duck-proof`; for trust-touching work, also produce
-   `$SP/break-rN.md` via `duck-break`. Confirm any required committed plan evidence, then invoke
-   `duck-review`. The review checks these artifacts but never creates them.
+   landed. Produce `proof-rN.md` via `duck-proof`; for trust-touching work, also produce
+   `break-rN.md` via `duck-break`. Both go to the durable records home, never the scratchpad and
+   never a commit on the candidate branch — a receipt committed there advances the head past the
+   SHA the review is about to authorize. **Run `duck-proof` before recording the candidate SHA**,
+   not after: its fifth section fixes what it finds, and a proof pass that edits the candidate
+   leaves the authorization pointing at code nobody reviewed. Confirm any required committed plan
+   evidence, then invoke `duck-review`. The review checks these artifacts but never creates them.
 
    **b. Act on the superreview result.**
    - `APPROVE`: for a mergeable change, invoke `duck-land` to ship and record it.

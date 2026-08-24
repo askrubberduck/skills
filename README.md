@@ -88,8 +88,8 @@ Who hands what to whom.
    |             |                 |
    |             +--------+--------+
    |                      |
-   +----------------------+          roster not empty:  a driver or booked wake
-                          |             holds the next iteration
+   +----------------------+          roster not empty:  the campaign books the next
+                          |             session and drives the roster to empty
                           |          roster empty:
                   +-------v-------+
                   |   duck-sweep  |  nothing left behind
@@ -260,6 +260,11 @@ None of these are required — the collection is self-contained — but they com
 - **[rtk](https://www.rtk-ai.app/)** — hook-level CLI proxy that shrinks dev-command output before
   it reaches the context; the runtime complement to `duck-diet`'s rules.
 
+The gate works by **sending your repository's contents to model vendors outside your machine** —
+that is what decorrelation buys, and `duck-review` will not dispatch until you have authorized it
+for that repository. Where the answer is no, the gate fails closed and says so; it does not
+silently review with one family.
+
 Hard prerequisites are `git` + `gh`, and **two reviewer CLIs from two different model families**,
 at least one proven different from the doer — that is the quorum `duck-review` enforces, not one.
 For example Gemini and Codex when the doer is Claude. A machine with a single reviewer satisfies
@@ -274,4 +279,4 @@ since been rewritten and no longer carries his text; the section arc is the surv
 
 ## Status
 
-v2.0.2, one duck — [release notes](https://github.com/askrubberduck/skills/releases).
+v2.1.0, one duck — [release notes](https://github.com/askrubberduck/skills/releases).

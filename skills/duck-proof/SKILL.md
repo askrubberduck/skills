@@ -39,17 +39,17 @@ more interesting is not the problem.
 
 ## 3. What is missing
 
-- Tests: updated and run, never assumed.
 - Every caller and dependent of a signature you changed.
 - TODOs: handle now or delete and own the debt. There is no later.
 - The sad path, not just the happy one.
-- The type checker, actually run.
+- A case the suite does not cover, which a green suite cannot tell you about.
 
-## 4. Run it
+## 4. Read the diff, and read what the gates said
 
-`git diff` read in full; build; the whole test suite, not the relevant-looking subset; the real
-artifact on its critical path; console, logs, network. Errors dismissed as "unrelated" may not be.
-Cannot run it? Say so explicitly — never substitute confidence for execution.
+`git diff` in full, every changed line. The gates are the caller's — `duck-run` stage 7 runs them —
+so confirm they ran against this code and read their output, not their exit status. Errors dismissed
+as "unrelated" may not be. Cannot run it? Say so explicitly — never substitute confidence for
+execution.
 
 ## 5. Fix, then attack the fix
 
@@ -93,11 +93,16 @@ suspected.
 
 ## Leave the receipt
 
-Write what you checked and found to `proof-<unit>.md` beside the work — for a review invocation that
-means the dispatch scratchpad, `$SP/proof-rN.md`, exactly where `duck-review` looks; otherwise
-the packet. One line per numbered section — what you attacked, what survived, what you fixed —
-each line citing its artifact (file:line, test name, command run), or the word skipped with the
-reason; a skip without a reason is an omission. "Nothing found" plus the artifact showing the
+Write what you checked and found to `proof-<unit>.md` — `proof-rN.md` when a review consumes it —
+in the **project's durable records home**, the same place its decisions and review reports live.
+Resolve that location in order: the repo's instructions, including anywhere outside the tree; else
+its existing convention; else ask. **Never the scratchpad**, which dies with the session and is
+unreadable to the new session the gate runs in; and **never a commit on the candidate branch**,
+because that advances the head past the SHA the authorization covers.
+
+One line per numbered section — what you attacked, what survived, what you fixed — each line citing
+its artifact (file:line, test name, command run), or the word skipped with the reason; a skip
+without a reason is an omission. "Nothing found" plus the artifact showing the
 attack ran is a legitimate receipt; no receipt is not. `duck-review` hands the receipt to its
 reviewers as a claim to attack; a missing artifact makes the associated claim unverifiable.
 
