@@ -24,7 +24,6 @@ NAME = "askrubberduck"
 # Fixed by convention and not this gate's business beyond parsing: a manifest that loads is a
 # manifest install can read. What it says is set; that it is JSON is what can break.
 MANIFESTS = (
-    "plugin.json",
     ".codex-plugin/plugin.json",
     ".claude-plugin/plugin.json",
     ".agents/plugins/marketplace.json",
