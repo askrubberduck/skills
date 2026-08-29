@@ -124,7 +124,7 @@ Who hands what to whom.
 | `duck-race` | Put two decorrelated model families on the same problem and let executed evidence pick the result |
 | `duck-review` | Run one independent cross-model superreview and deliver an evidence-backed APPROVE, REJECT, or NOTE; no participation trophies |
 | `duck-roast` | Roast an entire product, solution, or architecture from every angle until only the defensible parts remain |
-| `duck-run` | Frame, plan, implement, verify, independently review, and land a high-risk change; trust is not part of the pipeline |
+| `duck-run` | Deliver a high-risk change end to end without trusting any stage of it |
 | `duck-scan` | Find ready, blocked, and remaining work without changing anything; looking is free |
 | `duck-sweep` | Clean out stale branches, worktrees, checkouts, scratch directories, and ignore rules; the pond stays clean |
 | `duck-why` | Name the cause of a failure before anyone writes a fix, because the symptom is not the defect |
