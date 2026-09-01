@@ -1,6 +1,6 @@
 ---
 name: duck-break
-description: Attack a 'finished' build to find out how finished it actually is. Use when a build claims completion, security-, privacy-, or data-sensitive work lacks dynamic evidence, only a green test suite supports the claim, or the user asks to "try to break it" or run a "duck break".
+description: Attack a 'finished' build to find out how finished it actually is. Use when a build claims completion, security-, privacy-, or data-sensitive work lacks dynamic evidence, only a green test suite supports the claim, or the user asks to "try to break it", "red team it", or "duck break".
 ---
 
 # Duck Break

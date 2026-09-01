@@ -1,0 +1,4 @@
+interface:
+  display_name: "Duck Shape"
+  short_description: "Shape structure around what the reader holds, not lines"
+  default_prompt: "Use $askrubberduck:duck-shape to shape this change around what a reader must hold to change it safely."

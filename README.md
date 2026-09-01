@@ -33,11 +33,7 @@ Who hands what to whom.
                   +-------+-------+
                           |
                   +-------v-------+
-   +------------->|     build     |  TDD per unit; duck-diet routes the stage
-   |              +-------+-------+
-   |                      |
-   |              +-------v-------+
-   |              |    duck-dry   |  every unit's diff
+   +------------->|     build     |  per unit: test, pass, duck-shape, duck-dry
    |              +-------+-------+
    |                      |
    |              +-------v-------+
@@ -101,6 +97,9 @@ Who hands what to whom.
 - A packet arrives at `duck-run` already planned, so it is never planned twice.
 - On neither line: `duck-roast` at a milestone, `duck-learn` after one, `duck-scan` to look without
   touching anything.
+- `duck-shape` rides `build` on both lines: the doer's lens while the code is being written, scored
+  in concepts a reader must hold rather than lines or nesting. `duck-roast`'s simplicity angle is
+  the same lens at milestone altitude, and `duck-review` applies it per change.
 - Where a body disagrees with the map, the body wins.
 
 ## Skills
@@ -126,6 +125,7 @@ Who hands what to whom.
 | `duck-roast` | Roast an entire product, solution, or architecture from every angle until only the defensible parts remain |
 | `duck-run` | Deliver a high-risk change end to end without trusting any stage of it |
 | `duck-scan` | Find ready, blocked, and remaining work without changing anything; looking is free |
+| `duck-shape` | Shape code as it is written so the next reader holds as little as possible; the unit is concepts, not lines |
 | `duck-sweep` | Clean out stale branches, worktrees, checkouts, scratch directories, and ignore rules; the pond stays clean |
 | `duck-why` | Name the cause of a failure before anyone writes a fix, because the symptom is not the defect |
 <!-- skills-table:end -->
@@ -173,7 +173,7 @@ plugins install at session start; plugins enabled only in user settings do not t
 That form tracks the published default branch and needs network access to GitHub.
 
 The third route is enabling the skills on your claude.ai account — the only one that reaches Cowork.
-Every skill here carries `name` and `description` only, so all 18 upload as-is.
+Every skill here carries `name` and `description` only, so all 19 upload as-is.
 
 ### Codex CLI and the Codex app (recommended)
 
@@ -253,8 +253,8 @@ Paste the block from [`AGENTS-CATALOG.md`](AGENTS-CATALOG.md) into the repo's `A
 
 None of these are required — the collection is self-contained — but they compound it:
 
-- **[ponytail](https://github.com/DietrichGebert/ponytail)** — lazy-senior-dev mode; `duck-run`
-  invokes its simplification lens by name, and the whole family shares its cut-before-add soul.
+- **[ponytail](https://github.com/DietrichGebert/ponytail)** — lazy-senior-dev mode, worn rather
+  than invoked, so its ladder fires before anyone asks for it.
 - **[caveman](https://github.com/JuliusBrussee/caveman)** — terse-prose mode; pairs with
   `duck-diet`'s token discipline (diet cuts payloads, caveman cuts prose).
 - **[rtk](https://www.rtk-ai.app/)** — hook-level CLI proxy that shrinks dev-command output before

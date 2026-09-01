@@ -1,6 +1,6 @@
 ---
 name: duck-learn
-description: Turn session and delivery evidence into reusable lessons, so each mistake is only paid for once. Use when the user asks for a retrospective, wants to mine sessions or outcomes, asks what should become a skill or what wasted tokens, or after a campaign, incident, or review gate needed many rounds.
+description: Turn session and delivery evidence into reusable lessons, so each mistake is only paid for once. Use when the user asks for a retrospective, wants to mine sessions or outcomes, asks what should become a skill or where tokens were wasted, or after a campaign, incident, or review gate needed many rounds.
 ---
 
 # Duck Learn
