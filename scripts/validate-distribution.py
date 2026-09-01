@@ -92,11 +92,40 @@ def check_dispatch_rule(name: str, body: str, errors: list[str]) -> None:
                       f"by-path rule ({BY_PATH!r})")
 
 
+# Roughly 150 tokens per skill, loaded by every host in every session before anyone asks for
+# anything. The longest today is 502; the budget is the ceiling, not a fit to current contents.
+MAX_DESCRIPTION = 600
+
+# The cross-reference check below proves that references RESOLVE. It cannot prove one still
+# EXISTS, so a load-bearing link can be deleted and every check stays green. Measured: removing
+# duck-review's duck-shape clause passed the whole gate, catalog regenerated.
+REQUIRED_REFERENCES = [
+    ("duck-review", "duck-shape",
+     "the per-change structural check has no owner once the gate stops naming it"),
+]
+
+
+def check_required_references(root: Path, found: set[str], errors: list[str]) -> None:
+    for holder, referenced, why in REQUIRED_REFERENCES:
+        if holder not in found or referenced not in found:
+            continue
+        body = (root / "skills" / holder / "SKILL.md").read_text(errors="replace")
+        if f"`{referenced}`" not in body:
+            errors.append(f"skills/{holder}/SKILL.md: must reference `{referenced}` — {why}")
+
+
 def check_skill_tree(root: Path, errors: list[str]) -> set[str]:
     """The skill set is whatever is on disk. The invariant is that every one of them is linked."""
     found = {path.parent.name for path in (root / "skills").glob("*/SKILL.md")}
     if not found:
         errors.append("skills/: no skills found")
+
+    # A directory whose SKILL.md was never written is not "no skill" — it is a skill nobody can
+    # see. The glob above cannot report it, so a half-added skill would ship and the count would
+    # read correct. Dotted entries are host state, same exemption the link check makes below.
+    for path in sorted((root / "skills").iterdir()):
+        if path.is_dir() and not path.name.startswith(".") and path.name not in found:
+            errors.append(f"skills/{path.name}: directory without a SKILL.md")
 
     # Cloud sessions clone the repo and read `.claude/skills/`; they never see `~/.claude/skills/`.
     # A skill added to `skills/` without its link is invisible to every cloud session on this repo,
@@ -138,8 +167,12 @@ def check_skill(root: Path, name: str, found: set[str], errors: list[str]) -> No
         values = dict(line.split(":", 1) for line in lines)
         if values["name"].strip() != name:
             errors.append(f"{where}: frontmatter name must match directory")
-        if not values["description"].strip():
+        description = values["description"].strip()
+        if not description:
             errors.append(f"{where}: missing description")
+        elif len(description) > MAX_DESCRIPTION:
+            errors.append(f"{where}: description is {len(description)} characters, over the "
+                          f"{MAX_DESCRIPTION} budget — every host loads all of them, every session")
 
     interface_path = root / "skills" / name / "agents" / "openai.yaml"
     try:
@@ -191,6 +224,7 @@ def validate(root: Path) -> list[str]:
     manifests = {relative: load_json(root, relative, errors) for relative in MANIFESTS}
     check_codex(manifests[".codex-plugin/plugin.json"], errors)
     found = check_skill_tree(root, errors)
+    check_required_references(root, found, errors)
     for name in sorted(found):
         check_skill(root, name, found, errors)
     check_versions(manifests, readme, errors)
@@ -261,18 +295,30 @@ CASES: list[tuple[str, str, Callable[[Path], None]]] = [
                             lambda m: m.__setitem__("version", "9.9.9"))),
     ("dispatch without the by-path rule", "never states the by-path rule",
      lambda c: edit(c, "skills/duck-race/SKILL.md", "by absolute path", "somehow")),
+    ("required reference deleted", "must reference `duck-shape`",
+     lambda c: edit(c, "skills/duck-review/SKILL.md",
+                    "`duck-shape` owns this lens at change time; ", "")),
+    ("description over budget", "over the 600 budget",
+     lambda c: edit(c, SCAN, "Find ready, blocked", "x" * 600 + " Find ready, blocked")),
+    ("skill directory without a SKILL.md", "directory without a SKILL.md",
+     lambda c: (c / "skills" / "duck-ghost").mkdir()),
 ]
 
 
 def fingerprint(root: Path) -> dict[str, str]:
     # Symlinks are recorded by target, not followed: rglob does not descend into them, so a
     # deleted or repointed link would otherwise look like a mutation that changed nothing.
+    # Directories are recorded too, or a mutation that only creates one — a half-added skill, the
+    # exact shape one check below exists for — is invisible here and reads as changing nothing.
+    def entry(path: Path) -> str:
+        if path.is_symlink():
+            return f"symlink:{path.readlink()}"
+        return "dir:" if path.is_dir() else path.read_text(errors="replace")
+
     return {
-        str(path.relative_to(root)): (
-            f"symlink:{path.readlink()}" if path.is_symlink() else path.read_text(errors="replace")
-        )
+        str(path.relative_to(root)): entry(path)
         for path in sorted(root.rglob("*"))
-        if path.is_symlink() or path.is_file()
+        if path.is_symlink() or path.is_file() or path.is_dir()
     }
 
 
