@@ -279,4 +279,4 @@ since been rewritten and no longer carries his text; the section arc is the surv
 
 ## Status
 
-v2.2.0, one duck — [release notes](https://github.com/askrubberduck/skills/releases).
+v2.3.0, one duck — [release notes](https://github.com/askrubberduck/skills/releases).
