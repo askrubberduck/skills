@@ -1,6 +1,6 @@
 ---
 name: duck-review
-description: Run one independent cross-model superreview and deliver an evidence-backed APPROVE, REJECT, or NOTE; no participation trophies. Use when a PR or diff is ready to review, a security-, privacy-, or data-sensitive change reaches its release gate, the user says "gate it" or asks for a red-team or independent second opinion. It reviews and judges; it does not fix, repeat, or land.
+description: Run one independent cross-model superreview and deliver an evidence-backed APPROVE, REJECT, or NOTE; no participation trophies. Use when a PR or diff is ready to review, a security-, privacy-, or data-sensitive change reaches its release gate, the user says "gate it" or asks for an independent second opinion. It reviews and judges; it does not fix, repeat, or land.
 ---
 
 # Decorrelated Superreview
@@ -163,6 +163,7 @@ A tie goes to the reviewer.
   instead of implicitly inviting the next round.
 - Count concepts, not lines: identify any new branch, exception, or second home for the same fact,
   any abstraction with a single implementation, and any unit that took on a second job.
+  `duck-shape` owns this lens at change time; this gate reports any miss to the caller.
 - A comment that states something false about the code is a defect, ranked on what it misleads
   about. A demand for explanatory comments is not: where the code is unclear the fix is the code,
   and `duck-dry` sets what the surviving comments carry.

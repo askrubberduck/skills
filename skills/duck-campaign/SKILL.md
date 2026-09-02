@@ -1,6 +1,6 @@
 ---
 name: duck-campaign
-description: Carve a grand vision into independent workstreams that ship without waiting on each other. Use when the user asks to start a campaign, execute all plannable work, turn vision, backlog, or competitor gaps into parallel builds, or provides a broad directive spanning many work items without an existing campaign structure.
+description: Carve a grand vision into independent workstreams that ship without waiting on each other. Use when the user asks to start a campaign, execute all plannable work, turn a vision, a backlog, or competitor gaps into parallel builds, or provides a broad directive spanning many work items without an existing campaign structure.
 ---
 
 # Campaign Bootstrap

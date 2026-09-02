@@ -46,8 +46,9 @@ more interesting is not the problem.
 
 ## 4. Read the diff, and read what the gates said
 
-`git diff` in full, every changed line. The gates are the caller's — `duck-run` stage 7 runs them —
-so confirm they ran against this code and read their output, not their exit status. Errors dismissed
+`git diff` in full, every changed line. The gates are the caller's — `duck-run`'s Verify stage
+runs them — so confirm they ran against this code and read their output, not their exit status.
+Errors dismissed
 as "unrelated" may not be. Cannot run it? Say so explicitly — never substitute confidence for
 execution.
 

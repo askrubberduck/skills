@@ -1,6 +1,6 @@
 ---
 name: duck-run
-description: Deliver a high-risk change end to end without trusting any stage of it. Use when the user requests end-to-end delivery with adversarial plan critique, says "duck it" or "plan, critique, red team, execute on green", asks for a duck run or duck simplification, says "wear ponytail + duck soul", or invokes duck-run with a task.
+description: Deliver a high-risk change end to end without trusting any stage of it. Use when the user requests end-to-end delivery with adversarial plan critique, says "duck it" or "ground, plan, critique, execute on green, verify, gate", asks for a duck run, or invokes duck-run with a task.
 ---
 
 # Duck Run
@@ -54,24 +54,35 @@ work is small is itself a claim to attack.
    rule — the full cheap-routing precondition lives there; Verify additionally re-checks its
    output (a record is checked by reading it back); any unmet precondition runs the stage on the
    inherited model.
-   TDD for code units: failing test first, minimal pass, then simplify.
-   Draft commits already meet `duck-dry`'s prose bar — draft slop is not free: it leaks
-   through cherry-picks and is the raw material the squash message gets built from.
-5. **Ponytail lens throughout.** Delete before add; stdlib/existing helper before new code; one
-   home per fact; smallest diff after full understanding. Simplify touched code before building on
-   it; clear superseded paths as the last step of each unit. No migrations, no back-compat shims
-   unless the repo demands them.
-6. **Dry it — write for a senior reader.** Code explains itself; comments supplement it. Run
-   `duck-dry` over each unit's diff before Verify: it settles what a comment must carry, and where
-   the prose that does not belong in code goes instead.
-7. **Verify.** Run the project's gates (tests/build/vet or doc gates) — a gate that takes minutes
+   **Every code unit runs one cycle: failing test, minimal pass, shape, dry.** Shape and dry belong
+   inside the unit, not downstream of it — the diff is not committed yet, and that is the one window
+   where neither costs ceremony. Defer them and shaping becomes a restructure and drying becomes a
+   sweep; both then need their own commit and their own trip through the gate.
+
+   - **Shape** (`duck-shape`) is the third beat, where "then refactor" usually goes. Delete the
+     concept before naming it well; reach for an existing helper, the stdlib, or the platform before
+     writing a name the reader must verify; one home per fact; every layer answers something or it
+     is charging rent. Shape follows understanding — the smallest change in the wrong place is a
+     second bug, not a lean one. Shape the code the unit touched before building on it, and clear
+     superseded paths as the unit's last act: no migrations, no back-compat shims unless the repo
+     demands them. Restructuring code the unit did not touch is its own unit, never a passenger.
+   - **Dry** (`duck-dry`) closes the unit over its own diff, mechanical check included — strip
+     comments from both revisions, diff what is left. It runs per unit rather than at the end, where
+     a week of prose arrives at once and the one code edit riding among the deletions is hardest to
+     see. Draft commits meet the same bar: draft slop is not free, it leaks through cherry-picks and
+     is the raw material the squash message gets built from.
+
+   A unit is finished when both beats have run. Catching either at Verify costs a commit and a
+   second review each.
+
+5. **Verify.** Run the project's gates (tests/build/vet or doc gates) — a gate that takes minutes
    runs in the background, so the turn keeps working while it does; a blocked loop is the cost, and
    an unread result is the trap — then invoke `duck-proof` on your own diff. It leaves
    `proof-<unit>.md`, or `proof-r1.md` when Superreview is next, in the project's durable records
    home — never the scratchpad, which is where the gate looks; no file, no proof pass happened.
    Trust-touching work additionally gets the `duck-break` attacks executed before the gate. Evidence
    over assertion — a failed or unrun check means not done; say so with output.
-8. **Independent superreview.** Never self-approve — which forbids granting yourself the verdict,
+6. **Independent superreview.** Never self-approve — which forbids granting yourself the verdict,
    not doing the thinking: Verify exists because the doer is expected to have questioned and
    validated the change before anyone else reads it. Use the project's review policy — default:
    the `duck-review` / proven different-family gate. `duck-review` executes one review,

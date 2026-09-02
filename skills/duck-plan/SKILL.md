@@ -1,6 +1,6 @@
 ---
 name: duck-plan
-description: Catch architectural and implementation risks before the code catches them for you. Use when about to plan OR about to implement large, architectural, security-, privacy-, or data-sensitive work — including when implementation is about to start and no plan exists yet — when a plan needs decorrelated co-authorship rather than a same-family draft, or when similar work previously failed several review rounds.
+description: Catch architectural and implementation risks before the code catches them for you. Use when planning or implementing large, architectural, security-, privacy-, or data-sensitive work, including when implementation is about to start against no plan at all, when a plan needs decorrelated co-authorship rather than a same-family draft, or when similar work previously failed several review rounds.
 ---
 
 # Plan Co-Authoring with the Red Team
