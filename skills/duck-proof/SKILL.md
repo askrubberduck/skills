@@ -101,6 +101,15 @@ its existing convention; else ask. **Never the scratchpad**, which dies with the
 unreadable to the new session the gate runs in; and **never a commit on the candidate branch**,
 because that advances the head past the SHA the authorization covers.
 
+Those two rules leave one question, and every skill that writes a receipt inherits the answer.
+A records home **outside the tree** needs no commit — the file surviving the session is the whole
+durability, and that is the cheapest home for exactly this reason. An **in-tree** home needs a
+commit, and it goes on the repo's records branch: not the candidate's, and **not the base either**,
+which `duck-land` re-verifies before merging — a receipt landed there advances the base under the
+authorization the receipt exists to support, and the landing then demands a fresh one. Where the
+repo has no such branch, the home is the wrong home rather than an excuse to skip the receipt: say
+so and route the location to `duck-decide`.
+
 One line per numbered section — what you attacked, what survived, what you fixed — each line citing
 its artifact (file:line, test name, command run), or the word skipped with the reason; a skip
 without a reason is an omission. "Nothing found" plus the artifact showing the

@@ -108,11 +108,14 @@ the full suite once more and record it — the last green is the candidate's evi
 
 ## Contract (both modes)
 
-- Receipt to `$SP/race-rN.md`: problem hash, base SHA, participant identities with pinned model ids
-  — a receipt without identities cannot prove the run was cross-family at all — the mode, the raw
-  diffs or their `$SP` paths, test output per candidate **and for the merged or final candidate**,
-  divergence findings or the rally log, and the decision with its evidence. A losing diff is
-  evidence, not trash: it documents the road not taken and why.
+- Receipt to `race-rN.md` in the project's durable records home — the location `duck-proof`
+  resolves, **never the scratchpad**, because the stage that reads this evidence runs in a session
+  that cannot see `$SP`: problem hash, base SHA, participant identities with pinned model ids — a
+  receipt without identities cannot prove the run was cross-family at all — the mode, the diffs
+  themselves, test output per candidate **and for the merged or final candidate**, divergence
+  findings or the rally log, and the decision with its evidence. A losing diff is evidence, not
+  trash: it documents the road not taken and why, so it travels inside the receipt rather than as
+  a `$SP` path that resolves to nothing by the time anyone follows it.
 - One test per serve in rally mode. Batching tests hides which failure drove which code; the rally
   structure is the audit trail.
 - Never commit raw CLI stdout; keep it in `$SP`.
