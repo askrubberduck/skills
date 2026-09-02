@@ -102,6 +102,20 @@ MAX_DESCRIPTION = 600
 REQUIRED_REFERENCES = [
     ("duck-review", "duck-shape",
      "the per-change structural check has no owner once the gate stops naming it"),
+    ("duck-cut", "duck-scan",
+     "the sweep loses its only registry locator and reports a backlog that is merely elsewhere"),
+    ("duck-run", "duck-diet",
+     "stage routing loses the cheap-tier preconditions and no skill states them"),
+    ("duck-run", "duck-proof",
+     "Verify stops producing the receipt the gate refuses to dispatch without"),
+    ("duck-run", "duck-review",
+     "the pipeline loses its gate and the doer becomes its own final judge"),
+    ("duck-plan", "duck-frame",
+     "co-authoring starts from a fresh guess instead of a framed design"),
+    ("duck-shape", "duck-dry",
+     "the comments this lens deliberately does not touch lose their owner"),
+    ("duck-land", "duck-review",
+     "landing loses the authorization it is supposed to fail closed on"),
 ]
 
 
@@ -187,8 +201,9 @@ def check_skill(root: Path, name: str, found: set[str], errors: list[str]) -> No
                           f"{', '.join(wanted)}")
 
     body = text[frontmatter.end():]
-    # `duck-*` in backticks is reserved: it always means "invoke this skill", never a domain
-    # term. A prefixed or namespaced form hard-fails on a standalone install.
+    # `duck-*` in backticks is reserved for a reference to a sibling skill — invocation or
+    # citation, never a domain term. A prefixed or namespaced form hard-fails on a standalone
+    # install.
     for prefix, referenced in re.findall(r"`([$/]?)(duck-[a-z-]+)`", body):
         if prefix:
             errors.append(f"{where}: host-prefixed reference {prefix + referenced!r} — "

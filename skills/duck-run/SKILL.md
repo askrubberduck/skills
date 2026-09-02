@@ -79,7 +79,7 @@ work is small is itself a claim to attack.
    runs in the background, so the turn keeps working while it does; a blocked loop is the cost, and
    an unread result is the trap — then invoke `duck-proof` on your own diff. It leaves
    `proof-<unit>.md`, or `proof-r1.md` when Superreview is next, in the project's durable records
-   home — never the scratchpad, which is where the gate looks; no file, no proof pass happened.
+   home, which is where the gate looks — never the scratchpad; no file, no proof pass happened.
    Trust-touching work additionally gets the `duck-break` attacks executed before the gate. Evidence
    over assertion — a failed or unrun check means not done; say so with output.
 6. **Independent superreview.** Never self-approve — which forbids granting yourself the verdict,
@@ -121,9 +121,9 @@ work is small is itself a claim to attack.
    lane whose worktree still exists is a lane that has not landed. After a material change, rerun
    verification and `duck-proof`, then request a new superreview of the new candidate.
    Never re-dispatch an unchanged candidate or loop to
-   manufacture reviewer unanimity. **The loop has a circuit breaker**: when a fix pass introduces
-   new substantiated blockers for the second consecutive round, the loop is diverging, not
-   converging. Stop dispatching reviews and judge the loop's shape before spending anything else.
+   manufacture reviewer unanimity. **The loop has a circuit breaker**: it fires before every third
+   or later round. Stop dispatching reviews and judge the loop's shape before spending anything
+   else.
    The diagnosis is a judgment, not a routing table — recorded in one committed line
    (`loop-diagnosis: <shape> → <exit>, because …`) — and it picks the exit from the whole toolbox:
    - Blockers contradict the settled design: re-run `duck-frame` naming the contradiction —
@@ -136,8 +136,11 @@ work is small is itself a claim to attack.
      a regression is executable instead of prose.
    - Blockers dispute scope or design intent: `duck-decide`; a written owner freeze is a valid
      exit.
+   - Blockers land on the original candidate rather than on remediation, and are shrinking round
+     over round: the loop is converging and another round is the right spend. An exit like any
+     other — bought with the same committed line, naming what shrank.
    Buying round N+1 bare is not on the list, and the breaker is not self-graded: `duck-review`
-   refuses a third round's dispatch that carries no recorded diagnosis.
+   refuses a third or later round's dispatch that carries no recorded diagnosis.
 
 ## Rules
 

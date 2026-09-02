@@ -50,8 +50,9 @@ exit is stated to the caller rather than left to be discovered.
 
    For a third or later round on the same work (N≥3 in `rN`), the dispatch also carries the
    caller's committed loop diagnosis (`loop-diagnosis: …`): which breaker exit was weighed —
-   `duck-frame` re-frame, `duck-plan` replan, `duck-race` in either mode, `duck-decide` —
-   and why another review round is the right spend. No diagnosis, no dispatch: the gate does
+   `duck-frame` re-frame, `duck-plan` replan, `duck-race` in either mode, `duck-decide`, or a
+   further round on a loop the caller shows is converging — and why the chosen exit is the right
+   spend. No diagnosis, no dispatch: the gate does
    not sell round N+1 to a caller that has not judged its own loop.
 
    **No receipt, no dispatch — and presence is not verification**: spot-check each receipt by
@@ -73,9 +74,9 @@ exit is stated to the caller rather than left to be discovered.
    not decorrelated whatever the binary is called. Record that roster line beside the pinned id.
    A harness that prints no roster establishes no family — measured, `codex` warns "Defaulting to
    fallback metadata" and proceeds — and an absent roster is the unknown identity this step already
-   refuses to count, never a passed check. Sending a deliberately invalid `--model` to see whether
-   the harness rejects it is discipline this gate names and does not enforce; the soul says which
-   controls are checked and which are not.
+   refuses to count, never a passed check. **Prove the pin took before spending the round**: send a
+   deliberately invalid `--model` and confirm the CLI errors with its roster. A harness that accepts
+   garbage has a meaningless pin, which is unknown identity wearing a model id.
 
    Give each reviewer **its own scratchpad directory**. Reviewers that share one can read — and
    overwrite — each other's output before synthesis reads it, which buys correlation in the one

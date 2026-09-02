@@ -21,8 +21,8 @@ plan same-family and send it out for adversarial review; let the other families 
 2. **Establish the doer's model family from self-reported runtime metadata, then ask independent
    reviewer CLIs to PRODUCE plans, not review one**: "author the safest build plan, the task
    decomposition, the simpler design that deletes a concept, and the traps you'd attack", with the
-   design + seam map provided. At least one
-   required co-author must be from a different model family than the doer; a same-family session
+   design + seam map provided. **Two required co-authors** — `duck-review`'s count — at least one
+   proven a different model family than the doer; a same-family session
    may add evidence but never counts as decorrelated. Each required co-author meets
    `duck-review`'s reviewer bar — family and tier, pinned model id recorded beside its plan.
    Take each CLI's family from its harness roster rather than from the executable name. Use the
@@ -57,6 +57,8 @@ plan same-family and send it out for adversarial review; let the other families 
 ## Red flags
 
 - "The plan is simple, review after building is enough" — that is how long gates start.
-- A skill named inside another skill's step is an **instruction to invoke it**, not a citation.
+- A skill named in an imperative step — "run X", "route it to X" — is an **instruction to invoke
+  it**. A skill named to say who owns a lens or where work goes next is a citation, and reading one
+  as a dispatch is how a read-only pass starts mutating.
 - A refuted attack is not a defended design; N red-teamed mutations are not coverage of the N+1th.
 - One option enumerated is no decision made — synthesis needs real alternatives to reconcile.
