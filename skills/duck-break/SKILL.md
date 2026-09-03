@@ -44,10 +44,9 @@ review's job. A claim of robustness without an executed attack behind it is an o
   crash mid-attack in the shared tree leaves corruption for the next stage to read as the candidate.
 - **A dirty candidate does not survive `git worktree add` or `git clone`** — both carry committed
   state only, so the copy silently holds the base commit and every attack passes against code that
-  is not the candidate. Measured: an uncommitted marker present in the source was absent in the
-  worktree copy. Either commit the candidate first and copy that, or copy the working tree itself
-  (`cp -a`, `rsync`), and **verify the copy carries the change before attacking** — grep it for
-  something only the candidate has. An unverified copy is an unrun attack list.
+  is not the candidate. Either commit the candidate first and copy that, or copy the working tree
+  itself (`cp -a`, `rsync`), and **verify the copy carries the change before attacking** — grep it
+  for something only the candidate has. An unverified copy is an unrun attack list.
 - Record the tree's exact pre-attack state and restore *that*, not "clean" — the candidate under
   review is allowed to be a dirty worktree, so a clean tree is the wrong target and a mismatch is
   itself a finding against the breaker.

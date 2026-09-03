@@ -57,8 +57,7 @@ git -C "$WT_RIVAL" add -A && git -C "$WT_RIVAL" diff "$BASE_SHA" > $SP/rival.dif
 - **The doer finishes its own attempt before reading `rival.out` or `rival.diff`.** Peeking
   mid-attempt is the void condition. Dispatch-then-work makes the honest order also the fast one.
 - **Grant the rival write access** (`-s workspace-write`): the default sandbox is read-only, and a
-  rival that cannot write returns an empty attempt at exit 0. Measured live during this skill's own
-  gate — the shipped command produced no writes until the flag was added.
+  rival that cannot write returns an empty attempt at exit 0.
 - **`add -A`, then diff against the recorded base SHA** — never bare `git diff`: a rival that
   commits leaves the bare form empty at exit 0, and a rival that creates new files leaves them
   invisible to any diff until they are added. Both read as a forfeit that never happened.

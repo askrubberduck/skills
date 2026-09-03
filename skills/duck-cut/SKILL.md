@@ -3,7 +3,7 @@ name: duck-cut
 description: Shrink a backlog the honest way — obsolete work out, duplicates merged, viable items unblocked. Use when the user asks to cut or clean a backlog, critique open or blocked backlog items, autonomously close, cut, merge, or unblock every item that does not need the owner, or when open, blocked, and deferred work keeps accumulating.
 ---
 
-# Obligations Critique Sweep
+# Duck Cut
 
 Adversarial sweep over **every** open, blocked, and deferred item with a cut bias: the goal is a
 smaller backlog, not a tidier one. "Cut this" findings are first-class, equal to "do this".

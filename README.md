@@ -137,12 +137,10 @@ that is what decorrelation buys, and `duck-review` will not dispatch until you h
 for that repository. Where the answer is no, the gate fails closed and says so; it does not
 silently review with one family.
 
-Hard prerequisites are `git` + `gh`, and **two reviewer CLIs from two different model families**,
-at least one proven different from the doer — that is the quorum `duck-review` enforces, not one.
-For example Gemini and Codex when the doer is Claude. A machine with a single reviewer satisfies
-neither the gate nor this list: without a proven decorrelated family, `duck-review` fails closed
-by design. Executable names are not identities; pin the model and verify what it reports — the duck has
-been lied to before.
+`git`, `gh`, and **two reviewer CLIs from two different model families**, at least one proven
+different from the doer — the quorum `duck-review` enforces, not one. Gemini and Codex when the
+doer is Claude, say. One reviewer fails the gate, by design. Executable names are not identities;
+pin the model and verify what it reports — the duck has been lied to before.
 
 ## Install
 
@@ -189,7 +187,7 @@ That form tracks the published default branch and needs network access to GitHub
 The third route is enabling the skills on your claude.ai account — the only one that reaches Cowork.
 Every skill here carries `name` and `description` only, so every skill uploads as-is.
 
-### Codex CLI and the Codex app (recommended)
+### Codex CLI and the Codex app
 
 ```bash
 codex plugin marketplace add askrubberduck/skills
@@ -237,9 +235,8 @@ skill twice.
 | Agy plugin | `/duck-run`; namespaced only when needed | `SKILL.md` |
 | Standalone Agent Skills | Unqualified, using the host's syntax | `SKILL.md` |
 
-The table is what a person types. Inside a skill body, name another skill by its bare frontmatter
-name (`duck-proof`) — the only form that resolves standalone; a namespaced literal fails there with
-`Unknown skill: askrubberduck:duck-proof`.
+The table is what a person types; skill bodies name each other by bare frontmatter name, the one
+form every host resolves.
 
 ### Updating an existing install
 

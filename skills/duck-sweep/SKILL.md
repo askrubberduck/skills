@@ -3,7 +3,7 @@ name: duck-sweep
 description: Clean out stale branches, worktrees, checkouts, scratch directories, and ignore rules; the pond stays clean. Use when the user asks for repository cleanup across one or more repos, or when stale worktrees and temporary artifacts have accumulated after merged work.
 ---
 
-# Worktree and Branch Hygiene Sweep
+# Duck Sweep
 
 Multi-repo cleanup with a hard rule: **verify merged before delete, and keep nothing "just in
 case"** — unmerged work gets an explicit merge-or-delete decision, not a reprieve. One
@@ -25,9 +25,9 @@ durable home and is verified there before its container is removed.
      `origin/<default>`, then delete.
    - **Not preserved** — squash-merged, rebased, or cherry-picked with **no such record**: the
      default branch holds an equivalent *new* commit, never these objects, and no merge metadata
-     recovers the link — PR records, `git cherry`, tree diffs, and revert greps have all produced
-     false positives that end in destroyed work. Do not build a cleverer classifier; route to a
-     decision instead.
+     recovers the link — PR records, `git cherry`, tree diffs, and revert greps can each produce a
+     false positive, and a false positive here is destroyed work. Do not build a cleverer
+     classifier; route to a decision instead.
    - **Unproven** → the Unmerged path: open the work item, decide merge-or-delete on its state,
      record the decision, then `-D`.
 3. Delete — **but check the worktree for untracked and ignored files first**:
@@ -38,8 +38,9 @@ durable home and is verified there before its container is removed.
    keep, and only the owner may decide to delete one**. Uncommitted work is the case with no second
    copy to recover from, which is why this decision is never the doer's however obvious it looks;
    queue it via `duck-decide` and keep the file meanwhile. Then — only once nothing in the
-   worktree remains marked keep — `git worktree remove <path>`, `git branch -D <branch>`, and
-   `git worktree prune` for leftovers.
+   worktree remains marked keep — `git worktree remove <path>`, `git branch -d <branch>` (`-D`
+   only on the Unmerged path, against its recorded decision), and `git worktree prune` for
+   leftovers.
 4. Scratch dirs: hunt ad-hoc temp dirs outside the sanctioned scratchpad (e.g. `~/<repo>-tmp*`,
    `/tmp/<repo>*`, stray review-tmp dirs; the sanctioned scratchpad itself is disposable by design
    and never swept per-file). A non-git dir has no merge evidence, so inventory every entry

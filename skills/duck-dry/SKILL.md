@@ -3,7 +3,7 @@ name: duck-dry
 description: Strip comments, docstrings, commit messages, and PR descriptions until only unobvious decisions, contracts, and traps survive. Use when generated code or tests carry narration, storytelling, or change history in comments, when a comment restates the line under it, when a commit message or PR description narrates instead of carrying what the diff cannot, before committing or reviewing generated code, or the user asks to dry, prune, or de-slop comments or commit prose.
 ---
 
-# Dry the Comments
+# Duck Dry
 
 The compiler, the type checker, and the tests check the code. **Nothing checks a comment.** It is a
 hand-maintained second home for a fact, and the next edit falsifies it in silence — so a comment

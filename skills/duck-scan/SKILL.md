@@ -3,19 +3,19 @@ name: duck-scan
 description: Find ready, blocked, and remaining work without changing anything; looking is free. Use when the user asks what is next, open, ready, left, or available to pick up, requests status, or asks whether a named work item is ready.
 ---
 
-# Pickable Work Scan
+# Duck Scan
 
 Read-only. Answers "what's next" from the repo's own registries without a full-doc re-read and
 without acting on anything. Writes (close/approve/park) route to the repo's disposition workflow.
 
 ## Locate registries (detect, don't configure)
 
-Look for, in order: `STATUS.md`, `OBLIGATIONS.md`, a delivery/backlog doc
-(`docs/03-delivery/README.md`, `BACKLOG.md`, `TODO.md`), active work dirs (`docs/05-work/`),
-open PRs (`gh pr list`). **The registry need not be in the checkout** — a project may keep its
-plans and backlog outside the tree entirely, and the repo's own instruction files are what say so,
-so read those before trusting a miss. Use whichever exist; if none do, say so and ask where the
-backlog lives — once, then remember the answer for the session.
+Look for, in order: `STATUS.md`, `OBLIGATIONS.md`, a delivery or backlog doc (`BACKLOG.md`,
+`TODO.md`, a delivery README), active work-item directories, open PRs (`gh pr list`). **The
+registry need not be in the checkout** — a project may keep its plans and backlog outside the tree
+entirely, and the repo's own instruction files are what say so, so read those before trusting a
+miss. Use whichever exist; if none do, say so and ask where the backlog lives — once, then remember
+the answer for the session.
 
 **An in-repo miss is not an empty backlog.** Reporting "nothing open" from a scan that only
 searched the working tree is the failure this step exists to prevent: the repo looks quiet because

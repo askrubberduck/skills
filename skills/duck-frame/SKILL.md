@@ -3,7 +3,7 @@ name: duck-frame
 description: Settle a system's target design before planning begins, because 'we'll figure out the architecture later' means never. Use when the user asks for system analysis, system design, architecture options, or requirements and constraints before planning, when implementation is about to start against an architecture nobody wrote down, or when a change is large, architectural, security-, privacy-, or data-sensitive.
 ---
 
-# Frame the System
+# Duck Frame
 
 **Analysis is falsifiable** — claims about what is, each citing source. **Design is a choice** —
 claims about what should be, each with a rejected alternative and the reason it lost, ending with
@@ -33,8 +33,9 @@ when the missing evidence is what the decision turns on. Never invent the result
 
 ## Before anything: reuse what is already framed
 
-Find the artifact item 11 names. `READY` and not stale? Return it unchanged and stop. Absent,
-unsettled, or stale: frame now, and say which. Runs for every caller, so none has to remember.
+Find `design-<unit>.md` beside the work item (item 11). `READY` and not stale? Return it unchanged
+and stop. Absent, unsettled, or stale: frame now, and say which. Runs for every caller, so none has
+to remember.
 
 Two things disqualify reuse regardless of freshness. **A caller reporting that execution
 contradicted the design re-frames** — the contradiction is the evidence, and the pin cannot see
