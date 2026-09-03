@@ -211,10 +211,9 @@ resolves.
 
 ## Status
 
-The version and what changed in it live on the
-[releases page](https://github.com/askrubberduck/skills/releases). Every push runs
-`scripts/validate-distribution.py --self-test`: manifests parse, every skill is linked where cloud
-sessions look, cross-references resolve, generated files are current, and each check still rejects
-the corruption it exists for. The script checks structure only.
-Whether a skill reads well is a review's problem, and changes here go through the gate like any
-other work.
+Versions and what changed: the [releases page](https://github.com/askrubberduck/skills/releases).
+
+Every push runs `scripts/validate-distribution.py --self-test`. It checks structure: manifests
+parse, every skill is linked where cloud sessions look, cross-references resolve, generated files
+are current, and the checks themselves still reject what they exist to reject. It says nothing
+about whether a skill reads well. Nothing automated does.
