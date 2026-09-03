@@ -42,8 +42,8 @@ exit is stated to the caller rather than left to be discovered.
    guess a range from adjacent commits or review a different checkout.
 2. Take acceptance criteria from the work item, PR, or user's request; never invent them at
    dispatch. Freeze them for this invocation.
-3. Check, but do not produce, the candidate's evidence, in the project's durable records home —
-   never the scratchpad, which the session that wrote it has usually already ended:
+3. Check, but do not produce, the candidate's evidence, in the project's durable records home as
+   `duck-proof` resolves it — never the scratchpad:
    - `proof-rN.md` from `duck-proof` for every review;
    - the committed `duck-plan` co-authorship line for packet-sized or trust-touching work;
    - `break-rN.md` from `duck-break` for trust-touching work.
@@ -195,9 +195,8 @@ criteria reviewed. Never commit raw CLI stdout; keep it in `$SP`.
 
 **Write that report where the landing gate can read it** — the same durable records home as the
 receipts, never only into the caller's context or `$SP`, and never as a commit on the candidate
-branch, which would advance the head past the SHA this report authorizes. A verdict that exists
-only in a session transcript cannot be checked later, and `duck-land` needs the authorization
-itself, not a recollection that one was granted.
+branch. A verdict that exists only in a session transcript cannot be checked later, and
+`duck-land` needs the authorization itself, not a recollection that one was granted.
 
 Then stop. Persisting the result, executing a fix or deletion, resolving an owner decision,
 reviewing a materially changed candidate, and landing belong to the calling agent or workflow.

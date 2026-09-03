@@ -20,10 +20,11 @@ runs against that checkout. Sharing a live checkout with another run is the one 
 out. The short path below is the one exemption, and it is bought with a committed line.
 
 **Short path.** Work that moves no seam — no boundary between components, no public surface,
-nothing trust-touching — takes `duck-frame`'s short form, skips the worktree, and runs Execute
-through Verify in one pass. What it never skips is Superreview: the gate is the last thing to go,
-not the first. Bought with one committed line, `short-path because: …`, because the judgment that
-work is small is itself a claim to attack.
+nothing trust-touching (`duck-review`'s term: security-, privacy-, or data-sensitive work, or a
+change to any gate's semantics) — takes `duck-frame`'s short form, skips the worktree, and runs
+Execute through Verify in one pass. What it never skips is Superreview: the gate is the last thing
+to go, not the first. Bought with one committed line, `short-path because: …`, because the
+judgment that work is small is itself a claim to attack.
 
 ## Stages
 1. **Ground.** Run `duck-frame`: it reads the project's quality bar, traces the real flow end to
@@ -92,12 +93,12 @@ work is small is itself a claim to attack.
    **a. Prepare and invoke.** Commit the candidate first and record its SHA — the review names an
    exact target and landing requires that SHA, so a review of an uncommitted worktree cannot be
    landed. Produce `proof-rN.md` via `duck-proof`; for trust-touching work, also produce
-   `break-rN.md` via `duck-break`. Both go to the durable records home, never the scratchpad and
-   never a commit on the candidate branch — a receipt committed there advances the head past the
-   SHA the review is about to authorize. **Run `duck-proof` before recording the candidate SHA**,
-   not after: its fifth section fixes what it finds, and a proof pass that edits the candidate
-   leaves the authorization pointing at code nobody reviewed. Confirm any required committed plan
-   evidence, then invoke `duck-review`. The review checks these artifacts but never creates them.
+   `break-rN.md` via `duck-break`. Both go to the durable records home as `duck-proof` resolves
+   it — never the scratchpad, never a commit on the candidate branch. **Run `duck-proof` before
+   recording the candidate SHA**, not after: its fifth section fixes what it finds, and a proof
+   pass that edits the candidate leaves the authorization pointing at code nobody reviewed. Confirm
+   any required committed plan evidence, then invoke `duck-review`. The review checks these
+   artifacts but never creates them.
 
    **b. Act on the superreview result.**
    - `APPROVE`: for a mergeable change, invoke `duck-land` to ship and record it.
@@ -110,22 +111,23 @@ work is small is itself a claim to attack.
      candidate. If a gate decision is required, resolve the missing criterion, evidence, or owner
      decision before requesting another review.
 
-   When confirmed blockers fan wide, split remediation by **file ownership** — one lane owns a
-   file, and a finding spanning two files belongs to exactly one lane named in both briefs.
-   Concurrent lanes get a worktree each; one checkout shared by lanes that each rebuild and run the
-   suite collides on the index and on test output, and the result is neither lane's. Lanes never
-   self-approve. **Lanes converge before the next review, never after it**: each rebases onto the
-   candidate branch in turn, the file-ownership split guaranteeing no lane rewrites another's work,
-   and the merged result becomes the new candidate. It gets one verification run of its own —
-   per-lane green does not compose, exactly as it does not for `duck-race`'s merged candidate. A
-   lane whose worktree still exists is a lane that has not landed. After a material change, rerun
-   verification and `duck-proof`, then request a new superreview of the new candidate.
-   Never re-dispatch an unchanged candidate or loop to
-   manufacture reviewer unanimity. **The loop has a circuit breaker**: it fires before every third
-   or later round. Stop dispatching reviews and judge the loop's shape before spending anything
-   else.
-   The diagnosis is a judgment, not a routing table — recorded in one committed line
-   (`loop-diagnosis: <shape> → <exit>, because …`) — and it picks the exit from the whole toolbox:
+   **c. Remediation lanes.** When confirmed blockers fan wide, split remediation by **file
+   ownership** — one lane owns a file, and a finding spanning two files belongs to exactly one lane
+   named in both briefs. Concurrent lanes get a worktree each; one checkout shared by lanes that
+   each rebuild and run the suite collides on the index and on test output, and the result is
+   neither lane's. Lanes never self-approve. **Lanes converge before the next review, never after
+   it**: each rebases onto the candidate branch in turn, the file-ownership split guaranteeing no
+   lane rewrites another's work, and the merged result becomes the new candidate. It gets one
+   verification run of its own — per-lane green does not compose, exactly as it does not for
+   `duck-race`'s merged candidate. A lane whose worktree still exists is a lane that has not
+   landed. After a material change, rerun verification and `duck-proof`, then request a new
+   superreview of the new candidate. Never re-dispatch an unchanged candidate or loop to
+   manufacture reviewer unanimity.
+
+   **d. The circuit breaker** fires before every third or later round. Stop dispatching reviews
+   and judge the loop's shape before spending anything else. The diagnosis is a judgment, not a
+   routing table — recorded in one committed line (`loop-diagnosis: <shape> → <exit>, because …`)
+   — and it picks the exit from the whole toolbox:
    - Blockers contradict the settled design: re-run `duck-frame` naming the contradiction —
      the same rule this run already applies to any disproved stage-1 claim.
    - Blockers cluster on unit seams or the decomposition itself: replan via `duck-plan`.

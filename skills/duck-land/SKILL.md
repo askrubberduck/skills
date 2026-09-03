@@ -50,27 +50,29 @@ the repo forgot; a record without a verified merge is fiction.
 ## Land
 
 1. Merge per the repo's policy — **ask the remote for its enforced policy first, the base's history
-   only for its shape, never habit**. Server-side rules are the actual policy where the host exposes
-   them (`gh api repos/<owner>/<repo>/rulesets`, branch protection); history is a proxy. Measured:
-   a landing satisfied every documented precondition and still violated the repo's own stated
-   policy, because the tooling never asked the remote what that policy was. A rule the remote
-   enforces is the policy whether or not your account can get past it; **a landing this run cannot
-   make within the rules is an owner decision, never a route around them** — `duck-decide`. For
-   the shape:
-   where the last 20 commits on `origin/<base>` carry no merge commit, the branch is flat and this
-   landing is not the one that mints the first — rebase or squash, one commit per packet; a stray
-   merge in an otherwise flat log is not a license, match the dominant shape. Measured:
-   four `--no-ff` merges landed a campaign onto a flat `main`, breaking a convention that no config
-   enforced and no reviewer flagged. Squash-merge the PR, or direct push where that is the standard,
-   **pinning the base at merge time**: a base that advances between the precondition check and
-   the merge lands a combination nobody reviewed, and no later check can un-land it. The merge
-   must FAIL when the base moved — so **verify your mechanism blocks, never infer it from its
-   name.** Prove it on a moved base before trusting it: advance the base, run the mechanism, and
-   require it to refuse. Measured: a mechanism whose name promised exactly this protection leased
-   against a ref that a background fetch refreshed, landed over an advanced base anyway, and
-   **destroyed the other branch's commit** — and three further candidates read as pins while
-   pinning nothing. The one that held pinned an explicitly recorded base SHA rather than a ref
-   whose value could move underneath it.
+   only for its shape, never habit**.
+   - **Policy.** Server-side rules are the actual policy where the host exposes them
+     (`gh api repos/<owner>/<repo>/rulesets`, branch protection); history is a proxy. Measured: a
+     landing satisfied every documented precondition and still violated the repo's own stated
+     policy, because the tooling never asked the remote what that policy was. A rule the remote
+     enforces is the policy whether or not your account can get past it; **a landing this run
+     cannot make within the rules is an owner decision, never a route around them** —
+     `duck-decide`.
+   - **Shape.** Where the last 20 commits on `origin/<base>` carry no merge commit, the branch is
+     flat and this landing is not the one that mints the first — rebase or squash, one commit per
+     packet; a stray merge in an otherwise flat log is not a license, match the dominant shape.
+     Measured: four `--no-ff` merges landed a campaign onto a flat `main`, breaking a convention
+     that no config enforced and no reviewer flagged.
+   - **Pin the base.** Squash-merge the PR, or direct push where that is the standard, **pinning
+     the base at merge time**: a base that advances between the precondition check and the merge
+     lands a combination nobody reviewed, and no later check can un-land it. The merge must FAIL
+     when the base moved — so **verify your mechanism blocks, never infer it from its name.** Prove
+     it on a moved base before trusting it: advance the base, run the mechanism, and require it to
+     refuse. Measured: a mechanism whose name promised exactly this protection leased against a
+     ref that a background fetch refreshed, landed over an advanced base anyway, and **destroyed
+     the other branch's commit** — and three further candidates read as pins while pinning
+     nothing. The one that held pinned an explicitly recorded base SHA rather than a ref whose
+     value could move underneath it.
 2. **Confirm the merge landed**: the new SHA is on the default branch and **its tree matches the
    candidate tree** — read it back, don't assume. Read the push's full output too, not its exit
    status: the remote prints policy objections ("Changes must be made through a pull request")
