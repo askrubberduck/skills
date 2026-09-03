@@ -13,6 +13,7 @@ a dependency the gate has to grow a pip step for.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import re
 import shutil
@@ -121,11 +122,22 @@ REQUIRED_REFERENCES = [
 
 def check_required_references(root: Path, found: set[str], errors: list[str]) -> None:
     for holder, referenced, why in REQUIRED_REFERENCES:
-        if holder not in found or referenced not in found:
+        retired = {holder, referenced} - found
+        if retired:
+            errors.append(f"REQUIRED_REFERENCES names {', '.join(sorted(retired))}, which no "
+                          "longer exists — retire the entry with the skill")
             continue
         body = (root / "skills" / holder / "SKILL.md").read_text(errors="replace")
         if f"`{referenced}`" not in body:
             errors.append(f"skills/{holder}/SKILL.md: must reference `{referenced}` — {why}")
+
+
+def visible(directory: Path) -> set[str]:
+    """Dotted entries are host state — agent frameworks write into `skills/` and `.claude/`
+    alike — never a skill or a link to one."""
+    if not directory.is_dir():
+        return set()
+    return {path.name for path in directory.iterdir() if not path.name.startswith(".")}
 
 
 def check_skill_tree(root: Path, errors: list[str]) -> set[str]:
@@ -136,18 +148,16 @@ def check_skill_tree(root: Path, errors: list[str]) -> set[str]:
 
     # A directory whose SKILL.md was never written is not "no skill" — it is a skill nobody can
     # see. The glob above cannot report it, so a half-added skill would ship and the count would
-    # read correct. Dotted entries are host state, same exemption the link check makes below.
-    for path in sorted((root / "skills").iterdir()):
-        if path.is_dir() and not path.name.startswith(".") and path.name not in found:
-            errors.append(f"skills/{path.name}: directory without a SKILL.md")
+    # read correct.
+    for name in sorted(visible(root / "skills") - found):
+        if (root / "skills" / name).is_dir():
+            errors.append(f"skills/{name}: directory without a SKILL.md")
 
     # Cloud sessions clone the repo and read `.claude/skills/`; they never see `~/.claude/skills/`.
     # A skill added to `skills/` without its link is invisible to every cloud session on this repo,
     # and nothing but this check would say so.
     link_root = root / ".claude" / "skills"
-    # Dotted entries are host state (agent frameworks write into `.claude/`), never a skill link.
-    linked = ({p.name for p in link_root.iterdir() if not p.name.startswith(".")}
-              if link_root.is_dir() else set())
+    linked = visible(link_root)
     for name in sorted(found - linked):
         errors.append(f".claude/skills/{name}: missing link — the skill is invisible to cloud sessions")
     for name in sorted(linked - found):
@@ -220,11 +230,12 @@ def check_skill(root: Path, name: str, found: set[str], errors: list[str]) -> No
 
 def check_generated(root: Path, readme: str, errors: list[str]) -> None:
     script = root / "scripts" / "render-catalog.py"
-    namespace: dict[str, Any] = {"__name__": "render_catalog"}
+    spec = importlib.util.spec_from_file_location("render_catalog", script)
+    module = importlib.util.module_from_spec(spec)
     try:
-        exec(compile(script.read_text(), str(script), "exec"), namespace)
-        catalog_expected, readme_expected, _ = namespace["render"](root)
-    except (OSError, KeyError, TypeError, ValueError) as exc:
+        spec.loader.exec_module(module)
+        catalog_expected, readme_expected, _ = module.render(root)
+    except (OSError, AttributeError, TypeError, ValueError) as exc:
         errors.append(f"generated catalog validation failed: {exc}")
         return
     if (root / "AGENTS-CATALOG.md").read_text() != catalog_expected:
@@ -310,6 +321,9 @@ CASES: list[tuple[str, str, Callable[[Path], None]]] = [
                             lambda m: m.__setitem__("version", "9.9.9"))),
     ("dispatch without the by-path rule", "never states the by-path rule",
      lambda c: edit(c, "skills/duck-race/SKILL.md", "by absolute path", "somehow")),
+    ("required reference names a retired skill", "REQUIRED_REFERENCES names duck-shape",
+     lambda c: (shutil.rmtree(c / "skills/duck-shape"),
+                (c / ".claude/skills/duck-shape").unlink())),
     ("required reference deleted", "must reference `duck-shape`",
      lambda c: edit(c, "skills/duck-review/SKILL.md",
                     "`duck-shape` owns this lens at change time; ", "")),

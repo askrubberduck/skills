@@ -130,6 +130,20 @@ Who hands what to whom.
 | `duck-why` | Name the cause of a failure before anyone writes a fix, because the symptom is not the defect |
 <!-- skills-table:end -->
 
+## Prerequisites
+
+The gate works by **sending your repository's contents to model vendors outside your machine** —
+that is what decorrelation buys, and `duck-review` will not dispatch until you have authorized it
+for that repository. Where the answer is no, the gate fails closed and says so; it does not
+silently review with one family.
+
+Hard prerequisites are `git` + `gh`, and **two reviewer CLIs from two different model families**,
+at least one proven different from the doer — that is the quorum `duck-review` enforces, not one.
+For example Gemini and Codex when the doer is Claude. A machine with a single reviewer satisfies
+neither the gate nor this list: without a proven decorrelated family, `duck-review` fails closed
+by design. Executable names are not identities; pin the model and verify what it reports — the duck has
+been lied to before.
+
 ## Install
 
 Every route needs a new host session; hosts read skills at startup. Skills that need a project
@@ -148,7 +162,7 @@ Or symlink a clone:
 ```bash
 git clone https://github.com/askrubberduck/skills askrubberduck-skills
 mkdir -p ~/.claude/skills
-ln -s "$PWD"/askrubberduck-skills/skills/* ~/.claude/skills/
+ln -sfn "$PWD"/askrubberduck-skills/skills/* ~/.claude/skills/
 ```
 
 #### Cloud sessions
@@ -173,7 +187,7 @@ plugins install at session start; plugins enabled only in user settings do not t
 That form tracks the published default branch and needs network access to GitHub.
 
 The third route is enabling the skills on your claude.ai account — the only one that reaches Cowork.
-Every skill here carries `name` and `description` only, so all 19 upload as-is.
+Every skill here carries `name` and `description` only, so every skill uploads as-is.
 
 ### Codex CLI and the Codex app (recommended)
 
@@ -208,7 +222,7 @@ Copilot:
 ```bash
 git clone https://github.com/askrubberduck/skills askrubberduck-skills
 mkdir -p ~/.agents/skills
-ln -s "$PWD"/askrubberduck-skills/skills/* ~/.agents/skills/
+ln -sfn "$PWD"/askrubberduck-skills/skills/* ~/.agents/skills/
 ```
 
 Do not add standalone links to a profile that already has the plugin; the host then lists every
@@ -259,18 +273,6 @@ None of these are required — the collection is self-contained — but they com
   `duck-diet`'s token discipline (diet cuts payloads, caveman cuts prose).
 - **[rtk](https://www.rtk-ai.app/)** — hook-level CLI proxy that shrinks dev-command output before
   it reaches the context; the runtime complement to `duck-diet`'s rules.
-
-The gate works by **sending your repository's contents to model vendors outside your machine** —
-that is what decorrelation buys, and `duck-review` will not dispatch until you have authorized it
-for that repository. Where the answer is no, the gate fails closed and says so; it does not
-silently review with one family.
-
-Hard prerequisites are `git` + `gh`, and **two reviewer CLIs from two different model families**,
-at least one proven different from the doer — that is the quorum `duck-review` enforces, not one.
-For example Gemini and Codex when the doer is Claude. A machine with a single reviewer satisfies
-neither the gate nor this list: without a proven decorrelated family, `duck-review` fails closed
-by design. Executable names are not identities; pin the model and verify what it reports — the duck has
-been lied to before.
 
 ## Credits
 

@@ -25,10 +25,9 @@ assumptions; rally turns them into tests. Pick by which of those the work needs.
 2. Name the participants and their model families before starting. The doer (this session's family)
    is one; the rival must be a **proven different family** — `codex exec` by default when the doer
    is not OpenAI/GPT; a doer of that family uses another proven family (`agy --model <pinned>`)
-   instead. Executable names are not identities, and a harness may host several families: prove the
-   pin took before spending a round, by sending a deliberately invalid `--model` and confirming the
-   CLI errors with its roster. A harness that accepts garbage has a meaningless pin, and unknown
-   identity never counts as decorrelated.
+   instead. Executable names are not identities, and a harness may host several families: prove
+   the rival's family and pin to `duck-review`'s reviewer bar — roster line and pinned id recorded
+   — before spending a round. Unknown identity never counts as decorrelated.
 3. Confirm the owner has authorized sending this repository to the rival's vendor, per
    `duck-review`'s export precondition — a rival dispatch ships the same material a review does.
    Sanity-check a new invocation form with a trivial prompt first; a greeting needs no tool call, so
@@ -108,9 +107,9 @@ the full suite once more and record it — the last green is the candidate's evi
 
 ## Contract (both modes)
 
-- Receipt to `race-rN.md` in the project's durable records home — the location `duck-proof`
-  resolves, **never the scratchpad**, because the stage that reads this evidence runs in a session
-  that cannot see `$SP`: problem hash, base SHA, participant identities with pinned model ids — a
+- Receipt to `race-rN.md` in the project's durable records home as `duck-proof` resolves it —
+  never the scratchpad, never a commit on the candidate branch: problem hash, base SHA,
+  participant identities with pinned model ids — a
   receipt without identities cannot prove the run was cross-family at all — the mode, the diffs
   themselves, test output per candidate **and for the merged or final candidate**, divergence
   findings or the rally log, and the decision with its evidence. A losing diff is evidence, not

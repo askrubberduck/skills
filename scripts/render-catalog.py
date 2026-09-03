@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Render or verify the generated skill catalog and README table."""
+"""Render the skill catalog and README table; `validate-distribution.py` checks they are current."""
 
 from __future__ import annotations
 
-import argparse
 import re
 from pathlib import Path
 
@@ -69,27 +68,10 @@ def render(root: Path) -> tuple[str, str, int]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--check", action="store_true", help="fail if generated files are stale")
-    args = parser.parse_args()
-
     root = Path(__file__).resolve().parent.parent
     catalog_text, readme_text, count = render(root)
-    expected = {
-        root / "AGENTS-CATALOG.md": catalog_text,
-        root / "README.md": readme_text,
-    }
-
-    if args.check:
-        stale = [path.name for path, content in expected.items() if path.read_text() != content]
-        if stale:
-            print("stale generated files: " + ", ".join(stale))
-            return 1
-        print(f"catalog is up to date ({count} skills)")
-        return 0
-
-    for path, content in expected.items():
-        path.write_text(content)
+    (root / "AGENTS-CATALOG.md").write_text(catalog_text)
+    (root / "README.md").write_text(readme_text)
     print(f"wrote AGENTS-CATALOG.md + README table ({count} skills)")
     return 0
 
