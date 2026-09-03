@@ -70,24 +70,27 @@ Pick the one that matches what you are looking at.
 
 ## The pipeline
 
-`duck-run` is the directive stack you would otherwise type as a preamble. One change, from unframed
-to landed:
+`duck-run` walks one change through six stages. What passes between them is evidence: a design
+record, a plan, receipts, a verdict.
 
-```
-frame         plan          execute       verify        review        land
-duck-frame    duck-plan     duck-shape    duck-proof    duck-review   duck-land
-settle the    co-authored,  duck-dry      duck-break    one verdict,  merge, record,
-design        or solo and   inside each   receipts, or  another       clean up
-first         critiqued     unit          no pass ran   family
-```
+1. **Frame**, `duck-frame`. Settle the design: what exists, what changes, what can fail.
+2. **Plan**, `duck-plan`. Break it into units. Big or trust-touching work is co-authored with a
+   second model family; small work is drafted solo and red-teamed before any code.
+3. **Execute.** Each unit: a failing test, the minimal pass, then `duck-shape` and `duck-dry`
+   before the next unit.
+4. **Verify**, `duck-proof`. Run the project's gates, attack your own diff, write the receipt.
+   Trust-touching work also gets `duck-break`.
+5. **Review**, `duck-review`. A reviewer from another model family returns one verdict on the exact
+   commit.
+6. **Land**, `duck-land`. Merge, record what landed, delete the branch.
 
-A rejection names each blocker's cause before anyone touches code, through `duck-why` when the
-symptom does not already show the defect. Before a third round, and every round after it, a circuit
-breaker fires and picks an exit: re-frame, replan, `duck-race`, `duck-decide`, or one more round
-with the evidence that the loop is converging. Nothing buys round three bare.
+A rejection goes back to step 3 with each blocker's cause named first, through `duck-why` when the
+symptom hides it. Before the third review round, and every one after it, a circuit breaker picks a
+different exit: re-frame, replan, `duck-race`, `duck-decide`, or one more round with the evidence
+that the loop is converging.
 
-The rest sit around it, by when they run. Before: `duck-scan`, `duck-cut`, `duck-decide`,
-`duck-campaign`. Beside: `duck-diet`. After: `duck-sweep`, `duck-learn`.
+Around the run: `duck-scan`, `duck-cut`, `duck-decide`, and `duck-campaign` before it;
+`duck-diet` throughout; `duck-sweep` and `duck-learn` after.
 
 ## Every skill
 
