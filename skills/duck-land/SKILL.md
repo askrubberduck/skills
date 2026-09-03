@@ -58,7 +58,7 @@ the repo forgot; a record without a verified merge is fiction.
    - **Shape.** Where the last 20 commits on `origin/<base>` carry no merge commit, the branch is
      flat and this landing is not the one that mints the first — rebase or squash, one commit per
      packet; a stray merge in an otherwise flat log is not a license, match the dominant shape.
-     Nothing enforces this and no reviewer flags it; the history is the only guard.
+     No config enforces this; the history is the only guard.
    - **Pin the base.** Squash-merge the PR, or direct push where that is the standard, **pinning
      the base at merge time**: a base that advances between the precondition check and the merge
      lands a combination nobody reviewed, and no later check can un-land it. The merge must FAIL

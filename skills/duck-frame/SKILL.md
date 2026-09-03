@@ -33,8 +33,9 @@ when the missing evidence is what the decision turns on. Never invent the result
 
 ## Before anything: reuse what is already framed
 
-Find `design-<unit>.md` beside the work item (item 11). `READY` and not stale? Return it unchanged and stop. Absent,
-unsettled, or stale: frame now, and say which. Runs for every caller, so none has to remember.
+Find `design-<unit>.md` beside the work item (item 11). `READY` and not stale? Return it unchanged
+and stop. Absent, unsettled, or stale: frame now, and say which. Runs for every caller, so none has
+to remember.
 
 Two things disqualify reuse regardless of freshness. **A caller reporting that execution
 contradicted the design re-frames** — the contradiction is the evidence, and the pin cannot see

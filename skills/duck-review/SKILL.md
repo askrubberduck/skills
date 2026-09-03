@@ -93,10 +93,11 @@ agy --model <verified-non-doer> --add-dir "$SP" --print-timeout 45m -p "..." </d
 
 **The prompt is an argument; the material under review is a path inside it.** Hand the reviewer
 your instructions on the command line, and have those instructions name the diff, corpus, or files
-by absolute path for the reviewer to open — never paste that material into the command. Pasting
-the corpus flips 28 of 41 verdicts against the same pinned model on the same target, every flip
-toward the finding standing, and the pasted run quotes the corpus fluently while being wrong. It
-also forces a no-tools constraint, the prompt shape that provokes the permission-denied outage.
+by absolute path for the reviewer to open — never paste that material into the command. Pasted
+material degrades the verdict — 28 of 41 flipped in one comparison against the same pinned model
+on the same target, every flip toward the finding standing, the pasted run quoting the corpus
+fluently and wrong — and forces a no-tools constraint, the prompt shape that provokes the
+permission-denied outage.
 
 Sanity-check a new invocation form with `-p "Reply with exactly: OK"`. These traps yield plausible
 reviews at exit 0:
