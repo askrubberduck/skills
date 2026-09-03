@@ -1,6 +1,6 @@
 ---
 name: duck-run
-description: Deliver a high-risk change end to end without trusting any stage of it. Use when the user requests end-to-end delivery with adversarial plan critique, says "duck it" or "ground, plan, critique, execute on green, verify, gate", asks for a duck run, or invokes duck-run with a task.
+description: Deliver a high-risk change end to end without trusting any stage of it. Use when the user requests end-to-end delivery with adversarial plan critique, says "duck it" or "ground, plan, critique, execute on green, verify, gate", or asks for a duck run.
 ---
 
 # Duck Run
@@ -18,7 +18,7 @@ of this one. Step back out to the root checkout before `duck-land` runs, because
 worktree and cannot delete the directory it is standing in. No `git`, or a host without worktrees?
 Say so and take the next isolation the host has — a clone, or a dedicated branch when nothing else
 runs against that checkout. Sharing a live checkout with another run is the one option ruled
-out. The short path below is the one exemption, and it is bought with a committed line.
+out. The short path below is the one exemption.
 
 **Short path.** Work that moves no seam — no boundary between components, no public surface,
 nothing trust-touching (`duck-review`'s term: security-, privacy-, or data-sensitive work, or a
@@ -81,9 +81,7 @@ judgment that work is small is itself a claim to attack.
    the review round they feed, go to the durable records home as `duck-proof` resolves it — never
    the scratchpad, never a commit on the candidate branch; no file, no pass happened. Evidence over
    assertion — a failed or unrun check means not done; say so with output.
-6. **Independent superreview.** Never self-approve — which forbids granting yourself the verdict,
-   not doing the thinking: Verify exists because the doer is expected to have questioned and
-   validated the change before anyone else reads it. Use the project's review policy — default:
+6. **Independent superreview.** Never self-approve. Use the project's review policy — default:
    the `duck-review` / proven different-family gate. `duck-review` executes one review,
    adjudicates its reviewers, and returns one authoritative `APPROVE | REJECT | NOTE`; this stage
    acts on that result without reinterpreting the raw reviewer votes.

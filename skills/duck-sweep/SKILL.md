@@ -25,9 +25,9 @@ durable home and is verified there before its container is removed.
      `origin/<default>`, then delete.
    - **Not preserved** — squash-merged, rebased, or cherry-picked with **no such record**: the
      default branch holds an equivalent *new* commit, never these objects, and no merge metadata
-     recovers the link — PR records, `git cherry`, tree diffs, and revert greps have all produced
-     false positives that end in destroyed work. Do not build a cleverer classifier; route to a
-     decision instead.
+     recovers the link — PR records, `git cherry`, tree diffs, and revert greps all produce false
+     positives, and a false positive here is destroyed work. Do not build a cleverer classifier;
+     route to a decision instead.
    - **Unproven** → the Unmerged path: open the work item, decide merge-or-delete on its state,
      record the decision, then `-D`.
 3. Delete — **but check the worktree for untracked and ignored files first**:

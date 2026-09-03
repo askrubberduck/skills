@@ -29,7 +29,7 @@ is a campaign that stalls the first time that something else is not there.
    and each one frames itself against this artifact later. A `CUT` verdict ends the campaign;
    `OWNER DECISION` ends the turn, because there is no packet yet to move on to.
 4. **Carve packets** — one packet per independently shippable change, in the repo's work-item
-   convention (e.g. `docs/05-work/YYYY-MM-DD-topic/`). No mega-packet; if two changes can ship
+   convention (e.g. `<work-items>/YYYY-MM-DD-topic/`). No mega-packet; if two changes can ship
    separately, they are two packets.
 5. **Plan each packet** via `duck-plan` before any build starts. **No co-authorship line, no
    execute** — a packet whose committed plan does not name the families that co-authored it has not
@@ -66,7 +66,6 @@ is a campaign that stalls the first time that something else is not there.
 
 - Building the first candidate before the cut pass — the survey exists to kill work, not queue it.
 - One marathon session bootstrapping AND driving AND reviewing — each packet gets its own session.
-  Owning the loop means booking the next session, never holding the current one open.
 - Packets carved by code area instead of shippable outcome — a packet that can't ship alone is
   not one.
 - Skipping plan co-authoring because the campaign is "mostly mechanical" — the mechanical slices

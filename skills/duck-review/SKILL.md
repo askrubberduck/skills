@@ -29,12 +29,10 @@ candidate's contents to model vendors outside the machine it runs on; that is wh
 buys and it is not a transport detail. Confirm the owner has authorized sending *this repository* to
 the named external families, and record where that authorization lives, in the durable records home
 beside the receipts. A host that refuses the dispatch on those grounds has asked the owner's
-question, not thrown an error — measured: `Rejected("… can transmit private repository contents to
-an untrusted third-party destination; the user authorized the roast workflow but did not
-specifically authorize exporting this repository data")`. Route it to `duck-decide`, never to a
-re-dispatch: an authorization question answered by retrying is the failure this precondition exists
-to prevent. No authorization, no dispatch — which is this gate failing closed as designed, and the
-exit is stated to the caller rather than left to be discovered.
+question, not thrown an error: `Rejected("… can transmit private repository contents to an
+untrusted third-party destination …")`. Route it to `duck-decide`, never to a re-dispatch: an
+authorization question answered by retrying is the failure this precondition exists to prevent. No
+authorization, no dispatch; say so to the caller.
 
 1. Resolve the exact review target: `gh pr diff <N>`, packet draft, committed object, or an
    intentionally captured worktree diff. A release candidate spans the last released tag to the
@@ -57,9 +55,8 @@ exit is stated to the caller rather than left to be discovered.
 
    **No receipt, no dispatch — and presence is not verification**: spot-check each receipt by
    re-running or inspecting at least one claim's cited command or artifact; a claim that does not
-   check out is a finding against the receipt. Measured: three receipts in one build overclaimed
-   and every one passed a presence check. A change to this gate's own semantics is reviewed under
-   the PRE-change rules; the new rules bind the next candidate.
+   check out is a finding against the receipt. A change to this gate's own semantics is reviewed
+   under the PRE-change rules; the new rules bind the next candidate.
 4. Record the doer's self-reported model family. Name two required reviewers from two different
    model families, with at least one proven different from the doer. Each runs the **strongest tier
    of its family the host lists and you can pin**: decorrelation buys independence; tier buys rigor.
@@ -72,11 +69,10 @@ exit is stated to the caller rather than left to be discovered.
    prompt, and that claim is unfalsifiable. Print the harness's roster, find the pinned id in it,
    and take the family the roster attributes to that id; if it matches the doer's, the reviewer is
    not decorrelated whatever the binary is called. Record that roster line beside the pinned id.
-   A harness that prints no roster establishes no family — measured, `codex` warns "Defaulting to
-   fallback metadata" and proceeds — and an absent roster is the unknown identity this step already
-   refuses to count, never a passed check. **Prove the pin took before spending the round**: send a
-   deliberately invalid `--model` and confirm the CLI errors with its roster. A harness that accepts
-   garbage has a meaningless pin, which is unknown identity wearing a model id.
+   A harness that prints no roster establishes no family: `codex` warns "Defaulting to fallback
+   metadata" and proceeds, and that is unknown identity, not a passed check. **Prove the pin took
+   before spending the round**: send a deliberately invalid `--model` and confirm the CLI errors
+   with its roster. A harness that accepts garbage has a meaningless pin.
 
    Give each reviewer **its own scratchpad directory**. Reviewers that share one can read — and
    overwrite — each other's output before synthesis reads it, which buys correlation in the one
@@ -97,12 +93,10 @@ agy --model <verified-non-doer> --add-dir "$SP" --print-timeout 45m -p "..." </d
 
 **The prompt is an argument; the material under review is a path inside it.** Hand the reviewer
 your instructions on the command line, and have those instructions name the diff, corpus, or files
-by absolute path for the reviewer to open — never paste that material into the command. Delivery is
-not a performance detail, it is a verdict-integrity control. Measured: the same pinned model, same
-target, same instructions, disagreed on 28 of 41 verdicts between a run with the corpus pasted into
-the prompt and one where the prompt named it on disk — every flip toward the finding standing. The
-pasted run quoted the corpus fluently and was wrong. Pasting also forces a no-tools constraint,
-which is the prompt shape that provokes the permission-denied outage.
+by absolute path for the reviewer to open — never paste that material into the command. Pasting
+the corpus flips 28 of 41 verdicts against the same pinned model on the same target, every flip
+toward the finding standing, and the pasted run quotes the corpus fluently while being wrong. It
+also forces a no-tools constraint, the prompt shape that provokes the permission-denied outage.
 
 Sanity-check a new invocation form with `-p "Reply with exactly: OK"`. These traps yield plausible
 reviews at exit 0:
@@ -111,7 +105,6 @@ reviews at exit 0:
   the pin per step 4.
 - The prompt must be an **argument**. `--print "<text>"` can drop it, and a prompt redirected on
   **stdin** is discarded entirely — the reviewer answers with a greeting at exit 0.
-- Large inlined inputs time out, and short ones degrade the verdict. Pass them by path.
 
 A zero-byte, greeting-only, timed-out, or crashed dispatch is an outage: a dispatch attempted that
 produced no verdict. **A degraded dispatch is the harder case — full length, well formed, and
@@ -154,8 +147,6 @@ A tie goes to the reviewer.
 - Resolve disagreement about framework behavior by reading the dependency source, not by vote.
 - Disagreement about what *should* be — a design intent, a public boundary, a policy — has no
   source to read: route it to the owner via `duck-decide` instead of settling it as the doer.
-  Measured: three such disagreements in one build, each settled by the party the gate exists to
-  check.
 - If supplied history shows the same rule drawing repeated findings, apply the growth ratchet: ask
   whether that rule should exist rather than proposing another patch. When two consecutive rounds'
   substantiated blockers target code introduced by remediation rather than the original candidate,
@@ -178,8 +169,7 @@ Return exactly one superreview result:
 - `APPROVE` — a gate decision was requested, **both required reviewers returned a verdict**, and no
   substantiated `BLOCKER` remains. An outage on a required reviewer bars `APPROVE`: it produced no
   findings, which is not the same as finding nothing. Re-dispatch it, or return `NOTE` and say which
-  family is missing. Measured: a v1.0.0 release gate approved on a single family because the other
-  outaged for the third time that gate and nothing barred the verdict.
+  family is missing.
 - `REJECT` — at least one substantiated `BLOCKER` remains.
 - `NOTE` — something material stands out, but no gate decision was requested or the available
   criteria and evidence do not support one. `NOTE` neither authorizes nor rejects the candidate.
