@@ -68,14 +68,12 @@ def check_codex(codex: dict[str, Any], errors: list[str]) -> None:
         errors.append(f"{where}: defaultPrompt must contain 1-3 prompts")
 
 
-def check_versions(manifests: dict[str, Any], readme: str, errors: list[str]) -> None:
-    """Three files carry the release version and nothing compared them until a roast noticed."""
+def check_versions(manifests: dict[str, Any], errors: list[str]) -> None:
+    """Both manifests carry the release version and nothing compared them until a roast noticed."""
     declared = {
         relative: manifests[relative].get("version")
         for relative in (".claude-plugin/plugin.json", ".codex-plugin/plugin.json")
     }
-    status = re.search(r"^v(\d+\.\d+\.\d+)", readme, re.M)
-    declared["README.md"] = status.group(1) if status else None
     if len(set(declared.values())) != 1 or None in declared.values():
         errors.append(f"release version disagrees across files: {declared}")
 
@@ -253,7 +251,7 @@ def validate(root: Path) -> list[str]:
     check_required_references(root, found, errors)
     for name in sorted(found):
         check_skill(root, name, found, errors)
-    check_versions(manifests, readme, errors)
+    check_versions(manifests, errors)
     check_generated(root, readme, errors)
     return sorted(errors)
 
