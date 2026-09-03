@@ -5,7 +5,8 @@ description: Deliver a high-risk change end to end without trusting any stage of
 
 # Duck Run
 
-The bundled directive stack the user otherwise types as a preamble. Argument: the task.
+One change, from unframed to landed, and no stage takes the previous one's word for it — the
+directive stack you would otherwise type as a preamble. Argument: the task.
 
 ## Precondition: isolate
 
@@ -32,8 +33,9 @@ judgment that work is small is itself a claim to attack.
    never the reading. **Under a campaign** the campaign's frame binds this one but does not replace
    it: pass it in as a constraint and frame against this packet's own work item, because
    `duck-frame` resolves artifacts beside the work item it is given and would otherwise hand the
-   campaign's frame back as this packet's answer. Its `READY` artifact comes back here; this stage
-   decides what follows, and a `CUT` verdict ends the run.
+   campaign's frame back as this packet's answer. Its artifact comes back here and this stage
+   decides what follows: `READY` continues, `CUT` ends the run, `OWNER DECISION` ends the turn —
+   the first of the five reasons under Rules.
 2. **Plan.** Detailed decomposition: units of work, gates per unit, acceptance evidence.
    Steel-man at least one alternative decomposition before committing; the first idea is a
    candidate, not a decision.
@@ -60,29 +62,25 @@ judgment that work is small is itself a claim to attack.
    where neither costs ceremony. Defer them and shaping becomes a restructure and drying becomes a
    sweep; both then need their own commit and their own trip through the gate.
 
-   - **Shape** (`duck-shape`) is the third beat, where "then refactor" usually goes. Delete the
-     concept before naming it well; reach for an existing helper, the stdlib, or the platform before
-     writing a name the reader must verify; one home per fact; every layer answers something or it
-     is charging rent. Shape follows understanding — the smallest change in the wrong place is a
-     second bug, not a lean one. Shape the code the unit touched before building on it, and clear
-     superseded paths as the unit's last act: no migrations, no back-compat shims unless the repo
-     demands them. Restructuring code the unit did not touch is its own unit, never a passenger.
-   - **Dry** (`duck-dry`) closes the unit over its own diff, mechanical check included — strip
-     comments from both revisions, diff what is left. It runs per unit rather than at the end, where
-     a week of prose arrives at once and the one code edit riding among the deletions is hardest to
-     see. Draft commits meet the same bar: draft slop is not free, it leaks through cherry-picks and
-     is the raw material the squash message gets built from.
+   - **Shape** (`duck-shape`) is the third beat, where "then refactor" usually goes. Shape the code
+     the unit touched before building on it, and clear superseded paths as the unit's last act: no
+     migrations, no back-compat shims unless the repo demands them. Restructuring code the unit did
+     not touch is its own unit, never a passenger.
+   - **Dry** (`duck-dry`) closes the unit over its own diff, mechanical check included. Per unit
+     rather than at the end, where a week of prose arrives at once and the one code edit riding
+     among the deletions is hardest to see. Draft commits meet the same bar: draft slop leaks
+     through cherry-picks and is the raw material the squash message gets built from.
 
    A unit is finished when both beats have run. Catching either at Verify costs a commit and a
    second review each.
 
 5. **Verify.** Run the project's gates (tests/build/vet or doc gates) — a gate that takes minutes
    runs in the background, so the turn keeps working while it does; a blocked loop is the cost, and
-   an unread result is the trap — then invoke `duck-proof` on your own diff. It leaves
-   `proof-<unit>.md`, or `proof-r1.md` when Superreview is next, in the project's durable records
-   home, which is where the gate looks — never the scratchpad; no file, no proof pass happened.
-   Trust-touching work additionally gets the `duck-break` attacks executed before the gate. Evidence
-   over assertion — a failed or unrun check means not done; say so with output.
+   an unread result is the trap — then invoke `duck-proof` on your own diff; trust-touching work
+   also gets `duck-break`'s attacks executed. Their receipts, `proof-rN.md` and `break-rN.md` for
+   the review round they feed, go to the durable records home as `duck-proof` resolves it — never
+   the scratchpad, never a commit on the candidate branch; no file, no pass happened. Evidence over
+   assertion — a failed or unrun check means not done; say so with output.
 6. **Independent superreview.** Never self-approve — which forbids granting yourself the verdict,
    not doing the thinking: Verify exists because the doer is expected to have questioned and
    validated the change before anyone else reads it. Use the project's review policy — default:
@@ -90,14 +88,11 @@ judgment that work is small is itself a claim to attack.
    adjudicates its reviewers, and returns one authoritative `APPROVE | REJECT | NOTE`; this stage
    acts on that result without reinterpreting the raw reviewer votes.
 
-   **a. Prepare and invoke.** Commit the candidate first and record its SHA — the review names an
-   exact target and landing requires that SHA, so a review of an uncommitted worktree cannot be
-   landed. Produce `proof-rN.md` via `duck-proof`; for trust-touching work, also produce
-   `break-rN.md` via `duck-break`. Both go to the durable records home as `duck-proof` resolves
-   it — never the scratchpad, never a commit on the candidate branch. **Run `duck-proof` before
-   recording the candidate SHA**, not after: its fifth section fixes what it finds, and a proof
-   pass that edits the candidate leaves the authorization pointing at code nobody reviewed. Confirm
-   any required committed plan evidence, then invoke `duck-review`. The review checks these
+   **a. Prepare and invoke.** Verify's receipts exist first: `duck-proof`'s fifth section edits
+   the candidate, so a proof pass after the SHA is recorded leaves the authorization pointing at
+   code nobody reviewed. Then commit the candidate and record its SHA — the review names an exact
+   target and landing requires that SHA, so a review of an uncommitted worktree cannot be landed.
+   Confirm any required committed plan evidence, then invoke `duck-review`. The review checks these
    artifacts but never creates them.
 
    **b. Act on the superreview result.**

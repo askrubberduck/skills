@@ -3,6 +3,8 @@ name: duck-proof
 description: Give 'completed' work a skeptical second pass before anyone trusts it; 'it should work' is not evidence. Use when an implementation claims completion, the evidence is mostly "it should work", the user asks to verify or prove the work, or before handing a change to an independent review gate.
 ---
 
+# Duck Proof
+
 You do not declare victory, you prove it. "It should work" is not a claim, it is a confession that
 you have not looked. Diff the candidate against its recorded base and read every changed line before
 section 1 — `git diff <base>..<candidate>` for a committed candidate, plus `git diff` and
@@ -12,7 +14,8 @@ so on a committed candidate it reports nothing and proves nothing.
 ## 0. Check the ledger first
 
 Your memory is not your context window. Read the repo's **defect ledger**
-(`docs/defect-classes.md`, or wherever the repo keeps it; create it on first use). Every class
+(`docs/defect-classes.md`, or wherever the repo keeps it; create it on first use where the repo
+allows in-tree records). Every class
 recorded there is one you attack by default, without a reviewer teaching it to you again. A repo
 whose conventions bar such a file and name no other home makes the ledger's location an owner
 decision — queue it via `duck-decide`, state that the pass ran ledgerless, and never resolve
@@ -44,13 +47,12 @@ more interesting is not the problem.
 - The sad path, not just the happy one.
 - A case the suite does not cover, which a green suite cannot tell you about.
 
-## 4. Read the diff, and read what the gates said
+## 4. Read what the gates said
 
-`git diff` in full, every changed line. The gates are the caller's — `duck-run`'s Verify stage
-runs them — so confirm they ran against this code and read their output, not their exit status.
-Errors dismissed
-as "unrelated" may not be. Cannot run it? Say so explicitly — never substitute confidence for
-execution.
+The diff was read before section 1; now the gates. They are the caller's — `duck-run`'s Verify
+stage runs them — so confirm they ran against this code and read their output, not their exit
+status. Errors dismissed as "unrelated" may not be. Cannot run it? Say so explicitly — never
+substitute confidence for execution.
 
 ## 5. Fix, then attack the fix
 
@@ -70,7 +72,7 @@ review pressure the fastest way to look responsive is to add.
 - **What outcome dies if this code is deleted?** Not what it does — what dies. No answer is an
   answer.
 
-Then judge the shape:
+Then judge the shape — `duck-shape`'s lens, at the four points a fix most often fails:
 
 - **Concepts, not lines.** Did the count of things a reader must hold go down? Six checks replaced
   by one built-in flag is a win; ten lines of prose compressed to five is cosmetic.

@@ -3,7 +3,7 @@ name: duck-decide
 description: Walk the owner through the decisions they have been ducking, one at a time. Use when open decisions, blocked obligations, or approvals need the owner's answer, the user asks to walk through decisions or options, or several owner decisions are pending.
 ---
 
-# Decision Walkthrough
+# Duck Decide
 
 Blocking decisions are presented **one at a time, in full, in plain language**. Batching decisions
 produces rushed answers on exactly the items that were queued because they need judgment.

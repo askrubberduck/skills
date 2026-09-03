@@ -3,7 +3,7 @@ name: duck-campaign
 description: Carve a grand vision into independent workstreams that ship without waiting on each other. Use when the user asks to start a campaign, execute all plannable work, turn a vision, a backlog, or competitor gaps into parallel builds, or provides a broad directive spanning many work items without an existing campaign structure.
 ---
 
-# Campaign Bootstrap
+# Duck Campaign
 
 One vague directive becomes packets, plans, parallel builds — and this skill keeps driving them
 until the roster is empty. Bootstrap and continuation are one job here: polling, takeover, and merge
@@ -26,7 +26,8 @@ is a campaign that stalls the first time that something else is not there.
    models; a campaign running on an unwritten architecture is a collision waiting to happen. The
    work item here is the campaign itself — open its record now if the repo has none — so the
    frame's durable home is the campaign's directory, never a packet's: packets do not exist yet,
-   and each one frames itself against this artifact later. A `CUT` verdict ends the campaign.
+   and each one frames itself against this artifact later. A `CUT` verdict ends the campaign;
+   `OWNER DECISION` ends the turn, because there is no packet yet to move on to.
 4. **Carve packets** — one packet per independently shippable change, in the repo's work-item
    convention (e.g. `docs/05-work/YYYY-MM-DD-topic/`). No mega-packet; if two changes can ship
    separately, they are two packets.
@@ -40,29 +41,26 @@ is a campaign that stalls the first time that something else is not there.
    one session — the sequencing is the method, parallelism is only how a capable host spends it
    faster. Apply `duck-diet` to the fleet either way: batched agent traffic, no raw output in
    context.
-7. **Drive the roster to empty; never hand off into silence.** State the roster (packet, worktree,
-   branch, state) where a new session can read it — the durable records home, never the scratchpad —
-   then take the next iteration yourself.
-
-   **The loop ends and resumes a session per packet; it is not one long session.** `duck-diet`'s
-   rule stands unchanged and this skill is not an exception to it: at each packet boundary the
-   roster is written, the session ends, and the next one is booked (`/loop`, a scheduled wakeup,
-   cron) with the roster as its input. What the loop owns is that the booking happens — the failure
-   this step exists to prevent is a roster with nobody holding the next iteration, not a session
-   that ended. A campaign that keeps one session alive across every packet has broken the rule, not
-   applied it.
-
-   Each packet's landing removes its own worktree; `duck-sweep` at the end clears whatever landing
-   left behind.
-
-   The gap between packets is where a long campaign quietly dies, so between them the turn
-   continues: dispatch the next one. A packet that hits an obstacle is re-routed or re-scoped and
-   the route recorded, never abandoned — only a refused authorization is an answer rather than an
-   obstacle. **A packet that raises an owner decision queues it and the campaign moves to the next
-   packet**; it does not sit on the queued question. Independent workstreams that stop for one
-   packet's unanswered decision are not independent, whatever the roster says. When a packet's
-   execution disproves the campaign shape, re-frame it in writing rather than bending the remaining
-   packets around the damage; the campaign may argue its own goal, never substitute one.
+7. **Drive the roster to empty; never hand off into silence.**
+   - **Roster.** State it (packet, worktree, branch, state) where a new session can read it — the
+     durable records home, never the scratchpad — then take the next iteration yourself.
+   - **One session per packet, not one long session.** `duck-diet`'s rule stands unchanged and
+     this skill is not an exception to it: at each packet boundary the roster is written, the
+     session ends, and the next one is booked (`/loop`, a scheduled wakeup, cron) with the roster
+     as its input. What the loop owns is that the booking happens — the failure this step exists
+     to prevent is a roster with nobody holding the next iteration, not a session that ended. A
+     campaign that keeps one session alive across every packet has broken the rule, not applied
+     it. Each packet's landing removes its own worktree; `duck-sweep` at the end clears whatever
+     landing left behind.
+   - **Obstacles and decisions.** The gap between packets is where a long campaign quietly dies,
+     so between them the turn continues: dispatch the next one. A packet that hits an obstacle is
+     re-routed or re-scoped and the route recorded, never abandoned — only a refused authorization
+     is an answer rather than an obstacle. **A packet that raises an owner decision queues it and
+     the campaign moves to the next packet**; it does not sit on the queued question. Independent
+     workstreams that stop for one packet's unanswered decision are not independent, whatever the
+     roster says. When a packet's execution disproves the campaign shape, re-frame it in writing
+     rather than bending the remaining packets around the damage; the campaign may argue its own
+     goal, never substitute one.
 
 ## Common mistakes
 

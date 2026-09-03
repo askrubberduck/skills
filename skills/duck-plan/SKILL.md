@@ -3,7 +3,7 @@ name: duck-plan
 description: Catch architectural and implementation risks before the code catches them for you. Use when planning or implementing large, architectural, security-, privacy-, or data-sensitive work, including when implementation is about to start against no plan at all, when a plan needs decorrelated co-authorship rather than a same-family draft, or when similar work previously failed several review rounds.
 ---
 
-# Plan Co-Authoring with the Red Team
+# Duck Plan
 
 Decorrelated rigor arrives either as *co-authorship* now or as *rejections* later. Do NOT draft a
 plan same-family and send it out for adversarial review; let the other families co-author it.
@@ -28,10 +28,11 @@ plan same-family and send it out for adversarial review; let the other families 
    Take each CLI's family from its harness roster rather than from the executable name. Use the
    dispatch mechanics, neutral cwd, absolute-path/background rules, and the export authorization
    `duck-review` requires before any dispatch leaves the machine.
-   Raw plans land as `$SP/plan-<family>.md` (`$SP` = the dispatch scratchpad `duck-review`
-   defines) — scratchpad only, never committed; unlike a receipt, a raw co-author plan is working
-   material the committed co-authorship line supersedes. **No files, no
-   co-authorship** — a synthesis without a proven different-family plan is a solo draft.
+   Raw plans land as `$SP/plan-<family>.md` (`$SP`: an absolute path under the host's sanctioned
+   scratchpad root, as `duck-review` defines it) — scratchpad only, never committed; unlike a
+   receipt, a raw co-author plan is working material the committed co-authorship line supersedes.
+   **No files, no co-authorship** — a synthesis without a proven different-family plan is a solo
+   draft.
 3. **Synthesize** the independent plans + your own analysis into ONE plan. Reconcile
    disagreements about what *is* by READING SOURCE (`git show <sha>:path`), never by vote.
    **Disagreement about what *should* be — a design intent, a public boundary, a policy — has no

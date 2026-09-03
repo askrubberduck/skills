@@ -3,7 +3,7 @@ name: duck-review
 description: Run one independent cross-model superreview and deliver an evidence-backed APPROVE, REJECT, or NOTE; no participation trophies. Use when a PR or diff is ready to review, a security-, privacy-, or data-sensitive change reaches its release gate, the user says "gate it" or asks for an independent second opinion. It reviews and judges; it does not fix, repeat, or land.
 ---
 
-# Decorrelated Superreview
+# Duck Review
 
 The doer is never the final judge. Use a **different model family**, never a same-family second
 pass. If no decorrelated family is available, fail closed. *Final* carries the weight: this gate

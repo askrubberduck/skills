@@ -10,18 +10,19 @@ or gets consciously discarded. Lessons that live only in a chat transcript are l
 
 ## Recipe
 
-1. **Gather evidence, don't reminisce.** Session transcripts — Claude
-   `~/.claude/projects/<dir>/*.jsonl`, Codex `$CODEX_HOME/sessions` and `archived_sessions`, which
-   are the hosts whose stores are known, not the whole set: another host has its store located
-   before the mine, or the result is partial and says so —
-   alongside recorded outcomes, review trajectories, and token stats. Extract **counts**: repeated
-   directives, repeated failures, repeated tool patterns. Count independent owner tasks, not files:
-   fold every derived log — subagents, retries, forwarded copies — into its parent, by event
-   timestamp rather than file mtime, roots and delegated logs reported apart. Generated
-   prompts, task notifications, and tool results are tool evidence, never owner directives. Big
-   transcripts are mined by script or subagent, never read raw into the main context, and no raw
-   prompt text goes into durable output. Missing or malformed store? Say so and mark the result
-   partial.
+1. **Gather evidence, don't reminisce.**
+   - **Sources.** Session transcripts — Claude `~/.claude/projects/<dir>/*.jsonl`, Codex
+     `$CODEX_HOME/sessions` and `archived_sessions` — are the hosts whose stores are known, not the
+     whole set: another host has its store located before the mine, or the result is partial and
+     says so. Alongside them, recorded outcomes, review trajectories, and token stats. Missing or
+     malformed store? Say so and mark the result partial.
+   - **Count.** Extract counts: repeated directives, repeated failures, repeated tool patterns.
+     Count independent owner tasks, not files: fold every derived log — subagents, retries,
+     forwarded copies — into its parent, by event timestamp rather than file mtime, roots and
+     delegated logs reported apart. Generated prompts, task notifications, and tool results are
+     tool evidence, never owner directives.
+   - **Never raw.** Big transcripts are mined by script or subagent, never read raw into the main
+     context, and no raw prompt text goes into durable output.
 2. **Classify each candidate lesson** by its durable home — one authoritative home per lesson:
    - Repeatable multi-step workflow **the user asks for in words** → a **skill** (new, or a section
      of an existing one — prefer extending; a new skill is a cost).
