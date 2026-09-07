@@ -41,7 +41,11 @@ plan same-family and send it out for adversarial review; let the other families 
    discards the reason the other family was asked.
 4. Apply a cut pass: any task the synthesis shows unnecessary dies here — cheapest build is the one
    not built. Same blade for the design: an abstraction with one implementation, or a second home
-   for a fact that already has one, dies with it.
+   for a fact that already has one, dies with it. Same blade for the decomposition: tasks that
+   mirror a list of reported instances die into one task that builds the check over the whole
+   surface those instances share — every door, every position — and runs it before anything
+   ships; the instances become its cases. A plan sequenced instance by instance ships the first
+   fix into a review that finds the second.
 5. Fix-pass the draft **in place**, multi-round (r1, r2, …), until every required co-author,
    including at least one proven different family, concurs. The draft is a working doc — no commit
    per round; commit the settled plan once.

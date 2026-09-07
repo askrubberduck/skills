@@ -51,7 +51,9 @@ authorization, no dispatch; say so to the caller.
    `duck-frame` re-frame, `duck-plan` replan, `duck-race` in either mode, `duck-decide`, or a
    further round on a loop the caller shows is converging — and why the chosen exit is the right
    spend. No diagnosis, no dispatch: the gate does
-   not sell round N+1 to a caller that has not judged its own loop.
+   not sell round N+1 to a caller that has not judged its own loop. A diagnosis that claims
+   convergence names what shrank in ledger classes; one that counts blockers per round has not
+   judged the loop, and the dispatch is refused the same way.
 
    **No receipt, no dispatch — and presence is not verification**: spot-check each receipt by
    re-running or inspecting at least one claim's cited command or artifact; a claim that does not
@@ -151,8 +153,9 @@ A tie goes to the reviewer.
 - If supplied history shows the same rule drawing repeated findings, apply the growth ratchet: ask
   whether that rule should exist rather than proposing another patch. When two consecutive rounds'
   substantiated blockers target code introduced by remediation rather than the original candidate,
-  say so in the report and recommend the caller's circuit breaker — rebuild the contested unit
-  under `duck-race`'s race mode, or lock findings in as failing tests under its rally mode —
+  **or fall in one ledger class whatever code they land on**, say so in the report — naming the
+  class, not only the instance — and recommend the caller's circuit breaker — rebuild the
+  contested unit under `duck-race`'s race mode, or lock the class in under its rally mode —
   instead of implicitly inviting the next round.
 - Count concepts, not lines: identify any new branch, exception, or second home for the same fact,
   any abstraction with a single implementation, and any unit that took on a second job.

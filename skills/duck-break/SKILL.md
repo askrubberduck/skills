@@ -15,6 +15,9 @@ review's job. A claim of robustness without an executed attack behind it is an o
    A green suite alone proves little; delete-the-code is the only real test check.
 2. **Boundary abuse** — empty, null, huge, malformed, duplicate, and concurrent inputs at every
    trust boundary. The stated validation either holds under execution or you have a finding.
+   Drive every position — parameter, object key, array index — with one catalogue, on every
+   implementation behind the boundary; two implementations are broken when they answer
+   differently, not only when one throws.
 3. **Invariant attack** — take each named invariant (containment, fail-closed, isolation,
    authorization) and actively try to violate it from outside, as a hostile caller would. An
    invariant nobody attacked is a hope.

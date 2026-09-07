@@ -104,6 +104,11 @@ Stop when any holds: every acceptance criterion has a passing test; the turn cap
 (default 10 rallies) is reached; or both sides serve a no-new-test-ideas pass back to back. Then run
 the full suite once more and record it — the last green is the candidate's evidence.
 
+**Rally at class level.** When the serves would be instances of one ledger class, the serve is the
+table: one test that drives every position of the surface with the class's catalogue, on every
+implementation, and the return closes the class. One instance per serve is how a class outlives
+the turn cap — and how a review loop outlives its budget.
+
 ## Contract (both modes)
 
 - Receipt to `race-rN.md` in the project's durable records home as `duck-proof` resolves it —

@@ -56,7 +56,11 @@ that re-frames in full.
 
 1. **Outcome that dies.** The ask as an outcome, not a feature; the non-goals; and the search for an
    existing capability that already satisfies it. Report the search, not a verdict — inspection
-   cannot prove nothing shipped satisfies an outcome.
+   cannot prove nothing shipped satisfies an outcome. **An ask that arrives as a list** — a
+   review's blockers, a bug list — **is framed by the seams the items share, never as one delta
+   per item**: the count is evidence about a seam, not the unit of the frame. Six findings on one
+   boundary are one outcome (the boundary's contract holds), and a frame that hands back six deltas
+   has planned instances; the seventh arrives in review.
 2. **Pinned source.** The commit SHA the analysis read, plus the list of cited files. No git and
    no host tool: say so, pin what identifies the source. **Anything not established
    by a citation or an observation is labeled an assumption**, listed apart from the facts. Prefer
@@ -92,7 +96,11 @@ that re-frames in full.
 8. **Failure model.** Which of item 3's invariants are at risk, where it fails closed, what a
    hostile or failed component reaches, **how the failure is noticed** — the signal, or a record
    that none exists — the recovery path, and what is cheap to undo. Failing closed silently is still
-   an outage.
+   an outage. **Each invariant at risk names the executable check that would catch its
+   violation** — a test, a differential across implementations, a generator over the boundary's
+   inputs — or records that none exists, which is item 5's unknown. A boundary whose contract
+   lives only in prose is protected by nobody, and it is the check, not the sentence, that later
+   findings become cases of.
 9. **Concept accounting.** Every concept the shape adds and every one it removes. Both lists always;
    "adds one, removes none" is a legitimate answer, leaving it unstated is not.
 10. **Exit state**, exactly one, covering the whole frame; open sub-decisions are listed under

@@ -22,7 +22,12 @@ decision — queue it via `duck-decide`, state that the pass ran ledgerless, and
 the conflict by silently skipping the ledger or silently creating the file.
 
 Append the moment a class fires **twice**. **The second occurrence is the signal to repair the
-method**, not the instance. Seed entries, all one class — an operation that silently does not do
+method**, not the instance. Repairing the method means an executable check over the entire surface
+the class can fire on — every door, every position, derived from the signatures rather than from
+the instances seen — run on every implementation before the next dispatch. Widening the instance's
+neighbourhood, or auditing the surface in prose, is not a repair; it is the third firing waiting.
+A fix that costs one line per round is the signature of an unbounded class, not of a class closing.
+Seed entries, all one class — an operation that silently does not do
 what it looks like: an exit status read through a pipe, an `&&` guard broken by a heredoc, a
 string replace that matched nothing, a `||` fallback substituting the wrong file.
 
@@ -46,6 +51,10 @@ more interesting is not the problem.
 - TODOs: handle now or delete and own the debt. There is no later.
 - The sad path, not just the happy one.
 - A case the suite does not cover, which a green suite cannot tell you about.
+- Every boundary the diff touches, driven with the ledger's malformed-input catalogue at every
+  position — parameter, object key, array index — on every implementation, before dispatch. **A
+  reviewer never runs a catalogue the doer has not run**; a round spent on that is a round bought
+  for nothing.
 
 ## 4. Read what the gates said
 

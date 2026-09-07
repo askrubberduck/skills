@@ -133,7 +133,11 @@ judgment that work is small is itself a claim to attack.
      exit.
    - Blockers land on the original candidate rather than on remediation, and are shrinking round
      over round: the loop is converging and another round is the right spend. An exit like any
-     other — bought with the same committed line, naming what shrank.
+     other — bought with the same committed line, naming what shrank **in ledger classes**.
+     Shrinking is measured in classes, never in blocker counts: one blocker per round from the
+     same class is a flat line, however cheap each fix was. The same class in two rounds closes
+     this exit — the loop takes the rally exit above, at class level, and no further round is
+     bought until that check exists and runs green on every implementation.
    Buying round N+1 bare is not on the list, and the breaker is not self-graded: `duck-review`
    refuses a third or later round's dispatch that carries no recorded diagnosis.
 

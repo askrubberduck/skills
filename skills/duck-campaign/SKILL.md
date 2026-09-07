@@ -30,7 +30,10 @@ is a campaign that stalls the first time that something else is not there.
    `OWNER DECISION` ends the turn, because there is no packet yet to move on to.
 4. **Carve packets** — one packet per independently shippable change, in the repo's work-item
    convention (e.g. `<work-items>/YYYY-MM-DD-topic/`). No mega-packet; if two changes can ship
-   separately, they are two packets.
+   separately, they are two packets. The converse holds too: **findings that share a seam are one
+   packet**, carved first, whose acceptance evidence is the executable check over that seam — the
+   class-level check `duck-proof`'s ledger demands — and each finding is a case of it. One packet
+   per finding is how a campaign spends a review round per instance.
 5. **Plan each packet** via `duck-plan` before any build starts. **No co-authorship line, no
    execute** — a packet whose committed plan does not name the families that co-authored it has not
    been planned, whatever the roster says. Read the committed plan, never the scratchpad: a driver
