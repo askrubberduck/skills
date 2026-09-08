@@ -1,4 +1,4 @@
 interface:
   display_name: "Duck Proof"
-  short_description: "Verify completed work against concrete evidence"
-  default_prompt: "Use $askrubberduck:duck-proof to verify this completed work against concrete evidence before review."
+  short_description: "Make the goal, path and finished work earn your trust"
+  default_prompt: "Use $askrubberduck:duck-proof to try to disprove this goal or solution. Run the checks, challenge the finished shape, and say what actually survived."

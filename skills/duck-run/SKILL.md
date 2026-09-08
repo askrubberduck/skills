@@ -1,171 +1,149 @@
 ---
 name: duck-run
-description: Deliver a high-risk change end to end without trusting any stage of it. Use when the user requests end-to-end delivery with adversarial plan critique, says "duck it" or "ground, plan, critique, execute on green, verify, gate", or asks for a duck run.
+description: Challenge the goal, shape the plan, build it, and make it prove itself; local means local. Use when the user asks to duck a task or carry work through the delivery flow. Continue to independent review and landing only within the authorized endpoint.
 ---
 
 # Duck Run
 
-One change, from unframed to landed, and no stage takes the previous one's word for it — the
-directive stack you would otherwise type as a preamble. Argument: the task.
+Own the whole authorized task. Carry the outcome, constraints, candidate, valid evidence and next
+action across stages. A skill returning a finding is a handoff to this caller, not an automatic
+reason to ask for another go-ahead.
 
-## Precondition: isolate
+## Scope, endpoint and isolation
 
-Provision a dedicated worktree for this run — `.worktrees/<task>/` **at the repo root**, never the
-shared checkout — then switch to it before proceeding: a run that mutates the shared checkout
-collides with parallel runs and breaks campaign isolation. Every worktree this run later spawns
-(Superreview's remediation lanes, a `duck-race` racer) is a sibling under that root, never a child
-of this one. Step back out to the root checkout before `duck-land` runs, because it deletes this
-worktree and cannot delete the directory it is standing in. No `git`, or a host without worktrees?
-Say so and take the next isolation the host has — a clone, or a dedicated branch when nothing else
-runs against that checkout. Sharing a live checkout with another run is the one option ruled
-out. The short path below is the one exemption.
+Read the user's existing authority first. Local implementation ends with a verified local candidate;
+report-only ends with findings or a plan. Commit, PR, push and merge are distinct actions: perform
+them only when authorized. A passed review does not expand that authority. A release whose gate
+cannot run stays unapproved; finish the authorized local work and report what remains.
 
-**Short path.** Work that moves no seam — no boundary between components, no public surface,
-nothing trust-touching (`duck-review`'s term: security-, privacy-, or data-sensitive work, or a
-change to any gate's semantics) — takes `duck-frame`'s short form, skips the worktree, and runs
-Execute through Verify in one pass. What it never skips is Superreview: the gate is the last thing
-to go, not the first. Bought with one committed line, `short-path because: …`, because the
-judgment that work is small is itself a claim to attack.
+Use a dedicated worktree or equivalent copy when runs write concurrently or destructive checks
+need isolation. Worktrees are siblings under the repo root, never nested under another run's tree.
+A small single-worker local edit can use the existing checkout after checking its state. Preserve
+unrelated changes. Worktrees carry committed state only, so capture and verify relevant dirty
+candidate content when making test copies. Step out of a worktree before deleting it.
 
-## Stages
-1. **Ground.** Run `duck-frame`: it reads the project's quality bar, traces the real flow end to
-   end, and settles the shape before anything is planned or written. Laziness shortens the solution,
-   never the reading. **Under a campaign** the campaign's frame binds this one but does not replace
-   it: pass it in as a constraint and frame against this packet's own work item, because
-   `duck-frame` resolves artifacts beside the work item it is given and would otherwise hand the
-   campaign's frame back as this packet's answer. Its artifact comes back here and this stage
-   decides what follows: `READY` continues, `CUT` ends the run, `OWNER DECISION` ends the turn —
-   the first of the five reasons under Rules.
-2. **Plan.** Detailed decomposition: units of work, gates per unit, acceptance evidence.
-   Steel-man at least one alternative decomposition before committing; the first idea is a
-   candidate, not a decision.
-   Packet-sized or trust-touching: co-author the plan via `duck-plan` instead of
-   drafting solo. In doubt about the size, default up — the solo path is bought with one committed
-   line, `solo-drafted because: …`; a routing choice without a receipt is the doer grading its own
-   rigor. **Do not reach Execute without a settled plan** — either a committed plan carrying a
-   `duck-plan` co-authorship line, or a solo-drafted plan that has survived Critique. An unsettled
-   plan is the rejections arriving later instead of now. A plan that already carries that line —
-   one a campaign committed, say — **is** settled: it does not get re-planned here, and Critique is
-   for solo drafts only.
-3. **Critique (adversarial, pre-code) — for solo-drafted plans only.** When `duck-plan` ran in
-   Plan, its multi-round concurrence loop already **is** this stage; a second gate on a
-   co-authored plan is redundancy, not rigor. Otherwise: red-team the plan — wrong decomposition,
-   missing edge cases, simpler design that deletes a concept. Default the critic toward refute, use
-   the strongest available tier, fold findings, loop until the plan survives.
-4. **Execute on green.** Use the host's native staged or multi-agent orchestration when available;
-   otherwise execute the settled stages sequentially. Route stages per `duck-diet`'s stage-routing
-   rule — the full cheap-routing precondition lives there; Verify additionally re-checks its
-   output (a record is checked by reading it back); any unmet precondition runs the stage on the
-   inherited model.
-   **Every code unit runs one cycle: failing test, minimal pass, shape, dry.** Shape and dry belong
-   inside the unit, not downstream of it — the diff is not committed yet, and that is the one window
-   where neither costs ceremony. Defer them and shaping becomes a restructure and drying becomes a
-   sweep; both then need their own commit and their own trip through the gate.
+## 1. Ground and challenge
 
-   - **Shape** (`duck-shape`) is the third beat, where "then refactor" usually goes. Shape the code
-     the unit touched before building on it, and clear superseded paths as the unit's last act: no
-     migrations, no back-compat shims unless the repo demands them. Restructuring code the unit did
-     not touch is its own unit, never a passenger.
-   - **Dry** (`duck-dry`) closes the unit over its own diff, mechanical check included. Per unit
-     rather than at the end, where a week of prose arrives at once and the one code edit riding
-     among the deletions is hardest to see. Draft commits meet the same bar: draft slop leaks
-     through cherry-picks and is the raw material the squash message gets built from.
+Use `duck-frame` to establish or reuse the outcome, current flow, constraints and plausible paths.
+Challenge the link between the requested mechanism and the desired benefit. If the goal is refuted,
+recommend the smaller or corrected path; do not silently substitute a new goal. A material owner
+tradeoff goes to `duck-decide`; separately authorized independent work may continue.
 
-   A unit is finished when both beats have run. Catching either at Verify costs a commit and a
-   second review each.
+READY continues; CUT ends work that is demonstrably unnecessary under the owner's criteria. A
+small settled task uses the short form without creating a commit just to justify its size.
 
-5. **Verify.** Run the project's gates (tests/build/vet or doc gates) — a gate that takes minutes
-   runs in the background, so the turn keeps working while it does; a blocked loop is the cost, and
-   an unread result is the trap — then invoke `duck-proof` on your own diff; trust-touching work
-   also gets `duck-break`'s attacks executed. Their receipts, `proof-rN.md` and `break-rN.md` for
-   the review round they feed, go to the durable records home as `duck-proof` resolves it — never
-   the scratchpad, never a commit on the candidate branch; no file, no pass happened. Evidence over
-   assertion — a failed or unrun check means not done; say so with output.
-6. **Independent superreview.** Never self-approve. Use the project's review policy — default:
-   the `duck-review` / proven different-family gate. `duck-review` executes one review,
-   adjudicates its reviewers, and returns one authoritative `APPROVE | REJECT | NOTE`; this stage
-   acts on that result without reinterpreting the raw reviewer votes.
+## 2. Plan with proof
 
-   **a. Prepare and invoke.** Verify's receipts exist first: `duck-proof`'s fifth section edits
-   the candidate, so a proof pass after the SHA is recorded leaves the authorization pointing at
-   code nobody reviewed. Then commit the candidate and record its SHA — the review names an exact
-   target and landing requires that SHA, so a review of an uncommitted worktree cannot be landed.
-   Confirm any required committed plan evidence, then invoke `duck-review`. The review checks these
-   artifacts but never creates them.
+Use `duck-plan` for substantial or uncertain work. A narrow task can keep a short plan in the work
+record: intervention, affected invariant, falsifying check and expected final observation. Reuse
+an existing settled plan when its scope and assumptions still hold.
 
-   **b. Act on the superreview result.**
-   - `APPROVE`: for a mergeable change, invoke `duck-land` to ship and record it.
-   - `REJECT`: name each substantiated blocker's cause before touching it — `duck-why` when the
-     blocker reports a symptom and the defect behind it is not already obvious from the diff. Then
-     execute by deleting the unnecessary thing, fixing the defect, or escalating a genuine owner
-     decision through `duck-decide`. Never treat a raw reviewer claim that the superreview
-     dismissed as a work order.
-   - `NOTE`: record and surface what stood out. It neither authorizes landing nor rejects the
-     candidate. If a gate decision is required, resolve the missing criterion, evidence, or owner
-     decision before requesting another review.
+Select the challenge approach and participants from
+[challenge selection](../duck-review/references/challenge.md). Independent authorship and critical
+review are alternatives, not two mandatory tolls. Attack consequential assumptions with the cheapest
+experiment before building on them. Record actual participation; a self-check is not cross-family
+co-authorship. A local plan need not be committed. Respect repository release requirements later.
 
-   **c. Remediation lanes.** When confirmed blockers fan wide, split remediation by **file
-   ownership** — one lane owns a file, and a finding spanning two files belongs to exactly one lane
-   named in both briefs. Concurrent lanes get a worktree each; one checkout shared by lanes that
-   each rebuild and run the suite collides on the index and on test output, and the result is
-   neither lane's. Lanes never self-approve. **Lanes converge before the next review, never after
-   it**: each rebases onto the candidate branch in turn, the file-ownership split guaranteeing no
-   lane rewrites another's work, and the merged result becomes the new candidate. It gets one
-   verification run of its own — per-lane green does not compose, exactly as it does not for
-   `duck-race`'s merged candidate. A lane whose worktree still exists is a lane that has not
-   landed. After a material change, rerun verification and `duck-proof`, then request a new
-   superreview of the new candidate. Never re-dispatch an unchanged candidate or loop to
-   manufacture reviewer unanimity.
+A refuted decomposition is replanned; agreement alone never makes it ready. Bound plan critique as
+`duck-plan` specifies instead of waiting for every participant to concur.
 
-   **d. The circuit breaker** fires before every third or later round. Stop dispatching reviews
-   and judge the loop's shape before spending anything else. The diagnosis is a judgment, not a
-   routing table — recorded in one committed line (`loop-diagnosis: <shape> → <exit>, because …`)
-   — and it picks the exit from the whole toolbox:
-   - Blockers contradict the settled design: re-run `duck-frame` naming the contradiction —
-     the same rule this run already applies to any disproved stage-1 claim.
-   - Blockers cluster on unit seams or the decomposition itself: replan via `duck-plan`.
-   - Blockers attack remediation-born code under settled criteria — the review is red-teaming
-     its own byproducts and iteration cannot terminate it: rebuild the contested unit via
-     `duck-race`'s race mode, where executed evidence adjudicates and review becomes selection
-     instead of iteration, or lock each finding class in as a failing test via its rally mode, so
-     a regression is executable instead of prose.
-   - Blockers dispute scope or design intent: `duck-decide`; a written owner freeze is a valid
-     exit.
-   - Blockers land on the original candidate rather than on remediation, and are shrinking round
-     over round: the loop is converging and another round is the right spend. An exit like any
-     other — bought with the same committed line, naming what shrank **in ledger classes**.
-     Shrinking is measured in classes, never in blocker counts: one blocker per round from the
-     same class is a flat line, however cheap each fix was. The same class in two rounds closes
-     this exit — the loop takes the rally exit above, at class level, and no further round is
-     bought until that check exists and runs green on every implementation.
-   Buying round N+1 bare is not on the list, and the breaker is not self-graded: `duck-review`
-   refuses a third or later round's dispatch that carries no recorded diagnosis.
+## 3. Execute the smallest surviving path
 
-## Rules
+For each meaningful behavior change: establish the failing outcome, implement the minimum that
+satisfies it, apply `duck-shape`, then `duck-dry`. Use existing checks where possible; trivial edits
+need no invented test. Shape and dry apply within the unit before later work depends on it.
 
-- **A turn ends for five reasons and no others**: a decision genuinely the owner's; an owner
-  instruction to stop or narrow; an external block (spend limit, refused authorization); the work
-  complete; or a scheduled handoff. Anything else: keep going.
-- **An obstacle is a stage, not an exit.** An unreadable path or a failed assumption means route
-  around it and record the route. A refused authorization is the exception — that is a hard stop,
-  and no alternative route may shed the authorization the first one needed.
-- **Ground's design is a claim like any other.** When execution disproves it, re-run `duck-frame`
-  naming the contradiction instead of improvising against it. Argue the goal; never swap it.
-- **Mid-flight input is an extra command, not a new job.** Finish the running step, apply the
-  addition, report both. **Exceptions that take effect immediately:** input that narrows, redirects,
-  or withdraws authority ("stop", "don't merge").
-- **Close every turn against the ask.** Reconcile item by item: what was requested, what was
-  delivered, what was not. Name the open owner-decision count when it is non-zero.
+Remove superseded paths once the replacement is verified. Preserve required compatibility and
+public contracts; do not add speculative shims or delete a real edge case because scope is unclear.
+An unrelated restructure is separate work. Selected finding IDs delimit repairs; do not silently
+fix every item in the report.
 
-## Common mistakes
+Use native staged or parallel execution only where it helps independent work. `duck-diet` governs
+context and model routing; a cheap worker still needs a check that catches its failure. Converge
+parallel edits before verifying the assembled candidate, with one owner per file during concurrent
+remediation. Per-lane green does not prove the merged result.
 
-- **"Say the word and I'll start"** — handing a plan back for a "go" is a bug, not politeness. The
-  go-sign was the initial directive.
-- **Treating a review finding as a work order** — under pressure the fastest way to look responsive
-  is to add code. Every fix pass starts with "would deleting this end the finding?".
-- **Judging by diffstat instead of shape** — shrinking a diff while tangling the flow is worse than
-  growing it to untangle it.
-- **Silently dropping deferrals** — unresolved decisions go into the project's registry, never into
-  the void.
-- **Adding complexity for ambiguous scope** — if the scope is ambiguous, cut the edge case; do not
-  over-build for a hypothetical.
+## 4. Verify and try to break it
+
+Run relevant project gates and `duck-proof` on the actual candidate. Proof owns claim-specific
+counterexamples, final-state observations and the completed-shape probe. **Any proof or shape edit
+returns to affected executable checks before completion or dispatch.** Earlier green evidence does
+not survive a relevant repair. Read the outputs and the resulting state, not just exit codes.
+
+Use `duck-break` for requested broad attacks and the dynamic evidence required for trust-touching
+work. Select attacks appropriate to the artifact: agent behavior trials for skill/gate changes,
+service recovery tests for a service whose recovery is claimed. Do not substitute distribution
+validation for behavioral proof or label an unrun check passed.
+
+Write handoff evidence using `duck-proof`'s durable-home rules. A shared work record may hold the
+proof, break and plan sections; give the consumer exact locations. Preserve essential artifacts
+before scratch cleanup. An authorized local task can finish here with its evidence and any stated
+verification limits, without creating a commit, PR or release verdict.
+
+## Review-loop ownership and stable criteria
+
+The coordinating caller owns convergence, including when nobody is available to answer questions.
+Name that coordinator in the existing work record; preserve the role across handoffs. Reviewers
+produce evidence and judgments, not a new backlog for automatic execution. The coordinator resolves
+technical findings within authority, tracks causes and owns the next action; only the user can
+settle a genuinely new product, policy or scope decision.
+
+Before the first review, record the outcome, non-goals, required contracts, acceptance checks,
+release policy, participants and effort bound. Carry that baseline across rounds. Default to at
+most three review rounds total (initial review plus two re-reviews), unless the user or repository
+sets another bound. Reframing, changing reviewers or renaming the task does not reset it. Transport
+retries follow `duck-review`'s separate bounded outage rule.
+
+Track findings by stable cause, with the violated criterion, evidence, disposition and closure
+check. A reworded finding is not new. Reopen a closed cause only with contrary evidence or an
+impacting change. A newly discovered defect against an existing contract can still block; a new
+preference, feature or unrelated cleanup is separate proposed work, not a stronger acceptance bar.
+Do not silently promote SHOULD/NOTE items into required repairs.
+
+At the bound, stop redispatching and preserve the candidate, unresolved evidence and next action;
+release stays unapproved. If new evidence undermines the agreed goal, report the contradiction and
+hold dependent work without inventing replacement criteria. Without the user, make authorized
+technical decisions and continue independent work; do not guess their tradeoff or loop waiting for
+agreement. A later explicit continuation can supply a new bound; elapsed time cannot.
+
+## 5. Independent review, when requested or required for release
+
+Prepare the candidate and evidence before invoking `duck-review`. If committing is authorized,
+record the exact commit; otherwise review an explicit worktree snapshot and do not treat that as a
+landable SHA. A gate-policy change is reviewed under PRE-change rules, never its own relaxed rules.
+
+Act on the single adjudicated result:
+
+- APPROVE: continue only to the already authorized release action.
+- REJECT: name each substantiated blocker's cause, using `duck-why` when it is not established.
+  Repair at the level the evidence refutes: line, shared contract, mechanism, or goal. Rerun
+  affected verification before reviewing the changed candidate.
+- NOTE: resolve missing material evidence or criteria if possible. It is neither approval nor a
+  reason to invent a repair. An unavailable gate does not prevent completing authorized local work.
+
+Before a third or later review round, record a loop diagnosis. Contradicted premises go to frame;
+wrong decomposition to plan; repeated missed cases to an executable class-level check or
+`duck-race` rally; rival implementations to race; real owner tradeoffs to decide. Continue review
+only when a named unresolved cause is shrinking and new evidence will be available. Repeated
+blockers from one class require repairing the method, not buying another round on the same basis.
+Respect the owner's effort bound; at the limit state unresolved claims, never manufacture approval.
+
+## 6. Land only when authorized
+
+Use `duck-land` for an authorized merge after its gate passes. It checks the exact candidate/base,
+CI and remote policy, reads back what shipped, records the outcome and preserves work before
+cleanup. Push-only or PR preparation performs only that authorized action under repository rules;
+it is not a merge request. New code or a changed integration invalidates the affected authorization.
+
+## Continuation
+
+New owner input steers the current task; narrowing or withdrawal of authority takes effect
+immediately. Reuse settled decisions. A tool outage gets a bounded retry or another authorized
+mechanism; a permission rejection does not. Keep working until the authorized endpoint, a genuine
+owner decision on dependent work, an external block, an instruction to stop, or a real scheduled
+handoff. Never claim a handoff was booked without a host result confirming it.
+
+At a context boundary, preserve the outcome, source/candidate identity, valid evidence, unresolved
+claims and next authorized action. Use host compaction, a fresh session or a scheduled continuation
+according to actual capabilities and need, not a universal reset rule. Close with what changed,
+what was tested, and what remains unproven or unauthorized.

@@ -44,7 +44,11 @@ or gets consciously discarded. Lessons that live only in a chat transcript are l
    gate, or an instruction file is trust-touching, so it travels the same plan and review path as
    any other change to them — derive it, write it up, hand it on, never land it unreviewed.
 5. **Close the loop**: procedural guidance (a skill, a workflow rule) gets one rep before it's
-   trusted — reserve one occurrence as a holdout BEFORE deriving (derive from the rest; deriving
+   trusted. Check observable behavior, not whether the agent repeats the new rule: execute a
+   counterexample, verify final artifacts, and record the candidate guidance, prompt, oracle and
+   result. Pair opposite user preferences when testing agreement bias. Use an old-guidance baseline
+   before claiming improvement; one successful rep proves only that case.
+   Reserve one occurrence as a holdout BEFORE deriving (derive from the rest; deriving
    from every occurrence leaves nothing to test with), state the expected outcome, then run the
    guidance against that holdout — an occurrence it was NOT derived from — and attack the result
    with `duck-proof` discipline; a failed rep sends the guidance back to draft.

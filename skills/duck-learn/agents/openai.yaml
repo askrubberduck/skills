@@ -1,4 +1,4 @@
 interface:
   display_name: "Duck Learn"
-  short_description: "Turn delivery evidence into reusable lessons"
-  default_prompt: "Use $askrubberduck:duck-learn to extract reusable lessons from these sessions and outcomes."
+  short_description: "Make the next mistake a different one"
+  default_prompt: "Use $askrubberduck:duck-learn to turn these sessions into lessons worth keeping. Show the evidence and test the new guidance before trusting it."

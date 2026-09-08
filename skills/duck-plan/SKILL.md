@@ -1,69 +1,81 @@
 ---
 name: duck-plan
-description: Catch architectural and implementation risks before the code catches them for you. Use when planning or implementing large, architectural, security-, privacy-, or data-sensitive work, including when implementation is about to start against no plan at all, when a plan needs decorrelated co-authorship rather than a same-family draft, or when similar work previously failed several review rounds.
+description: Find the hole in the plan before building over it; assumptions and acceptance checks must survive challenge. Use for architectural or high-risk work, planning with proof, competing decompositions, or changes that previously needed repeated review fixes.
 ---
 
 # Duck Plan
 
-Decorrelated rigor arrives either as *co-authorship* now or as *rejections* later. Do NOT draft a
-plan same-family and send it out for adversarial review; let the other families co-author it.
+A plan is an argument that the proposed work reaches the outcome. Independent agreement can
+expose blind spots; it cannot establish feasibility or replace executable evidence.
 
-## Recipe
+## Ground and choose the challenge
 
-1. **Start from a framed design, never a fresh guess.** Read `design-<unit>.md` beside the work
-   item: it carries the seam map, the requirements, the rejected alternatives, and the pinned
-   source this plan decomposes. Always reach it by running `duck-frame` and waiting: its
-   preflight owns freshness and returns a settled artifact untouched, so re-deciding here would be a
-   second, weaker copy of that test — digests cannot see a changed ask. Then check what this plan
-   will actually touch: **anything you are about to decompose that the frame never looked at means
-   the frame is incomplete, not merely stale** — re-frame rather than filling the gap here. **No framed design, no dispatch** — a plan whose architecture
-   was invented in the same turn as its task list has nothing decorrelated about it.
-2. **Establish the doer's model family from self-reported runtime metadata, then ask independent
-   reviewer CLIs to PRODUCE plans, not review one**: "author the safest build plan, the task
-   decomposition, the simpler design that deletes a concept, and the traps you'd attack", with the
-   design + seam map provided. **Two required co-authors** — `duck-review`'s count — at least one
-   proven a different model family than the doer; a same-family session
-   may add evidence but never counts as decorrelated. Each required co-author meets
-   `duck-review`'s reviewer bar — family and tier, pinned model id recorded beside its plan.
-   Take each CLI's family from its harness roster rather than from the executable name. Use the
-   dispatch mechanics, neutral cwd, absolute-path/background rules, and the export authorization
-   `duck-review` requires before any dispatch leaves the machine.
-   Raw plans land as `$SP/plan-<family>.md` (`$SP`: an absolute path under the host's sanctioned
-   scratchpad root, as `duck-review` defines it) — scratchpad only, never committed; unlike a
-   receipt, a raw co-author plan is working material the committed co-authorship line supersedes.
-   **No files, no co-authorship** — a synthesis without a proven different-family plan is a solo
-   draft.
-3. **Synthesize** the independent plans + your own analysis into ONE plan. Reconcile
-   disagreements about what *is* by READING SOURCE (`git show <sha>:path`), never by vote.
-   **Disagreement about what *should* be — a design intent, a public boundary, a policy — has no
-   source to read**: route it to the owner via `duck-decide` rather than settling it as the doer.
-   Co-authored plans produce exactly this kind of disagreement by design; deciding it yourself
-   discards the reason the other family was asked.
-4. Apply a cut pass: any task the synthesis shows unnecessary dies here — cheapest build is the one
-   not built. Same blade for the design: an abstraction with one implementation, or a second home
-   for a fact that already has one, dies with it. Same blade for the decomposition: tasks that
-   mirror a list of reported instances die into one task that builds the check over the whole
-   surface those instances share — every door, every position — and runs it before anything
-   ships; the instances become its cases. A plan sequenced instance by instance ships the first
-   fix into a review that finds the second.
-5. Fix-pass the draft **in place**, multi-round (r1, r2, …), until every required co-author,
-   including at least one proven different family, concurs. The draft is a working doc — no commit
-   per round; commit the settled plan once.
-   **The committed plan carries its own co-authorship line**: which families authored, which
-   disagreed, and how each disagreement was settled. That line is the durable evidence — the
-   scratchpad dies with the session, so anything gating on co-authorship reads the committed plan,
-   never `$SP`. A plan without it is unplanned work with a plan-shaped file. The line is written by
-   the doer, so make it checkable rather than claimable: name each pinned model id, quote the
-   sentence that carried each disagreement, and state what the other family actually argued. A line
-   that names families and nothing they said is a line anyone could have typed without dispatching.
-6. Keep the binding decorrelated CODE gate after the build (`duck-review`). Co-authored
-   plans make it converge; they don't replace it.
+Use `duck-frame` to establish or reuse the outcome, constraints and affected paths. If the plan
+reaches a boundary the frame did not examine, complete that analysis first. A small settled task
+may use the short form; do not restate an unchanged frame. Challenge whether the proposed goal
+and mechanism deliver the intended benefit before treating them as premises.
 
-## Red flags
+Select participants and approach using [challenge selection](../duck-review/references/challenge.md).
+A narrow plan can be self-checked with competing hypotheses and a decisive experiment. Otherwise
+use an independent co-author or critic; broader work may justify two. Respect the selected setup
+and repository requirements. Do not imply cross-family review when no such participant ran.
+Use `duck-review`'s [dispatch mechanics](../duck-review/references/dispatch.md) for external calls.
 
-- "The plan is simple, review after building is enough" — that is how long gates start.
-- A skill named in an imperative step — "run X", "route it to X" — is an **instruction to invoke
-  it**. A skill named to say who owns a lens or where work goes next is a citation, and reading one
-  as a dispatch is how a read-only pass starts mutating.
-- A refuted attack is not a defended design; N red-teamed mutations are not coverage of the N+1th.
-- One option enumerated is no decision made — synthesis needs real alternatives to reconcile.
+For independent generation, provide the outcome, constraints, source and alternatives still open,
+not the doer's preferred plan. Each co-author produces a decomposition before seeing the others'.
+For a critical review of an existing plan, provide that plan and ask what would falsify it. These
+are different methods; choose by the uncertainty, not a rule that every task must use both.
+
+## Shape before decomposition
+
+Apply `duck-shape` in analysis mode before dividing the work: trace the proposed end-to-end path,
+assign one owner per rule and state, compare reuse/deletion with new mechanisms, and try a realistic
+next change against the proposed boundaries. Reuse a frame's valid structural analysis. This is
+part of planning, not a refactor or a deferred cleanup task. Carry its preserved contracts and
+structural checks into the units; proof later checks the assembled result against them.
+
+## Plan the evidence with the work
+
+Each meaningful unit names:
+
+- the required observable outcome and intervention that should cause it;
+- the assumption or failure mode that would refute that intervention;
+- the check that fails beforehand and should pass afterward, or the feasibility experiment needed
+  before code exists;
+- dependencies, affected invariants, and how the completed result will be observed.
+
+Use existing tests and platform mechanisms when they fit. Do not manufacture tests for trivial
+edits. A check copied from the proposed implementation can encode the same mistake: derive it
+from the outcome. Run the cheapest experiment on a consequential unknown before endorsing work
+that depends on it. Name checks not yet run; a ready plan is not a proven implementation.
+
+## Compare and cut
+
+Compare credible decompositions, including reuse or deletion where they could satisfy the same
+outcome. Prefer one owner per rule or state and fewer exceptional paths. An abstraction with one
+implementation needs a real contract or change-path justification; its count alone neither
+condemns nor saves it. Use `duck-shape`'s lens and preserve necessary boundaries and calibration.
+Consolidate repeated findings on one cause into a unit that checks and repairs the shared surface.
+
+Resolve factual disagreements with source or an experiment. Explain internal reversible choices
+using the evidence. Only a genuine owner tradeoff goes to `duck-decide`; routine disagreement
+between models is not automatically an owner decision. Contrary evidence about the goal returns
+to frame. Do not force a synthesis of incompatible designs just to keep something from each plan.
+
+## Settle without an agreement loop
+
+Synthesize once, then address substantiated challenges. Before dispatch, state the unresolved
+question and round bound; default at most two critique rounds after the initial draft unless the
+owner supplies another limit. Another round needs new evidence or a materially changed approach.
+If no progress is being made, change the experiment or report the unresolved claim. Do not loop
+until every participant concurs, discard justified dissent, or count repeated phrasing as progress.
+
+Return READY when the outcome, decomposition and checks are settled with no substantiated blocker;
+otherwise identify the refuted premise, missing evidence or owner decision. Record which checks
+ran, participants' verified identities, the selected method, disagreements and their resolution.
+A solo draft is labeled solo; a list of family names without what they contributed is not evidence.
+
+Save a handoff beside the work item when execution needs it; update one plan in place. Follow
+`duck-proof`'s evidence-home rules. Commit only when authorized, not as a prerequisite to local
+planning. Report-only stops at the plan; an executing caller resumes the authorized work.
+Planning evidence does not replace the later `duck-review` gate required for release.

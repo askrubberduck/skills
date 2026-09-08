@@ -1,4 +1,4 @@
 interface:
   display_name: "Duck Race"
   short_description: "Two model families, one problem, evidence decides"
-  default_prompt: "Use $askrubberduck:duck-race to put two decorrelated families on this and adjudicate on executed evidence."
+  default_prompt: "Use $askrubberduck:duck-race to give two model families this problem independently. Run the same outcome checks and let the evidence pick the result."

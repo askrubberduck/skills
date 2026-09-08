@@ -1,4 +1,4 @@
 interface:
   display_name: "Duck Decide"
-  short_description: "Resolve owner decisions one at a time"
-  default_prompt: "Use $askrubberduck:duck-decide to walk me through these owner decisions one at a time."
+  short_description: "Face the decisions you have been ducking"
+  default_prompt: "Use $askrubberduck:duck-decide to walk me through the decisions only I can make, one at a time. Bring evidence and a recommendation."

@@ -5,116 +5,60 @@ description: Run one independent cross-model superreview and deliver an evidence
 
 # Duck Review
 
-The doer is never the final judge. Use a **different model family**, never a same-family second
-pass. If no decorrelated family is available, fail closed. *Final* carries the weight: this gate
-takes the doer's authority to approve, never the doer's duty to validate and question the candidate
-first — an unscrutinized candidate wastes the round.
+Independent scrutiny precedes release approval. The builder must validate the candidate first;
+a reviewer is not a substitute for the doer's own breaking attempts. If the builder adjudicates
+the independent findings, identify that limited independence rather than claiming the final
+judgment was wholly external.
 
-**One invocation, one judgment.** A superreview may consult several independent reviewers, but it
-does not loop until they approve and it is not a vote. Inspect their claims, adjudicate the evidence,
-and return one authoritative result. Never edit the candidate, produce its prerequisite artifacts,
-repeat the review after fixes, or land it; the calling agent or workflow owns that execution.
+**One invocation, one judgment.** Never edit the candidate, create its prerequisite evidence, loop
+until reviewers approve, or land it. The caller owns repairs and the next authorized action.
+Analysis-only returns findings without implying release approval.
 
 ## Prepare the review
 
-`$SP` is this review's scratchpad: an absolute path under the host's sanctioned scratchpad root
-(for example, `<scratchpad-root>/<topic>-review`), created before step 1. Keep every dispatch
-artifact there. `rN` numbers review invocations, not an internal approval loop.
+1. Resolve the exact base, candidate and requested judgment. For a release use the last released
+   tag through the candidate, not adjacent commits; for a PR use its own base. An intentionally
+   captured dirty worktree can be reviewed, but landing later needs an authorized exact commit.
+2. Use the caller's recorded outcome, constraints and acceptance baseline across review rounds.
+   For a standalone review, establish that baseline once. Name the coordinating caller who owns
+   convergence, prior findings and the remaining round bound; `duck-run` defines the default loop
+   contract for an executing caller. Treat the mechanism and its benefit as
+   claims to challenge. If new evidence refutes the goal or criteria, return that contradiction;
+   do not silently rewrite acceptance criteria to pass or fail the candidate. Each blocker names
+   the existing criterion, required contract or binding policy it violates and the supporting
+   evidence. A newly discovered real defect may block even when earlier reviewers missed it.
+   New preferences, features and unrelated cleanup are proposals outside the gate's acceptance bar.
+   Retain stable cause IDs and prior dispositions; reopening needs new contrary evidence or an
+   impacting change, not another reviewer's wording.
+3. Select the required participants and effort bound using
+   [challenge selection](references/challenge.md). Ordinary gates default to one verified
+   cross-family reviewer; trust-touching gates default to two as that reference specifies.
+   Record the selected set before dispatch. A gate-semantics change uses the PRE-change rules,
+   including prerequisites and participant count; the new text cannot authorize itself.
+4. Check the caller's evidence using `duck-proof`'s durable-home rules. A release gate requires a
+   proof receipt tied to the final candidate; packet-sized or trust-touching work also needs the
+   settled `duck-plan` record, including its actual challenge and any required independent input.
+   Trust-touching work needs `duck-break` evidence appropriate to the changed surface. Instruction
+   changes need agent behavior trials, not invented service crash tests. A shared work record with
+   explicit proof/plan/break sections is equivalent to separate named receipts when all consumers
+   can resolve it. Existing `proof-rN.md` and `break-rN.md` conventions remain valid.
+5. Spot-check cited commands or artifacts; file presence alone is not evidence. A repair invalidates
+   relevant earlier checks. For re-review, inspect the new delta and affected paths, reopen impacted
+   findings, and reuse only evidence whose assumptions still hold. Never check only the old finding
+   list. Missing material evidence means the gate cannot approve; a standalone opinion may still
+   report what it can establish.
+6. Do not dispatch beyond the caller's recorded bound; return the unresolved status and evidence
+   without approval. For a third or later review round, require the caller's recorded loop diagnosis: why another
+   round will add evidence, or which reframe/replan/race/rally/owner-decision exit it selected.
+   Judge progress by unresolved causes, not wording or finding counts. A local record needs no
+   commit unless the repository requires one. Do not dispatch an unchanged candidate just to seek
+   a friendlier verdict.
 
-**Trust-touching** means security-, privacy-, or data-sensitive work, or a change to any gate's
-semantics.
-
-**Establish that the export is authorized before spending a round.** This gate works by sending the
-candidate's contents to model vendors outside the machine it runs on; that is what decorrelation
-buys and it is not a transport detail. Confirm the owner has authorized sending *this repository* to
-the named external families, and record where that authorization lives, in the durable records home
-beside the receipts. A host that refuses the dispatch on those grounds has asked the owner's
-question, not thrown an error: `Rejected("… can transmit private repository contents to an
-untrusted third-party destination …")`. Route it to `duck-decide`, never to a re-dispatch: an
-authorization question answered by retrying is the failure this precondition exists to prevent. No
-authorization, no dispatch; say so to the caller.
-
-1. Resolve the exact review target: `gh pr diff <N>`, packet draft, committed object, or an
-   intentionally captured worktree diff. A release candidate spans the last released tag to the
-   exact candidate commit, with both full SHAs stated in the prompt; a PR keeps its own base. Never
-   guess a range from adjacent commits or review a different checkout.
-2. Take acceptance criteria from the work item, PR, or user's request; never invent them at
-   dispatch. Freeze them for this invocation.
-3. Check, but do not produce, the candidate's evidence, in the project's durable records home as
-   `duck-proof` resolves it — never the scratchpad:
-   - `proof-rN.md` from `duck-proof` for every review;
-   - the committed `duck-plan` co-authorship line for packet-sized or trust-touching work;
-   - `break-rN.md` from `duck-break` for trust-touching work.
-
-   For a third or later round on the same work (N≥3 in `rN`), the dispatch also carries the
-   caller's committed loop diagnosis (`loop-diagnosis: …`): which breaker exit was weighed —
-   `duck-frame` re-frame, `duck-plan` replan, `duck-race` in either mode, `duck-decide`, or a
-   further round on a loop the caller shows is converging — and why the chosen exit is the right
-   spend. No diagnosis, no dispatch: the gate does
-   not sell round N+1 to a caller that has not judged its own loop. A diagnosis that claims
-   convergence names what shrank in ledger classes; one that counts blockers per round has not
-   judged the loop, and the dispatch is refused the same way.
-
-   **No receipt, no dispatch — and presence is not verification**: spot-check each receipt by
-   re-running or inspecting at least one claim's cited command or artifact; a claim that does not
-   check out is a finding against the receipt. A change to this gate's own semantics is reviewed
-   under the PRE-change rules; the new rules bind the next candidate.
-4. Record the doer's self-reported model family. Name two required reviewers from two different
-   model families, with at least one proven different from the doer. Each runs the **strongest tier
-   of its family the host lists and you can pin**: decorrelation buys independence; tier buys rigor.
-   Record the pinned model id plus the listing command and output that ranked it. Executable names
-   are not identities: one harness routinely hosts several families — `agy` serves Gemini, Claude,
-   and GPT-OSS from the same binary — while nested `codex` remains OpenAI/GPT when the doer is
-   OpenAI/GPT. Unknown identity never counts as decorrelated.
-
-   **The harness's roster is the family of record.** A model asked what it is answers from its
-   prompt, and that claim is unfalsifiable. Print the harness's roster, find the pinned id in it,
-   and take the family the roster attributes to that id; if it matches the doer's, the reviewer is
-   not decorrelated whatever the binary is called. Record that roster line beside the pinned id.
-   A harness that prints no roster establishes no family: `codex` warns "Defaulting to fallback
-   metadata" and proceeds, and that is unknown identity, not a passed check. **Prove the pin took
-   before spending the round**: send a deliberately invalid `--model` and confirm the CLI errors
-   with its roster. A harness that accepts garbage has a meaningless pin.
-
-   Give each reviewer **its own scratchpad directory**. Reviewers that share one can read — and
-   overwrite — each other's output before synthesis reads it, which buys correlation in the one
-   place the gate is paying for independence.
-5. Write one prompt to `$SP` containing the target, frozen criteria, and receipts as claims to
-   attack, never as a coverage map. Require the result contract below. Missing receipt evidence is
-   itself a finding. Reviewer default: refute, not bless.
-
-## Run the reviewers
-
-Run from a neutral scratch directory, never the target checkout. Close stdin, use absolute paths,
-and run in the background because reviews can take 10–45 minutes. Minimum shapes:
-
-```bash
-codex exec -m <strongest-listed> --skip-git-repo-check "$(cat $SP/prompt.md)" </dev/null > $SP/codex-rN.out 2>&1
-agy --model <verified-non-doer> --add-dir "$SP" --print-timeout 45m -p "..." </dev/null > $SP/agy-rN.out 2>&1
-```
-
-**The prompt is an argument; the material under review is a path inside it.** Hand the reviewer
-your instructions on the command line, and have those instructions name the diff, corpus, or files
-by absolute path for the reviewer to open — never paste that material into the command. Pasted
-material degrades the verdict — 28 of 41 flipped in one comparison against the same pinned model
-on the same target, every flip toward the finding standing, the pasted run quoting the corpus
-fluently and wrong — and forces a no-tools constraint, the prompt shape that provokes the
-permission-denied outage.
-
-Sanity-check a new invocation form with `-p "Reply with exactly: OK"`. These traps yield plausible
-reviews at exit 0:
-
-- An unpinned invocation can silently use the wrong model family. Always pin `--model`, and prove
-  the pin per step 4.
-- The prompt must be an **argument**. `--print "<text>"` can drop it, and a prompt redirected on
-  **stdin** is discarded entirely — the reviewer answers with a greeting at exit 0.
-
-A zero-byte, greeting-only, timed-out, or crashed dispatch is an outage: a dispatch attempted that
-produced no verdict. **A degraded dispatch is the harder case — full length, well formed, and
-wrong.** Nothing in the exit status distinguishes it, so before trusting any result, read three of
-its justifications and confirm each quote actually supports its verdict; one that cites the claim
-under attack as proof of that claim is a malformed result, recorded as such and not counted.
-**A REJECT is never an outage**, and a same-family pass never substitutes for a required reviewer.
+Use [dispatch mechanics](references/dispatch.md) for identity, isolation, export authority and
+transport checks. Pass review material by absolute path with source access; the brief carries
+requirements and receipts as claims to attack, never as a coverage map. Reviewers should seek a
+credible counterexample and a simpler valid path, substantiate their findings, and accept a claim
+that survives. Neither owner preference nor a mandate to be negative is evidence.
 
 ## Reviewer result contract
 
@@ -139,7 +83,8 @@ a recorded reason.
 point** — the reviewers are decorrelated but the synthesis is not, and dismissing a true finding
 looks identical to dismissing a false one. Say so in the report, dismiss only on evidence a third
 party can re-check from the artifacts, and let a finding you cannot settle stand rather than fall.
-A tie goes to the reviewer.
+A substantiated blocker stands until resolved. An unsubstantiated suspicion is not a blocker;
+if missing evidence prevents a gate decision, return NOTE and name the uncertainty.
 
 - Check the repository's own conventions before accepting a demand for a new artifact. Existing
   evidence beats reviewer-invented ceremony.
@@ -158,7 +103,8 @@ A tie goes to the reviewer.
   contested unit under `duck-race`'s race mode, or lock the class in under its rally mode —
   instead of implicitly inviting the next round.
 - Count concepts, not lines: identify any new branch, exception, or second home for the same fact,
-  any abstraction with a single implementation, and any unit that took on a second job.
+  any abstraction without a required contract or credible change-path justification, and any unit
+  that took on a second job.
   `duck-shape` owns this lens at change time; this gate reports any miss to the caller.
 - A comment that states something false about the code is a defect, ranked on what it misleads
   about. A demand for explanatory comments is not: where the code is unclear the fix is the code,
@@ -170,10 +116,10 @@ A tie goes to the reviewer.
 
 Return exactly one superreview result:
 
-- `APPROVE` — a gate decision was requested, **both required reviewers returned a verdict**, and no
+- `APPROVE` — a gate decision was requested, **every required reviewer returned a usable verdict**, and no
   substantiated `BLOCKER` remains. An outage on a required reviewer bars `APPROVE`: it produced no
-  findings, which is not the same as finding nothing. Re-dispatch it, or return `NOTE` and say which
-  family is missing.
+  findings, which is not the same as finding nothing. Retry an outage once within the effort bound, or return `NOTE` and say which
+  participant is missing. Never reduce the required set after dispatch.
 - `REJECT` — at least one substantiated `BLOCKER` remains.
 - `NOTE` — something material stands out, but no gate decision was requested or the available
   criteria and evidence do not support one. `NOTE` neither authorizes nor rejects the candidate.
@@ -185,18 +131,20 @@ may land only `APPROVE`; a superreview `NOTE` is a non-decision, not a hidden pa
 
 Report the authoritative result, each reviewer's pinned model id and family, each raw verdict, every
 finding's adjudicated classification and evidence, any outage or downgrade, and the exact target and
-criteria reviewed. Never commit raw CLI stdout; keep it in `$SP`.
+criteria reviewed. Keep raw CLI stdout in scratch; preserve the decisive evidence before scratch cleanup.
 
 **Write that report where the landing gate can read it** — the same durable records home as the
 receipts, never only into the caller's context or `$SP`, and never as a commit on the candidate
 branch. A verdict that exists only in a session transcript cannot be checked later, and
 `duck-land` needs the authorization itself, not a recollection that one was granted.
 
-Then stop. Persisting the result, executing a fix or deletion, resolving an owner decision,
+Then stop. Acting on the result, executing a fix or deletion, resolving an owner decision,
 reviewing a materially changed candidate, and landing belong to the calling agent or workflow.
 
-## Optional lens: product fit
+## Goal and product fit
 
-When the user requests product-fit review, use the same single invocation and judgment with this
-lens: does the change fit the product's scope, what should be cut, and is the boundary where users
-need it? Weigh functionality, extendability, and security; never weigh sunk implementation effort.
+Challenge whether the requested mechanism delivers the stated benefit. When the user asks to
+challenge the goal itself, assess its evidence and alternatives too. Ground objections in the real
+product constraints; do not invent deployment states or substitute another goal. Present genuine
+value, cost or schedule tradeoffs to the owner. Sunk implementation effort does not justify keeping
+a mechanism that fails its outcome.

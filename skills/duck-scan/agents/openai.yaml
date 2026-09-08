@@ -1,4 +1,4 @@
 interface:
   display_name: "Duck Scan"
-  short_description: "Find ready, blocked, and remaining work"
-  default_prompt: "Use $askrubberduck:duck-scan to find what work is ready, blocked, and left."
+  short_description: "Find the next work; looking is free"
+  default_prompt: "Use $askrubberduck:duck-scan to find what is ready, blocked, and left. Show the evidence without changing anything."

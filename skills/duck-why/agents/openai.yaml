@@ -1,4 +1,4 @@
 interface:
   display_name: "Duck Why"
-  short_description: "Name the cause, not the symptom"
-  default_prompt: "Use $askrubberduck:duck-why to find why this is failing, before fixing it."
+  short_description: "Name the cause before the fix starts guessing"
+  default_prompt: "Use $askrubberduck:duck-why to find the cause before writing a fix. Reproduce what you can and label what is still a hypothesis."

@@ -1,4 +1,4 @@
 interface:
   display_name: "Duck Roast"
-  short_description: "Critique a product or architecture end to end"
-  default_prompt: "Use $askrubberduck:duck-roast to critique this product or architecture from every angle."
+  short_description: "Find what the whole solution cannot defend"
+  default_prompt: "Use $askrubberduck:duck-roast to roast this solution within a bounded critique. Challenge its assumptions and mechanisms; keep only findings the evidence supports."

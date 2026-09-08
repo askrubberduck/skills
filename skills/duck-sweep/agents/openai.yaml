@@ -1,4 +1,4 @@
 interface:
   display_name: "Duck Sweep"
-  short_description: "Clean branches, worktrees, checkouts, and ignore rules"
-  default_prompt: "Use $askrubberduck:duck-sweep to clean stale branches, worktrees, checkouts, and ignore rules."
+  short_description: "Clear stale branches and worktrees; clean the pond"
+  default_prompt: "Use $askrubberduck:duck-sweep to clear stale branches, worktrees and scratch paths. Prove what is safe to remove before removing it."

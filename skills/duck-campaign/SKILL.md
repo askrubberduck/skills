@@ -34,10 +34,10 @@ is a campaign that stalls the first time that something else is not there.
    packet**, carved first, whose acceptance evidence is the executable check over that seam — the
    class-level check `duck-proof`'s ledger demands — and each finding is a case of it. One packet
    per finding is how a campaign spends a review round per instance.
-5. **Plan each packet** via `duck-plan` before any build starts. **No co-authorship line, no
-   execute** — a packet whose committed plan does not name the families that co-authored it has not
-   been planned, whatever the roster says. Read the committed plan, never the scratchpad: a driver
-   wakes in a new session and the scratchpad is already gone.
+5. **Plan each packet** via `duck-plan` before dependent implementation. Record its outcome,
+   checks, selected challenge and actual participants. A solo plan stays labeled solo; independent
+   input required by repository policy cannot be replaced by a claim. Read the durable record,
+   not scratch paths from an earlier session. Local execution does not require a committed plan.
 6. **Run each packet** through `duck-run`, which owns that packet's execution, verification, and
    superreview, and provisions its own worktree so concurrent builds cannot collide. Launch the runs
    in parallel where the host has subagents; where it has none, run the same packets sequentially in
@@ -47,14 +47,13 @@ is a campaign that stalls the first time that something else is not there.
 7. **Drive the roster to empty; never hand off into silence.**
    - **Roster.** State it (packet, worktree, branch, state) where a new session can read it — the
      durable records home, never the scratchpad — then take the next iteration yourself.
-   - **One session per packet, not one long session.** `duck-diet`'s rule stands unchanged and
-     this skill is not an exception to it: at each packet boundary the roster is written, the
-     session ends, and the next one is booked (`/loop`, a scheduled wakeup, cron) with the roster
-     as its input. What the loop owns is that the booking happens — the failure this step exists
-     to prevent is a roster with nobody holding the next iteration, not a session that ended. A
-     campaign that keeps one session alive across every packet has broken the rule, not applied
-     it. Each packet's landing removes its own worktree; `duck-sweep` at the end clears whatever
-     landing left behind.
+   - **Context and resumption.** Apply `duck-diet` using the host's real capabilities. At a
+     handoff preserve the roster, candidate identities, valid evidence and next authorized actions.
+     Use compaction or isolated sessions when useful; neither a forced reset nor one marathon
+     session is universally required. Book a scheduled continuation only if the host supports it
+     and the task authorizes it, and verify the booking. Otherwise continue in the current session
+     as possible and state any external limit; do not invent a scheduled wakeup. Landing removes
+     its worktree; `duck-sweep` can clear authorized leftovers at the end.
    - **Obstacles and decisions.** The gap between packets is where a long campaign quietly dies,
      so between them the turn continues: dispatch the next one. A packet that hits an obstacle is
      re-routed or re-scoped and the route recorded, never abandoned — only a refused authorization
@@ -68,10 +67,14 @@ is a campaign that stalls the first time that something else is not there.
 ## Common mistakes
 
 - Building the first candidate before the cut pass — the survey exists to kill work, not queue it.
-- One marathon session bootstrapping AND driving AND reviewing — each packet gets its own session.
+- Losing packet state during a reset or compaction, or claiming a continuation that was never booked.
 - Packets carved by code area instead of shippable outcome — a packet that can't ship alone is
   not one.
-- Skipping plan co-authoring because the campaign is "mostly mechanical" — the mechanical slices
-  are cheap precisely because the plan was not.
+- Skipping a required independent challenge, or running extra co-authors without a question they
+  can help resolve.
 - Ending the bootstrap turn with "say the word and I'll start the builds". The go-sign was the
   directive that started the campaign; asking for a second one is where autonomy dies.
+
+Carry the owner's endpoint through every packet: local-only means local execution and verification,
+not automatic commits, PRs or landing. Do not install a scheduler or expand authority to keep a
+campaign running. Queued decisions block their dependent actions, not independent packets.

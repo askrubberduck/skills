@@ -14,7 +14,10 @@ produces rushed answers on exactly the items that were queued because they need 
 2. **Options** — each with tradeoffs, gains, and risks stated concretely. Two to four real options;
    one option enumerated is no decision offered.
 3. **Recommendation** — pick one and say why, in one sentence.
-4. **Stop and wait.** No next decision, no other content, until the owner answers.
+4. **Wait on the dependent action.** In a standalone decision walkthrough, stop until the owner
+   answers before presenting the next decision. Embedded in an executing workflow, return the
+   pending decision to the caller so separately authorized independent work can continue. Silence
+   never supplies an answer or permission.
 
 After the answer: record it in the owning registry/doc (decision log, obligations registry —
 whatever the repo uses) before presenting the next decision, so a dropped session loses nothing.
@@ -27,8 +30,9 @@ work). Say how many are in the queue up front ("4 decisions queued; here is 1 of
 ## Common mistakes
 
 - Batching "the three small ones" into one message — the owner asked one-at-a-time for a reason.
-- Options with tradeoffs measured in build effort — weigh functionality, extendability, security;
-  never implementation cost.
+- Hiding material cost or schedule tradeoffs. Include them when relevant to the owner's decision,
+  alongside functionality, maintainability and risk; sunk effort does not justify keeping a defect.
 - Presenting a decision already made elsewhere — check the decision log first; re-litigating settled
   calls burns the owner's attention.
-- Continuing past an unanswered decision because the next one "doesn't depend on it".
+- Executing an action that depends on an unanswered decision; continuing independent work is the
+  caller's responsibility, not implied approval of the blocked action.

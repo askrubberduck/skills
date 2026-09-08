@@ -24,8 +24,9 @@ Differs from a disposition flow (which acts on IDs the owner names) — this one
      owner's voice counts only when attributed — unattributed stays blocked.
    - **KEEP** — survives the critique; record the one-sentence justification that saved it.
 3. Act autonomously on everything that doesn't need the owner: land CLOSE/CUT/MERGE/UNBLOCK edits in
-   the registries with evidence, one commit per batch. CUT deletes; a cut item counted in the report
-   but left standing in the registry is the rot this skill exists to remove. **A CUT commit carries
+   the registries with evidence. Local edits do not authorize a commit or publication. CUT deletes; a cut item counted in the report
+   but left standing in the registry is the rot this skill exists to remove. Preserve deleted text in existing history or the local change record until committed. When a commit
+   is authorized, **a CUT commit carries
    the deleted item's own text.** Deletion is the one verdict with no recovery path, and a deletion
    diff is unfindable in practice — nobody greps history for an entry they do not know existed — so
    the message buys back retrievability, which is why `duck-dry`'s prose bar names it an exception
