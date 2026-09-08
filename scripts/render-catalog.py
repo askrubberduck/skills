@@ -7,17 +7,17 @@ import re
 from pathlib import Path
 
 
-CATALOG_HEADER = """# Skills catalog
+CATALOG_HEADER = """# Bring your agent a duck
 
-Paste-ready block for any agent that reads `AGENTS.md` (Cursor, Antigravity, Codex, Copilot, …)
+No native skill discovery? Give this block to any agent that reads `AGENTS.md` (Cursor, Antigravity, Codex, Copilot, …)
 but lacks native Agent Skills discovery. Regenerate with `python3 scripts/render-catalog.py`.
 
 ---
 
 ## Skills
 
-The following skills provide specialized instructions for specific tasks. When a task matches a
-skill's description, read the `SKILL.md` at the listed path and follow it before proceeding.
+The duck reads before it speaks. When a task matches a skill below, read its `SKILL.md` and
+follow it before proceeding. Challenge the claim, run the check, keep the evidence.
 Installed location: `~/.agents/skills/<name>/SKILL.md` (or this repo's `skills/<name>/SKILL.md`).
 """
 

@@ -1,4 +1,4 @@
 interface:
   display_name: "Duck Shape"
-  short_description: "Shape structure around what the reader holds, not lines"
-  default_prompt: "Use $askrubberduck:duck-shape to shape this change around what a reader must hold to change it safely."
+  short_description: "Less to hold in your head, with the contracts intact"
+  default_prompt: "Use $askrubberduck:duck-shape to take this structure apart and find the simplest robust path. Keep the required contracts and prove the assembled result."

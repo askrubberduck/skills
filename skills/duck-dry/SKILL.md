@@ -18,9 +18,12 @@ judgment with a number. The unit of work is one comment against the keep test.
 
 The diff by default: `git diff`, `git diff --staged`, or `<base>..<candidate>`. Drying your own
 uncommitted diff needs no ceremony — those comments were never anyone's baseline. A file or tree
-already committed is swept only when named, and **that sweep is its own commit** — mixed into a
+already committed is swept only when named, and **keep that sweep separate from behavioral edits** — mixed into a
 behavior change, a code fix rides in hidden among prose deletions where no reviewer will find it,
 and a repo-wide pass churns blame across code nobody touched.
+
+Report-only means findings without edits. Repair unclear code only within authorized scope;
+otherwise name the proposed repair. Local editing does not authorize a commit or publication.
 
 ## The keep test
 
@@ -110,14 +113,15 @@ never in a comment beside it.
 
 ## Then prove nothing broke
 
-A comment sweep is not free. Run the project's gates — lint, type check, the whole suite, and the
-doc build if it publishes from docstrings. A deleted directive surfaces as a new lint or type
+A comment sweep is not free. Run checks affected by the sweep — directive-aware lint/type checks, relevant tests, and the
+doc build if it publishes from docstrings — plus every gate the repository requires. A deleted directive surfaces as a new lint or type
 error, never as a worse comment, so an unrun gate after a sweep is an unverified claim like any
 other.
 
 **Reading the diff is not the proof.** A sweep is the one diff a reviewer skims, so establish
 comment-only mechanically: strip comments from both revisions and diff what is left, ignoring
-whitespace. Every non-comment line must be byte-identical unless a code change was the point and is
+only whitespace the language treats as insignificant. Preserve indentation, newlines and spacing
+where they affect semantics. Every non-comment token must be identical unless a code change was the point and is
 stated — a disposition 2 fix, or a fact moved into a string the code already prints. Strip with
 something that parses the language — its own AST printer, a tree-sitter comment query — never a
 regex on `//` or `#`: it eats URLs and string contents, failing on the string case below. Run it
@@ -129,7 +133,7 @@ Three ways a comment edit silently becomes a code edit, each of which reads as p
 - **The formatter realigns.** A comment between aligned fields — in a struct, a composite literal,
   a `var`/`const` block, any run the formatter pads into columns — separates two alignment groups.
   Delete it and the formatter re-aligns every name around it. The strip-and-diff above cannot see
-  this, because it ignores whitespace; run the formatter's own check as a second gate and put a
+  this, because it may ignore insignificant whitespace; run the formatter's own check as a second gate and put a
   blank line back where the comment was if it complains.
 - **Declarations get merged.** Hoisting two constants into one block so they can share a comment is
   a refactor wearing a comment edit's clothes.

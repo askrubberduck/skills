@@ -1,12 +1,15 @@
 ---
 name: duck-land
-description: Merge approved work, update project records, and clean up the branch and worktree; landed means nothing left behind. Use when a change has passed its review gate, the user says to land, merge, push, or ship, a gate-passed PR is ready, or merged work was never recorded in status or outcome documentation.
+description: Merge approved work, update project records, and clean up the branch and worktree; landed means nothing left behind. Use when a change has passed its review gate, the user authorizes landing or merging, an authorized gate-passed PR is ready, or merged work was never recorded in status or outcome documentation.
 ---
 
 # Duck Land
 
 The ship step: gate passed → merge → record → clean. A merge without a recorded outcome is work
 the repo forgot; a record without a verified merge is fiction.
+
+A passed gate establishes readiness, not permission to merge. Use the endpoint already authorized
+by the user: a request only to push or prepare a PR does not authorize merging or branch deletion.
 
 ## Preconditions (fail closed — any miss stops the landing)
 
@@ -81,8 +84,7 @@ the repo forgot; a record without a verified merge is fiction.
 5. Clean up: delete the merged branch and its worktree. Step 2's read-back is what makes this
    safe and what `duck-sweep` cannot derive on its own — a squash leaves no metadata linking the
    branch to the commit that replaced it, so **record the landed SHA in step 3's outcome entry**
-   and delete against that, not against a classifier's guess. End the session at this boundary;
-   landing is a stage transition.
+   and delete against that, not against a classifier's guess. Record a resumable boundary; continue other authorized work if the host and task allow it.
 
 ## Common mistakes
 

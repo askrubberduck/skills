@@ -1,70 +1,65 @@
 ---
 name: duck-break
-description: Attack a 'finished' build to find out how finished it actually is. Use when a build claims completion, security-, privacy-, or data-sensitive work lacks dynamic evidence, only a green test suite supports the claim, or the user asks to "try to break it", "red team it", or "duck break".
+description: Try to break a system's claimed behavior, then show what actually happened. Use when the user asks to break or red-team work, when a behavioral proof needs hostile inputs, or when high-risk work lacks dynamic evidence. Test the actual candidate and substantiate failures.
 ---
 
 # Duck Break
 
-The breaker EXECUTES hostile intent against the running thing. It never reads-and-opines — that is
-review's job. A claim of robustness without an executed attack behind it is an opinion.
+An attack names the claim it could refute, executes the attempt, and observes the result. Reading
+and opining is not an executed attack. Surviving the selected attacks establishes only that scope.
+The breaker reports findings; the authorized caller repairs them and reruns the invalidated checks.
 
-## The five attacks
+## Bound the target and isolate destructive work
 
-1. **Mutation pass** — delete or invert load-bearing code; the suite MUST go red. Green-after-
-   deletion proves the tests don't bite, and that is a finding against the tests, not a pass.
-   A green suite alone proves little; delete-the-code is the only real test check.
-2. **Boundary abuse** — empty, null, huge, malformed, duplicate, and concurrent inputs at every
-   trust boundary. The stated validation either holds under execution or you have a finding.
-   Drive every position — parameter, object key, array index — with one catalogue, on every
-   implementation behind the boundary; two implementations are broken when they answer
-   differently, not only when one throws.
-3. **Invariant attack** — take each named invariant (containment, fail-closed, isolation,
-   authorization) and actively try to violate it from outside, as a hostile caller would. An
-   invariant nobody attacked is a hope.
-4. **Crash consistency** — kill the process mid-operation, restart, inspect state. Recovery paths
-   are claims until executed. Start the target in **its own process group** and kill the group, not
-   the pid: a killed parent leaves its children running, and the survivors hold the ports and locks
-   the restart needs, so the recovery you then measure is not the one the product performs. Confirm
-   no survivors before the next attack.
-5. **Run the real artifact** — the built binary/app on its critical paths, not the test harness.
-   The suite passing and the product working are different facts.
+Record the candidate and relevant environment. Read its outcome, contracts and realistic operating
+conditions before choosing attacks. Do not invent deployment states or require irrelevant attacks
+for every task. A goal or plan with no running artifact can have premises tested, but cannot claim
+runtime correctness. Instruction changes need realistic agent trials with actions and final-state
+checks; a packaging validator does not establish behavior.
 
-## Contract
+Attack a disposable copy for mutations or destructive tests, never the candidate checkout or live
+user data. Git worktrees/clones carry committed state only: capture any staged, unstaged and
+relevant untracked changes too. Verify the copied content matches the intended candidate before
+attacking. Record the pre-attack state and restore that state between attacks, not an assumed clean
+base. Use isolated data, ports and process groups for crash tests; verify no children survive
+before restart. Preserve original uncommitted and ignored files.
 
-- Every finding's evidence is the **reproducing command or input** — paste it, don't describe it.
-- Measure the artifact's exit status **directly, never through a pipe**: `cmd | head` reports the
-  tail's status, bash `PIPESTATUS` is zsh `pipestatus`, and grep exits 1 on zero matches — three
-  measured ways a break run reported green while the artifact was red.
-- Entire finding list, no severity triage — the owner weighs, the breaker surfaces. No triage is
-  not no validation: a finding whose reproducing command does not reproduce is not a finding, and
-  reporting it unchecked spends someone else's round.
-- **The breaker never fixes.** Doer and judge stay separate: findings route to the normal pipeline
-  (fix → `duck-review`). Fixing mid-break contaminates both roles. Separation bars the fix, not
-  the thinking — the breaker still questions every attack it runs and every result it gets.
-- "Unbreakable" is only claimable per attack actually executed — list what was run, including the
-  attacks that found nothing. Unattempted ≠ survived.
-- **Attack a disposable copy, never the candidate checkout.** Attack 1 deletes load-bearing code; a
-  crash mid-attack in the shared tree leaves corruption for the next stage to read as the candidate.
-- **A dirty candidate does not survive `git worktree add` or `git clone`** — both carry committed
-  state only, so the copy silently holds the base commit and every attack passes against code that
-  is not the candidate. Either commit the candidate first and copy that, or copy the working tree
-  itself (`cp -a`, `rsync`), and **verify the copy carries the change before attacking** — grep it
-  for something only the candidate has. An unverified copy is an unrun attack list.
-- Record the tree's exact pre-attack state and restore *that*, not "clean" — the candidate under
-  review is allowed to be a dirty worktree, so a clean tree is the wrong target and a mismatch is
-  itself a finding against the breaker.
-- **Leave the receipt.** The attack list — each attack carrying the command run and its observed
-  output, no-finding attacks under the same bar as findings — and the restored-state confirmation
-  go to `break-rN.md`, in the project's durable records home — the same location `duck-proof`
-  resolves for its own receipt, and the only place `duck-review` looks. Never the scratchpad and
-  never a commit on the candidate branch. An attack listed without its artifact is claimable
-  without execution, which is exactly the overclaim this receipt exists to prevent. Trust-touching
-  changes cannot pass that gate without it — an unwritten break run is indistinguishable from one
-  that never happened.
+## Select attacks that discriminate
 
-## Common mistakes
+- **Oracle check:** a targeted mutation or negative control should fail for the intended reason.
+  If it survives, determine whether it is equivalent, irrelevant to the contract, an unnecessary
+  mechanism, or missing coverage. An import failure does not demonstrate that a behavioral test
+  catches the bug. Mutation testing is one tool, not the only valid check of a test.
+- **Boundary and sequence abuse:** relevant malformed, empty, large, duplicate, reordered, stale
+  or concurrent inputs. Derive cases from reachable paths and input classes; state limits instead
+  of claiming every possible input was exhausted.
+- **Invariant attack:** try to violate the required isolation, authorization, state transition or
+  other contract from outside the boundary. Inspect the resulting state, not just the return code.
+- **Crash/recovery:** interrupt a consequential operation, restart and inspect persisted state when
+  recovery is part of the contract. Kill an isolated process group rather than leaving orphaned
+  children to contaminate the result.
+- **Real artifact:** exercise a critical path in the built binary or app. Test doubles and a green
+  suite may omit the integration that determines the user-visible outcome.
 
-- Reading the code carefully instead of running it — that's review with extra steps.
-- Skipping the mutation pass because "the suite is green" — green is the reason to run it.
-- Attacking only the happy-path module — boundaries and recovery paths are where builds actually break.
-- Stopping at the first break — one finding is a start; the attack list finishes regardless.
+Choose the highest-consequence plausible failures first. A focused proof can use one relevant
+attack; a broad break covers the material contracts within its agreed scope. Check remaining
+material claims after finding a defect unless they depend on the broken prerequisite. Respect
+owner effort limits and report blocked or unattempted attacks rather than claiming they survived.
+
+Differential results are leads, not verdicts. Resolve differences against an independent contract,
+normalizing permitted ordering, nondeterminism and tolerances. One wrong result does not make both
+implementations wrong; identical results can share a defect.
+
+## Report and hand off
+
+Capture each command/input, candidate identity, expected violation, observed output and final state.
+Read exit status directly: a pipeline can report the status of a filter instead of the artifact.
+Reproduce findings before calling them defects; distinguish suspected failures from substantiated
+ones. Retain the complete finding list, grouped by affected claim and consequence; rank when the
+owner requests it. Report no-finding attacks and limits under the same evidence standard.
+
+Use `duck-proof`'s durable-home rules for a downstream handoff: `break-rN.md` or an explicit section
+of the shared work record, with restored-state confirmation and evidence that survives scratch
+cleanup. A standalone report can stay in the response. Do not advance the candidate just to save
+the report. `duck-review` consumes required break evidence for release; a successful attack suite
+is not independent approval.

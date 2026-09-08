@@ -85,9 +85,9 @@ DISPATCH = re.compile(r"^\s*(codex exec|agy )", re.M)
 BY_PATH = "by absolute path"
 
 
-def check_dispatch_rule(name: str, body: str, errors: list[str]) -> None:
+def check_dispatch_rule(where: str, body: str, errors: list[str]) -> None:
     if DISPATCH.search(body) and BY_PATH not in body:
-        errors.append(f"skills/{name}/SKILL.md: shows a reviewer dispatch but never states the "
+        errors.append(f"{where}: shows a reviewer dispatch but never states the "
                       f"by-path rule ({BY_PATH!r})")
 
 
@@ -221,9 +221,19 @@ def check_skill(root: Path, name: str, found: set[str], errors: list[str]) -> No
     for hit in re.findall(r"[$/]?askrubberduck:[a-z-]+", body):
         errors.append(f"{where}: namespaced cross-skill reference {hit!r} "
                       "does not resolve on standalone installs")
-    if body.count("```") % 2:
-        errors.append(f"{where}: unbalanced ``` code fence")
-    check_dispatch_rule(name, body, errors)
+    documents = [root / where, *sorted((root / "skills" / name / "references").rglob("*.md"))]
+    for document in documents:
+        content = document.read_text(errors="replace")
+        location = str(document.relative_to(root))
+        if content.count("```") % 2:
+            errors.append(f"{location}: unbalanced ``` code fence")
+        check_dispatch_rule(location, content, errors)
+        for target in re.findall(r"\[[^\]\n]*\]\(([^\s)]+)\)", content):
+            if re.match(r"[a-zA-Z][a-zA-Z0-9+.-]*:", target) or target.startswith("#"):
+                continue
+            relative = target.split("#", 1)[0]
+            if not (document.parent / relative).is_file():
+                errors.append(f"{location}: missing linked resource {target!r}")
 
 
 def check_generated(root: Path, readme: str, errors: list[str]) -> None:
@@ -272,6 +282,12 @@ def edit(copy: Path, relative: str, old: str, new: str) -> None:
 SCAN = "skills/duck-scan/SKILL.md"
 RUN = "skills/duck-run/SKILL.md"
 CASES: list[tuple[str, str, Callable[[Path], None]]] = [
+    ("missing dispatch resource", "missing linked resource",
+     lambda c: (c / "skills/duck-review/references/dispatch.md").unlink()),
+    ("reference dispatch without by-path rule", "never states the by-path rule",
+     lambda c: edit(c, "skills/duck-review/references/dispatch.md", "by absolute path", "somehow")),
+    ("reference unbalanced fence", "unbalanced",
+     lambda c: (c / "skills/duck-review/references/challenge.md").write_text("```\n")),
     ("invalid manifest JSON", "invalid or unreadable JSON",
      lambda c: (c / ".codex-plugin/plugin.json").write_text("{")),
     ("codex skills path", 'skills must be "./skills/"',

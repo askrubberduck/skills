@@ -16,12 +16,11 @@ any other change. Separation bars the fix, never the thinking.
 
 ## Reproduce before you reason
 
-A failure you cannot reproduce on demand is a report, not a defect. Get to one command that fails
-and record it — that command is the only thing that will later prove the cause was real.
-
-Cannot reproduce? That is the finding. Say what you ran, what happened instead, and what would
-distinguish a flake from a fix that already landed. **Never reason about a failure you have not
-seen**; a plausible explanation of an unobserved bug is fiction with a stack trace.
+Try to obtain one reproducing command and record its output. If the fault is intermittent or the
+original environment is unavailable, use logs, traces and historical state to form provisional
+hypotheses. Say what you could not reproduce and choose observations that distinguish the causes.
+Lack of deterministic reproduction limits confidence; it does not forbid investigation or prove
+the defect absent. Never present an untested explanation as an established cause.
 
 ## Symptom, then cause
 
@@ -34,8 +33,9 @@ nobody wrote down, an assumption that used to hold, a boundary two components di
 Stopping at the first line that could be edited to make the red go away is how a symptom gets
 patched and the cause ships.
 
-**Grep every caller before you name it.** A cause in a shared function that only one caller trips
-is still a cause in the shared function, and the sibling callers are already broken.
+**Inspect every caller before you name the cause.** Classify which can reach it and which enforce
+preconditions that prevent it. Shared code does not imply every caller is broken. Locate the repair
+where the required contract belongs rather than adding a guard to each reported instance.
 
 ## Competing hypotheses, cheap discriminators
 
@@ -52,8 +52,8 @@ stays on the list.
 
 ## What comes back
 
-- The **reproducing command** and its output.
-- The **cause**, in one sentence, at the level of the decision that produced it.
+- The **reproducing command** and its output, or the available traces and limits of reproduction.
+- The **cause**, in one sentence, or the unresolved competing hypotheses and next discriminator.
 - The **evidence chain**: each step citing `file:line`, a command and its output, or a named commit.
   A link asserted rather than observed is marked as an assumption.
 - **Every caller or path that shares the cause**, not just the reported one.

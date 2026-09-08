@@ -11,12 +11,12 @@ here; the product of the audit is deletions.
 
 ## The six runtime rules
 
-1. **End the session at stage boundaries.** Plan→build, build→review, packet→packet: new session or
-   `/compact`. Every turn re-bills the whole window; a forced auto-compaction pays a summarization
-   tax AND loses state. One session per packet. Two conditions first, because a boundary is a
-   handoff and not an exit: the next step is named and dispatched or scheduled, and **anything the
-   next stage must read has left the scratchpad** — `$SP` dies with the session, and the review gate
-   refuses to dispatch without receipts a new session can no longer see. Unmet, the boundary waits.
+1. **Preserve state at context boundaries.** Use host compaction or a fresh isolated session when
+   context quality or task independence warrants it; do not force a reset per stage or packet.
+   Models and hosts differ. Before a handoff, preserve outcome, source/candidate identity, valid
+   evidence, unresolved claims and the next authorized action. Anything the next stage needs must
+   survive scratch cleanup. Schedule a continuation only through a supported, authorized host
+   mechanism and verify it was booked. A written next step alone is not a scheduled handoff.
 2. **Absolute paths, once.** No `cd` chains, no re-declared `VAR=/long/path` boilerplate per Bash
    call. Long scratchpad root: `ln -s` a short alias once.
 3. **Grep-first; delegate big reads.** Nothing >20KB into the main context: page with offset/limit,
@@ -24,8 +24,8 @@ here; the product of the audit is deletions.
    to store a file.
 4. **Stage routing: start cheap, bounce up on failure.** Route by stage, both model AND agent type.
    - **Mechanical work** (investigation, scripted edits, rebases, clerical verification, recording)
-     defaults to cheap-model executor agents — but only with a pinned model whose self-report is
-     verified, and a named gate (tests, compiler, a dedicated check script) that catches the stage's
+     defaults to cheap-model executor agents — but only with a pinned model whose identity is
+     verified from runtime or provider metadata, and a named gate (tests, compiler, a dedicated check script) that catches the stage's
      failure, executed and its result recorded before the stage's output is used. No pin or no gate,
      no cheap tier.
    - **Bounce up on failure.** A cheap agent that fails its gate, or fails to converge on a second
@@ -33,9 +33,10 @@ here; the product of the audit is deletions.
      strongest tier, or to an agent with elevated reasoning limits, carrying the failure context
      with it. A passing gate proves cheap was sufficient, never that it was best — the bounce is
      what stops a wrong cheap route from becoming the answer.
-   - **Strong by default.** Trust-touching, adversarial, and synthesis stages are never mechanical,
-     whatever the stage type: they get general-purpose agents on the strongest tier. Everything else
-     inherits the current model.
+   - **Judgment is not clerical work.** Use `duck-review`'s challenge-selection policy for
+     independent opinions and high-risk judgments. Calibrate ordinary tiers against task outcomes;
+     neither a strong model nor more participants substitutes for a discriminating check. Honor
+     explicit owner choices and required release policy; record limits rather than hiding them.
 5. **Batch agent traffic.** Poll teammates at round boundaries; never relay no-op idle pings into
    the coordinator context. Compress subagent output contracts ("return table, no prose").
 6. **Raw output stays out of git and out of context.** CLI stdout, logs, diffs: extract the decisive
@@ -72,8 +73,7 @@ is billed every turn of every session:
 
 - Treating cache reads as free because they're discounted — the window re-bills every turn; length
   is the cost driver.
-- "One more turn, then I'll split" across a stage boundary — the split is cheapest exactly at the
-  boundary.
+- Carrying stale evidence or losing the next authorized action at a context boundary.
 - Compressing prose while pasting whole files — rule 3 outweighs terse wording 100:1.
 - Trimming config rules the owner put there deliberately — when a line reads like a decision, ask.
 - Deleting the checked-in copy and keeping the local memory — backwards; checked-in serves every

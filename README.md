@@ -13,34 +13,29 @@ somewhere around the fourth line you hear it yourself.
 
 Your coding agent has no duck. When it says the change is done, who checked?
 
-These skills are the duck. They do not make the model smarter. They put a second stage after every
-claim, and that stage does not take the first one's word for it. A different model family holds the
-gate. Every finding carries the evidence that produced it. The decisions that are yours come back
-as decisions, never as defaults.
+These skills are the duck. Explain the goal. Show the path. Run the check. The duck keeps asking
+where the claim could break, including the claim that this thing needed building at all.
+
+Your preferred answer gets the same treatment as every other answer. So does the duck's.
 
 ## What the duck holds to
 
-Four rules. Every skill here is one of them, applied somewhere specific.
+**The duck asks for proof.** “The tests pass” starts a conversation. Which tests? Against whose
+requirements? What input should break this? Did you run them after the last fix? A gate returns
+`APPROVE`, `REJECT`, or `NOTE`, with evidence someone else can check. Confidence earns nothing.
 
-**The duck doesn't judge.** It measures. A gate returns `APPROVE`, `REJECT`, or `NOTE` on evidence a
-third party can re-check, never on taste, and each verdict cites the artifact that earned it. A
-break run and a roast return every finding, unranked, because weight is yours to assign. A choice
-that belongs to you ends the stage as `OWNER DECISION`, never as a guess made on your behalf.
+**The duck travels light.** One home per fact. One owner per rule. A layer that makes the reader
+open three more files has explaining to do. A comment that repeats the next line goes. A necessary
+boundary stays, however tempting the deletion count. Shorter code can still leave a bigger mess.
 
-**The duck doesn't repeat.** One home per fact. A comment that restates the line under it is
-deleted. A commit message carries only what the diff cannot. An unchanged candidate is never
-reviewed twice, and a decision already in the log is never asked again.
+**The duck reads first.** Follow the path from the input to what actually happens. Read the callers.
+Find the constraint that made the ugly bit necessary before removing it. When the cause is still a
+hypothesis, call it one. A plausible story does not become a reproducer by being told twice.
 
-**The duck listens.** It reads before it speaks, and says where it read: a file and line, a document
-at the version the project pins, or a command and what it printed. `duck-scan` reads and changes
-nothing. `duck-why` reproduces the failure before it names the cause. The skills that find
-problems, `duck-why`, `duck-break`, `duck-review`, and `duck-roast`, hand them on; none of them
-fixes.
-
-**The duck helps you think deeper, so the answer is yours.** Questions come before fixes. Would
-deleting this end the finding? What outcome dies if this is never built? What is the second case for
-this seam? What did the command print? The fix then travels the normal path, in your hands, past a
-reviewer that is not its author.
+**The duck knows when to stop.** The agent owns the work and the review loop. You own the decisions
+that change the goal, scope or policy. Settled decisions stay settled until evidence changes them.
+Another reviewer wanting another abstraction is not evidence. Nobody gets to move the finish line
+just because the code reached it.
 
 ## Say it to the duck
 
@@ -48,46 +43,61 @@ Install once, then talk to your agent as usual. The descriptions do the routing.
 
 | You say | What comes back |
 |---|---|
-| "duck it" | `duck-run`: the change landed, or the ask reconciled item by item with what stopped it. |
-| "why is this broken?" | `duck-why`: the reproducing command, the cause in one sentence, and where the fix belongs. No fix. |
-| "gate it" | `duck-review`: one verdict, each reviewer's family named, every finding with its evidence. |
-| "try to break it" | `duck-break`: the attack list, each attack with the command run and what it printed. |
-| "dry it" | `duck-dry`: the diff, a mechanical check that only comments changed, and the gates run green. |
-| "what's next?" | `duck-scan`: one table of item, state, blocked on, pickable, then one sentence of advice. |
-| "race it" | `duck-race`: the winning diff, both test outputs, and where the two attempts disagreed. |
-| "roast it" | `duck-roast`: the whole finding list, each with evidence and a proposed disposition, once a round finds nothing new. |
+| "duck it" | `duck-run`: challenge it, plan it, build it, try to break it. Stop where you authorized; local means local. |
+| "why is this broken?" | `duck-why`: the cause and its evidence, or the hypotheses still standing. The fix has an address; nobody has written it yet. |
+| "prove this goal or plan" | `duck-proof`: what would make it wrong, what was tried, and what survived. Your favorite answer gets no head start. |
+| "simplify it deeply" | `duck-shape`: take the mechanism apart, keep the contracts, rebuild the path with less to remember. Then check it. |
+| "gate it" | `duck-review`: one verdict, the reviewers named, and the evidence behind every finding. No participation trophies. |
+| "try to break it" | `duck-break`: attacks actually run, with inputs and results. Imagining a crash is not crashing it. |
+| "dry it" | `duck-dry`: prose that earns its place, with checks that the sweep did not smuggle in a code change. |
+| "what's next?" | `duck-scan`: what is ready, what is blocked, and why. Looking is free. |
+| "race it" | `duck-race`: two independent attempts, the same outcome checks, and a winner that earned it. |
+| "roast it" | `duck-roast`: the findings that stand up, what to do about them, and an end to the round. |
 
-## Four altitudes
-
-Pick the one that matches what you are looking at.
+## Where to point the duck
 
 | Looking at | Skill |
 |---|---|
-| your own fresh diff | `duck-proof` |
+| a goal, design, plan, or completed change | `duck-proof` |
 | one change at its gate | `duck-review`, plus `duck-break` when the change touches trust |
 | the backlog | `duck-cut` |
 | the whole solution | `duck-roast` |
 
-## The pipeline
+## One change through the pond
 
-`duck-run` walks one change through six stages. What passes between them is evidence: a design
-record, a plan, receipts, a verdict.
+`duck-run` carries the work. Each stage hands the next something it can check.
 
-1. **Frame**, `duck-frame`. Settle the design: what exists, what changes, what can fail.
-2. **Plan**, `duck-plan`. Break it into units. Big or trust-touching work is co-authored with a
-   second model family; small work is drafted solo and red-teamed before any code.
-3. **Execute.** Each unit: a failing test, the minimal pass, then `duck-shape` and `duck-dry`
-   before the next unit.
-4. **Verify**, `duck-proof`. Run the project's gates, attack your own diff, write the receipt.
-   Trust-touching work also gets `duck-break`.
-5. **Review**, `duck-review`. A reviewer from another model family returns one verdict on the exact
-   commit.
-6. **Land**, `duck-land`. Merge, record what landed, delete the branch.
+1. **Frame**, `duck-frame`. What outcome dies if this never ships? What already solves it?
+   Use `duck-shape` while choosing the boundaries, before a bad seam becomes a plan.
+2. **Plan**, `duck-plan`. Shape the path before dividing the work. Name the assumptions and the
+   checks that could kill them. Run the cheap experiment before building on the expensive guess.
+3. **Execute.** Make the meaningful check fail, make it pass, then apply `duck-shape` and
+   `duck-dry` inside that unit. “We'll simplify it later” has had enough chances.
+4. **Prove**, `duck-proof`. Attack the goal, the behavior and the finished shape. `duck-break`
+   runs hostile experiments where needed. Fix something? Run the affected checks again. Yesterday's
+   green does not cover today's edit.
+5. **Review**, `duck-review`. Where the task or release policy requires it, independent reviewers
+   challenge the exact candidate. A missing reviewer leaves a missing review, never a quiet pass.
+6. **Land**, `duck-land`. When you authorized a merge: merge, read back what landed, record it,
+   clean up. Asked for local changes? The verified local diff is the finish line.
 
-A rejection goes back to step 3 with each blocker's cause named first, through `duck-why` when the
-symptom hides it. Before the third review round, and every one after it, a circuit breaker picks a
-different exit: re-frame, replan, `duck-race`, `duck-decide`, or one more round with the evidence
-that the loop is converging.
+### The review loop has a keeper
+
+The coordinating agent carries the agreed outcome, constraints and checks through every round.
+Reviewers can find new defects against that agreement. They cannot turn a fresh preference into a
+new requirement. Findings keep their cause and closure evidence; rephrasing one does not reopen it.
+
+A rejection goes back to its cause: `duck-why` if it is hidden, frame if the premise broke, plan
+if the decomposition failed, race or rally if the method keeps missing the same class of defect.
+Before a third round, the agent must explain what new evidence that round will buy.
+
+The default is three review rounds total. Changing reviewers or renaming the problem does not
+refill the meter. At the limit, the agent stops dispatching, preserves the candidate and unresolved
+findings, and leaves the release unapproved. A different bound comes from you or the repo's policy.
+No endless pursuit of unanimous approval. No passing because everyone got tired.
+
+When you are away, the agent still owns technical decisions within the task. It continues independent
+work and holds only what needs your answer. Your silence does not choose a new goal.
 
 Around the run: `duck-scan`, `duck-cut`, `duck-decide`, and `duck-campaign` before it;
 `duck-diet` throughout; `duck-sweep` and `duck-learn` after.
@@ -97,7 +107,7 @@ Around the run: `duck-scan`, `duck-cut`, `duck-decide`, and `duck-campaign` befo
 <!-- skills-table:start -->
 | Skill | What it does |
 |---|---|
-| `duck-break` | Attack a 'finished' build to find out how finished it actually is |
+| `duck-break` | Try to break a system's claimed behavior, then show what actually happened |
 | `duck-campaign` | Carve a grand vision into independent workstreams that ship without waiting on each other |
 | `duck-cut` | Shrink a backlog the honest way — obsolete work out, duplicates merged, viable items unblocked |
 | `duck-decide` | Walk the owner through the decisions they have been ducking, one at a time |
@@ -106,14 +116,14 @@ Around the run: `duck-scan`, `duck-cut`, `duck-decide`, and `duck-campaign` befo
 | `duck-frame` | Settle a system's target design before planning begins, because 'we'll figure out the architecture later' means never |
 | `duck-land` | Merge approved work, update project records, and clean up the branch and worktree; landed means nothing left behind |
 | `duck-learn` | Turn session and delivery evidence into reusable lessons, so each mistake is only paid for once |
-| `duck-plan` | Catch architectural and implementation risks before the code catches them for you |
-| `duck-proof` | Give 'completed' work a skeptical second pass before anyone trusts it; 'it should work' is not evidence |
+| `duck-plan` | Find the hole in the plan before building over it; assumptions and acceptance checks must survive challenge |
+| `duck-proof` | Make the goal, the path, and the finished work earn your trust through counterexamples and executed checks |
 | `duck-race` | Put two decorrelated model families on the same problem and let executed evidence pick the result |
 | `duck-review` | Run one independent cross-model superreview and deliver an evidence-backed APPROVE, REJECT, or NOTE; no participation trophies |
-| `duck-roast` | Roast an entire product, solution, or architecture from every angle until only the defensible parts remain |
-| `duck-run` | Deliver a high-risk change end to end without trusting any stage of it |
+| `duck-roast` | Roast the whole solution until its weak claims show; a finding must earn its place, and a round must end |
+| `duck-run` | Challenge the goal, shape the plan, build it, and make it prove itself; local means local |
 | `duck-scan` | Find ready, blocked, and remaining work without changing anything; looking is free |
-| `duck-shape` | Shape code as it is written so the next reader holds as little as possible; the unit is concepts, not lines |
+| `duck-shape` | Take the mechanism apart and rebuild the simplest robust path; leave the reader less to hold in their head |
 | `duck-sweep` | Clean out stale branches, worktrees, checkouts, scratch directories, and ignore rules; the pond stays clean |
 | `duck-why` | Name the cause of a failure before anyone writes a fix, because the symptom is not the defect |
 <!-- skills-table:end -->
@@ -196,27 +206,36 @@ skill twice.
 Inside a skill, a sibling is named bare, `duck-proof`, because that is the one name every host
 resolves.
 
-## What the duck needs from you
+## How many ducks?
 
-- **A second family.** `duck-review`, `duck-plan`, `duck-race`, and `duck-roast` dispatch
-  reviewers from another model family, through the `codex` or `agy` CLI as `duck-review` defines
-  it, and prove which family answered before spending a round. No proven different family on the
-  machine, no verdict. The gate says so instead of passing.
-- **Your word on export.** A cross-model gate sends the candidate to a vendor outside your machine.
-  The duck confirms you have authorized that for this repository, records where the authorization
-  lives, and does not dispatch without it.
-- **A home for receipts.** Proof, break, race, and review reports go where the project keeps its
-  records.
-  Never the scratchpad, which dies with the session, and never a commit on the candidate branch,
-  which would move the SHA the verdict covers. A repository that names no such home gets asked, not
-  guessed at.
-- Everything else runs wherever the skills load.
+Enough to challenge the claim. More seats at the table do not make an experiment stronger.
 
-## Status
+A narrow proof may need one decisive self-check. A plan may need one independent critic. A race
+needs two isolated attempts; a rally alternates a failing test and a repair. Choose the method that
+can expose the mistake, and set the bound before starting. The agent picks a sensible setup unless
+you specify one; you do not have to configure a committee for every change.
+
+Release review has a firmer bar: by default, one reviewer from a verified different model family
+for ordinary work; two reviewers of different families, at least one different from the builder,
+for security, privacy, data or gate-policy changes. Your explicit setup and repository policy govern.
+A smaller analysis does not satisfy a stronger release gate. A missing participant does not lower
+the bar. The [challenge rules](skills/duck-review/references/challenge.md) carry the details.
+
+Sending your repository to another vendor needs your authorization. Once it covers the work,
+the duck remembers it. Asking again is not extra care.
+
+Evidence needs a home someone can find. A standalone proof can answer directly. Work handed to
+another stage uses the project's existing record, with the candidate, checks and open claims named.
+Proof and break can share a page. A pile of receipts is not a pile of proof.
+
+## Does the duck's own work pass?
+
+Every push runs `scripts/validate-distribution.py --self-test`: manifests parse, skills are linked,
+references resolve, generated files match, and deliberate corruptions get caught.
+
+That proves the package holds together. To find out whether the duck does its job, give it a task
+where agreement would be wrong, a green test hides a bug, or a reviewer moves the target. Inspect
+what it actually did. The [behavioral cases](evals/proof-cases.md) state the checks and which trials
+have run. An unrun trial stays unrun, even in the duck's own README.
 
 Versions and what changed: the [releases page](https://github.com/askrubberduck/skills/releases).
-
-Every push runs `scripts/validate-distribution.py --self-test`. It checks structure: manifests
-parse, every skill is linked where cloud sessions look, cross-references resolve, generated files
-are current, and the checks themselves still reject what they exist to reject. It says nothing
-about whether a skill reads well. Nothing automated does.

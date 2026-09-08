@@ -1,7 +1,7 @@
 {
   "name": "askrubberduck",
   "version": "2.6.0",
-  "description": "Plan, challenge, ship, and clean up complex work; the duck is skeptical, dry, and straightforward",
+  "description": "Make the work prove itself. Challenge the goal, cut the clutter, and check what actually happened.",
   "author": {
     "name": "askrubberduck",
     "url": "https://github.com/askrubberduck"
@@ -20,8 +20,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "askrubberduck",
-    "shortDescription": "Plan, challenge, ship, and clean up complex work; the duck is skeptical, dry, and straightforward",
-    "longDescription": "The duck listens, judges, and does not flatter: guided planning, independent critique, delivery, decisions, and repository cleanup. Every claim needs evidence; every gate is decorrelated.",
+    "shortDescription": "Make the work prove itself. Confidence earns nothing.",
+    "longDescription": "Your agent says it is done. The duck asks what could break it. Challenge the goal, shape the plan, build the smallest robust path, and run the checks after the last fix. Choose the challenge the task needs; keep release review independent. The agent owns the loop. Nobody moves the finish line.",
     "developerName": "askrubberduck",
     "category": "Productivity",
     "capabilities": [
@@ -29,9 +29,9 @@
       "Write"
     ],
     "defaultPrompt": [
-      "Use $askrubberduck:duck-run to plan and deliver this change with independent review.",
-      "Use $askrubberduck:duck-review to red-team this diff before it ships.",
-      "Use $askrubberduck:duck-scan to find what work is ready next."
+      "Use $askrubberduck:duck-run to challenge this goal, build the simplest robust path, and make it prove itself. Stop where I authorized.",
+      "Use $askrubberduck:duck-proof to try to disprove this goal or solution. Show the counterexamples and what actually survived.",
+      "Use $askrubberduck:duck-review to challenge this diff against the agreed criteria. One verdict, with the evidence it earned."
     ]
   }
 }

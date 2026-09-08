@@ -1,6 +1,6 @@
 ---
 name: duck-roast
-description: Roast an entire product, solution, or architecture from every angle until only the defensible parts remain. Use when the user asks for a roast or repeated full critique of the standing solution, wants a codebase audited for over-engineering, bloat, or what could be deleted repo-wide, or wants a milestone-level adversarial assessment rather than a change review or backlog sweep.
+description: Roast the whole solution until its weak claims show; a finding must earn its place, and a round must end. Use when the user asks for a roast or repeated full critique of the standing solution, wants a codebase audited for over-engineering, bloat, or what could be deleted repo-wide, or wants a milestone-level adversarial assessment rather than a change review or backlog sweep.
 ---
 
 # Duck Roast
@@ -10,7 +10,7 @@ target is one change (`duck-review`), the backlog
 (`duck-cut`), or your own fresh diff (`duck-proof`). Roast reads
 what exists end to end and argues it should be different or dead.
 
-## Angles (every round covers all)
+## Angles (cover material claims within the requested scope)
 
 1. **Containment/security posture** — boundaries enforced from outside? fail closed? what does a
    compromised component reach?
@@ -35,33 +35,38 @@ what exists end to end and argues it should be different or dead.
    should be a seam?
 5. **Operational reality** — failure modes, recovery paths, what breaks at 3am and who notices.
 
-Critique product and engineering substance ONLY — never market validation, user counts, or
-"run the pilot first" framing.
+Ground criticism in the actual product and deployment. When the owner asks to challenge the goal,
+question the evidence for its benefit and success measures too. Do not invent market or deployment
+requirements, or substitute a new goal to make the critique stronger.
 
 ## Recipe
 
 1. Ground in the real artifacts: canonical docs + actual source, not summaries.
-2. Dispatch independent reviewer families selected relative to the doer's verified model family,
-   with the full angle list and fail-closed rules from `duck-review`. Add your own
-   pass as a third perspective.
+2. Select the method, participants and effort bound from `duck-review`'s
+   [challenge selection](../duck-review/references/challenge.md); use its
+   [dispatch mechanics](../duck-review/references/dispatch.md) for external participants. A focused
+   self-critique is labeled as such, not cross-family review. Give independent critics complementary
+   material questions and the same constraints, not each other's conclusions.
 3. Merge findings; every finding carries evidence (file, doc, observed behavior). The roast does
-   NOT judge severity and does not triage — every finding survives to the output; the owner weighs
-   them. Refuted findings are recorded with the refutation and carried into the next round's prompt.
-4. **Run and run again**: next round re-dispatches with prior findings settled. Stop only when a
-   full round yields nothing new (loop-until-dry) — one pass is a review, not a roast.
-5. Land the output in the repo's reviews doc or a packet — the ENTIRE finding list, unfiltered and
-   unranked, each with evidence and a proposed disposition: fix now / backlog / owner decision
+   retains substantiated findings with their consequences; group or rank when the owner requests
+   it. Keep dismissed claims with their refutation so another pass does not resurrect them.
+4. **Another round needs a question.** Default at most two passes unless the owner supplies a
+   different bound. Re-dispatch only for a named unresolved claim with new evidence or a materially
+   different approach. Stop on supported conclusions, refuted premises, unavailable evidence or the
+   effort limit; record uncertainty. Never require an endless sequence of empty finding lists or
+   mistake agreement for proof.
+5. Land the output in the repo's reviews doc or a packet — the substantiated finding list and dismissed claims, each with evidence and a proposed disposition: fix now / backlog / owner decision
    (present those via `duck-decide`) / rejected-with-reason.
 
 ## Common mistakes
 
 - Roasting the latest diff — wrong altitude; the roast reads the whole standing solution.
-- Trimming the list to "the important ones" or severity-sorting it — the owner judges weight; the
-  roast only surfaces. A dropped finding is a silent decision the roast had no right to make.
+- Silently dropping substantiated findings; prioritizing a complete list is different from hiding
+  evidence or inventing severity.
 - Reading "surfaces everything" as "checks nothing" — weighing is the owner's, validating is the
   roast's. A claim it could not substantiate is reported as unsubstantiated, never laundered into
   the list as a finding.
-- Stopping after round one because it "found plenty" — the second round against settled findings is
-  where the deep ones surface.
+- Buying another round without a question it could settle, or keeping a later, more complex
+  candidate merely because it was produced last.
 - Letting the roast write fixes — output is findings + dispositions; execution goes through the
   normal pipeline (`duck-plan` / `duck-review`) like any other work.

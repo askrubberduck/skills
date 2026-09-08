@@ -1,4 +1,4 @@
 interface:
   display_name: "Duck Cut"
-  short_description: "Remove stale work and unblock viable backlog items"
-  default_prompt: "Use $askrubberduck:duck-cut to remove stale work, unblock viable items, and surface owner decisions."
+  short_description: "Make the backlog smaller, not just tidier"
+  default_prompt: "Use $askrubberduck:duck-cut to challenge why each backlog item still exists. Cut what no longer earns its place and unblock what does."

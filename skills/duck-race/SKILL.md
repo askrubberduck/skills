@@ -65,13 +65,18 @@ git -C "$WT_RIVAL" add -A && git -C "$WT_RIVAL" diff "$BASE_SHA" > $SP/rival.dif
 
 ### Adjudicate
 
-1. Run each candidate's tests in its own worktree and record both outputs. Executed evidence only:
-   a candidate whose tests were read but not run has no result.
+1. Run the same outcome checks against both candidates in their own worktrees, as well as each
+   candidate's relevant tests. Derive the shared oracle from the frozen requirements, independently
+   of the implementations where possible. Each passing its own tests alone does not establish
+   comparative correctness. Record inputs, outputs and relevant environment; tests merely read
+   but not executed have no result.
 2. Compare the diffs for divergent assumptions — where the attempts disagree is where the problem
-   statement was weakest; record each divergence as a finding even when both candidates pass.
-3. Pick the winner on the evidence, then steal: fold the loser's better parts into the winning
-   candidate. **Re-run the full suite on the merged result and record it** — per-candidate green
-   does not compose, and the merged run is the only proof the stolen parts fit.
+   statement may be ambiguous; record relevant divergences even when both candidates pass.
+   Different permitted outputs are not defects.
+3. Pick the winner on the evidence. Retain it whole unless combining parts actually improves the
+   required behavior or shape. If you combine candidates, **rerun the common outcome checks and
+   relevant suites on the assembled result**; per-candidate green does not compose. Resolve
+   divergences against permitted behavior, including ordering and tolerances, never by vote.
 4. Two finished attempts minimum. An outage that survives one re-dispatch downgrades the run to a
    single attempt — say so and stop calling it a race.
 
@@ -88,7 +93,7 @@ codex exec -C "$WT" -s workspace-write -m <pinned> "$(cat $SP/turn.md)" </dev/nu
 
 A rally is one red-green pair, and the serve alternates each rally.
 
-1. **Serve (test):** the serving side writes ONE failing test against the problem. Handoff requires
+1. **Serve (test):** the serving side writes ONE failing test against the frozen outcome contract, not merely the existing implementation. Handoff requires
    proven red — the test run's output pasted, failing for the intended reason, not an import error.
    A test without a runnable red proof is rejected and re-served; vague untestable tests are how a
    side dodges the game. Same bar both directions.

@@ -1,4 +1,4 @@
 interface:
   display_name: "Duck Plan"
-  short_description: "Catch plan risks before implementation begins"
-  default_prompt: "Use $askrubberduck:duck-plan to catch risks in this implementation plan before coding."
+  short_description: "Find the hole in the plan before building over it"
+  default_prompt: "Use $askrubberduck:duck-plan to shape this plan and try to falsify its assumptions before implementation. Name the checks that could stop it."
