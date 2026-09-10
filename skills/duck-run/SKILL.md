@@ -53,7 +53,8 @@ A refuted decomposition is replanned; agreement alone never makes it ready. Boun
 ## 3. Execute the smallest surviving path
 
 For each meaningful behavior change: establish the failing outcome, implement the minimum that
-satisfies it, apply `duck-shape`, then `duck-dry`. Use existing checks where possible; trivial edits
+satisfies it, apply `duck-shape`, then take the unit's diff through
+[the prose bar](../duck-dry/references/bar.md). Use existing checks where possible; trivial edits
 need no invented test. Shape and dry apply within the unit before later work depends on it.
 
 Remove superseded paths once the replacement is verified. Preserve required compatibility and
