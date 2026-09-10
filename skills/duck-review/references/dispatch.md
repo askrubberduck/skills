@@ -22,6 +22,10 @@ criteria and source snapshot; do not let participants read each other's draft co
 is an absolute directory under the host's sanctioned scratch root. Preserve essential evidence
 in the work record before disposing of scratch output.
 
+The brief states the language to answer in — the user's, unless they asked otherwise — and that
+verdicts, rankings, paths and quoted errors stay verbatim whatever the prose language. A reviewer
+told nothing answers in its own default and returns findings nobody asked for in that language.
+
 ## Run the reviewers
 
 Run from a neutral scratch directory, never the target checkout. Close stdin, use absolute paths,
@@ -50,7 +54,7 @@ reviews at exit 0:
 
 A zero-byte, greeting-only, timed-out, or crashed dispatch is an outage: a dispatch attempted that
 produced no verdict. **A degraded dispatch is the harder case — full length, well formed, and
-wrong.** Nothing in the exit status distinguishes it, so before trusting any result, read up to three of
-its justifications and confirm each quote actually supports its verdict; one that cites the claim
-under attack as proof of that claim is a malformed result, recorded as such and not counted.
+wrong.** Nothing in the exit status distinguishes it, so before trusting any result, read up to
+three of its justifications and confirm each quote actually supports its verdict; one that cites the
+claim under attack as proof of that claim is a malformed result, recorded as such and not counted.
 **A REJECT is never an outage**, and a same-family pass never substitutes for a required reviewer.

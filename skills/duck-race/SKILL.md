@@ -9,6 +9,9 @@ Decorrelated generation. Two model families work the same problem, and executed 
 what survives — never prose taste, never a vote. Same-family work lets one set of blind spots
 write both sides of the proof.
 
+Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+
 Two modes. **Race** when the question is *which implementation*: both attempt independently, in
 parallel, and the diffs are compared. **Rally** when the question is *which edge cases*: the
 families alternate, one writing a failing test and the other satisfying it. Race exposes divergent
@@ -30,13 +33,12 @@ assumptions; rally turns them into tests. Pick by which of those the work needs.
    — before spending a round. Unknown identity never counts as decorrelated.
 3. Confirm the owner has authorized sending this repository to the rival's vendor, per
    `duck-review`'s export precondition — a rival dispatch ships the same material a review does.
-   Sanity-check a new invocation form with a trivial prompt first; a greeting needs no tool call, so
-   it proves the transport and not the participant's ability to read anything. A zero-byte,
-   greeting-only, timed-out, or crashed dispatch is an outage, not a forfeit: record it and
-   re-dispatch. The
-   problem statement travels as the command's argument, but **anything it refers to — a diff, a
-   corpus, the files to change — is named by absolute path for the participant to open, never
-   pasted in.** Pasted material degrades a dispatch into confident nonsense at exit 0.
+   Sanity-check a new invocation form and classify a failed one by
+   [dispatch mechanics](../duck-review/references/dispatch.md); what it calls an outage is an
+   outage here, not a forfeit: record it and re-dispatch. The problem statement travels as the
+   command's argument, but **anything it refers to — a diff, a corpus, the files to change — is
+   named by absolute path for the participant to open, never pasted in.** Pasted material degrades
+   a dispatch into confident nonsense at exit 0.
 
 ## Race mode
 
@@ -93,10 +95,11 @@ codex exec -C "$WT" -s workspace-write -m <pinned> "$(cat $SP/turn.md)" </dev/nu
 
 A rally is one red-green pair, and the serve alternates each rally.
 
-1. **Serve (test):** the serving side writes ONE failing test against the frozen outcome contract, not merely the existing implementation. Handoff requires
-   proven red — the test run's output pasted, failing for the intended reason, not an import error.
-   A test without a runnable red proof is rejected and re-served; vague untestable tests are how a
-   side dodges the game. Same bar both directions.
+1. **Serve (test):** the serving side writes ONE failing test against the frozen outcome contract,
+   not merely the existing implementation. Handoff requires proven red — the test run's output
+   pasted, failing for the intended reason, not an import error. A test without a runnable red proof
+   is rejected and re-served; vague untestable tests are how a side dodges the game. Same bar both
+   directions.
 2. **Return (implement):** the other side writes the minimum that turns the suite green. Handoff
    requires proven green — full suite output pasted — and **no edits to any test in the same turn**.
    Editing the test you were served is the void condition; a test the returner believes is wrong

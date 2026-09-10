@@ -9,6 +9,9 @@ Context cost has two bodies: what sessions burn at runtime — cache-read of a m
 dominates it — and what the installed config bills every turn before work even starts. Both diets
 here; the product of the audit is deletions.
 
+Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+
 ## The six runtime rules
 
 1. **Preserve state at context boundaries.** Use host compaction or a fresh isolated session when
@@ -25,9 +28,9 @@ here; the product of the audit is deletions.
 4. **Stage routing: start cheap, bounce up on failure.** Route by stage, both model AND agent type.
    - **Mechanical work** (investigation, scripted edits, rebases, clerical verification, recording)
      defaults to cheap-model executor agents — but only with a pinned model whose identity is
-     verified from runtime or provider metadata, and a named gate (tests, compiler, a dedicated check script) that catches the stage's
-     failure, executed and its result recorded before the stage's output is used. No pin or no gate,
-     no cheap tier.
+     verified from runtime or provider metadata, and a named gate (tests, compiler, a dedicated
+     check script) that catches the stage's failure, executed and its result recorded before the
+     stage's output is used. No pin or no gate, no cheap tier.
    - **Bounce up on failure.** A cheap agent that fails its gate, or fails to converge on a second
      attempt at the same slice, has answered the routing question: re-dispatch that slice to the
      strongest tier, or to an agent with elevated reasoning limits, carrying the failure context

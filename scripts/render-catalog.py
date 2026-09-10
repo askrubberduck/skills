@@ -18,6 +18,8 @@ but lacks native Agent Skills discovery. Regenerate with `python3 scripts/render
 
 The duck reads before it speaks. When a task matches a skill below, read its `SKILL.md` and
 follow it before proceeding. Challenge the claim, run the check, keep the evidence.
+English is the home language; match task intent across languages. Follow the user's
+requested language, keeping commands, paths, identifiers, quoted errors and verdicts unchanged.
 Installed location: `~/.agents/skills/<name>/SKILL.md` (or this repo's `skills/<name>/SKILL.md`).
 """
 

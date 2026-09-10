@@ -1,6 +1,6 @@
 {
   "name": "askrubberduck",
-  "description": "Make the work prove itself. Challenge the goal, cut the clutter, and check what actually happened.",
+  "description": "Make the work prove itself. Challenge the goal, cut the clutter, and check what actually happened. English workflows. Ask in your language; check what the duck did.",
   "version": "3.0.0",
   "author": {
     "name": "askrubberduck"
@@ -13,7 +13,8 @@
     "planning",
     "backlog",
     "git-hygiene",
-    "workflows"
+    "workflows",
+    "russian"
   ],
   "license": "MIT"
 }

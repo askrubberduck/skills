@@ -9,6 +9,9 @@ Own the whole authorized task. Carry the outcome, constraints, candidate, valid 
 action across stages. A skill returning a finding is a handoff to this caller, not an automatic
 reason to ask for another go-ahead.
 
+Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+
 ## Scope, endpoint and isolation
 
 Read the user's existing authority first. Local implementation ends with a verified local candidate;
@@ -80,7 +83,29 @@ proof, break and plan sections; give the consumer exact locations. Preserve esse
 before scratch cleanup. An authorized local task can finish here with its evidence and any stated
 verification limits, without creating a commit, PR or release verdict.
 
-## Review-loop ownership and stable criteria
+## 5. Independent review, when requested or required for release
+
+Prepare the candidate and evidence before invoking `duck-review`. If committing is authorized,
+record the exact commit; otherwise review an explicit worktree snapshot and do not treat that as a
+landable SHA. A gate-policy change is reviewed under PRE-change rules, never its own relaxed rules.
+
+Act on the single adjudicated result:
+
+- APPROVE: continue only to the already authorized release action.
+- REJECT: name each substantiated blocker's cause, using `duck-why` when it is not established.
+  Repair at the level the evidence refutes: line, shared contract, mechanism, or goal. Rerun
+  affected verification before reviewing the changed candidate.
+- NOTE: resolve missing material evidence or criteria if possible. It is neither approval nor a
+  reason to invent a repair. An unavailable gate does not prevent completing authorized local work.
+
+Before a third or later review round, record a loop diagnosis. Contradicted premises go to frame;
+wrong decomposition to plan; repeated missed cases to an executable class-level check or
+`duck-race` rally; rival implementations to race; real owner tradeoffs to decide. Continue review
+only when a named unresolved cause is shrinking and new evidence will be available. Repeated
+blockers from one class require repairing the method, not buying another round on the same basis.
+Respect the owner's effort bound; at the limit state unresolved claims, never manufacture approval.
+
+### Review-loop ownership and stable criteria
 
 The coordinating caller owns convergence, including when nobody is available to answer questions.
 Name that coordinator in the existing work record; preserve the role across handoffs. Reviewers
@@ -106,28 +131,6 @@ hold dependent work without inventing replacement criteria. Without the user, ma
 technical decisions and continue independent work; do not guess their tradeoff or loop waiting for
 agreement. A later explicit continuation can supply a new bound; elapsed time cannot.
 
-## 5. Independent review, when requested or required for release
-
-Prepare the candidate and evidence before invoking `duck-review`. If committing is authorized,
-record the exact commit; otherwise review an explicit worktree snapshot and do not treat that as a
-landable SHA. A gate-policy change is reviewed under PRE-change rules, never its own relaxed rules.
-
-Act on the single adjudicated result:
-
-- APPROVE: continue only to the already authorized release action.
-- REJECT: name each substantiated blocker's cause, using `duck-why` when it is not established.
-  Repair at the level the evidence refutes: line, shared contract, mechanism, or goal. Rerun
-  affected verification before reviewing the changed candidate.
-- NOTE: resolve missing material evidence or criteria if possible. It is neither approval nor a
-  reason to invent a repair. An unavailable gate does not prevent completing authorized local work.
-
-Before a third or later review round, record a loop diagnosis. Contradicted premises go to frame;
-wrong decomposition to plan; repeated missed cases to an executable class-level check or
-`duck-race` rally; rival implementations to race; real owner tradeoffs to decide. Continue review
-only when a named unresolved cause is shrinking and new evidence will be available. Repeated
-blockers from one class require repairing the method, not buying another round on the same basis.
-Respect the owner's effort bound; at the limit state unresolved claims, never manufacture approval.
-
 ## 6. Land only when authorized
 
 Use `duck-land` for an authorized merge after its gate passes. It checks the exact candidate/base,
@@ -143,7 +146,5 @@ mechanism; a permission rejection does not. Keep working until the authorized en
 owner decision on dependent work, an external block, an instruction to stop, or a real scheduled
 handoff. Never claim a handoff was booked without a host result confirming it.
 
-At a context boundary, preserve the outcome, source/candidate identity, valid evidence, unresolved
-claims and next authorized action. Use host compaction, a fresh session or a scheduled continuation
-according to actual capabilities and need, not a universal reset rule. Close with what changed,
-what was tested, and what remains unproven or unauthorized.
+At a context boundary, preserve what `duck-diet`'s first runtime rule requires. Close with what
+changed, what was tested, and what remains unproven or unauthorized.

@@ -1,6 +1,6 @@
 ---
 name: duck-dry
-description: Strip comments, docstrings, commit messages, and PR descriptions until only unobvious decisions, contracts, and traps survive. Use when generated code or tests carry narration, storytelling, or change history in comments, when a comment restates the line under it, when a commit message or PR description narrates instead of carrying what the diff cannot, before committing or reviewing generated code, or the user asks to dry, prune, or de-slop comments or commit prose.
+description: Strip comments, docstrings, commit messages, and PR descriptions until only unobvious decisions, contracts, and traps survive. Use for redundant comments, generated code narration, or commit and PR prose that repeats the diff; before committing or reviewing generated code. Preserve parsed directives. Not ordinary prose editing.
 ---
 
 # Duck Dry
@@ -11,6 +11,9 @@ that repeats what the code already says is not documentation, it is duplication 
 Default: delete. The bar to keep: one fact the code cannot carry, written for a reader who knows
 the language.
 
+Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+
 Volume is not the target and neither is zero. A quota — "cut half the comments" — replaces
 judgment with a number. The unit of work is one comment against the keep test.
 
@@ -18,9 +21,9 @@ judgment with a number. The unit of work is one comment against the keep test.
 
 The diff by default: `git diff`, `git diff --staged`, or `<base>..<candidate>`. Drying your own
 uncommitted diff needs no ceremony — those comments were never anyone's baseline. A file or tree
-already committed is swept only when named, and **keep that sweep separate from behavioral edits** — mixed into a
-behavior change, a code fix rides in hidden among prose deletions where no reviewer will find it,
-and a repo-wide pass churns blame across code nobody touched.
+already committed is swept only when named, and **keep that sweep separate from behavioral edits** —
+mixed into a behavior change, a code fix rides in hidden among prose deletions where no reviewer
+will find it, and a repo-wide pass churns blame across code nobody touched.
 
 Report-only means findings without edits. Repair unclear code only within authorized scope;
 otherwise name the proposed repair. Local editing does not authorize a commit or publication.
@@ -60,8 +63,9 @@ a license, and no comment-quality argument touches it.
 ## One of three dispositions per comment
 
 1. **Delete** — it restates the code, narrates the next line, banners a section, apologizes for or
-   praises itself, records history ("changed from", "previously", "new:", "as requested in review"),
-   or is commented-out code. Deleting is the whole fix.
+   praises itself, records history (English "changed from", "previously", "new:", "as requested in
+   review", and whatever the codebase's own language says for them), or is commented-out code.
+   Deleting is the whole fix.
 2. **Fix the code** — the comment exists because a name, a signature, or a boundary is unclear.
    Rename, extract, invert the guard, split the function; the comment dies with the confusion it
    was covering. A docstring that needs a list to describe one function is a single-responsibility
@@ -113,28 +117,28 @@ never in a comment beside it.
 
 ## Then prove nothing broke
 
-A comment sweep is not free. Run checks affected by the sweep — directive-aware lint/type checks, relevant tests, and the
-doc build if it publishes from docstrings — plus every gate the repository requires. A deleted directive surfaces as a new lint or type
-error, never as a worse comment, so an unrun gate after a sweep is an unverified claim like any
-other.
+A comment sweep is not free. Run checks affected by the sweep — directive-aware lint/type checks,
+relevant tests, and the doc build if it publishes from docstrings — plus every gate the repository
+requires. A deleted directive surfaces as a new lint or type error, never as a worse comment, so an
+unrun gate after a sweep is an unverified claim like any other.
 
 **Reading the diff is not the proof.** A sweep is the one diff a reviewer skims, so establish
-comment-only mechanically: strip comments from both revisions and diff what is left, ignoring
-only whitespace the language treats as insignificant. Preserve indentation, newlines and spacing
-where they affect semantics. Every non-comment token must be identical unless a code change was the point and is
-stated — a disposition 2 fix, or a fact moved into a string the code already prints. Strip with
-something that parses the language — its own AST printer, a tree-sitter comment query — never a
-regex on `//` or `#`: it eats URLs and string contents, failing on the string case below. Run it
-per file across the whole sweep; it is the only thing that catches a code edit riding among prose
+comment-only mechanically: strip comments from both revisions and diff what is left, ignoring only
+whitespace the language treats as insignificant. Preserve indentation, newlines and spacing where
+they affect semantics. Every non-comment token must be identical unless a code change was the point
+and is stated — a disposition 2 fix, or a fact moved into a string the code already prints. Strip
+with something that parses the language — its own AST printer, a tree-sitter comment query — never a
+regex on `//` or `#`: it eats URLs and string contents, failing on the string case below. Run it per
+file across the whole sweep; it is the only thing that catches a code edit riding among prose
 deletions.
 
 Three ways a comment edit silently becomes a code edit, each of which reads as pure deletion:
 
-- **The formatter realigns.** A comment between aligned fields — in a struct, a composite literal,
-  a `var`/`const` block, any run the formatter pads into columns — separates two alignment groups.
+- **The formatter realigns.** A comment between aligned fields — in a struct, a composite literal, a
+  `var`/`const` block, any run the formatter pads into columns — separates two alignment groups.
   Delete it and the formatter re-aligns every name around it. The strip-and-diff above cannot see
-  this, because it may ignore insignificant whitespace; run the formatter's own check as a second gate and put a
-  blank line back where the comment was if it complains.
+  this, because it may ignore insignificant whitespace; run the formatter's own check as a second
+  gate and put a blank line back where the comment was if it complains.
 - **Declarations get merged.** Hoisting two constants into one block so they can share a comment is
   a refactor wearing a comment edit's clothes.
 - **A string is not a comment.** Prose inside an assertion message, an error constructor, or a test
