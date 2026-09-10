@@ -94,9 +94,11 @@ external contracts and calibrated knobs. Do not silently change behavior during 
 
 ## Handoff
 
-Apply justified changes where execution is already authorized, then verify. A real owner decision
-goes to `duck-decide`; independent work can continue. A whole-product critique belongs to
-`duck-roast`, not an unrequested expansion of the current restructure.
+Apply justified changes where execution is already authorized. Take the edited diff through
+[the prose bar](../duck-dry/references/bar.md) before verifying: a restructure moves the code a
+comment described. A real owner decision goes to `duck-decide`; independent work can continue. A
+whole-product critique belongs to `duck-roast`, not an unrequested expansion of the current
+restructure.
 
 The structural probe is evidence, not independent approval. `duck-review` judges release work under
 the repository's policy. Keep unrelated restructures separate from behavior changes when commits

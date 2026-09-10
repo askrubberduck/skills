@@ -18,9 +18,8 @@ they name sits outside the checkout. **The registry need not be in the checkout*
 what the repo actually has: docs that list items with states, active work-item directories, open
 PRs and issues through the host's CLI (`gh pr list`). Match a candidate on what it contains, never
 on what it is called — `STATUS.md`, `BACKLOG.md`, `TODO.md` and a delivery README are shapes that
-recur, not a lookup table, and a fixed list of filenames is a guess wearing a procedure's clothes.
-Use whichever exist; if none do, say so and ask where the backlog lives — once, then remember the
-answer for the session.
+recur, not a lookup table. Use whichever exist; if none do, say so and ask where the backlog
+lives — once, then remember the answer for the session.
 
 **An in-repo miss is not an empty backlog.** Reporting "nothing open" from a scan that only
 searched the working tree is the failure this step exists to prevent: the repo looks quiet because
