@@ -10,6 +10,9 @@ a reviewer is not a substitute for the doer's own breaking attempts. If the buil
 the independent findings, identify that limited independence rather than claiming the final
 judgment was wholly external.
 
+Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+
 **One invocation, one judgment.** Never edit the candidate, create its prerequisite evidence, loop
 until reviewers approve, or land it. The caller owns repairs and the next authorized action.
 Analysis-only returns findings without implying release approval.
@@ -48,11 +51,11 @@ Analysis-only returns findings without implying release approval.
    list. Missing material evidence means the gate cannot approve; a standalone opinion may still
    report what it can establish.
 6. Do not dispatch beyond the caller's recorded bound; return the unresolved status and evidence
-   without approval. For a third or later review round, require the caller's recorded loop diagnosis: why another
-   round will add evidence, or which reframe/replan/race/rally/owner-decision exit it selected.
-   Judge progress by unresolved causes, not wording or finding counts. A local record needs no
-   commit unless the repository requires one. Do not dispatch an unchanged candidate just to seek
-   a friendlier verdict.
+   without approval. For a third or later review round, require the caller's recorded loop
+   diagnosis: why another round will add evidence, or which reframe/replan/race/rally/owner-decision
+   exit it selected. Judge progress by unresolved causes, not wording or finding counts. A local
+   record needs no commit unless the repository requires one. Do not dispatch an unchanged candidate
+   just to seek a friendlier verdict.
 
 Use [dispatch mechanics](references/dispatch.md) for identity, isolation, export authority and
 transport checks. Pass review material by absolute path with source access; the brief carries
@@ -116,10 +119,11 @@ if missing evidence prevents a gate decision, return NOTE and name the uncertain
 
 Return exactly one superreview result:
 
-- `APPROVE` — a gate decision was requested, **every required reviewer returned a usable verdict**, and no
-  substantiated `BLOCKER` remains. An outage on a required reviewer bars `APPROVE`: it produced no
-  findings, which is not the same as finding nothing. Retry an outage once within the effort bound, or return `NOTE` and say which
-  participant is missing. Never reduce the required set after dispatch.
+- `APPROVE` — a gate decision was requested, **every required reviewer returned a usable verdict**,
+  and no substantiated `BLOCKER` remains. An outage on a required reviewer bars `APPROVE`: it
+  produced no findings, which is not the same as finding nothing. Retry an outage once within the
+  effort bound, or return `NOTE` and say which participant is missing. Never reduce the required set
+  after dispatch.
 - `REJECT` — at least one substantiated `BLOCKER` remains.
 - `NOTE` — something material stands out, but no gate decision was requested or the available
   criteria and evidence do not support one. `NOTE` neither authorizes nor rejects the candidate.
@@ -131,7 +135,8 @@ may land only `APPROVE`; a superreview `NOTE` is a non-decision, not a hidden pa
 
 Report the authoritative result, each reviewer's pinned model id and family, each raw verdict, every
 finding's adjudicated classification and evidence, any outage or downgrade, and the exact target and
-criteria reviewed. Keep raw CLI stdout in scratch; preserve the decisive evidence before scratch cleanup.
+criteria reviewed. Keep raw CLI stdout in scratch; preserve the decisive evidence before scratch
+cleanup.
 
 **Write that report where the landing gate can read it** — the same durable records home as the
 receipts, never only into the caller's context or `$SP`, and never as a commit on the candidate

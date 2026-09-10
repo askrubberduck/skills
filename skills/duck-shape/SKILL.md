@@ -9,6 +9,9 @@ The cost is what a reader must hold simultaneously before changing the code safe
 its place when it answers a question and ends the read. Depth, file count and line count cannot
 measure that. Removing a required invariant to shorten the code is a failed simplification.
 
+Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+
 Apply improvements within authorized implementation scope. Report-only means inspect and recommend
 without edits. Selected findings limit subsequent fixes; continue authorized local work through
 verification, not through unrequested commits, PRs or pushes.

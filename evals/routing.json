@@ -1,0 +1,234 @@
+{
+  "purpose": "Selection-only probes against the installed English descriptions. Select the primary skill or none; do not execute workflows. These cases do not establish workflow behavior or reply language.",
+  "cases": [
+    {
+      "skill": "duck-break",
+      "prompts": {
+        "en": [
+          "Try to break this implementation and show the inputs that caused real failures."
+        ],
+        "ru": [
+          "попробуй сломать реализацию",
+          "проверь систему на прочность"
+        ]
+      }
+    },
+    {
+      "skill": "duck-campaign",
+      "prompts": {
+        "en": [
+          "Turn this project vision into independent workstreams that can ship separately."
+        ],
+        "ru": [
+          "разбей проект на независимые потоки",
+          "сделай всё что можно параллельно"
+        ]
+      }
+    },
+    {
+      "skill": "duck-cut",
+      "prompts": {
+        "en": [
+          "Clean up this backlog: retire obsolete tasks, merge duplicates, and unblock useful work."
+        ],
+        "ru": [
+          "почисти бэклог",
+          "закрой ненужные задачи"
+        ]
+      }
+    },
+    {
+      "skill": "duck-decide",
+      "prompts": {
+        "en": [
+          "Walk me through the project decisions that need my answer, one at a time."
+        ],
+        "ru": [
+          "разбери решения, которые ждут меня",
+          "что нужно решить владельцу"
+        ]
+      }
+    },
+    {
+      "skill": "duck-diet",
+      "prompts": {
+        "en": [
+          "Find where my agent setup wastes context and tokens; keep the necessary instructions."
+        ],
+        "ru": [
+          "сократи контекст агента",
+          "урежь расход токенов",
+          "почисти CLAUDE.md"
+        ]
+      }
+    },
+    {
+      "skill": "duck-dry",
+      "prompts": {
+        "en": [
+          "Trim the comments in this code and the PR description to facts the diff cannot explain."
+        ],
+        "ru": [
+          "почисти комментарии в коде",
+          "сократи описание коммита"
+        ]
+      }
+    },
+    {
+      "skill": "duck-frame",
+      "prompts": {
+        "en": [
+          "Work out this system’s requirements, constraints, and architecture before we plan implementation."
+        ],
+        "ru": [
+          "спроектируй систему",
+          "продумай архитектуру и ограничения"
+        ]
+      }
+    },
+    {
+      "skill": "duck-land",
+      "prompts": {
+        "en": [
+          "Merge this approved PR, verify what landed, record it, and clean up the branch."
+        ],
+        "ru": [
+          "влей проверенную ветку",
+          "смерджи одобренный PR"
+        ]
+      }
+    },
+    {
+      "skill": "duck-learn",
+      "prompts": {
+        "en": [
+          "Look back over these coding sessions and extract lessons worth keeping."
+        ],
+        "ru": [
+          "разбор полётов по сессии",
+          "какие уроки вынести из этой работы"
+        ]
+      }
+    },
+    {
+      "skill": "duck-plan",
+      "prompts": {
+        "en": [
+          "Challenge this implementation plan and identify checks that could disprove its assumptions."
+        ],
+        "ru": [
+          "составь план разработки",
+          "проверь план реализации"
+        ]
+      }
+    },
+    {
+      "skill": "duck-proof",
+      "prompts": {
+        "en": [
+          "Prove that this goal is worth pursuing and that the proposed solution works."
+        ],
+        "ru": [
+          "докажи что решение работает",
+          "обоснуй необходимость этой цели"
+        ]
+      }
+    },
+    {
+      "skill": "duck-race",
+      "prompts": {
+        "en": [
+          "Have two model families solve this task independently and compare their results using the same checks."
+        ],
+        "ru": [
+          "устрой гонку моделей",
+          "пинг-понг по задаче"
+        ]
+      }
+    },
+    {
+      "skill": "duck-review",
+      "prompts": {
+        "en": [
+          "Give this PR an independent review against the agreed criteria. Return a verdict without fixing or merging it."
+        ],
+        "ru": [
+          "сделай независимое ревью",
+          "проверь пулреквест"
+        ]
+      }
+    },
+    {
+      "skill": "duck-roast",
+      "prompts": {
+        "en": [
+          "Critique the whole codebase for over-engineering and keep only findings backed by evidence."
+        ],
+        "ru": [
+          "разнеси решение целиком",
+          "найди переусложнение в кодовой базе"
+        ]
+      }
+    },
+    {
+      "skill": "duck-run",
+      "prompts": {
+        "en": [
+          "Take this task through goal validation, planning, implementation, and proof. Stop at a verified local change."
+        ],
+        "ru": [
+          "возьми задачу в работу целиком",
+          "прогони задачу через пайплайн"
+        ]
+      }
+    },
+    {
+      "skill": "duck-scan",
+      "prompts": {
+        "en": [
+          "Show which tasks in this repository are ready and which are blocked, without changing anything."
+        ],
+        "ru": [
+          "что готово к работе в репозитории",
+          "покажи статус задач"
+        ]
+      }
+    },
+    {
+      "skill": "duck-shape",
+      "prompts": {
+        "en": [
+          "Simplify this code’s structure while preserving its required contracts."
+        ],
+        "ru": [
+          "упрости код",
+          "убери лишние абстракции"
+        ]
+      }
+    },
+    {
+      "skill": "duck-sweep",
+      "prompts": {
+        "en": [
+          "Clean up stale branches, worktrees, and scratch directories after verifying that no work will be lost."
+        ],
+        "ru": [
+          "почисти репозиторий",
+          "убери старые ветки и воркдиры"
+        ]
+      }
+    },
+    {
+      "skill": "duck-why",
+      "prompts": {
+        "en": [
+          "Find the cause of this build failure before writing a fix."
+        ],
+        "ru": [
+          "почему падает сборка",
+          "найди причину ошибки"
+        ]
+      }
+    }
+  ]
+}

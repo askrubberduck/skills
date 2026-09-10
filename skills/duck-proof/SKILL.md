@@ -9,6 +9,9 @@ Try to falsify the claim, including the owner's preferred goal or mechanism. Agr
 aggressive review, and a green suite are not substitutes for a discriminating test. A supported
 claim may survive unchanged; do not manufacture defects to look skeptical.
 
+Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+
 ## Scope and authority
 
 Identify the object: goal, design, plan, implementation, or completed shape. State the outcome,
@@ -118,8 +121,9 @@ missing independence honestly rather than silently upgrading a self-check into a
 For a standalone question, a concise response with commands, results and limits is sufficient.
 When another stage consumes the pass, write or update the project's existing durable work record:
 claim, candidate identity, relevant environment, attack, observation, repairs and final reruns.
-Resolve the home from instructions, existing convention, then an owner-provided task directory;
-ask only if a durable handoff is required and none is available. Do not invent a records branch.
+Resolve the home from instructions — including a location outside the tree — then existing
+convention, then an owner-provided task directory; ask only if a durable handoff is required and
+none is available. Do not invent a records branch.
 
 Use `proof-rN.md` when the consumer expects it, or give the consumer the exact section in a shared
 work record. Evidence and referenced artifacts must survive that handoff; scratch paths that will

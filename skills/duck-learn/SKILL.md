@@ -8,6 +8,9 @@ description: Turn session and delivery evidence into reusable lessons, so each m
 The feedback loop: evidence from past work becomes durable updates — a skill, a memory, a rule —
 or gets consciously discarded. Lessons that live only in a chat transcript are lessons lost.
 
+Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+
 ## Recipe
 
 1. **Gather evidence, don't reminisce.**

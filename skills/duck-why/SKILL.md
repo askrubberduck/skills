@@ -8,6 +8,9 @@ description: Name the cause of a failure before anyone writes a fix, because the
 Explain the failure out loud, in order, to something that believes none of it. Most bugs die in
 that sentence — the step you skip while explaining is the step you skipped while writing.
 
+Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+
 **This skill names a cause. It does not fix one.** Doer and judge stay separate here for the same
 reason they do in `duck-break`: the pass that finds a cause and the pass that repairs it reward
 opposite instincts, and running them together turns "I understand this" into "I changed something

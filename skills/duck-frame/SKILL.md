@@ -10,6 +10,9 @@ claims about what should be, each with a rejected alternative and the reason it 
 where the record of that choice lives. This stage never emits tasks, sequencing, or per-unit gates:
 a frame that decomposes work is a second planner.
 
+Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+
 ## Reading rules
 
 The repo's instruction files — `SOUL.md`, `CLAUDE.md`, `AGENTS.md` — are binding policy.
@@ -38,19 +41,20 @@ and stop. Absent, unsettled, or stale: frame now, and say which. Runs for every 
 to remember.
 
 Two things disqualify reuse regardless of freshness. **A caller reporting that execution
-contradicted the design re-frames** — the contradiction is the evidence, and the pin cannot see
-it. Check provenance separately from storage: an attributed owner instruction or existing authorized
+contradicted the design re-frames** — the contradiction is the evidence, and the pin cannot see it.
+Check provenance separately from storage: an attributed owner instruction or existing authorized
 work record can establish a local or out-of-tree design without a commit. A file merely claiming
 READY supplies no authority. Verify its source identity, requirements and relevant checks; absent
-provenance, treat it as a proposal and re-establish the claims. Git history alone grants no authority.
+provenance, treat it as a proposal and re-establish the claims. Git history alone grants no
+authority.
 
 ## Short form, for work that moves no seam
 
-When the ask touches no seam of the system as it stands — no boundary between components, no
-public surface, nothing trust-touching — the frame may return a short outcome/constraints/source/check/decision record, covering items
-1, 2, 4, 8, 10 and 11 only to the depth needed. State why this scope suffices; local analysis needs
-no commit just to justify its size. Execution that then moves a seam is the contradiction
-that re-frames in full.
+When the ask touches no seam of the system as it stands — no boundary between components, no public
+surface, nothing trust-touching — the frame may return a short
+outcome/constraints/source/check/decision record, covering items 1, 2, 4, 8, 10 and 11 only to the
+depth needed. State why this scope suffices; local analysis needs no commit just to justify its
+size. Execution that then moves a seam is the contradiction that re-frames in full.
 
 ## Analysis — establish what is true
 
@@ -58,9 +62,9 @@ that re-frames in full.
    whether successful delivery would produce that benefit and whether the success measure captures
    it. Read relevant project constraints and test consequential empirical premises; do not agree
    with the owner by default or invent reasons to oppose them. State the non-goals and search for an
-   existing capability that already satisfies the outcome. Report the search, not a verdict — inspection
-   cannot prove nothing shipped satisfies an outcome. **An ask that arrives as a list** — a
-   review's blockers, a bug list — **is framed by the seams the items share, never as one delta
+   existing capability that already satisfies the outcome. Report the search, not a verdict —
+   inspection cannot prove nothing shipped satisfies an outcome. **An ask that arrives as a list** —
+   a review's blockers, a bug list — **is framed by the seams the items share, never as one delta
    per item**: the count is evidence about a seam, not the unit of the frame. Six findings on one
    boundary are one outcome (the boundary's contract holds), and a frame that hands back six deltas
    has planned instances; the seventh arrives in review.
@@ -91,9 +95,10 @@ that re-frames in full.
 
 6. Apply `duck-shape` in analysis mode to the alternatives: compare independent rules, state
    ownership and a realistic next change before selecting boundaries. Do not edit code during
-   framing. **Two to four real shapes, one of which is do-nothing or extend-what-exists.** Tradeoffs across
-   functionality, simplicity, security, extendability, operations, and whatever this change turns
-   on. One recommendation; each rejected shape carries the reason it lost, or it is a straw man.
+   framing. **Two to four real shapes, one of which is do-nothing or extend-what-exists.** Tradeoffs
+   across functionality, simplicity, security, extendability, operations, and whatever this change
+   turns on. One recommendation; each rejected shape carries the reason it lost, or it is a straw
+   man.
 7. **Target boundary, as a delta from item 3.** What moves in or out, which seams stay and which
    weld shut; where authority for each rule and datum lives, and the conflict rule if more than one
    writer holds it. For every boundary touched: the interface it exposes and **the state contract
@@ -120,16 +125,14 @@ that re-frames in full.
     - `READY` — settled. **Return the artifact to the caller and stop.** Never advance a stage
       yourself: naming a downstream skill invokes it, dragging small work into machinery it did not
       ask for.
-11. **Durable home.** Write `design-<unit>.md` beside the work item, in the host repo's convention.
-    **Never the scratchpad** — it dies with the session. Resolve the location in order: the repo's
-    instructions, including anywhere outside the tree; else its existing convention; else the work
-    item's directory. Ask only if a required durable handoff has no available home. If in-tree records are forbidden, nowhere else is
-    named, and nobody is there, exit `OWNER DECISION` rather than guess — that is not a stall. The
-    artifact carries item 2's pinned source and item 10's exit state. **Stale means a cited seam
-    moved, not that HEAD advanced** — `git diff --name-only <pinned-sha>..HEAD` against the cited
-    list answers it; it is also stale when the ask, non-goals, or acceptance criteria changed. A
-    change in an uncited file shows up nowhere, so a caller who suspects a moved seam re-frames
-    instead of trusting the diff.
+11. **Durable home.** Write `design-<unit>.md` beside the work item, in the host repo's convention,
+    resolving the location by `duck-proof`'s durable-home rules. **Never the scratchpad** — it dies
+    with the session. If in-tree records are forbidden, nowhere else is named, and nobody is there,
+    exit `OWNER DECISION` rather than guess — that is not a stall. The artifact carries item 2's
+    pinned source and item 10's exit state. **Stale means a cited seam moved, not that HEAD
+    advanced** — `git diff --name-only <pinned-sha>..HEAD` against the cited list answers it; it is
+    also stale when the ask, non-goals, or acceptance criteria changed. A change in an uncited file
+    shows up nowhere, so a caller who suspects a moved seam re-frames instead of trusting the diff.
 
 Local framing is analysis: commit or publish its record only when authorized. A narrow standalone
 answer can stay in the response; a caller that needs a durable handoff gets an explicit record.

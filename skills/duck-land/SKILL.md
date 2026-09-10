@@ -8,6 +8,9 @@ description: Merge approved work, update project records, and clean up the branc
 The ship step: gate passed → merge → record → clean. A merge without a recorded outcome is work
 the repo forgot; a record without a verified merge is fiction.
 
+Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+
 A passed gate establishes readiness, not permission to merge. Use the endpoint already authorized
 by the user: a request only to push or prepare a PR does not authorize merging or branch deletion.
 
@@ -23,11 +26,11 @@ by the user: a request only to push or prepare a PR does not authorize merging o
   wrong branches; confirm the branch you are landing from — and the PR head where there is one —
   points at the candidate. The remote default branch is what landing *moves*, so it is never
   part of this equality check; step 2 is what verifies where it ended up.
-- Re-verify the base: `git fetch`, compare origin/<base> to what was branched from. **If it advanced,
-  integrating it produces a new head nobody authorized** — conflict resolutions and semantic
-  merges ride in unexamined. Integrate, re-run the repo's checks, and **re-authorize the resulting
-  SHA** the same way this landing was authorized — the review gate, or the owner's renewed written
-  waiver; landing on the strength of the old authorization merges an unexamined diff.
+- Re-verify the base: `git fetch`, compare origin/<base> to what was branched from. **If it
+  advanced, integrating it produces a new head nobody authorized** — conflict resolutions and
+  semantic merges ride in unexamined. Integrate, re-run the repo's checks, and **re-authorize the
+  resulting SHA** the same way this landing was authorized — the review gate, or the owner's renewed
+  written waiver; landing on the strength of the old authorization merges an unexamined diff.
 - CI green on the exact head being merged.
 - **Commit messages and the PR description meet `duck-dry`'s prose bar**, checked before
   merge: a squash merge promotes the description into the commit body, so slop in either ships
@@ -81,10 +84,11 @@ by the user: a request only to push or prepare a PR does not authorize merging o
    PR number, merged SHA, and what changed. One recorded outcome per landing.
 4. Close or queue obligations the change touched — the doer never closes an item that needs the
    owner's sign-off; queue those (`duck-decide` presents them).
-5. Clean up: delete the merged branch and its worktree. Step 2's read-back is what makes this
-   safe and what `duck-sweep` cannot derive on its own — a squash leaves no metadata linking the
-   branch to the commit that replaced it, so **record the landed SHA in step 3's outcome entry**
-   and delete against that, not against a classifier's guess. Record a resumable boundary; continue other authorized work if the host and task allow it.
+5. Clean up: delete the merged branch and its worktree. Step 2's read-back is what makes this safe
+   and what `duck-sweep` cannot derive on its own — a squash leaves no metadata linking the branch
+   to the commit that replaced it, so **record the landed SHA in step 3's outcome entry** and delete
+   against that, not against a classifier's guess. Record a resumable boundary; continue other
+   authorized work if the host and task allow it.
 
 ## Common mistakes
 

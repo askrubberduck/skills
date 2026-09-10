@@ -195,6 +195,12 @@ def check_skill(root: Path, name: str, found: set[str], errors: list[str]) -> No
         elif len(description) > MAX_DESCRIPTION:
             errors.append(f"{where}: description is {len(description)} characters, over the "
                           f"{MAX_DESCRIPTION} budget — every host loads all of them, every session")
+        # A plain scalar ends at ": " or " #", so a description that grows a label reads as a
+        # nested mapping and every host's YAML parser refuses the file. The split above still
+        # sees a description: measured, the whole gate passed a skill Psych would not load.
+        elif token := next((t for t in (": ", " #") if t in description), None):
+            errors.append(f"{where}: description contains {token!r} — a plain YAML scalar ends "
+                          "there, so no host can load the skill")
 
     interface_path = root / "skills" / name / "agents" / "openai.yaml"
     try:
@@ -341,6 +347,8 @@ CASES: list[tuple[str, str, Callable[[Path], None]]] = [
     ("required reference deleted", "must reference `duck-shape`",
      lambda c: edit(c, "skills/duck-review/SKILL.md",
                     "`duck-shape` owns this lens at change time; ", "")),
+    ("description ends a plain YAML scalar", "no host can load the skill",
+     lambda c: edit(c, SCAN, "Find ready, blocked", "Note: find ready, blocked")),
     ("description over budget", "over the 600 budget",
      lambda c: edit(c, SCAN, "Find ready, blocked", "x" * 600 + " Find ready, blocked")),
     ("skill directory without a SKILL.md", "directory without a SKILL.md",

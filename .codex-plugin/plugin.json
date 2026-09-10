@@ -1,7 +1,7 @@
 {
   "name": "askrubberduck",
   "version": "3.0.0",
-  "description": "Make the work prove itself. Challenge the goal, cut the clutter, and check what actually happened.",
+  "description": "Make the work prove itself. Challenge the goal, cut the clutter, and check what actually happened. English workflows. Ask in your language; check what the duck did.",
   "author": {
     "name": "askrubberduck",
     "url": "https://github.com/askrubberduck"
@@ -15,13 +15,14 @@
     "planning",
     "backlog",
     "git-hygiene",
-    "workflows"
+    "workflows",
+    "russian"
   ],
   "skills": "./skills/",
   "interface": {
     "displayName": "askrubberduck",
     "shortDescription": "Make the work prove itself. Confidence earns nothing.",
-    "longDescription": "Your agent says it is done. The duck asks what could break it. Challenge the goal, shape the plan, build the smallest robust path, and run the checks after the last fix. Choose the challenge the task needs; keep release review independent. The agent owns the loop. Nobody moves the finish line.",
+    "longDescription": "Your agent says it is done. The duck asks what could break it. Challenge the goal, shape the plan, build the smallest robust path, and run the checks after the last fix. Choose the challenge the task needs; keep release review independent. The agent owns the loop. Nobody moves the finish line. English is the home language. Ask in yours; the duck still owes you proof.",
     "developerName": "askrubberduck",
     "category": "Productivity",
     "capabilities": [

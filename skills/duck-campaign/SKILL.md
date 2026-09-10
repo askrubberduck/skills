@@ -10,6 +10,9 @@ until the roster is empty. Bootstrap and continuation are one job here: polling,
 chaining have no separate owner, because a campaign whose next iteration belongs to something else
 is a campaign that stalls the first time that something else is not there.
 
+Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+
 ## Recipe
 
 1. **Survey & scan.** Run `duck-scan` over the repo's registries, read the vision, delivery, and
@@ -67,7 +70,8 @@ is a campaign that stalls the first time that something else is not there.
 ## Common mistakes
 
 - Building the first candidate before the cut pass — the survey exists to kill work, not queue it.
-- Losing packet state during a reset or compaction, or claiming a continuation that was never booked.
+- Losing packet state during a reset or compaction, or claiming a continuation that was never
+  booked.
 - Packets carved by code area instead of shippable outcome — a packet that can't ship alone is
   not one.
 - Skipping a required independent challenge, or running extra co-authors without a question they

@@ -9,6 +9,9 @@ An attack names the claim it could refute, executes the attempt, and observes th
 and opining is not an executed attack. Surviving the selected attacks establishes only that scope.
 The breaker reports findings; the authorized caller repairs them and reruns the invalidated checks.
 
+Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+
 ## Bound the target and isolate destructive work
 
 Record the candidate and relevant environment. Read its outcome, contracts and realistic operating

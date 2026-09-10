@@ -10,6 +10,9 @@ case"** — unmerged work gets an explicit merge-or-delete decision, not a repri
 preservation invariant covers every deletion path: an entry marked **keep** relocates to its
 durable home and is verified there before its container is removed.
 
+Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+
 ## Sweep per repo
 
 1. Inventory: `git worktree list`, `git branch -vv`, `git fetch --prune` first so remote state is
@@ -30,17 +33,16 @@ durable home and is verified there before its container is removed.
      classifier; route to a decision instead.
    - **Unproven** → the Unmerged path: open the work item, decide merge-or-delete on its state,
      record the decision, then `-D`.
-3. Delete — **but check the worktree for untracked and ignored files first**:
-   `git status --short --untracked-files=all --ignored`. Plain `git status` hides ignored files, so
-   `git worktree remove` exits 0 and takes the `.env`, local config, or credentials living there with
-   it. Any `??` or `!!` entry gets an explicit keep-or-delete decision before removal — those files
-   exist in exactly one place by definition; the preservation invariant applies, so **unknown means
-   keep, and only the owner may decide to delete one**. Uncommitted work is the case with no second
-   copy to recover from, which is why this decision is never the doer's however obvious it looks;
-   queue it via `duck-decide` and keep the file meanwhile. Then — only once nothing in the
-   worktree remains marked keep — `git worktree remove <path>`, `git branch -d <branch>` (`-D`
-   only on the Unmerged path, against its recorded decision), and `git worktree prune` for
-   leftovers.
+3. Delete — **but check the worktree for untracked and ignored files first**: `git status --short
+   --untracked-files=all --ignored`. Plain `git status` hides ignored files, so `git worktree
+   remove` exits 0 and takes the `.env`, local config, or credentials living there with it. Any `??`
+   or `!!` entry gets an explicit keep-or-delete decision before removal — those files exist in
+   exactly one place by definition; the preservation invariant applies, so **unknown means keep, and
+   only the owner may decide to delete one**. Uncommitted work is the case with no second copy to
+   recover from, which is why this decision is never the doer's however obvious it looks; queue it
+   via `duck-decide` and keep the file meanwhile. Then — only once nothing in the worktree remains
+   marked keep — `git worktree remove <path>`, `git branch -d <branch>` (`-D` only on the Unmerged
+   path, against its recorded decision), and `git worktree prune` for leftovers.
 4. Scratch dirs: hunt ad-hoc temp dirs outside the sanctioned scratchpad (e.g. `~/<repo>-tmp*`,
    `/tmp/<repo>*`, stray review-tmp dirs; the sanctioned scratchpad itself is disposable by design
    and never swept per-file). A non-git dir has no merge evidence, so inventory every entry

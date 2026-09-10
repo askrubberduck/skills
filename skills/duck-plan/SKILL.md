@@ -8,6 +8,9 @@ description: Find the hole in the plan before building over it; assumptions and 
 A plan is an argument that the proposed work reaches the outcome. Independent agreement can
 expose blind spots; it cannot establish feasibility or replace executable evidence.
 
+Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+
 ## Ground and choose the challenge
 
 Use `duck-frame` to establish or reuse the outcome, constraints and affected paths. If the plan
@@ -15,11 +18,12 @@ reaches a boundary the frame did not examine, complete that analysis first. A sm
 may use the short form; do not restate an unchanged frame. Challenge whether the proposed goal
 and mechanism deliver the intended benefit before treating them as premises.
 
-Select participants and approach using [challenge selection](../duck-review/references/challenge.md).
-A narrow plan can be self-checked with competing hypotheses and a decisive experiment. Otherwise
-use an independent co-author or critic; broader work may justify two. Respect the selected setup
-and repository requirements. Do not imply cross-family review when no such participant ran.
-Use `duck-review`'s [dispatch mechanics](../duck-review/references/dispatch.md) for external calls.
+Select participants and approach using [challenge
+selection](../duck-review/references/challenge.md). A narrow plan can be self-checked with competing
+hypotheses and a decisive experiment. Otherwise use an independent co-author or critic; broader work
+may justify two. Respect the selected setup and repository requirements. Do not imply cross-family
+review when no such participant ran. Use `duck-review`'s [dispatch
+mechanics](../duck-review/references/dispatch.md) for external calls.
 
 For independent generation, provide the outcome, constraints, source and alternatives still open,
 not the doer's preferred plan. Each co-author produces a decomposition before seeing the others'.

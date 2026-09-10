@@ -8,14 +8,19 @@ description: Find ready, blocked, and remaining work without changing anything; 
 Read-only. Answers "what's next" from the repo's own registries without a full-doc re-read and
 without acting on anything. Writes (close/approve/park) route to the repo's disposition workflow.
 
+Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+
 ## Locate registries (detect, don't configure)
 
-Look for, in order: `STATUS.md`, `OBLIGATIONS.md`, a delivery or backlog doc (`BACKLOG.md`,
-`TODO.md`, a delivery README), active work-item directories, open PRs (`gh pr list`). **The
-registry need not be in the checkout** — a project may keep its plans and backlog outside the tree
-entirely, and the repo's own instruction files are what say so, so read those before trusting a
-miss. Use whichever exist; if none do, say so and ask where the backlog lives — once, then remember
-the answer for the session.
+**The repo's own instruction files say where work lives** — read them first, including when what
+they name sits outside the checkout. **The registry need not be in the checkout** at all. Then take
+what the repo actually has: docs that list items with states, active work-item directories, open
+PRs and issues through the host's CLI (`gh pr list`). Match a candidate on what it contains, never
+on what it is called — `STATUS.md`, `BACKLOG.md`, `TODO.md` and a delivery README are shapes that
+recur, not a lookup table, and a fixed list of filenames is a guess wearing a procedure's clothes.
+Use whichever exist; if none do, say so and ask where the backlog lives — once, then remember the
+answer for the session.
 
 **An in-repo miss is not an empty backlog.** Reporting "nothing open" from a scan that only
 searched the working tree is the failure this step exists to prevent: the repo looks quiet because

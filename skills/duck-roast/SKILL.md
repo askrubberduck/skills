@@ -10,6 +10,9 @@ target is one change (`duck-review`), the backlog
 (`duck-cut`), or your own fresh diff (`duck-proof`). Roast reads
 what exists end to end and argues it should be different or dead.
 
+Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+
 ## Angles (cover material claims within the requested scope)
 
 1. **Containment/security posture** — boundaries enforced from outside? fail closed? what does a
@@ -47,7 +50,7 @@ requirements, or substitute a new goal to make the critique stronger.
    [dispatch mechanics](../duck-review/references/dispatch.md) for external participants. A focused
    self-critique is labeled as such, not cross-family review. Give independent critics complementary
    material questions and the same constraints, not each other's conclusions.
-3. Merge findings; every finding carries evidence (file, doc, observed behavior). The roast does
+3. Merge findings; every finding carries evidence (file, doc, observed behavior). The roast
    retains substantiated findings with their consequences; group or rank when the owner requests
    it. Keep dismissed claims with their refutation so another pass does not resurrect them.
 4. **Another round needs a question.** Default at most two passes unless the owner supplies a
@@ -55,8 +58,9 @@ requirements, or substitute a new goal to make the critique stronger.
    different approach. Stop on supported conclusions, refuted premises, unavailable evidence or the
    effort limit; record uncertainty. Never require an endless sequence of empty finding lists or
    mistake agreement for proof.
-5. Land the output in the repo's reviews doc or a packet — the substantiated finding list and dismissed claims, each with evidence and a proposed disposition: fix now / backlog / owner decision
-   (present those via `duck-decide`) / rejected-with-reason.
+5. Land the output in the repo's reviews doc or a packet — the substantiated finding list and
+   dismissed claims, each with evidence and a proposed disposition: fix now / backlog / owner
+   decision (present those via `duck-decide`) / rejected-with-reason.
 
 ## Common mistakes
 
