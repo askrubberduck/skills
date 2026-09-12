@@ -33,7 +33,7 @@ recommend the smaller or corrected path; do not silently substitute a new goal. 
 tradeoff goes to `duck-decide`; separately authorized independent work may continue.
 
 READY continues; CUT ends work that is demonstrably unnecessary under the owner's criteria. A
-small settled task uses the short form without creating a commit just to justify its size.
+small settled task uses the short form.
 
 ## 2. Plan with proof
 
@@ -45,7 +45,7 @@ Select the challenge approach and participants from
 [challenge selection](../duck-review/references/challenge.md). Independent authorship and critical
 review are alternatives, not two mandatory tolls. Attack consequential assumptions with the cheapest
 experiment before building on them. Record actual participation; a self-check is not cross-family
-co-authorship. A local plan need not be committed. Respect repository release requirements later.
+co-authorship.
 
 A refuted decomposition is replanned; agreement alone never makes it ready. Bound plan critique as
 `duck-plan` specifies instead of waiting for every participant to concur.
@@ -104,7 +104,6 @@ wrong decomposition to plan; repeated missed cases to an executable class-level 
 `duck-race` rally; rival implementations to race; real owner tradeoffs to decide. Continue review
 only when a named unresolved cause is shrinking and new evidence will be available. Repeated
 blockers from one class require repairing the method, not buying another round on the same basis.
-Respect the owner's effort bound; at the limit state unresolved claims, never manufacture approval.
 
 ### Review-loop ownership and stable criteria
 

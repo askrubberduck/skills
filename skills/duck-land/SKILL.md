@@ -92,7 +92,5 @@ by the user: a request only to push or prepare a PR does not authorize merging o
 
 ## Common mistakes
 
-- Recording the outcome before step 2's read-back — squash merges mint a new SHA; record the one
-  that actually landed, not the branch head.
 - Leaving the worktree "for reference" — the record is the reference; the worktree is debt.
 - Skipping the base re-verify because the branch is "fresh" — fresh was true when you last fetched.

@@ -65,4 +65,3 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
   rots; link, don't copy.
 - Mining only failures — validated approaches that WORKED are equally worth encoding (with their
   evidence), or they'll be re-derived at full cost next time.
-- A retro that ends in chat — if nothing was written to a durable home, the learn didn't happen.

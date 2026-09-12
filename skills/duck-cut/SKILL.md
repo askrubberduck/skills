@@ -20,7 +20,8 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
    merely somewhere else. Grep-first; read only surviving items in full.
 2. Per item, argue **against its existence** before anything else. Verdict, one of:
    - **CLOSE NOW** — already satisfied, obsolete, or superseded; close with evidence.
-   - **CUT** — the need was speculative or the product moved past it; delete, don't park.
+   - **CUT** — the need was speculative or the product moved past it; delete, don't park — a
+     parked item is still backlog.
    - **MERGE** — duplicate or subset of another item; fold and close.
    - **UNBLOCK** — the stated blocker no longer holds (verify, don't assume); make it pickable.
      `duck-scan`'s attribution rule decides whether an entry lifting it counts: unattributed stays
@@ -43,8 +44,6 @@ per-item verdict list with evidence links.
 
 ## Common mistakes
 
-- Parking instead of cutting — "deferred" items that fail the critique die; parking one is still
-  backlog debt.
 - Closing on assumption — CLOSE NOW requires evidence (the commit, the shipped PR, the doc) that the
   need is met, not a recollection.
 - Sweeping only the obligations registry — blocked delivery items and stale active-work dirs are the
