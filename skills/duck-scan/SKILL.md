@@ -34,7 +34,7 @@ filter. For readiness pings on named IDs, check exactly those items plus their g
 
 ## Answer shape
 
-One table, then one sentence of recommendation:
+One table, then the recommendation:
 
 | Item | State | Blocked on | Pickable? |
 |---|---|---|---|
@@ -54,4 +54,3 @@ One table, then one sentence of recommendation:
 ## Common mistakes
 
 - Treating "in review" as pickable — a change at its gate belongs to the reviewer, not a new doer.
-- Mutating anything. This skill never edits registries; it hands off to disposition/close flows.

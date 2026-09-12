@@ -49,7 +49,7 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
 
 Asked "why was this expensive": per-session, report cache_read vs output tokens, session span,
 compaction count, `cd`/redeclaration counts, results >20KB — each mapped to the rule above that was
-broken. Numbers first, then the two highest-leverage fixes only.
+broken. Numbers first, then only the fixes with the most leverage.
 
 ## Installed-config audit mode
 
@@ -67,7 +67,8 @@ is billed every turn of every session:
    candidate. Report counts and metadata, never raw prompt content. Can't find a store, or it's
    malformed? Say so and mark the audit partial — a missing store is never zero usage.
 4. **Dedupe**: local memory files repeating checked-in CLAUDE.md facts — keep the checked-in copy,
-   delete the memory. Same for AGENTS.md vs copilot-instructions duplication: one canonical file.
+   delete the memory; checked-in serves every agent, memory serves one machine. Same for
+   AGENTS.md vs copilot-instructions duplication: one canonical file.
 5. **Trim to non-derivable**: a CLAUDE.md line earns its place only if a fresh session could NOT
    derive it from the repo. Owner decisions, invariants, and workflow rules stay.
 6. Present cuts as one list with per-item size saved; apply on approval.
@@ -76,8 +77,5 @@ is billed every turn of every session:
 
 - Treating cache reads as free because they're discounted — the window re-bills every turn; length
   is the cost driver.
-- Carrying stale evidence or losing the next authorized action at a context boundary.
 - Compressing prose while pasting whole files — rule 3 outweighs terse wording 100:1.
 - Trimming config rules the owner put there deliberately — when a line reads like a decision, ask.
-- Deleting the checked-in copy and keeping the local memory — backwards; checked-in serves every
-  agent, not one machine.

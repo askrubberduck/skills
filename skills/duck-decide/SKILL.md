@@ -13,8 +13,8 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
 
 ## Per decision, present
 
-1. **Context** — what the decision unblocks and why it's the owner's call (2–3 sentences, no
-   jargon).
+1. **Context** — what the decision unblocks and why it's the owner's call, in plain language the
+   owner can read at a glance.
 2. **Options** — each with tradeoffs, gains, and risks stated concretely. Two to four real options;
    one option enumerated is no decision offered.
 3. **Recommendation** — pick one and say why, in one sentence.
@@ -33,7 +33,6 @@ work). Say how many are in the queue up front ("4 decisions queued; here is 1 of
 
 ## Common mistakes
 
-- Batching "the three small ones" into one message — the owner asked one-at-a-time for a reason.
 - Hiding material cost or schedule tradeoffs. Include them when relevant to the owner's decision,
   alongside functionality, maintainability and risk; sunk effort does not justify keeping a defect.
 - Presenting a decision already made elsewhere — check the decision log first; re-litigating settled

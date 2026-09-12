@@ -53,8 +53,8 @@ authority.
 When the ask touches no seam of the system as it stands — no boundary between components, no public
 surface, nothing trust-touching — the frame may return a short
 outcome/constraints/source/check/decision record, covering items 1, 2, 4, 8, 10 and 11 only to the
-depth needed. State why this scope suffices; local analysis needs no commit just to justify its
-size. Execution that then moves a seam is the contradiction that re-frames in full.
+depth needed. State why this scope suffices. Execution that then moves a seam is the contradiction
+that re-frames in full.
 
 ## Analysis — establish what is true
 

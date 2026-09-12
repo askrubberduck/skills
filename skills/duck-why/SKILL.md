@@ -23,7 +23,7 @@ Try to obtain one reproducing command and record its output. If the fault is int
 original environment is unavailable, use logs, traces and historical state to form provisional
 hypotheses. Say what you could not reproduce and choose observations that distinguish the causes.
 Lack of deterministic reproduction limits confidence; it does not forbid investigation or prove
-the defect absent. Never present an untested explanation as an established cause.
+the defect absent.
 
 ## Symptom, then cause
 
@@ -47,8 +47,7 @@ observation that would **rule it out** — then run that, not the one that would
 favourite. A hypothesis with no discriminating test is not a hypothesis, it is a preference.
 
 Evidence is what a command printed. Reasoning about what the code must do is a hypothesis, however
-confident; label it as one. When history is the evidence, bisect it and name the commit rather than
-reading diffs for something that looks guilty.
+confident; label it as one. When history is the evidence, the evidence is the named commit.
 
 Errors dismissed along the way as unrelated are hypotheses too. Say why each is unrelated, or it
 stays on the list.
@@ -70,8 +69,5 @@ stays on the list.
 
 - Fixing it because the cause was obvious once found — that is the boundary this skill exists to
   hold, and "it was a one-liner" is how an unreviewed change lands in a gate file.
-- Explaining the failure instead of reproducing it. The explanation is the method, not the evidence.
-- Stopping at the line that makes the test green rather than the decision that made the line wrong.
-- One hypothesis, pursued until it fits. Ruling nothing out is not investigating.
 - Treating a passing suite as proof the cause is gone — nothing was fixed yet, and if the suite
   passed while the bug existed, the suite is a second finding.

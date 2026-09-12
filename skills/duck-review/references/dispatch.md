@@ -39,10 +39,9 @@ agy --model <verified-non-doer> --add-dir "$SP" --print-timeout 45m -p "..." </d
 **The prompt is an argument; the material under review is a path inside it.** Hand the reviewer
 your instructions on the command line, and have those instructions name the diff, corpus, or files
 by absolute path for the reviewer to open — never paste that material into the command. Pasted
-material degrades the verdict — 28 of 41 flipped in one comparison against the same pinned model
-on the same target, every flip toward the finding standing, the pasted run quoting the corpus
-fluently and wrong — and forces a no-tools constraint, the prompt shape that provokes the
-permission-denied outage.
+material degrades the verdict — the reviewer quotes the corpus fluently and wrong, and flips
+toward letting findings stand — and forces a no-tools constraint, the prompt shape that provokes
+the permission-denied outage.
 
 Sanity-check a new invocation form with `-p "Reply with exactly: OK"`. These traps yield plausible
 reviews at exit 0:
@@ -54,7 +53,7 @@ reviews at exit 0:
 
 A zero-byte, greeting-only, timed-out, or crashed dispatch is an outage: a dispatch attempted that
 produced no verdict. **A degraded dispatch is the harder case — full length, well formed, and
-wrong.** Nothing in the exit status distinguishes it, so before trusting any result, read up to
-three of its justifications and confirm each quote actually supports its verdict; one that cites the
-claim under attack as proof of that claim is a malformed result, recorded as such and not counted.
+wrong.** Nothing in the exit status distinguishes it, so before trusting any result, check that
+its quoted justifications actually support its verdict; one that cites the claim under attack as
+proof of that claim is a malformed result, recorded as such and not counted.
 **A REJECT is never an outage**, and a same-family pass never substitutes for a required reviewer.

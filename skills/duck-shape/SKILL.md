@@ -20,16 +20,8 @@ verification, not through unrequested commits, PRs or pushes.
 
 Read the affected flow from entry to observable effect, including callers, state owners, failure
 recovery and project constraints. Pick a realistic next change or the last bug. What must you open
-and what facts must you hold before safely editing? A diff alone hides most of that path.
-
-Look especially for:
-
-- a flag set elsewhere that changes a branch's meaning;
-- unenforced ordering or lifetime: initialize first, close later, valid only in some states;
-- units, timezone, precision or calibration whose meaning lives elsewhere;
-- shared mutable state and duplicate homes for a rule;
-- forwarding layers that make the reader travel without answering a question;
-- a mode or parameter that looks live but no reachable caller needs.
+and what facts must you hold before safely editing? A diff alone hides most of that path; the
+facts whose meaning lives somewhere other than where they are used are the ones to name.
 
 State the outcome lost if a mechanism disappears. No lost outcome is a deletion candidate, not
 permission to ignore public contracts or callers you have not inspected. Dead code matters when

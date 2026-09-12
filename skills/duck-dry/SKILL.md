@@ -15,7 +15,8 @@ Follow the user’s language unless they ask otherwise. Keep commands, paths, id
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 
 Volume is not the target and neither is zero. A quota — "cut half the comments" — replaces
-judgment with a number. The unit of work is one comment against the keep test.
+judgment with a number, and a count reported as the result is the same mistake — the result is
+what the code no longer needs explained. The unit of work is one comment against the keep test.
 
 ## Target
 
@@ -111,12 +112,9 @@ iterate over…"), no docstring restating the signature above it.
 ## Common mistakes
 
 - Deleting the comment and keeping the code that needed one — the comment was the symptom.
-- Cutting a directive, license header, or published docstring because it reads like noise.
 - Editing comments in a generated file; the generator wins the next run. Fix the generator or leave
   it.
-- Adding a comment because a reviewer asked for one, when the finding was that the code is unclear.
 - Cutting a line that reads like an owner's decision or a policy. That is not the doer's to delete;
   ask.
-- Reporting a comment count as the result. The result is what the code no longer needs explained.
 - Reading a low deletion count as proof a file is done. A file whose survivors are all traps is
   done; a file nobody opened is not. Tell them apart by which comments were actually read.

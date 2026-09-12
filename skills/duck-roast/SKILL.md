@@ -18,19 +18,17 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
 1. **Containment/security posture** — boundaries enforced from outside? fail closed? what does a
    compromised component reach?
 2. **Simplicity** — concepts that should die, dual paths, layers nobody needs; the biggest deletion
-   available, not the tidiest nit. Cost is what a reader must hold, never lines or nesting depth,
-   so hunt: layers that forward the question instead of answering it, names saying how a thing was
-   built rather than what it provides, seams with one implementation whose second case nobody can
-   state, hand-rolled code shadowing a name the stack already holds, branches a reader cannot tell
-   are dead, and the densest comment neighbourhoods — whoever wrote them stood where the reading
-   got hard. Two queries carry this angle: the same pair of files co-occurring across most commits
-   is the wrong-seam signature, invisible in any single file and obvious in history; and churn per
-   file, which is **evidence on a finding, never a rank** — a deep hierarchy nobody has opened in
-   two years is sediment, not debt, and saying so is part of the finding. Walk three to five
-   plausible next changes through the tree rather than reading files: a finding attached to a real
-   walk survives argument, one attached to a grep does not. Close the angle by naming the patterns
-   that repeat — one speculative seam is a finding, the same seam in nine modules is a convention,
-   and that is one owner decision rather than nine edits. `duck-shape` is this lens at change
+   available, not the tidiest nit. Cost is what a reader must hold, never lines or nesting depth;
+   names that say how a thing was built rather than what it provides, and the densest comment
+   neighbourhoods — whoever wrote them stood where the reading got hard — mark where that cost
+   concentrates.
+   History carries evidence no single file shows: the same pair of files co-occurring across most
+   commits is the wrong-seam signature, and churn per file is **evidence on a finding, never a
+   rank** — a deep hierarchy nobody has opened in two years is sediment, not debt, and saying so
+   is part of the finding. A finding attached to a plausible next change walked through the tree
+   survives argument; one attached to a grep does not. Close the angle by naming the patterns that
+   repeat — one speculative seam is a finding, the same seam in nine modules is a convention, and
+   that is one owner decision rather than nine edits. `duck-shape` is this lens at change
    altitude, and applies what this angle finds.
 3. **Product fit and scope** — does what's built serve the stated vision? what shipped that
    shouldn't have? where is the boundary not where users need it?
@@ -64,7 +62,6 @@ requirements, or substitute a new goal to make the critique stronger.
 
 ## Common mistakes
 
-- Roasting the latest diff — wrong altitude; the roast reads the whole standing solution.
 - Silently dropping substantiated findings; prioritizing a complete list is different from hiding
   evidence or inventing severity.
 - Reading "surfaces everything" as "checks nothing" — weighing is the owner's, validating is the

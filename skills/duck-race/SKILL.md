@@ -136,7 +136,6 @@ the turn cap — and how a review loop outlives its budget.
 
 ## Common mistakes
 
-- Reading the rival's diff "just to check progress" — that is the void condition, not diligence.
 - Racing a problem statement that names an implementation approach — you get two copies of the same
   assumption and pay double for one attempt.
 - Adjudicating on diff elegance instead of executed tests — prose taste is how correlated errors
@@ -145,8 +144,6 @@ the turn cap — and how a review loop outlives its budget.
   reasons is the cheapest spec-review available.
 - Accepting a red that fails on a typo or missing import — red for the wrong reason proves nothing;
   the serve is re-run, not patched by the returner.
-- The returner "fixing" the test — void condition, even when the test is genuinely wrong. Objection
-  in writing, back to the server.
 - Implementing past the test because the next requirement is obvious — the extra code is untested by
   construction, and the next serve was the place to demand it.
 - Playing both sides from one family because the rival CLI is slow or down — that is solo work
