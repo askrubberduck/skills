@@ -1,6 +1,6 @@
 {
   "name": "askrubberduck",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "description": "Make the work prove itself. Challenge the goal, cut the clutter, and check what actually happened. English workflows. Ask in your language; check what the duck did.",
   "author": {
     "name": "askrubberduck",
@@ -32,7 +32,7 @@
     "defaultPrompt": [
       "Use $askrubberduck:duck-run to challenge this goal, build the simplest robust path, and make it prove itself. Stop where I authorized.",
       "Use $askrubberduck:duck-proof to try to disprove this goal or solution. Show the counterexamples and what actually survived.",
-      "Use $askrubberduck:duck-review to challenge this diff against the agreed criteria. One verdict, with the evidence it earned."
+      "Use $askrubberduck:duck-review to review this work from multiple angles against the agreed criteria. Report findings or, when requested, one independent verdict with the evidence it earned."
     ]
   }
 }

@@ -74,15 +74,32 @@ A case file is a question to ask the duck, not a receipt saying it passed.
 
 | Language | Prepared coverage | Evidence for the current descriptions |
 |---|---|---|
-| English | Selection probes for every skill; existing behavioral cases | No recorded host/model routing runs |
+| English | Selection probes for every skill; existing behavioral cases | Two bounded selection probes on 2026-09-17; see below |
 | Russian | Selection probes for every skill; behavioral cases 9-17 | No recorded host/model routing runs |
 
-The new routing corpus and cases 13-18 are unrun. Earlier runs, if any, do not verify the changed
+The rest of the routing corpus and cases 13-18 are unrun. Earlier runs, if any, do not verify changed
 descriptions. Package validation checks distribution structure; it cannot establish language support.
+
+### Local selection probes, 2026-09-17
+
+Two fresh Codex subagents each received the current English names/descriptions and one prompt, with
+no expected answer or skill body. Runtime model identity was not exposed by the collaboration tool;
+these results establish neither a pinned-model comparison nor cross-host reliability.
+
+| Prompt | Observed selection |
+|---|---|
+| Trunk is still failing in CI after this PR. Find the cause. | `duck-why` |
+| Explain how this API worked in version 1 compared with version 2. Nothing is failing; I only want a historical explanation. | none |
+
+Both match the oracle. `duck-why`'s description is unchanged from `4dff3ea`; the supplied roster
+included the initial findings-only `duck-review` description, before its scope was broadened beyond
+PRs. No workflow ran and no improvement over old routing is claimed. The broader review description
+and added non-PR probes remain untested. These results do not justify expanding `duck-why`'s description.
 
 ## Coverage
 
-Behavioral cases avoid `duck-review`, `duck-race`, and `duck-diet` on purpose: those dispatch a
-second model family through `codex` or `agy`, which a reviewer will not have installed. Their
-selection probes do not verify those workflows. Running the gate on this repository can exercise
-them, but only a recorded run establishes what actually happened.
+Directory-submission cases avoid independent `duck-review`, `duck-race`, and `duck-diet` workflows:
+those dispatch a second model family through `codex` or `agy`, which a reviewer will not have
+installed. Their selection probes do not verify those workflows. `proof-cases.md` also covers
+in-session findings-only review without external CLIs. Running the gate on this repository can
+exercise independent review, but only a recorded run establishes what actually happened.
