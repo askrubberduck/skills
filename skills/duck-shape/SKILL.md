@@ -16,6 +16,10 @@ Apply improvements within authorized implementation scope. Report-only means ins
 without edits. Selected findings limit subsequent fixes; continue authorized local work through
 verification, not through unrequested commits, PRs or pushes.
 
+If the desired outcome or architectural contract is unsettled, use `duck-frame` to settle that
+decision. A question about the simplest structure under an established contract stays here;
+"future-proof" alone does not justify a planning pipeline or speculative extension points.
+
 ## Understand before cutting
 
 Read the affected flow from entry to observable effect, including callers, state owners, failure

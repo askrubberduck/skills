@@ -78,7 +78,8 @@
       "skill": "duck-frame",
       "prompts": {
         "en": [
-          "Work out this system’s requirements, constraints, and architecture before we plan implementation."
+          "Work out this system’s requirements, constraints, and architecture before we plan implementation.",
+          "Before choosing the structure, determine which consistency guarantees this system must provide."
         ],
         "ru": [
           "спроектируй систему",
@@ -150,7 +151,10 @@
       "skill": "duck-review",
       "prompts": {
         "en": [
-          "Give this PR an independent review against the agreed criteria. Return a verdict without fixing or merging it."
+          "Give this PR an independent review against the agreed criteria. Return a verdict without fixing or merging it.",
+          "Review this PR, including uncommitted changes, from multiple angles. Report findings first; do not post comments.",
+          "Review this design document from multiple angles against its stated constraints. Report findings only.",
+          "Review the completed implementation in this local folder. There is no PR; report correctness and maintainability findings."
         ],
         "ru": [
           "сделай независимое ревью",
@@ -198,7 +202,8 @@
       "skill": "duck-shape",
       "prompts": {
         "en": [
-          "Simplify this code’s structure while preserving its required contracts."
+          "Simplify this code’s structure while preserving its required contracts.",
+          "The required behavior is settled. Is this implementation the simplest robust structure?"
         ],
         "ru": [
           "упрости код",
@@ -222,11 +227,21 @@
       "skill": "duck-why",
       "prompts": {
         "en": [
-          "Find the cause of this build failure before writing a fix."
+          "Find the cause of this build failure before writing a fix.",
+          "Trunk is still failing in CI after this PR. Find the cause.",
+          "The retry fix did not stick; investigate what still breaks."
         ],
         "ru": [
           "почему падает сборка",
           "найди причину ошибки"
+        ]
+      }
+    },
+    {
+      "skill": null,
+      "prompts": {
+        "en": [
+          "Explain how this API worked in version 1 compared with version 2. Nothing is failing; I only want a historical explanation."
         ]
       }
     }

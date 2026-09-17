@@ -25,7 +25,7 @@ Your preferred answer gets the same treatment as every other answer. So does the
 Install once, then talk to your agent as usual. The descriptions do the routing.
 
 Ask in your language; the skill descriptions stay in English.
-The duck has no recorded host/model routing results yet — see the [language evals](evals/README.md).
+Routing evidence is limited to two English selection probes — see the [language evals](evals/README.md).
 
 | You say | What comes back |
 |---|---|
@@ -34,6 +34,7 @@ The duck has no recorded host/model routing results yet — see the [language ev
 | "prove this goal or plan" | `duck-proof`: what would make it wrong, what was tried, and what survived. Your favorite answer gets no head start. |
 | "simplify it deeply" | `duck-shape`: take the mechanism apart, keep the contracts, rebuild the path with less to remember. Then check it. |
 | "gate it" | `duck-review`: one verdict, the reviewers named, and the evidence behind every finding. No participation trophies. |
+| "review this work from multiple angles" | `duck-review`: evidenced findings on a design, plan, document or implementation, reported in-session. No edits or publication. |
 | "try to break it" | `duck-break`: attacks actually run, with inputs and results. Imagining a crash is not crashing it. |
 | "dry it" | `duck-dry`: prose that earns its place, with checks that the sweep did not smuggle in a code change. |
 | "trim the backlog" | `duck-cut`: retire obsolete work, merge duplicates, unblock what still matters. Every task earns its place. |
@@ -136,7 +137,7 @@ resolves.
 | `duck-plan` | Find the hole in the plan before building over it; assumptions and acceptance checks must survive challenge |
 | `duck-proof` | Make the goal, the path, and the finished work earn your trust through counterexamples and executed checks |
 | `duck-race` | Put two decorrelated model families on the same problem and let executed evidence pick the result |
-| `duck-review` | Run one independent cross-model superreview and deliver an evidence-backed APPROVE, REJECT, or NOTE; no participation trophies |
+| `duck-review` | Review work from multiple angles or deliver an independent judgment |
 | `duck-roast` | Roast the whole solution until its weak claims show; a finding must earn its place, and a round must end |
 | `duck-run` | Challenge the goal, shape the plan, build it, and make it prove itself; local means local |
 | `duck-scan` | Find ready, blocked, and remaining work without changing anything; looking is free |

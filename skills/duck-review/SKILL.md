@@ -1,9 +1,12 @@
 ---
 name: duck-review
-description: Run one independent cross-model superreview and deliver an evidence-backed APPROVE, REJECT, or NOTE; no participation trophies. Use when a PR or diff is ready to review, a security-, privacy-, or data-sensitive change reaches its release gate, the user says "gate it" or asks for an independent second opinion. It reviews and judges; it does not fix, repeat, or land.
+description: Review work from multiple angles or deliver an independent judgment. Use for designs, plans, documents, code, local changes, completed work or PRs; findings-only reviews; an independent second opinion; or a release gate. Findings-only review stays in-session; independent and release reviews use cross-model scrutiny and return APPROVE, REJECT, or NOTE. It does not fix, repeat, or land.
 ---
 
 # Duck Review
+
+Review the specified work at its current stage. Test a design's assumptions without demanding an
+implementation; judge completed work against observable results.
 
 Independent scrutiny precedes release approval. The builder must validate the candidate first;
 a reviewer is not a substitute for the doer's own breaking attempts. If the builder adjudicates
@@ -13,15 +16,35 @@ judgment was wholly external.
 Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 
-**One invocation, one judgment.** Never edit the candidate, create its prerequisite evidence, loop
+**One invocation, one pass.** Never edit the candidate, create its prerequisite evidence, loop
 until reviewers approve, or land it. The caller owns repairs and the next authorized action.
-Analysis-only returns findings without implying release approval.
+
+## Findings or independent judgment
+
+An explicit independent, cross-model or release-gate review uses the workflow below. Otherwise a
+findings-only, analysis-only or "multiple angles" request uses this in-session path. With no such
+scope specified, use the independent workflow. A findings pass never satisfies a required gate.
+
+Resolve the target, applicable base, constraints and prior dispositions as in preparation steps 1–2;
+for re-review also apply step 5. Inspect relevant risk surfaces such as behavior, failure recovery
+and maintainability. Use distinct lenses rather than a fixed reviewer count; delegate only when
+useful and authorized. Same-family perspectives do not establish cross-family independence.
+
+Substantiate and adjudicate findings against the current target using the criteria below. Return one
+consolidated list with stable IDs, severity, evidence and proposed fixes, plus coverage limits.
+No gate verdict is issued; a receipt is needed only when policy or a downstream handoff requires one.
+Report in-session. Posting comments, submitting a GitHub review and resolving threads each need
+their own existing authorization. Then return to the caller: a later selection authorizes that
+caller's scoped local fixes, not another review or a new approval round. Commit and publication
+remain separate actions.
 
 ## Prepare the review
 
-1. Resolve the exact base, candidate and requested judgment. For a release use the last released
-   tag through the candidate, not adjacent commits; for a PR use its own base. An intentionally
-   captured dirty worktree can be reviewed, but landing later needs an authorized exact commit.
+1. Resolve the exact target, its version and the requested judgment. For a code release use the last
+   released tag through the candidate, not adjacent commits; for a PR use its own base. An
+   intentionally captured dirty worktree can be reviewed, but landing later needs an authorized
+   exact commit. For a design, plan or document, identify the supplied revision or snapshot; no
+   PR, commit or invented Git base is needed.
 2. Use the caller's recorded outcome, constraints and acceptance baseline across review rounds.
    For a standalone review, establish that baseline once. Name the coordinating caller who owns
    convergence, prior findings and the remaining round bound; `duck-run` defines the default loop
@@ -46,10 +69,12 @@ Analysis-only returns findings without implying release approval.
    explicit proof/plan/break sections is equivalent to separate named receipts when all consumers
    can resolve it. Existing `proof-rN.md` and `break-rN.md` conventions remain valid.
 5. Spot-check cited commands or artifacts; file presence alone is not evidence. A repair invalidates
-   relevant earlier checks. For re-review, inspect the new delta and affected paths, reopen impacted
+   relevant earlier checks. For re-review, identify the previous reviewed revision or snapshot and
+   the current target. Inspect the new delta and affected contracts or paths, reopen impacted
    findings, and reuse only evidence whose assumptions still hold. Never check only the old finding
-   list. Missing material evidence means the gate cannot approve; a standalone opinion may still
-   report what it can establish.
+   list. If the previous target is unavailable or changed contracts invalidate wider evidence, name
+   the gap and broaden the review accordingly. Missing material evidence means the gate cannot
+   approve; a standalone opinion may still report what it can establish.
 6. Do not dispatch beyond the caller's recorded bound; return the unresolved status and evidence
    without approval. For a third or later review round, require the caller's recorded loop
    diagnosis: why another round will add evidence, or which reframe/replan/race/rally/owner-decision
