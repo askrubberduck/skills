@@ -5,80 +5,64 @@ description: Carve a grand vision into independent workstreams that ship without
 
 # Duck Campaign
 
-One vague directive becomes packets, plans, parallel builds — and this skill keeps driving them
-until the roster is empty. Bootstrap and continuation are one job here: polling, takeover, and merge
-chaining have no separate owner, because a campaign whose next iteration belongs to something else
-is a campaign that stalls the first time that something else is not there.
+Turn the requested outcomes into a manageable set of workstreams and carry each to its authorized
+endpoint. Split work when separate execution, ownership or release helps; the ability to ship two
+small changes separately is not by itself a reason to create two packets.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
-quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Follow the user's language; preserve commands, paths, identifiers, quoted errors and verdicts.
+Carry existing authority through the campaign. Local work ends with verified local changes;
+commits, PRs, pushes and merges require their own authorization. A planning-only request ends with
+the plan. Keep unresolved decisions attached to their dependent work.
 
-## Recipe
+## Establish the work that is needed
 
-1. **Survey & scan.** Run `duck-scan` over the repo's registries, read the vision, delivery, and
-   decision docs, and scout the product code with read-only subagents. Output: a candidate list of
-   shippable changes with evidence, not ideas.
-2. **Cut pass.** Run `duck-cut` — or apply its cut bias by hand — against the candidate list. Argue
-   against each candidate (speculative? superseded? mergeable?). Survivors only. For each survivor,
-   name the outcome that dies if it is never built — a candidate with no such answer is a habit, not
-   work. Re-run this pass whenever a packet grows mid-flight: the cut is a standing lens, not a
-   one-time gate at the survey.
-3. **Frame the campaign.** Run `duck-frame` on the system the surviving candidates land in — not
-   on the candidates themselves, because a frame that decomposes work is a second planner. It
-   settles the macro-architecture, the boundaries every packet must respect, and the failure
-   models; a campaign running on an unwritten architecture is a collision waiting to happen. The
-   work item here is the campaign itself — open its record now if the repo has none — so the
-   frame's durable home is the campaign's directory, never a packet's: packets do not exist yet,
-   and each one frames itself against this artifact later. A `CUT` verdict ends the campaign;
-   `OWNER DECISION` ends the turn, because there is no packet yet to move on to.
-4. **Carve packets** — one packet per independently shippable change, in the repo's work-item
-   convention (e.g. `<work-items>/YYYY-MM-DD-topic/`). No mega-packet; if two changes can ship
-   separately, they are two packets. The converse holds too: **findings that share a seam are one
-   packet**, carved first, whose acceptance evidence is the executable check over that seam — the
-   class-level check `duck-proof`'s ledger demands — and each finding is a case of it. One packet
-   per finding is how a campaign spends a review round per instance.
-5. **Plan each packet** via `duck-plan` before dependent implementation. Record its outcome,
-   checks, selected challenge and actual participants. A solo plan stays labeled solo; independent
-   input required by repository policy cannot be replaced by a claim. Read the durable record,
-   not scratch paths from an earlier session. Local execution does not require a committed plan.
-6. **Run each packet** through `duck-run`, which owns that packet's execution, verification, and
-   superreview, and provisions its own worktree so concurrent builds cannot collide. Launch the runs
-   in parallel where the host has subagents; where it has none, run the same packets sequentially in
-   one session — the sequencing is the method, parallelism is only how a capable host spends it
-   faster. Apply `duck-diet` to the fleet either way: batched agent traffic, no raw output in
-   context.
-7. **Drive the roster to empty; never hand off into silence.**
-   - **Roster.** State it (packet, worktree, branch, state) where a new session can read it — the
-     durable records home, never the scratchpad — then take the next iteration yourself.
-   - **Context and resumption.** Apply `duck-diet` using the host's real capabilities. At a
-     handoff preserve the roster, candidate identities, valid evidence and next authorized actions.
-     Use compaction or isolated sessions when useful; neither a forced reset nor one marathon
-     session is universally required. Book a scheduled continuation only if the host supports it
-     and the task authorizes it, and verify the booking. Otherwise continue in the current session
-     as possible and state any external limit; do not invent a scheduled wakeup. Landing removes
-     its worktree; `duck-sweep` can clear authorized leftovers at the end.
-   - **Obstacles and decisions.** The gap between packets is where a long campaign quietly dies,
-     so between them the turn continues: dispatch the next one. A packet that hits an obstacle is
-     re-routed or re-scoped and the route recorded, never abandoned — only a refused authorization
-     is an answer rather than an obstacle. **A packet that raises an owner decision queues it and
-     the campaign moves to the next packet**; it does not sit on the queued question. Independent
-     workstreams that stop for one packet's unanswered decision are not independent, whatever the
-     roster says. When a packet's execution disproves the campaign shape, re-frame it in writing
-     rather than bending the remaining packets around the damage; the campaign may argue its own
-     goal, never substitute one.
+Use `duck-scan` to locate current work and read relevant product constraints and source. Reuse
+existing records and decisions. Delegate bounded read-only investigation only when it helps;
+a campaign does not need a scout fleet merely to begin.
 
-## Common mistakes
+Apply `duck-cut`'s necessity check to the candidates: what required outcome is missing, what already
+satisfies it, and which findings share a cause? Remove speculative or superseded work. Recheck a
+candidate that grows; do not quietly expand the user's goal.
 
-- Building the first candidate before the cut pass — the survey exists to kill work, not queue it.
-- Losing packet state during a reset or compaction, or claiming a continuation that was never
-  booked.
-- Packets carved by code area instead of shippable outcome — a packet that can't ship alone is
-  not one.
-- Skipping a required independent challenge, or running extra co-authors without a question they
-  can help resolve.
-- Ending the bootstrap turn with "say the word and I'll start the builds". The go-sign was the
-  directive that started the campaign; asking for a second one is where autonomy dies.
+Use `duck-frame` to settle shared contracts and consequential unknowns before dependent plans.
+Reuse valid design decisions instead of framing each packet afresh. Keep the campaign's shared
+contracts in its existing work record, creating a record only when no adequate home exists.
+CUT ends unnecessary work. An owner decision blocks the work that depends on it; continue other
+settled, authorized work when available, even if the roster has not yet been divided into packets.
 
-Carry the owner's endpoint through every packet: local-only means local execution and verification,
-not automatic commits, PRs or landing. Do not install a scheduler or expand authority to keep a
-campaign running. Queued decisions block their dependent actions, not independent packets.
+## Group by execution needs
+
+Keep related changes together when they share a rule, verification path or small delivery surface.
+Repeated findings at one boundary usually need one repair with several cases, not one packet per
+finding. Conversely, separate work with different owners, release timing, material risks or genuinely
+independent execution. Avoid overlapping ownership of files that will be edited concurrently.
+
+Each packet names its outcome, affected scope, dependencies and completion check. Use the existing
+work-item convention; a small campaign may need only one record with several units. Do not create
+one directory, branch, design and plan per checklist item. A packet must have an independently
+verifiable finish, not merely be a named code area.
+
+Plan substantial or uncertain packets with `duck-plan`; a small settled unit can keep its concrete
+steps and checks in the campaign record as `duck-run` permits. Preserve independent input required
+by repository policy. Record actual participation; solo work is not an independent challenge.
+
+## Execute and keep the roster current
+
+Use `duck-run` for execution and verification, passing the outcome, valid shared decisions and
+remaining authority. Parallelize only independent work that benefits from it; otherwise execute
+sequentially. Isolate concurrent writers or destructive checks as that skill requires. Apply
+`duck-diet` to preserve useful context and keep dispatch overhead proportionate.
+
+Maintain one roster in the durable work record: packet, state, dependencies, evidence and next
+action; include branch/worktree only when used. Finish a ready unit and continue to the next without
+another go-ahead. Reconcile concurrent changes and verify the combined result before completion.
+
+When blocked, record the actual blocker and a concrete next action. Continue independent work;
+do not invent consent, rescope away a required outcome or retry an unchanged failure indefinitely.
+Contrary execution evidence reopens the affected shared design before dependent work continues.
+Stop when the authorized work is complete or all remaining work is blocked, and state which.
+
+At a context boundary, preserve the roster, candidate identities and valid evidence using
+`duck-diet`. Schedule a continuation only through a supported, authorized host mechanism and verify
+it was booked. Do not claim that a written next step schedules anything. Use `duck-sweep` for
+already-authorized cleanup when needed; do not delete work just to make the roster appear empty.

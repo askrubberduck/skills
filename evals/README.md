@@ -103,3 +103,12 @@ those dispatch a second model family through `codex` or `agy`, which a reviewer 
 installed. Their selection probes do not verify those workflows. `proof-cases.md` also covers
 in-session findings-only review without external CLIs. Running the gate on this repository can
 exercise independent review, but only a recorded run establishes what actually happened.
+
+## Cleanup and planning
+
+[Cleanup cases](cleanup-cases.md) compare old and revised shape/frame/plan guidance on bounded
+code-cleanup and CSV-design fixtures. Both versions passed; the record distinguishes observed
+output changes from unproven improvement and lists the untested companion edits.
+
+[Workflow cases](workflow-cases.md) exercise dry, why, campaign, roast and diet against unnecessary
+archiving, over-planning, invented findings and unsupported cost claims, with paired baseline results.

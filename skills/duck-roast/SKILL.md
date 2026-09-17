@@ -5,69 +5,62 @@ description: Roast the whole solution until its weak claims show; a finding must
 
 # Duck Roast
 
-Adversarial critique of the **whole solution** — the fourth critique altitude. Wrong tool if the
-target is one change (`duck-review`), the backlog
-(`duck-cut`), or your own fresh diff (`duck-proof`). Roast reads
-what exists end to end and argues it should be different or dead.
+Find consequential defects and unnecessary mechanisms in the requested solution. Inspect the
+whole relevant flow; a convincing criticism names what fails or what can disappear without losing
+a required outcome. No finding is a valid result when the claims survive inspection.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
-quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Follow the user's language; preserve commands, paths, identifiers, quoted errors and verdicts.
+Roast reports findings and proposed dispositions; it does not edit the candidate. One change belongs
+to `duck-review`, a backlog sweep to `duck-cut`, and verification of your own candidate to `duck-proof`.
 
-## Angles (cover material claims within the requested scope)
+## Ground the critique
 
-1. **Containment/security posture** — boundaries enforced from outside? fail closed? what does a
-   compromised component reach?
-2. **Simplicity** — concepts that should die, dual paths, layers nobody needs; the biggest deletion
-   available, not the tidiest nit. Cost is what a reader must hold, never lines or nesting depth;
-   names that say how a thing was built rather than what it provides, and the densest comment
-   neighbourhoods — whoever wrote them stood where the reading got hard — mark where that cost
-   concentrates.
-   History carries evidence no single file shows: the same pair of files co-occurring across most
-   commits is the wrong-seam signature, and churn per file is **evidence on a finding, never a
-   rank** — a deep hierarchy nobody has opened in two years is sediment, not debt, and saying so
-   is part of the finding. A finding attached to a plausible next change walked through the tree
-   survives argument; one attached to a grep does not. Close the angle by naming the patterns that
-   repeat — one speculative seam is a finding, the same seam in nine modules is a convention, and
-   that is one owner decision rather than nine edits. `duck-shape` is this lens at change
-   altitude, and applies what this angle finds.
-3. **Product fit and scope** — does what's built serve the stated vision? what shipped that
-   shouldn't have? where is the boundary not where users need it?
-4. **Extendability** — what change class is expensive that will be asked for? what's welded that
-   should be a seam?
-5. **Operational reality** — failure modes, recovery paths, what breaks at 3am and who notices.
+Read the actual source and product constraints. Establish the requested scope, observable outcomes
+and operating conditions. Challenge the benefit when the task calls for it, but do not invent a
+market, deployment or future requirement to make a criticism sound important.
 
-Ground criticism in the actual product and deployment. When the owner asks to challenge the goal,
-question the evidence for its benefit and success measures too. Do not invent market or deployment
-requirements, or substitute a new goal to make the critique stronger.
+Choose relevant questions rather than filling every category:
 
-## Recipe
+- Does the mechanism deliver the required outcome? Can existing behavior or deletion satisfy it?
+- Where do duplicate rules/state, unused paths, speculative options or leaking wrappers create a
+  real maintenance burden? Apply `duck-shape`'s concrete necessity checks.
+- Do affected trust boundaries enforce their contract? What can malformed input or a compromised
+  component reach in the actual deployment?
+- Which required operation can fail, how is it noticed, and what recovery is available?
+- Does an evidenced upcoming change expose misplaced ownership or coupling?
 
-1. Ground in the real artifacts: canonical docs + actual source, not summaries.
-2. Select the method, participants and effort bound from `duck-review`'s
-   [challenge selection](../duck-review/references/challenge.md); use its
-   [dispatch mechanics](../duck-review/references/dispatch.md) for external participants. A focused
-   self-critique is labeled as such, not cross-family review. Give independent critics complementary
-   material questions and the same constraints, not each other's conclusions.
-3. Merge findings; every finding carries evidence (file, doc, observed behavior). The roast
-   retains substantiated findings with their consequences; group or rank when the owner requests
-   it. Keep dismissed claims with their refutation so another pass does not resurrect them.
-4. **Another round needs a question.** Default at most two passes unless the owner supplies a
-   different bound. Re-dispatch only for a named unresolved claim with new evidence or a materially
-   different approach. Stop on supported conclusions, refuted premises, unavailable evidence or the
-   effort limit; record uncertainty. Never require an endless sequence of empty finding lists or
-   mistake agreement for proof.
-5. Land the output in the repo's reviews doc or a packet — the substantiated finding list and
-   dismissed claims, each with evidence and a proposed disposition: fix now / backlog / owner
-   decision (present those via `duck-decide`) / rejected-with-reason.
+Trace callers and consequences before calling a pattern defective. Co-changing files, dense
+comments and old code are investigation leads, not proof of a wrong boundary or harmless debt.
+Repeated instances may have one shared fix; repetition alone does not make that fix an owner decision.
 
-## Common mistakes
+## Substantiate and bound the pass
 
-- Silently dropping substantiated findings; prioritizing a complete list is different from hiding
-  evidence or inventing severity.
-- Reading "surfaces everything" as "checks nothing" — weighing is the owner's, validating is the
-  roast's. A claim it could not substantiate is reported as unsubstantiated, never laundered into
-  the list as a finding.
-- Buying another round without a question it could settle, or keeping a later, more complex
-  candidate merely because it was produced last.
-- Letting the roast write fixes — output is findings + dispositions; execution goes through the
-  normal pipeline (`duck-plan` / `duck-review`) like any other work.
+Choose method, participants and effort bound with `duck-review`'s
+[challenge selection](../duck-review/references/challenge.md). A focused self-critique stays labeled
+as such. Use its [dispatch mechanics](../duck-review/references/dispatch.md) for external participants;
+required authorization and identity checks still apply. Give independent critics the same
+constraints and complementary questions, not each other's conclusions.
+
+For each proposed finding, identify the violated contract or concrete cost, cite its source and
+execute a relevant counterexample when feasible. Distinguish demonstrated defects, supported
+maintenance findings and untested suspicions. Prefer the smallest fix, including deletion or reuse.
+Do not rank by lines removed, file age or the confidence of the reviewer.
+
+Group findings by cause; retain substantiated ones and explicitly resolve previously disputed claims.
+Do not publish every discarded hunch. Default to at most two passes unless the user supplies another
+bound. Another pass needs an unresolved question and new evidence or a materially different approach;
+never repeat until the finding list is empty or every critic agrees.
+
+## Return the useful result
+
+Report findings with location, consequence, evidence and proposed action, then material coverage
+limits. Separate required repairs from optional improvements and genuine owner decisions. Use
+`duck-decide` only for a tradeoff the owner actually needs to settle.
+
+A standalone critique stays in the response. Update an existing review/work record when requested,
+required by policy or needed for a downstream handoff, using `duck-proof`'s durable-home rules.
+Do not create a packet or backlog entry merely because a finding exists.
+
+Return to the caller for already-authorized repairs. Small local fixes need their relevant checks;
+substantial work may need `duck-plan`, and release follows the required `duck-review` gate. The roast
+itself grants neither repair authority nor release approval.

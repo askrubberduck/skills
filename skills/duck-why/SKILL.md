@@ -5,69 +5,49 @@ description: Name the cause of a failure before anyone writes a fix, because the
 
 # Duck Why
 
-Explain the failure out loud, in order, to something that believes none of it. Most bugs die in
-that sentence — the step you skip while explaining is the step you skipped while writing.
+Find the demonstrated cause of the failure and the paths it affects. Stop when that explanation
+accounts for the evidence; a typo need not become an architectural or organizational diagnosis.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
-quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Follow the user's language; preserve commands, paths, identifiers, quoted errors and verdicts.
+This skill diagnoses without editing the candidate. Return the cause and repair location to the
+caller, which continues any already-authorized fix and verification. Do not request the same local
+repair permission again or imply that diagnosis satisfies a release gate.
 
-**This skill names a cause. It does not fix one.** Doer and judge stay separate here for the same
-reason they do in `duck-break`: the pass that finds a cause and the pass that repairs it reward
-opposite instincts, and running them together turns "I understand this" into "I changed something
-and it stopped". The output is a named, evidenced cause; the fix travels the normal pipeline like
-any other change. Separation bars the fix, never the thinking.
+## Reproduce and trace
 
-## Reproduce before you reason
+Obtain a reproducing command and inspect its output and relevant state. If the environment is
+unavailable or the fault intermittent, use logs, traces and history, state the reproduction limit,
+and distinguish observations from provisional explanations.
 
-Try to obtain one reproducing command and record its output. If the fault is intermittent or the
-original environment is unavailable, use logs, traces and historical state to form provisional
-hypotheses. Say what you could not reproduce and choose observations that distinguish the causes.
-Lack of deterministic reproduction limits confidence; it does not forbid investigation or prove
-the defect absent.
+Trace the failing path to the first point where behavior diverges from the required contract.
+Read the function's callers and relevant configuration; classify which can reach the failure and
+which enforce preconditions that prevent it. State search limits when external or dynamic callers
+cannot be enumerated. Shared code does not imply every caller is broken.
 
-## Symptom, then cause
+Identify the cause at the level needed to explain those paths. A shared rule may need one repair
+at its owner rather than a guard in each caller. An incorrect comparison may need only that
+comparison corrected. Investigate a deeper design or policy decision only when evidence points to it.
 
-The report names where it hurt, not where it broke. Walk outward from the failing assertion to the
-first point where reality diverged from intent — the last place the state was still correct is the
-edge of the defect.
+## Separate plausible causes
 
-Ask why until the answer stops being about the code and starts being about a decision: a contract
-nobody wrote down, an assumption that used to hold, a boundary two components disagreed about.
-Stopping at the first line that could be edited to make the red go away is how a symptom gets
-patched and the cause ships.
+When more than one explanation fits, choose the cheapest observation that distinguishes them and
+run it. With decisive direct evidence, verify that explanation without inventing a rival hypothesis.
+A passing general suite does not refute a reproducer it never exercises.
 
-**Inspect every caller before you name the cause.** Classify which can reach it and which enforce
-preconditions that prevent it. Shared code does not imply every caller is broken. Locate the repair
-where the required contract belongs rather than adding a guard to each reported instance.
+Cite inspected source as source evidence, executed behavior as an observation, and deductions as
+reasoning. Do not describe an unexecuted prediction as observed output. Investigate additional
+errors that could affect the causal chain; record why a consequential competing cause was ruled out.
 
-## Competing hypotheses, cheap discriminators
+## Return an actionable diagnosis
 
-One hypothesis pursued is a guess defended. Hold at least two, and for each write down the cheapest
-observation that would **rule it out** — then run that, not the one that would confirm your
-favourite. A hypothesis with no discriminating test is not a hypothesis, it is a preference.
+Lead with the cause or the unresolved question, then provide:
 
-Evidence is what a command printed. Reasoning about what the code must do is a hypothesis, however
-confident; label it as one. When history is the evidence, the evidence is the named commit.
+- The reproducer or available trace, actual result and expected contract.
+- Source and observations connecting the failure to the cause, including affected sibling paths.
+- The shared repair location and the check that would show the failure is gone.
+- Material uncertainty and the next discriminator, if the cause remains unresolved.
 
-Errors dismissed along the way as unrelated are hypotheses too. Say why each is unrelated, or it
-stays on the list.
-
-## What comes back
-
-- The **reproducing command** and its output, or the available traces and limits of reproduction.
-- The **cause**, in one sentence, or the unresolved competing hypotheses and next discriminator.
-- The **evidence chain**: each step citing `file:line`, a command and its output, or a named commit.
-  A link asserted rather than observed is marked as an assumption.
-- **Every caller or path that shares the cause**, not just the reported one.
-- Hypotheses ruled out, each with what ruled it out. A short list of dead ends is worth more than a
-  confident single answer, because it is what stops the next person re-running them.
-- Where the fix belongs, named but **not made**: a unit for `duck-run`, a re-frame via `duck-frame`
-  when the cause is the architecture, an owner call via `duck-decide` when the cause is a policy
-  nobody has set. `duck-proof` is what later shows the fix actually took.
-
-## Common mistakes
-
-- Fixing it because the cause was obvious once found — that is the boundary this skill exists to
-  hold, and "it was a one-liner" is how an unreviewed change lands in a gate file.
-- Treating a passing suite as proof the cause is gone — nothing was fixed yet, and if the suite
-  passed while the bug existed, the suite is a second finding.
+Keep ruled-out hypotheses only when their evidence prevents repeating a consequential dead end.
+Do not create a design or work item merely to explain a local defect. An unsettled architectural
+contract belongs to `duck-frame`; an actual owner policy choice belongs to `duck-decide`.
+The executing caller may use `duck-run`; `duck-proof` verifies the eventual repair.

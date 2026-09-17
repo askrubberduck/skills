@@ -8,7 +8,8 @@ committed tree, and the proof that a sweep changed no code; this file is the bar
 A comment earns its place by carrying one of these, and says only it:
 
 - **Why not the simpler code** — the constraint that killed the shape a maintainer would write in
-  its place. Line-level only: an alternative *design* goes to the design record.
+  its place. A still-relevant broader design rationale belongs in the existing design record;
+  an obsolete alternative does not need archiving merely because its comment is deleted.
 - **An external contract** — a wire format, an API's documented quirk at the version the project
   pins, a spec section, an ordering the protocol demands.
 - **A trap** — non-obvious ordering or lifetime, concurrency, precision or units, a security
@@ -34,10 +35,10 @@ a license, and no comment-quality argument touches it.
    review", and whatever the codebase's own language says for them), or is commented-out code.
    Deleting is the whole fix.
 2. **Fix the code** — the comment exists because a name, a signature, or a boundary is unclear.
-   Rename, extract, invert the guard, split the function; the comment dies with the confusion it
-   was covering. A docstring that needs a list to describe one function is a single-responsibility
-   finding, and a comment mapping which caller passes which flag is a coupling finding. Never leave
-   the comment as the fix for unclear code.
+   Identify the concrete ambiguity and repair it within authorized scope. Prefer a clearer name
+   or simpler control flow before extracting another helper. A list in a docstring or a caller/flag
+   explanation is a prompt to inspect responsibilities, not proof that the function needs splitting.
+   Keep an explanation of a necessary contract; do not create machinery just to delete its comment.
 3. **Keep and tighten** — it passes the keep test. Cut it to the fact, drop the story, put it
    where the reader hits the surprise, not at the top of the file.
 

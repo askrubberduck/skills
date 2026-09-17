@@ -5,77 +5,69 @@ description: Put agent context, memory, and token costs on a diet without starvi
 
 # Duck Diet
 
-Context cost has two bodies: what sessions burn at runtime — cache-read of a marathon session
-dominates it — and what the installed config bills every turn before work even starts. Both diets
-here; the product of the audit is deletions.
+Reduce measured waste in agent context and work. Find repeated reads, duplicated guidance,
+unnecessary dispatches or retries before recommending a new setup. Smaller output alone does not
+establish lower cost or better results.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
-quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Follow the user's language; preserve commands, paths, identifiers, quoted errors and verdicts.
+Respect existing edit authority. An audit alone reports proposed changes; a request to trim applies
+justified local edits and verifies them without another approval request. Preserve owner decisions,
+security boundaries and required workflow evidence.
 
-## The six runtime rules
+## Runtime rules
 
-1. **Preserve state at context boundaries.** Use host compaction or a fresh isolated session when
-   context quality or task independence warrants it; do not force a reset per stage or packet.
-   Models and hosts differ. Before a handoff, preserve outcome, source/candidate identity, valid
-   evidence, unresolved claims and the next authorized action. Anything the next stage needs must
-   survive scratch cleanup. Schedule a continuation only through a supported, authorized host
-   mechanism and verify it was booked. A written next step alone is not a scheduled handoff.
-2. **Absolute paths, once.** No `cd` chains, no re-declared `VAR=/long/path` boilerplate per Bash
-   call. Long scratchpad root: `ln -s` a short alias once.
-3. **Grep-first; delegate big reads.** Nothing >20KB into the main context: page with offset/limit,
-   or send an investigator subagent that returns a summary. Main context is the most expensive place
-   to store a file.
-4. **Stage routing: start cheap, bounce up on failure.** Route by stage, both model AND agent type.
-   - **Mechanical work** (investigation, scripted edits, rebases, clerical verification, recording)
-     defaults to cheap-model executor agents — but only with a pinned model whose identity is
-     verified from runtime or provider metadata, and a named gate (tests, compiler, a dedicated
-     check script) that catches the stage's failure, executed and its result recorded before the
-     stage's output is used. No pin or no gate, no cheap tier.
-   - **Bounce up on failure.** A cheap agent that fails its gate, or fails to converge on a second
-     attempt at the same slice, has answered the routing question: re-dispatch that slice to the
-     strongest tier, or to an agent with elevated reasoning limits, carrying the failure context
-     with it. A passing gate proves cheap was sufficient, never that it was best — the bounce is
-     what stops a wrong cheap route from becoming the answer.
-   - **Judgment is not clerical work.** Use `duck-review`'s challenge-selection policy for
-     independent opinions and high-risk judgments. Calibrate ordinary tiers against task outcomes;
-     neither a strong model nor more participants substitutes for a discriminating check. Honor
-     explicit owner choices and required release policy; record limits rather than hiding them.
-5. **Batch agent traffic.** Poll teammates at round boundaries; never relay no-op idle pings into
-   the coordinator context. Compress subagent output contracts ("return table, no prose").
-6. **Raw output stays out of git and out of context.** CLI stdout, logs, diffs: extract the decisive
-   lines; full text lives in the scratchpad only.
+1. **Preserve state at context boundaries.** Use host compaction or an isolated session when useful,
+   not automatically per stage. Carry outcome, source/candidate identity, valid evidence, unresolved
+   claims and next authorized action into the handoff. Evidence needed later must survive scratch
+   cleanup. A scheduled continuation requires a supported, authorized host mechanism and a confirmed
+   booking; a written next step is not a scheduled task.
+2. **Read what the task needs.** Search first, then read relevant sections with enough surrounding
+   context to understand them. Keep paths and working directories explicit. Large output may call
+   for filtering, paging or a bounded investigator; it does not automatically justify another agent.
+   Do not compress away an error, contract or contradictory observation.
+3. **Route by demonstrated capability.** Reuse the current worker for small tasks when delegation
+   adds more overhead than useful separation. For mechanical work worth delegating, a cheaper model
+   needs a verified pinned identity and a named executable check that catches its failure. Run that
+   check before accepting the result; without identity or a suitable check, do not claim a validated
+   cheaper route. If it fails, inspect the cause and escalate when capability is the limit, rather
+   than retrying the same attempt. Two failed attempts at the same slice end that routing experiment.
+   Use `duck-review`'s challenge-selection policy for independent or high-risk judgments; honor the
+   owner's model choices and repository requirements.
+4. **Batch useful communication.** Dispatch bounded independent tasks with the necessary context.
+   Request findings and decisive evidence, not transcripts or repeated idle updates. More workers
+   and more rounds need a question they can resolve.
+5. **Keep raw output separate.** Extract the evidence needed for the decision. Keep raw logs in
+   authorized scratch storage; preserve decisive evidence in the work record before cleanup when
+   a later stage needs it. Avoid committing raw session logs or private prompt contents.
 
-## Session audit mode
+## Session cost audit
 
-Asked "why was this expensive": per-session, report cache_read vs output tokens, session span,
-compaction count, `cd`/redeclaration counts, results >20KB — each mapped to the rule above that was
-broken. Numbers first, then only the fixes with the most leverage.
+Use actual host usage records. `duck-learn` owns known transcript-store locations and counting rules;
+include subagents and retries without double-counting derived logs. Report available input, cached
+input and output usage, measured elapsed time, repeated reads/dispatches and retry outcomes.
+A missing field or inaccessible store is unknown, never zero.
 
-## Installed-config audit mode
+Separate measured tokens, context size and billed cost. Bytes or word counts are size proxies, not
+measured tokens. Cached-input volume alone does not establish the dominant billed cost: conversion
+requires the applicable model rates and billing semantics. Verify current official pricing when a
+monetary recommendation needs it, or leave cost uncomputed. Do not invent a savings percentage.
 
-Everything always-loaded (CLAUDE.md chain, memory index, plugin skill descriptions, hooks context)
-is billed every turn of every session:
+Tie each recommendation to an observed source of waste and a check that useful behavior survives.
+Compare before and after on equivalent work when claiming savings; label estimates and their
+assumptions. A long session or a large file is not itself proof of waste.
 
-1. **Installation health**: use the active host's diagnostics when available (`claude doctor` for
-   Claude Code; `codex --version` plus plugin/skill configuration checks for Codex); inspect plugin
-   cache integrity and broken symlinks in skill directories.
-2. **Always-loaded inventory**: user + project CLAUDE.md/AGENTS.md (follow `@includes`), memory
-   index, enabled plugins. Estimate each block's size; rank by cost.
-3. **Usage cross-check**: read the host's transcripts — `duck-learn` step 1 owns the
-   transcript-store locations; use those rather than re-deriving them — and count what each
-   always-loaded block was actually used for. Loaded-never-invoked for weeks = disable
-   candidate. Report counts and metadata, never raw prompt content. Can't find a store, or it's
-   malformed? Say so and mark the audit partial — a missing store is never zero usage.
-4. **Dedupe**: local memory files repeating checked-in CLAUDE.md facts — keep the checked-in copy,
-   delete the memory; checked-in serves every agent, memory serves one machine. Same for
-   AGENTS.md vs copilot-instructions duplication: one canonical file.
-5. **Trim to non-derivable**: a CLAUDE.md line earns its place only if a fresh session could NOT
-   derive it from the repo. Owner decisions, invariants, and workflow rules stay.
-6. Present cuts as one list with per-item size saved; apply on approval.
+## Installed-config audit
 
-## Common mistakes
+Inspect the active host's actual configuration, instruction includes, skill/plugin discovery and
+broken links. Use available host diagnostics when they answer a real health question. Distinguish
+always-loaded content from on-demand bodies instead of assuming all installed files are loaded.
 
-- Treating cache reads as free because they're discounted — the window re-bills every turn; length
-  is the cost driver.
-- Compressing prose while pasting whole files — rule 3 outweighs terse wording 100:1.
-- Trimming config rules the owner put there deliberately — when a line reads like a decision, ask.
+Find duplicated or stale guidance and locate its authoritative home. Keep a reference where another
+host needs it; do not delete a host's only working instruction path. Compare invocation evidence
+when available, but absence of explicit invocation does not prove an implicitly applied rule was
+unused. Unreadable logs do not justify disabling a skill.
+
+Preserve non-obvious constraints, owner decisions and safety rules. Remove generic or redundant
+advice when existing authority covers it. Do not change an unresolved owner policy under the label
+of compression. Report proposed/applied cuts, measured size change and verification limits. Recheck
+links and host loading after edits; a shorter configuration that loses required behavior failed.

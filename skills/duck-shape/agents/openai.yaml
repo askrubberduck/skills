@@ -1,4 +1,4 @@
 interface:
   display_name: "Duck Shape"
-  short_description: "Less to hold in your head, with the contracts intact"
-  default_prompt: "Use $askrubberduck:duck-shape to take this structure apart and find the simplest robust path. Keep the required contracts and prove the assembled result."
+  short_description: "Remove unnecessary code while preserving required behavior"
+  default_prompt: "Use $askrubberduck:duck-shape to remove unnecessary mechanisms and duplicate rules from this code, preserve its required behavior, and verify the result."

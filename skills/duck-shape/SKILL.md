@@ -1,101 +1,72 @@
 ---
 name: duck-shape
-description: Take the mechanism apart and rebuild the simplest robust path; leave the reader less to hold in their head. Use while implementing, to verify completed structure, or for deep simplification that dismantles accidental mechanisms and rebuilds a robust path. Judge concepts and realistic changes, not line count.
+description: Remove unnecessary code, duplicate rules, and speculative abstractions while preserving required behavior. Use for AI slop cleanup, simplifying an implementation, or checking the structure of completed work. Deep reconstruction is available when local cleanup cannot fix the boundary.
 ---
 
 # Duck Shape
 
-The cost is what a reader must hold simultaneously before changing the code safely. A layer earns
-its place when it answers a question and ends the read. Depth, file count and line count cannot
-measure that. Removing a required invariant to shorten the code is a failed simplification.
+Remove a concrete maintenance burden without losing required behavior. A smaller diff or a more
+impressive design is not evidence of improvement.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
-quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Follow the user's language; preserve commands, paths, identifiers, quoted errors and verdicts.
+Apply scoped local edits unless the request is report-only or analysis-only. Selected findings
+limit repairs. Continue through verification; commits and publication need separate authorization.
 
-Apply improvements within authorized implementation scope. Report-only means inspect and recommend
-without edits. Selected findings limit subsequent fixes; continue authorized local work through
-verification, not through unrequested commits, PRs or pushes.
+## Establish the scope and behavior
 
-If the desired outcome or architectural contract is unsettled, use `duck-frame` to settle that
-decision. A question about the simplest structure under an established contract stays here;
-"future-proof" alone does not justify a planning pipeline or speculative extension points.
+Default to the current task's changed code; an explicit file or subsystem bounds a wider cleanup.
+Read the affected path through its callers, state owners and observable effects. Inspect shared
+helpers and project conventions before replacing anything. Do not expand a cleanup into a repo audit.
 
-## Understand before cutting
+Identify the outcomes that must survive, including errors, recovery and public contracts. Run the
+relevant existing checks before editing. Add a focused regression check when a material contract
+is uncovered; do not manufacture tests for trivial edits or lock in a known bug as intended behavior.
+If execution is unavailable, name the missing check and limit the claim accordingly.
 
-Read the affected flow from entry to observable effect, including callers, state owners, failure
-recovery and project constraints. Pick a realistic next change or the last bug. What must you open
-and what facts must you hold before safely editing? A diff alone hides most of that path; the
-facts whose meaning lives somewhere other than where they are used are the ones to name.
+## Find specific things to remove
 
-State the outcome lost if a mechanism disappears. No lost outcome is a deletion candidate, not
-permission to ignore public contracts or callers you have not inspected. Dead code matters when
-readers must carry it as a live possibility; unrelated sediment is not automatically this task.
+Use these as inspection prompts, not automatic deletion rules:
 
-## Compare structures against the same contract
+- Duplicate rules or state: locate the authoritative owner and the copies that can drift.
+- Dead paths, exports and flags: check callers, configuration and external use before deleting.
+- Pass-through wrappers and speculative options: identify the contract they actually protect.
+- Reimplemented helpers or platform features: compare the existing facility's real guarantees.
+- Defensive branches and fallbacks: distinguish required boundary validation and recovery from
+  impossible internal states or errors silently converted into success.
+- Tests that mirror implementation: preserve outcome checks; question mocks or assertions that
+  can pass while the required behavior fails.
 
-Prefer removal, an existing helper, stdlib, or a native platform mechanism when its actual
-guarantees fit. A familiar name often ends a read; a one-call dependency can add a vocabulary and
-lifecycle that cost more than it saves. A wrapper helps when it names the operation or isolates
-real volatility, and hurts when it hides a familiar contract behind an uninformative name.
+For each material candidate, choose **remove**, **simplify using an existing facility**, or **keep**.
+Ground the choice in a caller, contract, failure case or demonstrated change cost. "Separation of
+concerns" or a possible future use is not sufficient evidence. A single implementation may still
+protect a public API, security boundary or real platform difference.
 
-Ask whether a reader can state what an operation does and identify where to look next without a
-search. A hierarchy whose contracts answer that question may be cheaper than flattening it into
-one function. Composition helps when it reduces facts held together, not because inheritance is
-inherently defective. Keep required polymorphic, platform, public-version and volatile boundaries.
+## Make the smallest justified cleanup
 
-An abstraction with one implementation is neither automatically debt nor automatically justified
-by a possible second case. Read the roadmap and current contract; ask the owner only when an
-unresolved bet changes the decision. Compare the cost of the seam today with introducing it when
-needed. Preserve one concise explanation of a real constraint; a name for a hypothetical future
-must not immunize unnecessary machinery from challenge.
+Start with safe deletions, then consolidate repeated rules where they belong. Keep one owner per
+rule and state transition. Avoid creating a replacement abstraction merely to perform the cleanup.
+Keep validation, security, accessibility, recovery and necessary calibration intact.
 
-A leaky seam charges a hop while still requiring knowledge of the inside. A wrong seam splits
-things that change together. Trace a realistic change or relevant history to distinguish these
-from a naming problem. Re-cutting a boundary uses `duck-frame` to settle the affected contract;
-relabeling a wrong boundary does not repair it.
+Keep edits focused on a cause; rerun affected checks before building on a risky change. Preserve
+required behavior unless a behavior change is explicitly in scope. Comments and docstrings use
+`duck-dry`'s [prose bar](../duck-dry/references/bar.md); deleting commentary does not repair the
+structure or justify extracting another helper.
 
-## Reconstruction, when local cleanup cannot remove the mechanism
+For an explicitly requested deep simplification or a demonstrated wrong boundary that local
+cleanup cannot fix, use [reconstruction](references/reconstruction.md). If the required outcome or
+boundary contract is unsettled, resolve that decision with `duck-frame` before dependent edits.
+Analysis-only use compares proposed mechanisms with the same tests of necessity; it does not edit.
 
-Use this for an explicitly requested deep simplification or a demonstrated wrong boundary, bounded
-to the subsystem under discussion. Compare with a smaller in-place correction before replacing it.
+## Verify and finish
 
-1. Recover the required outcomes and contracts, including failure recovery and known next changes.
-2. Separate inputs, decisions, state and side effects conceptually. This is analysis, not a demand
-   for a class or file per piece.
-3. Classify mechanisms as required by the problem, required by the platform, or accidental. Attack
-   duplicate state, parallel paths, mode flags, translation layers and caller ordering obligations.
-4. Assemble the smallest path with one owner per rule and state transition. Reuse existing
-   facilities and keep security, validation, accessibility and necessary calibration intact.
-5. Replace within the authorized scope, test the contracts, and remove superseded code, config and
-   tests that only encode the old mechanism. Preserve tests of required outcomes. Intentional
-   behavior changes need explicit checks rather than blind equivalence to the original bug.
+Run the relevant checks on the final candidate and inspect the resulting path. For structural
+changes, walk a realistic next change: did a duplicate rule, state owner, ordering obligation or
+unnecessary hop disappear? Do not trade obvious code for dense expressions or hidden coupling.
 
-Do not rebuild merely because the alternative looks cleaner. The replacement must remove a real
-obligation or make a realistic change easier without weakening the contracts.
+Report the material removals or simplifications, any questionable mechanism retained and its
+concrete reason, and the checks actually run with their limits. Unchanged code is a valid result
+when no candidate survives inspection. Stop when the scoped findings are resolved and affected
+checks pass; another pass needs an unresolved defect, not a cleanup quota.
 
-## Verify the completed shape
-
-Walk the assembled path again and attempt the representative change. Name what the reader no
-longer has to hold and where each remaining fact belongs. A smaller diff that spreads state or
-hides ordering failed the probe; more lines with fewer independent obligations can win.
-
-Run affected behavioral checks after restructuring. Use `duck-proof` for contract counterexamples,
-final-state evidence and comparison of surviving alternatives. Shape edits invalidate relevant
-prior evidence. Keep causes near effects and one authoritative home per fact. A regex, clever
-comprehension or compressed branch wins only when its semantics are actually easier to read.
-
-Comments can reveal hidden coupling, but their absence proves no clarity. Fix the structure that
-made an explanation necessary; `duck-dry` owns the surviving prose and protects parsed directives,
-external contracts and calibrated knobs. Do not silently change behavior during a comment sweep.
-
-## Handoff
-
-Apply justified changes where execution is already authorized. Take the edited diff through
-[the prose bar](../duck-dry/references/bar.md) before verifying: a restructure moves the code a
-comment described. A real owner decision goes to `duck-decide`; independent work can continue. A
-whole-product critique belongs to `duck-roast`, not an unrequested expansion of the current
-restructure.
-
-The structural probe is evidence, not independent approval. `duck-review` judges release work under
-the repository's policy. Keep unrelated restructures separate from behavior changes when commits
-are authorized; shaping the code a unit already changes belongs in that unit.
+`duck-proof` can challenge a remaining contract claim. This cleanup does not provide the independent
+release approval owned by `duck-review`.

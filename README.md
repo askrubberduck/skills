@@ -131,17 +131,17 @@ resolves.
 | `duck-decide` | Walk the owner through the decisions they have been ducking, one at a time |
 | `duck-diet` | Put agent context, memory, and token costs on a diet without starving the essential guidance |
 | `duck-dry` | Strip comments, docstrings, commit messages, and PR descriptions until only unobvious decisions, contracts, and traps survive |
-| `duck-frame` | Settle a system's target design before planning begins, because 'we'll figure out the architecture later' means never |
+| `duck-frame` | Establish the required outcome, current behavior, and smallest justified design before planning |
 | `duck-land` | Merge approved work, update project records, and clean up the branch and worktree; landed means nothing left behind |
 | `duck-learn` | Turn session and delivery evidence into reusable lessons, so each mistake is only paid for once |
-| `duck-plan` | Find the hole in the plan before building over it; assumptions and acceptance checks must survive challenge |
+| `duck-plan` | Turn a settled outcome into necessary changes and checks that can expose a wrong plan |
 | `duck-proof` | Make the goal, the path, and the finished work earn your trust through counterexamples and executed checks |
 | `duck-race` | Put two decorrelated model families on the same problem and let executed evidence pick the result |
 | `duck-review` | Review work from multiple angles or deliver an independent judgment |
 | `duck-roast` | Roast the whole solution until its weak claims show; a finding must earn its place, and a round must end |
 | `duck-run` | Challenge the goal, shape the plan, build it, and make it prove itself; local means local |
 | `duck-scan` | Find ready, blocked, and remaining work without changing anything; looking is free |
-| `duck-shape` | Take the mechanism apart and rebuild the simplest robust path; leave the reader less to hold in their head |
+| `duck-shape` | Remove unnecessary code, duplicate rules, and speculative abstractions while preserving required behavior |
 | `duck-sweep` | Clean out stale branches, worktrees, checkouts, scratch directories, and ignore rules; the pond stays clean |
 | `duck-why` | Name the cause of a failure before anyone writes a fix, because the symptom is not the defect |
 <!-- skills-table:end -->

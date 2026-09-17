@@ -1,4 +1,4 @@
 interface:
   display_name: "Duck Plan"
-  short_description: "Find the hole in the plan before building over it"
-  default_prompt: "Use $askrubberduck:duck-plan to shape this plan and try to falsify its assumptions before implementation. Name the checks that could stop it."
+  short_description: "Plan necessary changes and checks that can expose mistakes"
+  default_prompt: "Use $askrubberduck:duck-plan to identify the necessary changes, cut speculative tasks, and name the checks that could expose a wrong implementation."
