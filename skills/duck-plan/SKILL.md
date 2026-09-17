@@ -1,6 +1,6 @@
 ---
 name: duck-plan
-description: Turn a settled outcome into necessary changes and checks that can expose a wrong plan. Use for implementation planning, consequential uncertainty, or work that previously needed repeated review fixes. Reuse established design decisions and cut speculative tasks.
+description: Find the hole in the plan before building over it; assumptions and acceptance checks must survive challenge. Use for implementation planning, consequential uncertainty, or work that previously needed repeated review fixes. Reuse established design decisions and cut speculative tasks.
 ---
 
 # Duck Plan

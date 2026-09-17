@@ -1,4 +1,4 @@
 interface:
   display_name: "Duck Frame"
-  short_description: "Settle the outcome and smallest justified design"
+  short_description: "Settle the design before the code settles it for you"
   default_prompt: "Use $askrubberduck:duck-frame to challenge what this system needs to do, trace what exists, and settle the simplest defensible design before planning."

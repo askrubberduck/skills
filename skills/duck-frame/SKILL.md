@@ -1,6 +1,6 @@
 ---
 name: duck-frame
-description: Establish the required outcome, current behavior, and smallest justified design before planning. Use for system analysis, architecture choices, or unsettled requirements and boundaries. Reuse a settled design when its assumptions still hold.
+description: Settle a system's target design before planning begins, because 'we'll figure out the architecture later' means never. Use for system analysis, architecture choices, or unsettled requirements and boundaries. Reuse a settled design when its assumptions still hold.
 ---
 
 # Duck Frame

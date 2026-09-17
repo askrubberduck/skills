@@ -32,6 +32,7 @@ Routing evidence is limited to two English selection probes — see the [languag
 | "duck it" | `duck-run`: challenge it, plan it, build it, try to break it. Stop where you authorized; local means local. |
 | "why is this broken?" | `duck-why`: the cause and its evidence, or the hypotheses still standing. The fix has an address; nobody has written it yet. |
 | "prove this goal or plan" | `duck-proof`: what would make it wrong, what was tried, and what survived. Your favorite answer gets no head start. |
+| "clean up the AI slop" | `duck-shape`: make every layer earn its place. Cut the needless machinery, keep the contracts, run the checks. |
 | "simplify it deeply" | `duck-shape`: take the mechanism apart, keep the contracts, rebuild the path with less to remember. Then check it. |
 | "gate it" | `duck-review`: one verdict, the reviewers named, and the evidence behind every finding. No participation trophies. |
 | "review this work from multiple angles" | `duck-review`: evidenced findings on a design, plan, document or implementation, reported in-session. No edits or publication. |
@@ -131,17 +132,17 @@ resolves.
 | `duck-decide` | Walk the owner through the decisions they have been ducking, one at a time |
 | `duck-diet` | Put agent context, memory, and token costs on a diet without starving the essential guidance |
 | `duck-dry` | Strip comments, docstrings, commit messages, and PR descriptions until only unobvious decisions, contracts, and traps survive |
-| `duck-frame` | Establish the required outcome, current behavior, and smallest justified design before planning |
+| `duck-frame` | Settle a system's target design before planning begins, because 'we'll figure out the architecture later' means never |
 | `duck-land` | Merge approved work, update project records, and clean up the branch and worktree; landed means nothing left behind |
 | `duck-learn` | Turn session and delivery evidence into reusable lessons, so each mistake is only paid for once |
-| `duck-plan` | Turn a settled outcome into necessary changes and checks that can expose a wrong plan |
+| `duck-plan` | Find the hole in the plan before building over it; assumptions and acceptance checks must survive challenge |
 | `duck-proof` | Make the goal, the path, and the finished work earn your trust through counterexamples and executed checks |
 | `duck-race` | Put two decorrelated model families on the same problem and let executed evidence pick the result |
 | `duck-review` | Review work from multiple angles or deliver an independent judgment |
 | `duck-roast` | Roast the whole solution until its weak claims show; a finding must earn its place, and a round must end |
 | `duck-run` | Challenge the goal, shape the plan, build it, and make it prove itself; local means local |
 | `duck-scan` | Find ready, blocked, and remaining work without changing anything; looking is free |
-| `duck-shape` | Remove unnecessary code, duplicate rules, and speculative abstractions while preserving required behavior |
+| `duck-shape` | Make every layer earn its place; cut the machinery the problem never asked for |
 | `duck-sweep` | Clean out stale branches, worktrees, checkouts, scratch directories, and ignore rules; the pond stays clean |
 | `duck-why` | Name the cause of a failure before anyone writes a fix, because the symptom is not the defect |
 <!-- skills-table:end -->
@@ -233,7 +234,7 @@ references resolve, generated files match, and deliberate corruptions get caught
 
 That proves the package holds together. To find out whether the duck does its job, give it a task
 where agreement would be wrong, a green test hides a bug, or a reviewer moves the target. Inspect
-what it actually did. The [behavioral cases](evals/proof-cases.md) state the checks and which trials
+what it actually did. The [eval guide](evals/README.md) links the behavioral cases and records which trials
 have run. An unrun trial stays unrun, even in the duck's own README.
 
 Versions and what changed: the [releases page](https://github.com/askrubberduck/skills/releases).

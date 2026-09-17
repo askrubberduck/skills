@@ -1,4 +1,4 @@
 interface:
   display_name: "Duck Dry"
-  short_description: "Keep the facts the code cannot speak for itself"
-  default_prompt: "Use $askrubberduck:duck-dry to strip this prose to the facts the code cannot carry. Keep the traps and contracts; check that nothing broke."
+  short_description: "Keep what the code cannot tell you"
+  default_prompt: "Use $askrubberduck:duck-dry to cut narration from these comments and PR descriptions. Keep the traps and contracts; check that nothing broke."

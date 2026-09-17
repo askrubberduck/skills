@@ -1,6 +1,6 @@
 ---
 name: duck-shape
-description: Remove unnecessary code, duplicate rules, and speculative abstractions while preserving required behavior. Use for AI slop cleanup, simplifying an implementation, or checking the structure of completed work. Deep reconstruction is available when local cleanup cannot fix the boundary.
+description: Make every layer earn its place; cut the machinery the problem never asked for. Use for AI slop cleanup, simplifying an implementation, or checking the structure of completed work. Deep reconstruction is available when local cleanup cannot fix the boundary.
 ---
 
 # Duck Shape

@@ -1,4 +1,4 @@
 interface:
   display_name: "Duck Shape"
-  short_description: "Remove unnecessary code while preserving required behavior"
-  default_prompt: "Use $askrubberduck:duck-shape to remove unnecessary mechanisms and duplicate rules from this code, preserve its required behavior, and verify the result."
+  short_description: "Make every layer earn its place"
+  default_prompt: "Use $askrubberduck:duck-shape to make every layer earn its place. Cut unnecessary mechanisms, keep the contracts, and prove nothing broke."

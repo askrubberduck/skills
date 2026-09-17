@@ -98,9 +98,10 @@ and added non-PR probes remain untested. These results do not justify expanding 
 
 ## Coverage
 
-Directory-submission cases avoid independent `duck-review`, `duck-race`, and `duck-diet` workflows:
-those dispatch a second model family through `codex` or `agy`, which a reviewer will not have
-installed. Their selection probes do not verify those workflows. `proof-cases.md` also covers
+Directory-submission cases avoid independent `duck-review` and `duck-race` workflows, which need
+another model family and tools a reviewer may not have installed. Diet can audit supplied usage
+records without dispatching another model; model-routing experiments need their own tools and checks.
+Selection probes do not verify those workflows. `proof-cases.md` also covers
 in-session findings-only review without external CLIs. Running the gate on this repository can
 exercise independent review, but only a recorded run establishes what actually happened.
 
