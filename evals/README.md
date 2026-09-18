@@ -142,7 +142,8 @@ runs per arm.
 | `why` | 0.87 | 0.90 | −0.03 | 9/18 |
 
 Six cases (`why-04`, `why-05`, `shape-02`, `shape-03`, `shape-04`, `scan-06`) were rerun the same day after
-their graders failed correct answers; the table uses the reruns. The first three `why-05` fixtures
+their graders failed correct answers; the table uses the reruns, which ran the graders as
+committed (`why-04` gained `gives-local-reproducer` in its rerun, so both runs score it the same way). The first three `why-05` fixtures
 were decidable — per-worker counters and a "well below 500" cue let arithmetic rule one cause out,
 and the answers that did so were right. The committed fixture shares the counter and gives no rate.
 
@@ -198,8 +199,10 @@ judge and run count as the first run.
 No should-not-fire case fired in either arm. `duck-why` now loads every time; its with-plugin score
 rose from 0.87 to 0.93, with `why-04` and `why-06` passing three of three. The rest of the `why` Δ is
 the no-plugin arm falling from 0.90 to 0.74 on the same prompts. `dry` and `scan` did not change
-between the runs and their Δ still moved by 0.16 and 0.11: at three runs a flow's Δ carries about
-that much noise, so a single run settles only the large effects (`scan-02`, `scan-05`, `why-03`).
+between the runs and their Δ still moved by 0.16 and 0.11. Both tables predate the tightening of
+three half-weight regexes; replayed, the committed patterns change one reported cell, the `why`
+no-plugin mean, from 0.74 to 0.73. At three runs a flow's Δ carries about 0.1 to 0.2 of noise, so
+a single run settles only the large effects (`scan-02`, `scan-05`, `why-03`).
 `duck-shape` loads and changes nothing the graders can see; the no-plugin arm already passes these
 fixtures.
 
