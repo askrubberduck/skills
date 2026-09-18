@@ -32,7 +32,7 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
    a cut item counted in the report but left standing in the registry is the rot this skill exists
    to remove. Preserve deleted text in existing history or the local change record until committed.
    When a commit is authorized, **a CUT commit carries the deleted item's own text** — the one
-   exception `duck-dry`'s prose bar names, and it states why.
+   exception `duck-dry` names, and it states why.
 4. Items needing the owner (sign-offs, policy calls, anything the doer may not close): queue them
    and run `duck-decide` — never close an owner-gated item yourself, never drop it silently. Queuing
    one is not a reason to stop; the sweep continues past it.

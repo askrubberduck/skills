@@ -8,7 +8,7 @@ description: Make every layer earn its place; cut the machinery the problem neve
 Remove a concrete maintenance burden without losing required behavior. A smaller diff or a more
 impressive design is not evidence of improvement.
 
-Follow the user's language; preserve commands, paths, identifiers, quoted errors and verdicts.
+Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and verdicts.
 Apply scoped local edits unless the request is report-only or analysis-only. Selected findings
 limit repairs. Continue through verification; commits and publication need separate authorization.
 

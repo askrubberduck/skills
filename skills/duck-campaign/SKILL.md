@@ -9,7 +9,7 @@ Turn the requested outcomes into a manageable set of workstreams and carry each 
 endpoint. Split work when separate execution, ownership or release helps; the ability to ship two
 small changes separately is not by itself a reason to create two packets.
 
-Follow the user's language; preserve commands, paths, identifiers, quoted errors and verdicts.
+Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and verdicts.
 Carry existing authority through the campaign. Local work ends with verified local changes;
 commits, PRs, pushes and merges require their own authorization. A planning-only request ends with
 the plan. Keep unresolved decisions attached to their dependent work.

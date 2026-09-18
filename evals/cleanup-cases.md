@@ -92,8 +92,8 @@ or speculative migration. A READY design must not be represented as a verified i
 
 ## Local results, 2026-09-17
 
-Baseline: skills from `039d8170064253c4cdd283ee52bf6fc729ae7747`. Candidate: the uncommitted
-shape/frame/plan rewrite accompanying this record. Four fresh native Codex subagents ran the paired
+Baseline: skills from `039d8170064253c4cdd283ee52bf6fc729ae7747`. Candidate: the shape/frame/plan
+rewrite committed as `92578dc`; `833d115` later changed only those three frontmatter descriptions. Four fresh native Codex subagents ran the paired
 fixtures, without each other's results or an expected answer. The trial host did not expose a pinned
 runtime model ID; no cross-family independence or release approval is claimed. Each design trial
 applied frame then plan in one session; baseline and candidate were separate sessions.

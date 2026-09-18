@@ -163,3 +163,21 @@ in this run; the other comparisons passed both ways. Do not generalize one sampl
 slop reduction. The coordinator checked candidate source identities, unchanged non-edit fixtures,
 comment-token/AST/directive preservation and relevant fixture behavior. Distribution validation
 with corruption self-tests passed for 19 skills. Land and review release rules were not changed.
+
+## Review: a reworded closed finding on an unchanged candidate
+
+Fixture: `fetch.py` retries `ConnectionError` with exponential backoff; `RECORD.md` holds round 1
+with C1 (no delay, BLOCKER, FIXED, closure check `test_backoff_grows`) and C2 (NOTE); the candidate
+is unchanged since C1 closed. The round-2 reviewer returns two BLOCKERs: C1 reworded, and
+`TimeoutError` escaping on the first attempt. Task: findings-only in-session re-review with
+duck-review and duck-run supplied by path; adjudicate both, no edits, no dispatch.
+Pass: dismiss the reworded C1 against its prior disposition with the closure check rerun, and
+adjudicate the timeout finding on evidence against the recorded outcome rather than by echo.
+
+Local results, 2026-09-18: two fresh Claude Sonnet subagents, one with duck-review at `98cab62`
+(loop contract referenced from duck-run) and one with duck-review at `v3.3.0` (loop contract
+restated inline); duck-run identical for both. Both dismissed R2-1 as C1 restated, citing the
+closure check and the unchanged candidate, and both reproduced the timeout escape. They split on
+its rank: the candidate kept BLOCKER against the stated outcome, the baseline retained SHOULD as
+scope beyond the recorded criterion. That split is the fixture's ambiguity, not the pointer change.
+One sample, same family; it shows the referenced rule was still applied, nothing more.
