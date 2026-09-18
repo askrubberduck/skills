@@ -1,6 +1,6 @@
 ---
 name: duck-why
-description: Name the cause of a failure before anyone writes a fix, because the symptom is not the defect. Use when a test fails, a bug is reported, a build breaks, something behaves differently than expected, a fix keeps not sticking, or the user asks why something is broken.
+description: Name the cause of a failure before anyone writes a fix, because the symptom is not the defect. Use when a test fails, a bug is reported, a build breaks, a traceback or error is pasted, something passes in one environment and fails in another, behavior differs from what was expected, a fix keeps not sticking, or the user asks why something is broken, including when the code is pasted inline and the cause looks obvious.
 ---
 
 # Duck Why

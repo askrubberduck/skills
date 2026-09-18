@@ -74,7 +74,7 @@ A case file is a question to ask the duck, not a receipt saying it passed.
 
 | Language | Prepared coverage | Evidence for the current descriptions |
 |---|---|---|
-| English | Selection probes for every skill; existing behavioral cases | Two bounded selection probes on 2026-09-17; see below |
+| English | Selection probes for every skill; existing behavioral cases; runner suites for why, dry, shape and scan | Two bounded selection probes on 2026-09-17; with/without runs for four skills on 2026-09-18, see Runner suites |
 | Russian | Selection probes for every skill; behavioral cases 9-17 | No recorded host/model routing runs |
 
 The rest of the routing corpus and cases 13-18 are unrun. Earlier runs, if any, do not verify changed
@@ -91,10 +91,11 @@ these results establish neither a pinned-model comparison nor cross-host reliabi
 | Trunk is still failing in CI after this PR. Find the cause. | `duck-why` |
 | Explain how this API worked in version 1 compared with version 2. Nothing is failing; I only want a historical explanation. | none |
 
-Both match the oracle. `duck-why`'s description is unchanged from `4dff3ea`; the supplied roster
+Both match the oracle. On the probe date `duck-why`'s description was unchanged from `4dff3ea`; the supplied roster
 included the initial findings-only `duck-review` description, before its scope was broadened beyond
 PRs. No workflow ran and no improvement over old routing is claimed. The broader review description
-and added non-PR probes remain untested. These results do not justify expanding `duck-why`'s description.
+and added non-PR probes remain untested. These probes did not justify expanding `duck-why`'s
+description; the runner suites below did, a day later.
 
 ## Coverage
 
@@ -113,3 +114,95 @@ output changes from unproven improvement and lists the untested companion edits.
 
 [Workflow cases](workflow-cases.md) exercise dry, why, campaign, roast and diet against unnecessary
 archiving, over-planning, invented findings and unsupported cost claims, with paired baseline results.
+
+## Runner suites
+
+The `why-*`, `dry-*`, `shape-*` and `scan-*` directories are `claude plugin eval` cases: a prompt
+with its fixture pasted inline, outcome graders beside it. Each prompt runs with the plugin and
+without it; the number to read is the difference. One flow per run, because a mean across flows
+describes none of them:
+
+    claude plugin eval . --ablation with-without --judge-model sonnet -j 4 --case 'scan-*'
+
+Cases grant only the Skill tool, so nothing is edited or executed. The reproduce and verify halves
+of `duck-why`, `duck-dry` and `duck-shape` are untested here; the cases check that the answer
+admits that limit. The judge sees the answer and the rubric, never the prompt — a rubric that
+compares against the original file carries that file.
+
+### Run of 2026-09-18
+
+Candidate `290d548` (plugin 3.5.0), Claude Code 2.1.274, default agent model, Sonnet judge, three
+runs per arm.
+
+| Flow | With | Without | Mean Δ | Skill fired on should-fire runs |
+|---|---|---|---|---|
+| `scan` | 1.00 | 0.65 | +0.35 | 18/18 |
+| `dry` | 0.98 | 0.86 | +0.12 | 15/15 |
+| `shape` | 0.98 | 1.00 | −0.02 | 3/15 |
+| `why` | 0.87 | 0.90 | −0.03 | 9/18 |
+
+Six cases (`why-04`, `why-05`, `shape-02`, `shape-03`, `shape-04`, `scan-06`) were rerun the same day after
+their graders failed correct answers; the table uses the reruns, which ran the graders as
+committed (`why-04` gained `gives-local-reproducer` in its rerun, so both runs score it the same way). The first three `why-05` fixtures
+were decidable — per-worker counters and a "well below 500" cue let arithmetic rule one cause out,
+and the answers that did so were right. The committed fixture shares the counter and gives no rate.
+
+No should-not-fire case fired in either arm. `duck-why` never loaded for the decoy traceback and
+loaded once in six runs for the CI-only failure (8/18 in the first run, the ninth in the `why-04`
+rerun); `duck-shape` loaded only for the prompt that said "AI slop". Where a skill did
+not load, both arms ran the same agent and the difference is noise. In `why-06` the with-plugin arm
+passed only in the run where the skill loaded. In `why-05` the skill loaded every time and the
+answer led with one "most likely cause" in two runs of three, while the no-plugin arm passed three
+of three; on a second draw the no-plugin arm passed one of three, so three runs do not settle this
+case. No run in either arm of `why-04` offers a local reproducer. The `duck-cut` regex in `scan-04` can only pass
+with the plugin installed and carries half weight for that reason.
+
+### Description experiment, 2026-09-18
+
+A scratch copy of `290d548` changed only the `duck-why` and `duck-shape` descriptions: symptom
+phrasings the missed prompts used (a pasted traceback, passes locally and fails in CI, shorten,
+over-engineered, too defensive, which of two designs carries less) and a clause that a pasted
+snippet still counts. With-plugin arm only, three runs, same judge. The phrasings were taken from
+the prompts that had failed to load the skill, so the firing rates below are in-sample: they show
+the misses are closed, not how unseen wording routes. `routing.json` was not rerun, and misrouting
+into neighbours other than `duck-dry` — `duck-roast` shares "over-engineered" and "bloat" with the
+new `duck-shape` text — is unmeasured.
+
+| | `290d548` | candidate |
+|---|---|---|
+| `duck-why` fired on should-fire runs | 9/18 | 18/18 |
+| `duck-shape` fired on should-fire runs | 3/15 | 14/15 |
+| Fired on a should-not-fire case (`why`, `shape`, `dry`) | 0/18 | 0/18 |
+| `dry-*` still selected `duck-dry` | 15/15 | 15/15 |
+
+With the skill loading, `why-04` gave a local reproducer in three runs of three (none before) and
+`why-06` dropped the unrequested cleanup list in three of three. `why-05` did not improve: the skill
+loaded and the answer still led with one likely cause. A one-line addition to the `duck-why` body,
+telling it to lead with the unresolved question when nothing separates two causes, changed the
+opening in three runs of three and the grade in two; the no-plugin arm swung between one and three
+passes across draws, so that line is not yet shown to help. A `duck-shape` line about swallowed
+errors changed nothing measurable. Neither candidate is applied here. `why-07` failed three of three
+in the candidate's with-plugin arm without the skill loading; the cause is not known.
+
+### Run on the new descriptions, 2026-09-18
+
+Candidate `21addad` (the `duck-why` and `duck-shape` descriptions above, nothing else), same host,
+judge and run count as the first run.
+
+| Flow | With | Without | Mean Δ | Skill fired on should-fire runs |
+|---|---|---|---|---|
+| `scan` | 0.99 | 0.75 | +0.24 | 18/18 |
+| `why` | 0.93 | 0.74 | +0.19 | 18/18 (was 9/18) |
+| `shape` | 0.98 | 1.00 | −0.02 | 12/15 (was 3/15; 14/15 on the scratch copy) |
+| `dry` | 0.91 | 0.95 | −0.04 | 15/15 |
+
+No should-not-fire case fired in either arm. `duck-why` now loads every time; its with-plugin score
+rose from 0.87 to 0.93, with `why-04` and `why-06` passing three of three. The rest of the `why` Δ is
+the no-plugin arm falling from 0.90 to 0.74 on the same prompts. `dry` and `scan` did not change
+between the runs and their Δ still moved by 0.16 and 0.11. Both tables predate the tightening of
+three half-weight regexes; replayed, the committed patterns change one reported cell, the `why`
+no-plugin mean, from 0.74 to 0.73. At three runs a flow's Δ carries about 0.1 to 0.2 of noise, so
+a single run settles only the large effects (`scan-02`, `scan-05`, `why-03`).
+`duck-shape` loads and changes nothing the graders can see; the no-plugin arm already passes these
+fixtures.
+
