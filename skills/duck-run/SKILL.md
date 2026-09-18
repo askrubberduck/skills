@@ -55,7 +55,10 @@ A refuted decomposition is replanned; agreement alone never makes it ready. Boun
 For each meaningful behavior change: establish the failing outcome, implement the minimum that
 satisfies it, apply `duck-shape`, then take the unit's diff through
 [the prose bar](../duck-dry/references/bar.md). Use existing checks where possible; trivial edits
-need no invented test. Shape and dry apply within the unit before later work depends on it.
+need no invented test. Shape and dry apply within the unit before later work depends on it, as
+their own commits when committing is authorized: a structural change and a behavior change never
+share a diff. Tidy first when it makes this change easier, after when it makes the next one
+easier, never on speculation.
 
 Remove superseded paths once the replacement is verified. Preserve required compatibility and
 public contracts; do not add speculative shims or delete a real edge case because scope is unclear.
@@ -73,6 +76,8 @@ Run relevant project gates and `duck-proof` on the actual candidate. Proof owns 
 counterexamples, final-state observations and the completed-shape probe. **Any proof or shape edit
 returns to affected executable checks before completion or dispatch.** Earlier green evidence does
 not survive a relevant repair. Read the outputs and the resulting state, not just exit codes.
+A red check stops new work on that surface until it is green or its cause is named; do not build
+the next unit on a failure you plan to look at later.
 
 Use `duck-break` for requested broad attacks and the dynamic evidence required for trust-touching
 work. Select attacks appropriate to the artifact: agent behavior trials for skill/gate changes,

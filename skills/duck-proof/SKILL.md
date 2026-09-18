@@ -69,7 +69,9 @@ relevant input classes and positions, state bounds and omissions, and do not cla
 coverage of an unbounded surface. For instruction changes, execute realistic agent tasks and
 inspect their actions and outcomes; a structural Markdown validator is not behavioral proof.
 
-Cannot execute a needed check? Record what is missing and mark that claim UNPROVEN. A plausible
+Prefer the check that reports a break soonest after the edit; a slow gate that finds the same
+failure is a second check, not the first. Cannot execute a needed check? Record what is missing
+and mark that claim UNPROVEN. A plausible
 code read, another model's confidence, and a receipt file cannot stand in for the observation.
 
 ## 3. Repair at the level the evidence refutes

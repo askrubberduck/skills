@@ -61,4 +61,5 @@ The prose introduced by an authorized code change can be dried in that same chan
 
 Report material deletions, retained constraints and actual verification; no deletion quota or new
 receipt is needed for a standalone cleanup. Stop when the scoped prose meets the keep test and
-relevant checks pass. Apply that test while writing new comments too.
+relevant checks pass. Apply that test while writing new comments too: intent notes written before
+the code are scaffolding, and once the code says the same thing they come down.

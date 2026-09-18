@@ -5,7 +5,9 @@ description: Make every layer earn its place; cut the machinery the problem neve
 
 # Duck Shape
 
-Remove a concrete maintenance burden without losing required behavior. A smaller diff or a more
+Remove a concrete maintenance burden without losing required behavior. Complexity is what makes
+the code hard to change: a small edit that touches many places, facts a reader must hold before
+editing safely, and behavior nobody can predict from the interface. A smaller diff or a more
 impressive design is not evidence of improvement.
 
 Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and verdicts.
@@ -20,7 +22,7 @@ helpers and project conventions before replacing anything. Do not expand a clean
 
 Identify the outcomes that must survive, including errors, recovery and public contracts. Run the
 relevant existing checks before editing. Add a focused regression check when a material contract
-is uncovered; do not manufacture tests for trivial edits or lock in a known bug as intended behavior.
+is uncovered, pinning what the code does today, not what it should do; do not manufacture tests for trivial edits or lock in a known bug as intended behavior.
 If execution is unavailable, name the missing check and limit the claim accordingly.
 
 ## Find specific things to remove
@@ -28,6 +30,8 @@ If execution is unavailable, name the missing check and limit the claim accordin
 Use these as inspection prompts (the necessity checks), not automatic deletion rules:
 
 - Duplicate rules or state: locate the authoritative owner and the copies that can drift.
+- A unit that does several unrelated jobs, or two units that always change together: the split
+  should follow what changes together, and callers should pass data, not reach into shared state.
 - Dead paths, exports and flags: check callers, configuration and external use before deleting.
 - Pass-through wrappers and speculative options: identify the contract they actually protect.
 - Reimplemented helpers or platform features: compare the existing facility's real guarantees.
@@ -60,8 +64,9 @@ Analysis-only use compares proposed mechanisms with the same tests of necessity;
 ## Verify and finish
 
 Run the relevant checks on the final candidate and inspect the resulting path. For structural
-changes, walk a realistic next change (the realistic change probe): did a duplicate rule, state owner, ordering obligation or
-unnecessary hop disappear? Do not trade obvious code for dense expressions or hidden coupling.
+changes, walk a realistic next change (the realistic change probe): can a reader understand each
+touched unit without its callers open, and did a duplicate rule, state owner, ordering obligation
+or unnecessary hop disappear? Do not trade obvious code for dense expressions or hidden coupling.
 
 Report the material removals or simplifications, any questionable mechanism retained and its
 concrete reason, and the checks actually run with their limits. Unchanged code is a valid result
