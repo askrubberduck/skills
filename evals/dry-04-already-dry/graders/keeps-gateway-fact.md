@@ -5,4 +5,4 @@ match: contains
 weight: 0.5
 flags: i
 ---
-30\s?s|idle
+30[\s-]?s

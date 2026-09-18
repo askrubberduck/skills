@@ -91,10 +91,11 @@ these results establish neither a pinned-model comparison nor cross-host reliabi
 | Trunk is still failing in CI after this PR. Find the cause. | `duck-why` |
 | Explain how this API worked in version 1 compared with version 2. Nothing is failing; I only want a historical explanation. | none |
 
-Both match the oracle. `duck-why`'s description is unchanged from `4dff3ea`; the supplied roster
+Both match the oracle. On the probe date `duck-why`'s description was unchanged from `4dff3ea`; the supplied roster
 included the initial findings-only `duck-review` description, before its scope was broadened beyond
 PRs. No workflow ran and no improvement over old routing is claimed. The broader review description
-and added non-PR probes remain untested. These results do not justify expanding `duck-why`'s description.
+and added non-PR probes remain untested. These probes did not justify expanding `duck-why`'s
+description; the runner suites below did, a day later.
 
 ## Coverage
 
@@ -145,8 +146,9 @@ their graders failed correct answers; the table uses the reruns. The first three
 were decidable — per-worker counters and a "well below 500" cue let arithmetic rule one cause out,
 and the answers that did so were right. The committed fixture shares the counter and gives no rate.
 
-No should-not-fire case fired in either arm. `duck-why` never loaded for the decoy traceback or
-the CI-only failure; `duck-shape` loaded only for the prompt that said "AI slop". Where a skill did
+No should-not-fire case fired in either arm. `duck-why` never loaded for the decoy traceback and
+loaded once in six runs for the CI-only failure (8/18 in the first run, the ninth in the `why-04`
+rerun); `duck-shape` loaded only for the prompt that said "AI slop". Where a skill did
 not load, both arms ran the same agent and the difference is noise. In `why-06` the with-plugin arm
 passed only in the run where the skill loaded. In `why-05` the skill loaded every time and the
 answer led with one "most likely cause" in two runs of three, while the no-plugin arm passed three
@@ -159,7 +161,11 @@ with the plugin installed and carries half weight for that reason.
 A scratch copy of `290d548` changed only the `duck-why` and `duck-shape` descriptions: symptom
 phrasings the missed prompts used (a pasted traceback, passes locally and fails in CI, shorten,
 over-engineered, too defensive, which of two designs carries less) and a clause that a pasted
-snippet still counts. With-plugin arm only, three runs, same judge.
+snippet still counts. With-plugin arm only, three runs, same judge. The phrasings were taken from
+the prompts that had failed to load the skill, so the firing rates below are in-sample: they show
+the misses are closed, not how unseen wording routes. `routing.json` was not rerun, and misrouting
+into neighbours other than `duck-dry` — `duck-roast` shares "over-engineered" and "bloat" with the
+new `duck-shape` text — is unmeasured.
 
 | | `290d548` | candidate |
 |---|---|---|
@@ -186,7 +192,7 @@ judge and run count as the first run.
 |---|---|---|---|---|
 | `scan` | 0.99 | 0.75 | +0.24 | 18/18 |
 | `why` | 0.93 | 0.74 | +0.19 | 18/18 (was 9/18) |
-| `shape` | 0.98 | 1.00 | −0.02 | 12/15 (was 3/15) |
+| `shape` | 0.98 | 1.00 | −0.02 | 12/15 (was 3/15; 14/15 on the scratch copy) |
 | `dry` | 0.91 | 0.95 | −0.04 | 15/15 |
 
 No should-not-fire case fired in either arm. `duck-why` now loads every time; its with-plugin score

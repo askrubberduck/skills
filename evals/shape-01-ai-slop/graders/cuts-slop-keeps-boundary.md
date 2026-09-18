@@ -8,7 +8,7 @@ You are shown only the answer, so here is the ORIGINAL file the user supplied, f
 ```python
 import re
 
-EMAIL_RE = re.compile(r"^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
 class SignupError(ValueError):

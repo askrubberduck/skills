@@ -5,4 +5,4 @@ match: contains
 weight: 0.5
 flags: i
 ---
-where|which (file|tracker|repo)|point me|tell me|share|paste
+where (is|does|do|did|the|your|it)|which (file|tracker|repo)|point me|tell me where
