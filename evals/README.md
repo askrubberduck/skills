@@ -74,7 +74,7 @@ A case file is a question to ask the duck, not a receipt saying it passed.
 
 | Language | Prepared coverage | Evidence for the current descriptions |
 |---|---|---|
-| English | Selection probes for every skill; existing behavioral cases | Two bounded selection probes on 2026-09-17; see below |
+| English | Selection probes for every skill; existing behavioral cases; runner suites for why, dry, shape and scan | Two bounded selection probes on 2026-09-17; with/without runs for four skills on 2026-09-18, see Runner suites |
 | Russian | Selection probes for every skill; behavioral cases 9-17 | No recorded host/model routing runs |
 
 The rest of the routing corpus and cases 13-18 are unrun. Earlier runs, if any, do not verify changed
@@ -176,3 +176,24 @@ opening in three runs of three and the grade in two; the no-plugin arm swung bet
 passes across draws, so that line is not yet shown to help. A `duck-shape` line about swallowed
 errors changed nothing measurable. Neither candidate is applied here. `why-07` failed three of three
 in the candidate's with-plugin arm without the skill loading; the cause is not known.
+
+### Run on the new descriptions, 2026-09-18
+
+Candidate `21addad` (the `duck-why` and `duck-shape` descriptions above, nothing else), same host,
+judge and run count as the first run.
+
+| Flow | With | Without | Mean Δ | Skill fired on should-fire runs |
+|---|---|---|---|---|
+| `scan` | 0.99 | 0.75 | +0.24 | 18/18 |
+| `why` | 0.93 | 0.74 | +0.19 | 18/18 (was 9/18) |
+| `shape` | 0.98 | 1.00 | −0.02 | 12/15 (was 3/15) |
+| `dry` | 0.91 | 0.95 | −0.04 | 15/15 |
+
+No should-not-fire case fired in either arm. `duck-why` now loads every time; its with-plugin score
+rose from 0.87 to 0.93, with `why-04` and `why-06` passing three of three. The rest of the `why` Δ is
+the no-plugin arm falling from 0.90 to 0.74 on the same prompts. `dry` and `scan` did not change
+between the runs and their Δ still moved by 0.16 and 0.11: at three runs a flow's Δ carries about
+that much noise, so a single run settles only the large effects (`scan-02`, `scan-05`, `why-03`).
+`duck-shape` loads and changes nothing the graders can see; the no-plugin arm already passes these
+fixtures.
+
