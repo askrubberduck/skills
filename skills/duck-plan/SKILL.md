@@ -8,7 +8,7 @@ description: Find the hole in the plan before building over it; assumptions and 
 Produce a plan someone can execute and verify. Each unit must change a required outcome or resolve
 an uncertainty that blocks it. Agreement among planners does not establish feasibility.
 
-Follow the user's language; preserve commands, paths, identifiers, quoted errors and verdicts.
+Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and verdicts.
 Planning does not authorize implementation or publication. Return to an executing caller so it can
 continue within existing authority; a standalone planning request ends with the plan.
 
@@ -77,6 +77,6 @@ Bound critique before dispatch: at most two critique rounds after the initial dr
 owner supplies another limit. Another round needs new evidence or a materially changed approach.
 Stop redispatching at the bound and preserve unresolved claims; do not loop until everyone agrees.
 
-Update one existing plan when a durable execution handoff is needed, using `duck-proof`'s evidence-home
+Update one existing plan when a durable execution handoff is needed, using `duck-proof`'s durable-home
 rules. A short standalone plan can stay in the response. Record decisive checks and disagreements,
 not a transcript of the planning process. This does not replace a required `duck-review` release gate.

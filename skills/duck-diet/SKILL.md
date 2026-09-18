@@ -9,7 +9,7 @@ Reduce measured waste in agent context and work. Find repeated reads, duplicated
 unnecessary dispatches or retries before recommending a new setup. Smaller output alone does not
 establish lower cost or better results.
 
-Follow the user's language; preserve commands, paths, identifiers, quoted errors and verdicts.
+Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and verdicts.
 Respect existing edit authority. An audit alone reports proposed changes; a request to trim applies
 justified local edits and verifies them without another approval request. Preserve owner decisions,
 security boundaries and required workflow evidence.

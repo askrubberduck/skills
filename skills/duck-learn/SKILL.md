@@ -14,7 +14,7 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
 ## Recipe
 
 1. **Gather evidence, don't reminisce.**
-   - **Sources.** Session transcripts — Claude `~/.claude/projects/<dir>/*.jsonl`, Codex
+   - **Sources.** Transcript-store locations — Claude `~/.claude/projects/<dir>/*.jsonl`, Codex
      `$CODEX_HOME/sessions` and `archived_sessions` — are the hosts whose stores are known, not the
      whole set: another host has its store located before the mine, or the result is partial and
      says so. Alongside them, recorded outcomes, review trajectories, and token stats. Missing or

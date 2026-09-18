@@ -8,7 +8,7 @@ description: Name the cause of a failure before anyone writes a fix, because the
 Find the demonstrated cause of the failure and the paths it affects. Stop when that explanation
 accounts for the evidence; a typo need not become an architectural or organizational diagnosis.
 
-Follow the user's language; preserve commands, paths, identifiers, quoted errors and verdicts.
+Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and verdicts.
 This skill diagnoses without editing the candidate. Return the cause and repair location to the
 caller, which continues any already-authorized fix and verification. Do not request the same local
 repair permission again or imply that diagnosis satisfies a release gate.

@@ -8,7 +8,7 @@ description: Strip comments, docstrings, commit messages, and PR descriptions un
 Remove commentary that repeats the code or records an obsolete story. Keep the facts a maintainer
 needs but cannot recover from the code: constraints, external contracts, traps and calibration.
 
-Follow the user's language; preserve commands, paths, identifiers, quoted errors and verdicts.
+Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and verdicts.
 Default to the current task's diff, including staged changes. Sweep committed files or a tree only
 when named. Report-only means no edits. Local cleanup does not authorize commits or publication.
 

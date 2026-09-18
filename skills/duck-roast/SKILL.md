@@ -9,7 +9,7 @@ Find consequential defects and unnecessary mechanisms in the requested solution.
 whole relevant flow; a convincing criticism names what fails or what can disappear without losing
 a required outcome. No finding is a valid result when the claims survive inspection.
 
-Follow the user's language; preserve commands, paths, identifiers, quoted errors and verdicts.
+Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and verdicts.
 Roast reports findings and proposed dispositions; it does not edit the candidate. One change belongs
 to `duck-review`, a backlog sweep to `duck-cut`, and verification of your own candidate to `duck-proof`.
 
@@ -23,7 +23,7 @@ Choose relevant questions rather than filling every category:
 
 - Does the mechanism deliver the required outcome? Can existing behavior or deletion satisfy it?
 - Where do duplicate rules/state, unused paths, speculative options or leaking wrappers create a
-  real maintenance burden? Apply `duck-shape`'s concrete necessity checks.
+  real maintenance burden? Apply `duck-shape`'s necessity checks.
 - Do affected trust boundaries enforce their contract? What can malformed input or a compromised
   component reach in the actual deployment?
 - Which required operation can fail, how is it noticed, and what recovery is available?

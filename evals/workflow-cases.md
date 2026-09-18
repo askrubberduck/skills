@@ -163,3 +163,37 @@ in this run; the other comparisons passed both ways. Do not generalize one sampl
 slop reduction. The coordinator checked candidate source identities, unchanged non-edit fixtures,
 comment-token/AST/directive preservation and relevant fixture behavior. Distribution validation
 with corruption self-tests passed for 19 skills. Land and review release rules were not changed.
+
+## Review: a reworded closed finding on an unchanged candidate
+
+Fixture: `fetch.py` retries `ConnectionError` with exponential backoff; `RECORD.md` holds round 1
+with C1 (no delay, BLOCKER, FIXED, closure check `test_backoff_grows`) and C2 (NOTE); the candidate
+is unchanged since C1 closed. The round-2 reviewer returns two BLOCKERs: C1 reworded, and
+`TimeoutError` escaping on the first attempt. Task: findings-only in-session re-review with
+duck-review and duck-run supplied by path; adjudicate both, no edits, no dispatch.
+Pass: dismiss the reworded C1 against its prior disposition with the closure check rerun, and
+adjudicate the timeout finding on evidence against the recorded outcome rather than by echo.
+
+Local results, 2026-09-18: two fresh Claude Sonnet subagents, one with duck-review at `98cab62`
+(loop contract referenced from duck-run) and one with duck-review at `v3.3.0` (loop contract
+restated inline); duck-run identical for both. Both dismissed R2-1 as C1 restated, citing the
+closure check and the unchanged candidate, and both reproduced the timeout escape. They split on
+its rank: the candidate kept BLOCKER against the stated outcome, the baseline retained SHOULD as
+scope beyond the recorded criterion. That split is the fixture's ambiguity, not the pointer change.
+One sample, same family; it shows the referenced rule was still applied, nothing more.
+
+## Shape and dry on freshly generated code
+
+Fixture: `notify.py` with one public `send`; `CONTRACT.md` asks for a per-process rolling limit of
+5 sends per 60 seconds raising `RuntimeError("rate limited")`, stdlib only, no new files, config,
+persistence or logging; `check.py` is the acceptance check. Task: implement it, apply duck-shape,
+then duck-dry to the added prose, run the check, commit with a message meeting dry's bar.
+Pass: check passes; no class, option, wrapper or new file the contract never asked for; no comment
+that restates the code; commit message carries the rule, not the edit story.
+
+Local results, 2026-09-18: two fresh Claude Sonnet subagents, shape and dry at `c091737` versus
+`v3.3.0`. Both produced the same eleven-line change (module-level timestamp list, prune, raise,
+append) and byte-identical commit messages; both checks pass. The baseline kept one deliberate
+ceiling comment, the candidate none; both are within the bar. The fixture did not discriminate:
+this model produces lean output on a task this small with either version, so it records preserved
+behavior only. A discriminating fixture needs a task where the unaided model reliably over-builds.
