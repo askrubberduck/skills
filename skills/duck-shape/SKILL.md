@@ -1,6 +1,6 @@
 ---
 name: duck-shape
-description: Make every layer earn its place; cut the machinery the problem never asked for. Use for AI slop cleanup, simplifying an implementation, or checking the structure of completed work. Deep reconstruction is available when local cleanup cannot fix the boundary.
+description: Make every layer earn its place; cut the machinery the problem never asked for. Use when the user asks to simplify, shorten or clean up code, calls it over-engineered, bloated, too defensive or AI slop, asks which of two designs carries less, or wants the structure of completed work checked, whether a file, a diff or a pasted snippet. Deep reconstruction is available when local cleanup cannot fix the boundary.
 ---
 
 # Duck Shape
