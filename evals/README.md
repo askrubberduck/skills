@@ -206,6 +206,22 @@ a single run settles only the large effects (`scan-02`, `scan-05`, `why-03`).
 `duck-shape` loads and changes nothing the graders can see; the no-plugin arm already passes these
 fixtures.
 
+### `why-05` at ten runs, 2026-09-18
+
+Released v3.5.1 against a scratch copy that adds one sentence to `duck-why`, under "Separate
+plausible causes": *When two explanations fit and no available observation separates them, lead
+with the unresolved question and the discriminator; plausibility is not evidence, so do not rank
+one as near-certain.* Same fixture, same judge; the skill loaded in all twenty with-plugin runs.
+
+| Arm | Passed `stays-unresolved` | Judge votes |
+|---|---|---|
+| v3.5.1, with plugin | 3/10 | 9/30 |
+| v3.5.1, no plugin | 5/10 | 15/30 |
+| scratch copy with the sentence, with plugin | 9/10 | 27/30 |
+
+As released, `duck-why` names one cause as most likely on evidence that fits two, no less often
+than the agent without it. The sentence is not applied in this repository.
+
 ### `why` and `split` on the archaeology clause and the new skill, 2026-09-20
 
 Candidate `7a68177`: `duck-why`'s description gains "when or why an existing constant, check or
