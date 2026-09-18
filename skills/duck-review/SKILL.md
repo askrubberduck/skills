@@ -48,14 +48,10 @@ remain separate actions.
 2. Use the caller's recorded outcome, constraints and acceptance baseline across review rounds.
    For a standalone review, establish that baseline once. Name the coordinating caller who owns
    convergence, prior findings and the remaining round bound; `duck-run` defines the default loop
-   contract for an executing caller. Treat the mechanism and its benefit as
-   claims to challenge. If new evidence refutes the goal or criteria, return that contradiction;
-   do not silently rewrite acceptance criteria to pass or fail the candidate. Each blocker names
-   the existing criterion, required contract or binding policy it violates and the supporting
-   evidence. A newly discovered real defect may block even when earlier reviewers missed it.
-   New preferences, features and unrelated cleanup are proposals outside the gate's acceptance bar.
-   Retain stable cause IDs and prior dispositions; reopening needs new contrary evidence or an
-   impacting change, not another reviewer's wording.
+   contract for an executing caller, including stable cause IDs, reopening and what counts as a
+   blocker versus a proposal. Treat the mechanism and its benefit as claims to challenge. If new
+   evidence refutes the goal or criteria, return that contradiction; do not silently rewrite
+   acceptance criteria to pass or fail the candidate.
 3. Select the required participants and effort bound using
    [challenge selection](references/challenge.md). Ordinary gates default to one verified
    cross-family reviewer; trust-touching gates default to two as that reference specifies.
@@ -77,8 +73,7 @@ remain separate actions.
    approve; a standalone opinion may still report what it can establish.
 6. Do not dispatch beyond the caller's recorded bound; return the unresolved status and evidence
    without approval. For a third or later review round, require the caller's recorded loop
-   diagnosis: why another round will add evidence, or which reframe/replan/race/rally/owner-decision
-   exit it selected. Judge progress by unresolved causes, not wording or finding counts. A local
+   diagnosis. Judge progress by unresolved causes, not wording or finding counts. A local
    record needs no commit unless the repository requires one. Do not dispatch an unchanged candidate
    just to seek a friendlier verdict.
 

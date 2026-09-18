@@ -94,9 +94,8 @@ end to end, then attempt a likely next change. What rules, state owners, units a
 must the reader hold together? What can be removed without losing an outcome? Cause should be
 near effect, with one authoritative home per fact.
 
-Use its concrete cleanup candidates to test that claim: duplicate rules/state, dead paths,
-pass-through wrappers, speculative options and reimplemented facilities. Name a removable mechanism
-or the actual contract that requires it; do not accept "clean architecture" as verification.
+Use its cleanup candidates to test that claim. Name a removable mechanism or the actual contract
+that requires it; do not accept "clean architecture" as verification.
 
 Compare credible alternatives after correctness and operational constraints hold. Prefer fewer
 independent obligations and a traceable path; line count and abstraction count are not targets.

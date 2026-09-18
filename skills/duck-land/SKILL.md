@@ -47,9 +47,8 @@ by the user: a request only to push or prepare a PR does not authorize merging o
   moment it is given; step 3's outcome record then **names what was waived**. Waiving is the
   owner's call on a named precondition, never the doer's, and never a blanket exemption from the
   rest; a waiver a reviewer discovers afterward is a second violation, not a footnote.
-- **A registry entry is not an authorization unless it says who authorized it.** The doer writes to
-  the same decision log the owner does — re-frames, challenges, queued questions all land there — so
-  an entry read as a waiver carries the owner's own words and when they were given. An unattributed
+- **A registry entry is not an authorization unless it says who authorized it** — `duck-scan`'s
+  attribution rule. The doer writes to the same decision log the owner does, so an unattributed
   entry is the doer's note, and reading one as permission is how a run authorizes itself in writing.
 
 ## Land
