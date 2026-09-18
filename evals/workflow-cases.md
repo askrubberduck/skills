@@ -181,3 +181,19 @@ closure check and the unchanged candidate, and both reproduced the timeout escap
 its rank: the candidate kept BLOCKER against the stated outcome, the baseline retained SHOULD as
 scope beyond the recorded criterion. That split is the fixture's ambiguity, not the pointer change.
 One sample, same family; it shows the referenced rule was still applied, nothing more.
+
+## Shape and dry on freshly generated code
+
+Fixture: `notify.py` with one public `send`; `CONTRACT.md` asks for a per-process rolling limit of
+5 sends per 60 seconds raising `RuntimeError("rate limited")`, stdlib only, no new files, config,
+persistence or logging; `check.py` is the acceptance check. Task: implement it, apply duck-shape,
+then duck-dry to the added prose, run the check, commit with a message meeting dry's bar.
+Pass: check passes; no class, option, wrapper or new file the contract never asked for; no comment
+that restates the code; commit message carries the rule, not the edit story.
+
+Local results, 2026-09-18: two fresh Claude Sonnet subagents, shape and dry at `c091737` versus
+`v3.3.0`. Both produced the same eleven-line change (module-level timestamp list, prune, raise,
+append) and byte-identical commit messages; both checks pass. The baseline kept one deliberate
+ceiling comment, the candidate none; both are within the bar. The fixture did not discriminate:
+this model produces lean output on a task this small with either version, so it records preserved
+behavior only. A discriminating fixture needs a task where the unaided model reliably over-builds.
