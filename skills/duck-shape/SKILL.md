@@ -25,7 +25,7 @@ If execution is unavailable, name the missing check and limit the claim accordin
 
 ## Find specific things to remove
 
-Use these as inspection prompts, not automatic deletion rules:
+Use these as inspection prompts (the necessity checks), not automatic deletion rules:
 
 - Duplicate rules or state: locate the authoritative owner and the copies that can drift.
 - Dead paths, exports and flags: check callers, configuration and external use before deleting.
@@ -60,7 +60,7 @@ Analysis-only use compares proposed mechanisms with the same tests of necessity;
 ## Verify and finish
 
 Run the relevant checks on the final candidate and inspect the resulting path. For structural
-changes, walk a realistic next change: did a duplicate rule, state owner, ordering obligation or
+changes, walk a realistic next change (the realistic change probe): did a duplicate rule, state owner, ordering obligation or
 unnecessary hop disappear? Do not trade obvious code for dense expressions or hidden coupling.
 
 Report the material removals or simplifications, any questionable mechanism retained and its

@@ -18,7 +18,8 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
    this skill does not carry a second copy of where registries live. Not installed? Say so and ask
    where the backlog is, once; a guessed location is how a sweep reports an empty backlog that is
    merely somewhere else. Grep-first; read only surviving items in full.
-2. Per item, argue **against its existence** before anything else. Verdict, one of:
+2. Per item, argue **against its existence** before anything else (the necessity check). Verdict,
+   one of:
    - **CLOSE NOW** — already satisfied, obsolete, or superseded; close with evidence.
    - **CUT** — the need was speculative or the product moved past it; delete, don't park — a
      parked item is still backlog.

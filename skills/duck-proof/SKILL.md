@@ -119,7 +119,7 @@ This is self-verification, not independent release approval. `duck-review` owns 
 For an additional independent challenge, use its challenge-selection reference; identify any
 missing independence honestly rather than silently upgrading a self-check into a gate.
 
-## Evidence and handoff
+## Evidence and handoff (durable-home rules)
 
 For a standalone question, a concise response with commands, results and limits is sufficient.
 When another stage consumes the pass, write or update the project's existing durable work record:

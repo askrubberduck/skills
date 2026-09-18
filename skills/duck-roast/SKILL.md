@@ -23,7 +23,7 @@ Choose relevant questions rather than filling every category:
 
 - Does the mechanism deliver the required outcome? Can existing behavior or deletion satisfy it?
 - Where do duplicate rules/state, unused paths, speculative options or leaking wrappers create a
-  real maintenance burden? Apply `duck-shape`'s concrete necessity checks.
+  real maintenance burden? Apply `duck-shape`'s necessity checks.
 - Do affected trust boundaries enforce their contract? What can malformed input or a compromised
   component reach in the actual deployment?
 - Which required operation can fail, how is it noticed, and what recovery is available?
