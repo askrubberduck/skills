@@ -113,3 +113,66 @@ output changes from unproven improvement and lists the untested companion edits.
 
 [Workflow cases](workflow-cases.md) exercise dry, why, campaign, roast and diet against unnecessary
 archiving, over-planning, invented findings and unsupported cost claims, with paired baseline results.
+
+## Runner suites
+
+The `why-*`, `dry-*`, `shape-*` and `scan-*` directories are `claude plugin eval` cases: a prompt
+with its fixture pasted inline, outcome graders beside it. Each prompt runs with the plugin and
+without it; the number to read is the difference. One flow per run, because a mean across flows
+describes none of them:
+
+    claude plugin eval . --ablation with-without --judge-model sonnet -j 4 --case 'scan-*'
+
+Cases grant only the Skill tool, so nothing is edited or executed. The reproduce and verify halves
+of `duck-why`, `duck-dry` and `duck-shape` are untested here; the cases check that the answer
+admits that limit. The judge sees the answer and the rubric, never the prompt — a rubric that
+compares against the original file carries that file.
+
+### Run of 2026-09-18
+
+Candidate `290d548` (plugin 3.5.0), Claude Code 2.1.274, default agent model, Sonnet judge, three
+runs per arm.
+
+| Flow | With | Without | Mean Δ | Skill fired on should-fire runs |
+|---|---|---|---|---|
+| `scan` | 1.00 | 0.65 | +0.35 | 18/18 |
+| `dry` | 0.98 | 0.86 | +0.12 | 15/15 |
+| `shape` | 0.98 | 1.00 | −0.02 | 3/15 |
+| `why` | 0.87 | 0.90 | −0.03 | 9/18 |
+
+Six cases (`why-04`, `why-05`, `shape-02`, `shape-03`, `shape-04`, `scan-06`) were rerun the same day after
+their graders failed correct answers; the table uses the reruns. The first three `why-05` fixtures
+were decidable — per-worker counters and a "well below 500" cue let arithmetic rule one cause out,
+and the answers that did so were right. The committed fixture shares the counter and gives no rate.
+
+No should-not-fire case fired in either arm. `duck-why` never loaded for the decoy traceback or
+the CI-only failure; `duck-shape` loaded only for the prompt that said "AI slop". Where a skill did
+not load, both arms ran the same agent and the difference is noise. In `why-06` the with-plugin arm
+passed only in the run where the skill loaded. In `why-05` the skill loaded every time and the
+answer led with one "most likely cause" in two runs of three, while the no-plugin arm passed three
+of three; on a second draw the no-plugin arm passed one of three, so three runs do not settle this
+case. No run in either arm of `why-04` offers a local reproducer. The `duck-cut` regex in `scan-04` can only pass
+with the plugin installed and carries half weight for that reason.
+
+### Description experiment, 2026-09-18
+
+A scratch copy of `290d548` changed only the `duck-why` and `duck-shape` descriptions: symptom
+phrasings the missed prompts used (a pasted traceback, passes locally and fails in CI, shorten,
+over-engineered, too defensive, which of two designs carries less) and a clause that a pasted
+snippet still counts. With-plugin arm only, three runs, same judge.
+
+| | `290d548` | candidate |
+|---|---|---|
+| `duck-why` fired on should-fire runs | 9/18 | 18/18 |
+| `duck-shape` fired on should-fire runs | 3/15 | 14/15 |
+| Fired on a should-not-fire case (`why`, `shape`, `dry`) | 0/18 | 0/18 |
+| `dry-*` still selected `duck-dry` | 15/15 | 15/15 |
+
+With the skill loading, `why-04` gave a local reproducer in three runs of three (none before) and
+`why-06` dropped the unrequested cleanup list in three of three. `why-05` did not improve: the skill
+loaded and the answer still led with one likely cause. A one-line addition to the `duck-why` body,
+telling it to lead with the unresolved question when nothing separates two causes, changed the
+opening in three runs of three and the grade in two; the no-plugin arm swung between one and three
+passes across draws, so that line is not yet shown to help. A `duck-shape` line about swallowed
+errors changed nothing measurable. Neither candidate is applied here. `why-07` failed three of three
+in the candidate's with-plugin arm without the skill loading; the cause is not known.
