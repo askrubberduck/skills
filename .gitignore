@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 graphify-out/
 .worktrees/
+.DS_Store
