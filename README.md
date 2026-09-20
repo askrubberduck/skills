@@ -25,7 +25,7 @@ Your preferred answer gets the same treatment as every other answer. So does the
 Install once, then talk to your agent as usual. The descriptions do the routing.
 
 Ask in your language; the skill descriptions stay in English.
-Routing evidence is limited to two English selection probes — see the [language evals](evals/README.md).
+Routing evidence: two English selection probes, plus with/without runs for four skills — see the [eval guide](evals/README.md).
 
 | You say | What comes back |
 |---|---|
