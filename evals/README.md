@@ -239,3 +239,6 @@ answer rubric, in both arms. `why` as a flow scored 0.94 with and 0.77 without, 
 21 of 21 should-fire runs. `duck-split` routes and adds nothing the graders can see: the agent
 without it already sorts a mixed commit by hunk. Both phrasings come from the prompts the skills
 were written for, so neither says how unseen wording routes.
+
+Both tables above predate a rewrite of the `duck-why`, `duck-split` and `duck-review` descriptions
+on 2026-09-21; the shipped wording is unmeasured.

@@ -7,7 +7,8 @@ the owner's words with text the host injected. Count the first; the second is to
 `type == "user"` whose `message.content` is a string, or a list holding `text` parts. A list of
 `tool_result` parts is a tool answer. `isMeta` rows are loaded skill bodies; `isCompactSummary`
 rows are the host's own summary. A slash command arrives as `<command-name>` and `<command-args>`
-and is the owner's directive: keep both. Delegated logs sit apart, in `<session>/subagents/`, so a
+and is the owner's directive: keep both. A row that opens "Another Claude session sent a message"
+is a subagent reporting back. Delegated logs sit apart, in `<session>/subagents/`, so a
 one-level glob already reports roots only.
 
 **Codex**, `$CODEX_HOME/sessions/**` and `archived_sessions/**`. The first row, `session_meta`,
@@ -30,7 +31,7 @@ SINCE = sys.argv[1] if len(sys.argv) > 1 else ""  # ISO date; row timestamps com
 CLAUDE = os.path.expanduser(os.environ.get("CLAUDE_STORE", "~/.claude/projects"))
 CODEX = os.path.expanduser(os.environ.get("CODEX_HOME", "~/.codex"))
 INJECTED = ("system-reminder|task-notification|command-message|local-command-stdout|bash-input|"
-            "bash-stdout|bash-stderr|ide_opened_file|ide_selection|teammate-message|"
+            "bash-stdout|bash-stderr|ide_opened_file|ide_selection|teammate-message|agent-message|"
             "environment_context|user_instructions|permissions_instructions|skills_instructions|"
             "collaboration_mode|turn_aborted")
 WRAPPER = re.compile(rf"<({INJECTED})\b[^>]*>.*?</\1>", re.S)
@@ -89,7 +90,8 @@ for host, workspace, session, parent, began, found in sessions():
     if session and session in texts:
         skipped["session id seen twice, first copy kept"] += 1
         continue
-    found = [(ts, text) for ts, text in found if text]
+    found = [(ts, text) for ts, text in found
+             if text and not text.startswith("Another Claude session sent a message")]
     found_in.append((host, workspace, session, parent, found))
     if session:
         started[session], texts[session] = began, [text for _, text in found]

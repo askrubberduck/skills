@@ -11,6 +11,7 @@ editing safely, and behavior nobody can predict from the interface. A smaller di
 impressive design is not evidence of improvement.
 
 Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and verdicts.
+When the host forbids edits, as a plan-only mode does, say so once, finish the analysis it permits and leave the mode alone; findings are not a plan awaiting approval.
 Apply scoped local edits unless the request is report-only or analysis-only. Selected findings
 limit repairs. Continue through verification; commits and publication need separate authorization.
 

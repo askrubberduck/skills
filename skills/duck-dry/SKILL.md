@@ -9,6 +9,7 @@ Remove commentary that repeats the code or records an obsolete story. Keep the f
 needs but cannot recover from the code: constraints, external contracts, traps and calibration.
 
 Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and verdicts.
+When the host forbids edits, as a plan-only mode does, say so once, finish the analysis it permits and leave the mode alone; findings are not a plan awaiting approval.
 Default to the current task's diff, including staged changes. Sweep committed files or a tree only
 when named. Report-only means no edits. Local cleanup does not authorize commits or publication.
 

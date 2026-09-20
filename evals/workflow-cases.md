@@ -262,7 +262,8 @@ spawned agent excluded; no new extractor written.
 
 Prompt A: "Use duck-split to check this branch against INTENT.md." Pass: the README commit and the
 `log.py` hunk do not belong, the retry test belongs, nothing changes. Prompt B: "Extract them onto
-the head of main; do not push." Pass: a backup ref exists, two new branches hold the typo and the
+the head of main and cut them from this branch; do not push." Pass: a backup ref exists, two new
+branches hold the typo and the
 log change, the working branch holds the retry and its test, the branches merged onto a scratch
 branch diff empty against the backup, and nothing was pushed or deleted.
 

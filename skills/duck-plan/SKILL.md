@@ -38,10 +38,10 @@ Use actual operations: "deduplicate retries by event ID at ingestion; check two 
 one charge" gives an implementer something to do and verify. "Build a robust processing layer,
 add comprehensive tests, update docs" does not.
 
-Use existing checks where they cover the contract. Add coverage for a material gap, not a test per
-helper or a suite that mirrors the proposed branches. Keep necessary integration, failure recovery
-and security checks; a happy-path unit test cannot stand in for them. Trivial edits need no invented
-test. State the final user-visible observation, not merely that all planned steps were completed.
+Use existing checks where they cover the contract. Add coverage for a material gap, not one check
+per piece of the proposal. Keep necessary integration, failure recovery and security checks; a
+happy-path check cannot stand in for them. State the final user-visible observation, not merely
+that all planned steps were completed.
 
 ## Try to invalidate the plan
 
@@ -62,7 +62,7 @@ every participant's contribution.
 
 An independent participant opens with one line, `PLAN: CONCUR` or `PLAN: OBJECT`, then numbered
 objections, each naming a `path:line`, an unexecuted assumption or a missing check. A result without
-that line is malformed, never a silent CONCUR. Count objections by stable cause across rounds.
+that line is malformed, never a silent CONCUR.
 
 Resolve factual disagreements with source or execution. A genuine owner tradeoff goes to
 `duck-decide`; routine technical choices do not. Evidence refuting the design returns to frame.

@@ -30,8 +30,7 @@ Capture a code candidate from its fork point: `git diff $(git merge-base <base> 
 <candidate>`, and record both SHAs in the brief. For a dirty worktree drop the second argument so
 the diff reaches the working tree, add each untracked file, and say the candidate has no SHA. A
 plain `git diff <base>` against a base that has moved shows the base's newer commits reversed, and
-the reviewer reports a blocker in a file the branch never touched. Check that the captured diff
-names every file the candidate changed and no other.
+the reviewer reports a blocker in a file the branch never touched.
 
 A brief for round two or later carries the prior adjudication — each finding accepted with the
 check that proves the fix, or refuted with evidence — and the settled causes by stable ID, with the
@@ -63,9 +62,8 @@ reviews at exit 0:
 - The prompt must be an **argument**. `--print "<text>"` can drop it, and a prompt redirected on
   **stdin** is discarded entirely — the reviewer answers with a greeting at exit 0.
 - After a repair, a reviewer can replay its previous round instead of reading the new candidate.
-  Have it open its result with the candidate SHA and one current line quoted from a named changed
-  file, and compare each round's output with the last: an identical body is an outage, not a verdict.
-  Pasting the source into the prompt to force a fresh read trades this trap for the one above.
+  Have it open its result with the candidate's revision and one current line quoted from a named
+  changed artifact, and compare each round's output with the last: an identical body is an outage, not a verdict.
 
 A zero-byte, greeting-only, timed-out, or crashed dispatch is an outage: a dispatch attempted that
 produced no verdict. An output that holds only a quota or credit error is an outage no retry
