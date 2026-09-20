@@ -197,3 +197,74 @@ append) and byte-identical commit messages; both checks pass. The baseline kept 
 ceiling comment, the candidate none; both are within the bar. The fixture did not discriminate:
 this model produces lean output on a task this small with either version, so it records preserved
 behavior only. A discriminating fixture needs a task where the unaided model reliably over-builds.
+
+## Review: a defect that lives outside the diff
+
+`settings.py` defines `LIMIT = 50`; the diff changes it to `10` and touches nothing else.
+`worker.py`, not in the diff, does `batch = items[:LIMIT]`, and its test asserts `len(batch) >= 20`.
+
+Prompt: "Use duck-review in findings mode on this diff. Report only." Pass: the broken assertion
+is a ranked finding, and `worker.py` is listed among files read beyond the diff. Record the
+baseline too; a reviewer that stays inside the diff finds nothing.
+
+## Dispatch: moved base, replayed round, settled cause
+
+Three fixtures for `duck-review`'s dispatch reference; none dispatches a reviewer.
+
+`main` gains a commit touching `auth.py` after the candidate forked; the candidate touches only
+`store.py`. Prompt: "Prepare the independent review material for this branch; do not dispatch."
+Pass: the captured diff holds `store.py` only and the brief records the fork point and candidate
+SHAs. A capture against the moved `main` shows `auth.py` reversed; record that baseline.
+
+Supply `codex-r3.out` and a byte-identical `codex-r4.out`. Prompt: "Adjudicate round 4." Pass:
+round 4 is an outage, the reason is the identical body, one retry is proposed and no verdict is
+counted.
+
+Supply a round-1 adjudication with two accepted findings, and a round-2 result that repeats one
+of them reworded and adds a new one. Prompt: "Adjudicate round 2 and prepare the round-3 brief."
+Pass: the repeat is malformed against its settled ID, the new finding is judged on its merits, and
+the brief carries both under settled causes.
+
+## Why: a constant whose reason lapsed
+
+A repository where commit A adds `MAX_ROWS = 100` with the message "cap rows, see #12", `PR-12.md`
+says "prevents OOM on 2GB boxes", and commit B later removes the only caller that loaded rows
+into memory. Prompt: "Why does MAX_ROWS exist?" Pass: commit A and PR 12 are cited, the OOM reason
+is quoted, the reason is reported lapsed at commit B with the caller named, no reproduction is
+attempted, nothing is edited and no deletion is proposed. Pair it with `why-07`: a request to
+explain how two API versions differ still selects no skill.
+
+## Plan: a participant that never says CONCUR
+
+Supply a plan and two participant results: one opens with `PLAN: OBJECT` and an objection citing
+`store.py:40`; the other agrees in prose and has no verdict line. Prompt: "Adjudicate the
+concurrence round." Pass: the objection is settled against source, the second result is recorded
+malformed and not counted as concurrence, and the plan is not READY.
+
+## Learn: count owner prompts in two stores
+
+A Claude session file with owner prompts as a string and as a list of text parts, one short
+directive typed twice, one prompt quoting `<foo>markup</foo>`, one wrapped in a
+`<system-reminder>`, one slash command with arguments, plus a tool result, an `isMeta` skill body,
+a task notification and a `subagents/` file beside it. Codex sessions: an owner session with a
+repeated directive, a fork of it with one new prompt, an unrelated owner session opening with the
+same words, a `codex_exec` dispatch and a spawned agent.
+
+Prompt: "Use duck-learn to count owner directives in these stores." Pass: six Claude prompts, with
+the markup intact and the slash command kept with its arguments; five Codex prompts, the fork's
+replayed prefix dropped, the unrelated session and the honest repeat kept, the dispatch and the
+spawned agent excluded; no new extractor written.
+
+## Split: three commits, one intent
+
+`INTENT.md` says "add retry to fetch()". Commit 1 adds the retry, commit 2 fixes a typo in
+`README.md`, commit 3 adds a retry test and changes a log prefix in `log.py`.
+
+Prompt A: "Use duck-split to check this branch against INTENT.md." Pass: the README commit and the
+`log.py` hunk do not belong, the retry test belongs, nothing changes. Prompt B: "Extract them onto
+the head of main; do not push." Pass: a backup ref exists, two new branches hold the typo and the
+log change, the working branch holds the retry and its test, the branches merged onto a scratch
+branch diff empty against the backup, and nothing was pushed or deleted.
+
+The extractor in `duck-learn`'s reference and the split recipe were executed once by their author
+on these fixtures on 2026-09-20. Every agent trial above is unrun.

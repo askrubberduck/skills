@@ -154,11 +154,13 @@
           "Give this PR an independent review against the agreed criteria. Return a verdict without fixing or merging it.",
           "Review this PR, including uncommitted changes, from multiple angles. Report findings first; do not post comments.",
           "Review this design document from multiple angles against its stated constraints. Report findings only.",
-          "Review the completed implementation in this local folder. There is no PR; report correctness and maintainability findings."
+          "Review the completed implementation in this local folder. There is no PR; report correctness and maintainability findings.",
+          "Rereview with the latest updates."
         ],
         "ru": [
           "сделай независимое ревью",
-          "проверь пулреквест"
+          "проверь пулреквест",
+          "перепроверь с последними изменениями"
         ]
       }
     },
@@ -212,6 +214,19 @@
       }
     },
     {
+      "skill": "duck-split",
+      "prompts": {
+        "en": [
+          "What in this branch doesn't belong to the original task?",
+          "Extract the healthcheck change into its own PR."
+        ],
+        "ru": [
+          "что в этой ветке не относится к задаче?",
+          "вынеси healthcheck в отдельный PR"
+        ]
+      }
+    },
+    {
       "skill": "duck-sweep",
       "prompts": {
         "en": [
@@ -229,11 +244,13 @@
         "en": [
           "Find the cause of this build failure before writing a fix.",
           "Trunk is still failing in CI after this PR. Find the cause.",
-          "The retry fix did not stick; investigate what still breaks."
+          "The retry fix did not stick; investigate what still breaks.",
+          "Why does MAX_ROWS exist and when was it added?"
         ],
         "ru": [
           "почему падает сборка",
-          "найди причину ошибки"
+          "найди причину ошибки",
+          "зачем нужен MAX_ROWS и когда его добавили?"
         ]
       }
     },
@@ -241,7 +258,8 @@
       "skill": null,
       "prompts": {
         "en": [
-          "Explain how this API worked in version 1 compared with version 2. Nothing is failing; I only want a historical explanation."
+          "Explain how this API worked in version 1 compared with version 2. Nothing is failing; I only want a historical explanation.",
+          "Rebase this branch onto main."
         ]
       }
     }

@@ -45,6 +45,11 @@ remain separate actions.
    intentionally captured dirty worktree can be reviewed, but landing later needs an authorized
    exact commit. For a design, plan or document, identify the supplied revision or snapshot; no
    PR, commit or invented Git base is needed.
+   A code change is reviewed with its neighbourhood: the callers of each changed symbol, the
+   config, migrations and tests that read a changed value, and the flow the change sits in. A
+   finding in a file outside the diff is in scope. When a changed symbol has more callers than
+   the review can read, sample them and say so. Report which files beyond the diff were read;
+   diff-only is a coverage limit to state, never the default.
 2. Use the caller's recorded outcome, constraints and acceptance baseline across review rounds.
    For a standalone review, establish that baseline once. Name the coordinating caller who owns
    convergence, prior findings and the remaining round bound; `duck-run` defines the default loop
@@ -68,8 +73,9 @@ remain separate actions.
    relevant earlier checks. For re-review, identify the previous reviewed revision or snapshot and
    the current target. Inspect the new delta and affected contracts or paths, reopen impacted
    findings, and reuse only evidence whose assumptions still hold. Never check only the old finding
-   list. If the previous target is unavailable or changed contracts invalidate wider evidence, name
-   the gap and broaden the review accordingly. Missing material evidence means the gate cannot
+   list. Report both revisions and which causes closed, stayed open or reopened. If the previous
+   target is unavailable or changed contracts invalidate wider evidence, name the gap and broaden
+   the review accordingly. Missing material evidence means the gate cannot
    approve; a standalone opinion may still report what it can establish.
 6. Do not dispatch beyond the caller's recorded bound; return the unresolved status and evidence
    without approval. For a third or later review round, require the caller's recorded loop

@@ -1,6 +1,6 @@
 ---
 name: duck-why
-description: Name the cause of a failure before anyone writes a fix, because the symptom is not the defect. Use when a test fails, a bug is reported, a build breaks, a traceback or error is pasted, something passes in one environment and fails in another, behavior differs from what was expected, a fix keeps not sticking, or the user asks why something is broken, including when the code is pasted inline and the cause looks obvious.
+description: Name the cause of a failure before anyone writes a fix, because the symptom is not the defect. Use when a test fails, a bug is reported, a build breaks, a traceback or error is pasted, something passes in one environment and fails in another, behavior differs from what was expected, a fix keeps not sticking, or the user asks why something is broken, including when the code is pasted inline and the cause looks obvious. Also when the user asks when or why an existing constant, check or behavior was introduced.
 ---
 
 # Duck Why
@@ -38,9 +38,19 @@ Cite inspected source as source evidence, executed behavior as an observation, a
 reasoning. Do not describe an unexecuted prediction as observed output. Investigate additional
 errors that could affect the causal chain; record why a consequential competing cause was ruled out.
 
+## Trace an existing decision
+
+A question about when or why something was introduced has no failure to reproduce. Find the
+introducing commit with `git log -S` or `-G` on the symbol and blame at the current line, then the
+change request behind it and its stated reason: description, linked ticket, review thread. Check
+that reason against today's callers. Return the commit, the change request, the reason, and whether
+it holds, lapsed or is unknown. A lapsed reason is a finding, not a deletion; removal belongs to
+`duck-shape`. Explaining how something works, with no decision to trace, needs no diagnosis.
+
 ## Return an actionable diagnosis
 
-Lead with the cause or the unresolved question, then provide:
+A traced decision returns what its section lists. For a failure, lead with the cause or the
+unresolved question, then provide:
 
 - The reproducer or available trace, actual result and expected contract.
 - Source and observations connecting the failure to the cause, including affected sibling paths.

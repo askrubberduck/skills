@@ -143,6 +143,7 @@ resolves.
 | `duck-run` | Challenge the goal, shape the plan, build it, and make it prove itself; local means local |
 | `duck-scan` | Find ready, blocked, and remaining work without changing anything; looking is free |
 | `duck-shape` | Make every layer earn its place; cut the machinery the problem never asked for |
+| `duck-split` | Check that a branch carries only the change it was opened for, and move the rest where it belongs; one branch, one intent |
 | `duck-sweep` | Clean out stale branches, worktrees, checkouts, scratch directories, and ignore rules; the pond stays clean |
 | `duck-why` | Name the cause of a failure before anyone writes a fix, because the symptom is not the defect |
 <!-- skills-table:end -->
@@ -185,7 +186,8 @@ just because the code reached it.
    clean up. Asked for local changes? The verified local diff is the finish line.
 
 Around the run: `duck-scan`, `duck-cut`, `duck-decide`, and `duck-campaign` before it;
-`duck-diet` throughout; `duck-sweep` and `duck-learn` after.
+`duck-diet` throughout, and `duck-split` before review when the branch outgrew its task;
+`duck-sweep` and `duck-learn` after.
 
 ## How many ducks review your work?
 

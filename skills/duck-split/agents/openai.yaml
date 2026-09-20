@@ -1,0 +1,4 @@
+interface:
+  display_name: "Duck Split"
+  short_description: "One branch, one intent; move the rest out"
+  default_prompt: "Use $askrubberduck:duck-split to check this branch against its intent. List what does not belong before moving anything."
