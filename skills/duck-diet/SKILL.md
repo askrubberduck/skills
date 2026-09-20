@@ -42,7 +42,8 @@ security boundaries and required workflow evidence.
 
 ## Session cost audit
 
-Use actual host usage records. `duck-learn` owns known transcript-store locations and counting rules;
+Use actual host usage records. `duck-learn` owns the known transcript-store locations and how owner
+tasks are told from derived logs; usage is counted here:
 include subagents and retries without double-counting derived logs. Report available input, cached
 input and output usage, measured elapsed time, repeated reads/dispatches and retry outcomes.
 A missing field or inaccessible store is unknown, never zero.

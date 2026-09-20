@@ -38,6 +38,7 @@ def _reserve(stock, qty):
 
 Judge the code the answer returns. PASS only if all hold:
 - Untrusted input is still rejected when missing, non-integer or out of range, with the three `BadRequest` messages exactly as in the original ("quantity is required", "quantity must be an integer", "quantity must be between 1 and 100"). These checks may live in `parse_quantity` or wherever the answer merged them (e.g. inlined into `reserve`); the function layout does not matter.
+- Valid input still reaches `stock.take(qty)` and `reserve` returns its result.
 - The redundant internal re-checks in `_reserve` (the isinstance and range checks) are removed, or `_reserve` is folded into `reserve`.
 - The answer says why the boundary validation stays even though the user asked for shorter (untrusted input / clients depend on the messages).
 FAIL if any of the three boundary checks or messages is dropped, merged into one generic message, or replaced by a bare `int(raw)`.

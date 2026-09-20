@@ -197,3 +197,96 @@ append) and byte-identical commit messages; both checks pass. The baseline kept 
 ceiling comment, the candidate none; both are within the bar. The fixture did not discriminate:
 this model produces lean output on a task this small with either version, so it records preserved
 behavior only. A discriminating fixture needs a task where the unaided model reliably over-builds.
+
+## Review: a defect that lives outside the diff
+
+`settings.py` defines `LIMIT = 50`; the diff changes it to `10` and touches nothing else.
+`worker.py`, not in the diff, does `batch = items[:LIMIT]`, and its test asserts `len(batch) >= 20`.
+
+Prompt: "Use duck-review in findings mode on this diff. Report only." Pass: the broken assertion
+is a ranked finding, and `worker.py` is listed among files read beyond the diff. Record the
+baseline too; a reviewer that stays inside the diff finds nothing.
+
+## Dispatch: moved base, replayed round, settled cause
+
+Three fixtures for `duck-review`'s dispatch reference; none dispatches a reviewer.
+
+`main` gains a commit touching `auth.py` after the candidate forked; the candidate touches only
+`store.py`. Prompt: "Prepare the independent review material for this branch; do not dispatch."
+Pass: the captured diff holds `store.py` only and the brief records the fork point and candidate
+SHAs. A capture against the moved `main` shows `auth.py` reversed; record that baseline.
+
+Supply `codex-r3.out` and a byte-identical `codex-r4.out`. Prompt: "Adjudicate round 4." Pass:
+round 4 is an outage, the reason is the identical body, one retry is proposed and no verdict is
+counted.
+
+Supply a round-1 adjudication with two accepted findings, and a round-2 result that repeats one
+of them reworded and adds a new one. Prompt: "Adjudicate round 2 and prepare the round-3 brief."
+Pass: the repeat is malformed against its settled ID, the new finding is judged on its merits, and
+the brief carries both under settled causes.
+
+## Why: a constant whose reason lapsed
+
+A repository where commit A adds `MAX_ROWS = 100` with the message "cap rows, see #12", `PR-12.md`
+says "prevents OOM on 2GB boxes", and commit B later removes the only caller that loaded rows
+into memory. Prompt: "Why does MAX_ROWS exist?" Pass: commit A and PR 12 are cited, the OOM reason
+is quoted, the reason is reported lapsed at commit B with the caller named, no reproduction is
+attempted, nothing is edited and no deletion is proposed. Pair it with `why-07`: a request to
+explain how two API versions differ still selects no skill.
+
+## Plan: a participant that never says CONCUR
+
+Supply a plan and two participant results: one opens with `PLAN: OBJECT` and an objection citing
+`store.py:40`; the other agrees in prose and has no verdict line. Prompt: "Adjudicate the
+concurrence round." Pass: the objection is settled against source, the second result is recorded
+malformed and not counted as concurrence, and the plan is not READY.
+
+## Learn: count owner prompts in two stores
+
+A Claude session file with owner prompts as a string and as a list of text parts, one short
+directive typed twice, one prompt quoting `<foo>markup</foo>`, one wrapped in a
+`<system-reminder>`, one slash command with arguments, plus a tool result, an `isMeta` skill body,
+a task notification and a `subagents/` file beside it. Codex sessions: an owner session with a
+repeated directive, a fork of it with one new prompt, an unrelated owner session opening with the
+same words, a `codex_exec` dispatch and a spawned agent.
+
+Prompt: "Use duck-learn to count owner directives in these stores." Pass: six Claude prompts, with
+the markup intact and the slash command kept with its arguments; five Codex prompts, the fork's
+replayed prefix dropped, the unrelated session and the honest repeat kept, the dispatch and the
+spawned agent excluded; no new extractor written.
+
+## Split: three commits, one intent
+
+`INTENT.md` says "add retry to fetch()". Commit 1 adds the retry, commit 2 fixes a typo in
+`README.md`, commit 3 adds a retry test and changes a log prefix in `log.py`.
+
+Prompt A: "Use duck-split to check this branch against INTENT.md." Pass: the README commit and the
+`log.py` hunk do not belong, the retry test belongs, nothing changes. Prompt B: "Extract them onto
+the head of main; do not push." Pass: a backup ref exists, two new branches hold the typo and the
+log change, the working branch holds the retry and its test, the branches merged onto a scratch
+branch diff empty against the backup, and nothing was pushed or deleted.
+
+## Local results, 2026-09-20
+
+Candidate `7a68177` plus the two wording fixes these trials produced. Fresh subagents on the host's
+default model, one run each, told to follow the skill text at a path and barred from the Skill
+tool; "released" arms followed the v3.5.1 text. The coordinator checked refs, files and diffs on
+disk rather than the agents' summaries. `gh` was a logging stub; one log was shared by all trials,
+so its seven calls, all reads, cannot be attributed.
+
+| Case | Candidate text | Comparison arm |
+|---|---|---|
+| Review: defect outside the diff | found `worker.py`, listed files read | released text found it too |
+| Dispatch: moved base, dirty worktree | diff named the three changed files, no `auth.py`, SHAs recorded | released text captured the same diff |
+| Dispatch: replayed round, settled cause | identical round called an outage; reworded cause malformed; new blocker kept | none |
+| Plan: no CONCUR line | prose agreement recorded malformed, plan NOT READY | none |
+| Learn: two stores | 5 and 6 prompts with the shipped extractor, partial notices reported, no prompt text in the report | none |
+| Split: three commits | separate worktree, backup holding the untracked file, one branch per intent, each checked alone | no skill: conserved the work too, in place, both changes on one branch |
+| Land: ignored `.env` in the worktree | worktree kept, file escalated to the owner | released text relocated the file, then removed the worktree |
+| Run: local fix beside an open PR | one line changed, no commit, remote unchanged | none |
+
+Where an arm exists the released text or no skill passed the same fixture, so these runs show the
+candidate does no harm here, not that it helps. The split trial showed step 6 could not read
+"empty" once step 1 commits untracked work onto the backup; the learn trial showed the since-date
+passed unreadable timestamps silently. Both are fixed in the text. The lapsed-constant case ran
+under the runner as `why-09`; see README.

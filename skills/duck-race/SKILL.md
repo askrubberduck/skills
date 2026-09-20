@@ -47,11 +47,11 @@ Dispatch the rival into the background first, then work the doer's attempt inlin
 rival's diff only **after its dispatch has finished**:
 
 ```bash
-codex exec -C "$WT_RIVAL" -s workspace-write -m <pinned> "$(cat $SP/problem.md)" </dev/null > $SP/rival.out 2>&1 &
+codex exec -C "$WT_RIVAL" -s workspace-write -m <pinned> "$(cat "$SP/problem.md")" </dev/null > "$SP/rival.out" 2>&1 &
 RIVAL=$!
 # ... the doer works its own attempt here, in its own worktree ...
 wait "$RIVAL"
-git -C "$WT_RIVAL" add -A && git -C "$WT_RIVAL" diff "$BASE_SHA" > $SP/rival.diff
+git -C "$WT_RIVAL" add -A && git -C "$WT_RIVAL" diff "$BASE_SHA" > "$SP/rival.diff"
 ```
 
 - **Wait before you capture.** Backgrounding the dispatch and diffing immediately records an empty
@@ -90,7 +90,7 @@ file paths) **by file**, never inlined. `$SP/turn.md` states the role for this t
 path, and the current state.
 
 ```bash
-codex exec -C "$WT" -s workspace-write -m <pinned> "$(cat $SP/turn.md)" </dev/null > $SP/rival-tN.out 2>&1
+codex exec -C "$WT" -s workspace-write -m <pinned> "$(cat "$SP/turn.md")" </dev/null > "$SP/rival-tN.out" 2>&1
 ```
 
 A rally is one red-green pair, and the serve alternates each rally.
@@ -98,7 +98,8 @@ A rally is one red-green pair, and the serve alternates each rally.
 1. **Serve (test):** the serving side writes ONE failing test against the frozen outcome contract,
    not merely the existing implementation. Handoff requires proven red — the test run's output
    pasted, failing for the intended reason, not an import error. A test without a runnable red proof
-   is rejected and re-served; vague untestable tests are how a side dodges the game. Same bar both
+   is rejected and re-served, and the rejected serve still counts against the turn cap; vague
+   untestable tests are how a side dodges the game. Same bar both
    directions.
 2. **Return (implement):** the other side writes the minimum that turns the suite green. Handoff
    requires proven green — full suite output pasted — and **no edits to any test in the same turn**.
@@ -132,7 +133,7 @@ the turn cap — and how a review loop outlives its budget.
 - Never commit raw CLI stdout; keep it in `$SP`.
 - **Adjudication is synthesis, not approval.** The output is a tested candidate, not an approved
   one: it enters the normal pipeline (`duck-proof`, then `duck-review`) like any other work. This
-  skill replaces nothing downstream, and the doer-never-final-judge rule is untouched.
+  skill replaces nothing downstream.
 
 ## Common mistakes
 

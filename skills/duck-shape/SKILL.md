@@ -17,8 +17,10 @@ limit repairs. Continue through verification; commits and publication need separ
 ## Establish the scope and behavior
 
 Default to the current task's changed code; an explicit file or subsystem bounds a wider cleanup.
-Read the affected path through its callers, state owners and observable effects. Inspect shared
-helpers and project conventions before replacing anything. Do not expand a cleanup into a repo audit.
+Reading goes further than the edits: a duplicate rule or a second owner of the same state
+usually sits in a file the diff never touched. Read the affected path through its callers, state
+owners and observable effects. Inspect shared helpers and project conventions before replacing
+anything. Do not expand a cleanup into a repo audit.
 
 Identify the outcomes that must survive, including errors, recovery and public contracts. Run the
 relevant existing checks before editing. Add a focused regression check when a material contract
