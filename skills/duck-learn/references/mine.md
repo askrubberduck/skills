@@ -106,9 +106,10 @@ for host, workspace, session, parent, found in found_in:
             replayed += 1
         skipped["prompt folded as a fork's replay, by text"] += replayed
     for n, (ts, text) in enumerate(found[replayed:], replayed):
-        if not ts:
-            skipped["prompt without timestamp, kept"] += 1
-        if not ts or ts >= SINCE:
+        dated = isinstance(ts, str) and ts[:4].isdigit()
+        if not dated:
+            skipped["prompt without a readable timestamp, kept"] += 1
+        if not dated or ts >= SINCE:
             print(json.dumps({"host": host, "workspace": workspace, "ts": ts,
                               "first": n == 0, "text": text[:1500]}))
 for reason, count in skipped.items():

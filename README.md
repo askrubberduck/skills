@@ -39,6 +39,7 @@ Routing evidence is limited to two English selection probes — see the [languag
 | "try to break it" | `duck-break`: attacks actually run, with inputs and results. Imagining a crash is not crashing it. |
 | "dry it" | `duck-dry`: prose that earns its place, with checks that the sweep did not smuggle in a code change. |
 | "trim the backlog" | `duck-cut`: retire obsolete work, merge duplicates, unblock what still matters. Every task earns its place. |
+| "what doesn't belong in this branch?" | `duck-split`: every hunk sorted against the branch's intent, the hitchhikers moved to their own branches, and a diff that shows nothing fell off. |
 | "what's next?" | `duck-scan`: what is ready, what is blocked, and why. Looking is free. |
 | "race it" | `duck-race`: two independent attempts, the same outcome checks, and a winner that earned it. |
 | "roast it" | `duck-roast`: the findings that stand up, what to do about them, and an end to the round. |
@@ -143,7 +144,7 @@ resolves.
 | `duck-run` | Challenge the goal, shape the plan, build it, and make it prove itself; local means local |
 | `duck-scan` | Find ready, blocked, and remaining work without changing anything; looking is free |
 | `duck-shape` | Make every layer earn its place; cut the machinery the problem never asked for |
-| `duck-split` | Check that a branch carries only the change it was opened for, and move the rest where it belongs; one branch, one intent |
+| `duck-split` | Hold a branch to the one change it was opened for; whatever hitched a ride gets a branch of its own, and nothing falls off on the way |
 | `duck-sweep` | Clean out stale branches, worktrees, checkouts, scratch directories, and ignore rules; the pond stays clean |
 | `duck-why` | Name the cause of a failure before anyone writes a fix, because the symptom is not the defect |
 <!-- skills-table:end -->
@@ -186,8 +187,8 @@ just because the code reached it.
    clean up. Asked for local changes? The verified local diff is the finish line.
 
 Around the run: `duck-scan`, `duck-cut`, `duck-decide`, and `duck-campaign` before it;
-`duck-diet` throughout, and `duck-split` before review when the branch outgrew its task;
-`duck-sweep` and `duck-learn` after.
+`duck-diet` throughout; `duck-split` when a branch has picked up passengers; `duck-sweep` and
+`duck-learn` after.
 
 ## How many ducks review your work?
 

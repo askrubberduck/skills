@@ -206,3 +206,20 @@ a single run settles only the large effects (`scan-02`, `scan-05`, `why-03`).
 `duck-shape` loads and changes nothing the graders can see; the no-plugin arm already passes these
 fixtures.
 
+### `why` and `split` on the archaeology clause and the new skill, 2026-09-20
+
+Candidate `7a68177`: `duck-why`'s description gains "when or why an existing constant, check or
+behavior was introduced", and `duck-split` is new. Same host, judge and run count as above.
+
+| Case | With | Without | Skill fired |
+|---|---|---|---|
+| `why-07-neg-history` | 0.83 | 0.67 | 0/3, as required |
+| `why-09-lapsed-constant` | 1.00 | 0.78 | 3/3 |
+| `split-01-mixed-commit` | 1.00 | 1.00 | 3/3 |
+| `split-02-neg-rebase` | 1.00 | 1.00 | 0/3, as required |
+
+The clause did not pull the history explanation into `duck-why`; `why-07`'s lost points are its
+answer rubric, in both arms. `why` as a flow scored 0.94 with and 0.77 without, the skill loading on
+21 of 21 should-fire runs. `duck-split` routes and adds nothing the graders can see: the agent
+without it already sorts a mixed commit by hunk. Both phrasings come from the prompts the skills
+were written for, so neither says how unseen wording routes.

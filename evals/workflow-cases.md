@@ -266,6 +266,27 @@ the head of main; do not push." Pass: a backup ref exists, two new branches hold
 log change, the working branch holds the retry and its test, the branches merged onto a scratch
 branch diff empty against the backup, and nothing was pushed or deleted.
 
-The extractor in `duck-learn`'s reference and the split recipe were executed once by their author
-on these fixtures on 2026-09-20. Every agent trial in the seven sections from "Review: a defect
-that lives outside the diff" onward is unrun.
+## Local results, 2026-09-20
+
+Candidate `7a68177` plus the two wording fixes these trials produced. Fresh subagents on the host's
+default model, one run each, told to follow the skill text at a path and barred from the Skill
+tool; "released" arms followed the v3.5.1 text. The coordinator checked refs, files and diffs on
+disk rather than the agents' summaries. `gh` was a logging stub; one log was shared by all trials,
+so its seven calls, all reads, cannot be attributed.
+
+| Case | Candidate text | Comparison arm |
+|---|---|---|
+| Review: defect outside the diff | found `worker.py`, listed files read | released text found it too |
+| Dispatch: moved base, dirty worktree | diff named the three changed files, no `auth.py`, SHAs recorded | released text captured the same diff |
+| Dispatch: replayed round, settled cause | identical round called an outage; reworded cause malformed; new blocker kept | none |
+| Plan: no CONCUR line | prose agreement recorded malformed, plan NOT READY | none |
+| Learn: two stores | 5 and 6 prompts with the shipped extractor, partial notices reported, no prompt text in the report | none |
+| Split: three commits | separate worktree, backup holding the untracked file, one branch per intent, each checked alone | no skill: conserved the work too, in place, both changes on one branch |
+| Land: ignored `.env` in the worktree | worktree kept, file escalated to the owner | released text relocated the file, then removed the worktree |
+| Run: local fix beside an open PR | one line changed, no commit, remote unchanged | none |
+
+Where an arm exists the released text or no skill passed the same fixture, so these runs show the
+candidate does no harm here, not that it helps. The split trial showed step 6 could not read
+"empty" once step 1 commits untracked work onto the backup; the learn trial showed the since-date
+passed unreadable timestamps silently. Both are fixed in the text. The lapsed-constant case ran
+under the runner as `why-09`; see README.
