@@ -14,6 +14,10 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
 A passed gate establishes readiness, not permission to merge. Use the endpoint already authorized
 by the user: a request only to push or prepare a PR does not authorize merging or branch deletion.
 
+Work that already merged and was never recorded enters at the read-back: verify what is on the
+default branch, record it, and name any evidence that can no longer be recovered. It needs no
+candidate branch and merges nothing.
+
 ## Preconditions (fail closed — any miss stops the landing)
 
 - The gate actually returned **`APPROVE`** per the repo's policy, and its receipt records the
@@ -83,8 +87,10 @@ by the user: a request only to push or prepare a PR does not authorize merging o
    PR number, merged SHA, and what changed. One recorded outcome per landing.
 4. Close or queue obligations the change touched — the doer never closes an item that needs the
    owner's sign-off; queue those (`duck-decide` presents them).
-5. Clean up: delete the merged branch and its worktree. Step 2's read-back is what makes this safe
-   and what `duck-sweep` cannot derive on its own — a squash leaves no metadata linking the branch
+5. Clean up: delete the merged branch and its worktree under `duck-sweep`'s step 3, which settles
+   untracked and ignored files before a worktree goes; a matching tree says nothing about a
+   `.env` beside it. Step 2's read-back is what makes the branch safe to delete and what
+   `duck-sweep` cannot derive on its own — a squash leaves no metadata linking the branch
    to the commit that replaced it, so **record the landed SHA in step 3's outcome entry** and delete
    against that, not against a classifier's guess. Record a resumable boundary; continue other
    authorized work if the host and task allow it.

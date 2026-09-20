@@ -258,6 +258,13 @@ def check_generated(root: Path, readme: str, errors: list[str]) -> None:
         errors.append("README.md: generated skills table is stale")
 
 
+def check_routing(root: Path, found: set[str], errors: list[str]) -> None:
+    routing = load_json(root, "evals/routing.json", errors) or {}
+    probed = {case.get("skill") for case in routing.get("cases", [])}
+    for name in sorted(found - probed):
+        errors.append(f"evals/routing.json: no selection probe for {name}")
+
+
 def validate(root: Path) -> list[str]:
     errors: list[str] = []
     readme = (root / "README.md").read_text()
@@ -267,6 +274,7 @@ def validate(root: Path) -> list[str]:
     check_required_references(root, found, errors)
     for name in sorted(found):
         check_skill(root, name, found, errors)
+    check_routing(root, found, errors)
     check_versions(manifests, errors)
     check_generated(root, readme, errors)
     return sorted(errors)
@@ -351,6 +359,8 @@ CASES: list[tuple[str, str, Callable[[Path], None]]] = [
      lambda c: edit(c, SCAN, "Find ready, blocked", "Note: find ready, blocked")),
     ("description over budget", "over the 600 budget",
      lambda c: edit(c, SCAN, "Find ready, blocked", "x" * 600 + " Find ready, blocked")),
+    ("skill without a routing probe", "no selection probe for duck-scan",
+     lambda c: edit(c, "evals/routing.json", '"skill": "duck-scan"', '"skill": "duck-scam"')),
     ("skill directory without a SKILL.md", "directory without a SKILL.md",
      lambda c: (c / "skills" / "duck-ghost").mkdir()),
 ]

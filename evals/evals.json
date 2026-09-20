@@ -45,7 +45,7 @@
       "skill": "duck-frame",
       "prompt": "We want to add a fifth host manifest alongside the Claude and Codex ones. Nobody has written down how the manifests relate. Frame it before we plan.",
       "expect": "duck-frame fires and settles the target design before any implementation: what the manifests share, what each host requires, where the version and skill list are single-sourced, what the gate must enforce.",
-      "result_shape": "Requirements, constraints, and at least two options with the trade-off that separates them, ending in a recommended target. No code written.",
+      "result_shape": "Requirements, constraints and a recommended target, with a rival design only where a real trade-off separates them. No code written.",
       "fixture": "repo clone"
     },
     {

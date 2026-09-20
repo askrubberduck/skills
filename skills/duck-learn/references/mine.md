@@ -24,6 +24,8 @@ removes the markup an owner pasted.
 ```python
 import collections, glob, json, os, re, sys
 
+skipped = collections.Counter()
+
 SINCE = sys.argv[1] if len(sys.argv) > 1 else ""  # ISO date; row timestamps compare as strings
 CLAUDE = os.path.expanduser(os.environ.get("CLAUDE_STORE", "~/.claude/projects"))
 CODEX = os.path.expanduser(os.environ.get("CODEX_HOME", "~/.codex"))
@@ -38,27 +40,37 @@ def text_of(content):
     if isinstance(content, str):
         return content
     parts = content if isinstance(content, list) else []
-    return " ".join(p.get("text", "") for p in parts
-                    if isinstance(p, dict) and p.get("type", "text").endswith("text"))
+    return " ".join(p["text"] for p in parts
+                    if isinstance(p, dict) and isinstance(p.get("text"), str)
+                    and str(p.get("type") or "text").endswith("text"))
 
 def clean(text):
     return " ".join(COMMAND.sub(" ", WRAPPER.sub("", text)).split())
 
 def rows(path):
-    for line in open(path, errors="ignore"):
+    lines = open(path, errors="replace").read().splitlines()
+    for n, line in enumerate(lines):
         try:
-            yield json.loads(line)
+            row = json.loads(line)
         except ValueError:
-            pass  # a truncated last row is normal in a live session
+            row = None
+        if isinstance(row, dict):
+            yield row
+        elif n < len(lines) - 1:  # a truncated last row is normal in a live session
+            skipped["malformed row"] += 1
 
 def sessions():
+    codex = sorted(glob.glob(CODEX + "/sessions/**/*.jsonl", recursive=True) +
+                   glob.glob(CODEX + "/archived_sessions/**/*.jsonl", recursive=True))
+    for store, paths in (("claude", glob.glob(CLAUDE + "/*/*.jsonl")), ("codex", codex)):
+        if not paths:
+            skipped[f"{store} store empty or missing"] += 1
     for path in glob.glob(CLAUDE + "/*/*.jsonl"):
-        yield "claude", path.split("/")[-2], None, None, [
+        yield "claude", path.split("/")[-2], None, None, "", [
             (r.get("timestamp"), clean(text_of(r.get("message", {}).get("content"))))
             for r in rows(path)
             if r.get("type") == "user" and not r.get("isMeta") and not r.get("isCompactSummary")]
-    for path in sorted(glob.glob(CODEX + "/sessions/**/*.jsonl", recursive=True) +
-                       glob.glob(CODEX + "/archived_sessions/**/*.jsonl", recursive=True)):
+    for path in codex:
         meta, found = {}, []
         for r in rows(path):
             payload = r.get("payload") if isinstance(r.get("payload"), dict) else r
@@ -69,20 +81,30 @@ def sessions():
         if not meta:
             skipped["codex session without session_meta"] += 1
         elif meta.get("originator") != "codex_exec" and not meta.get("parent_thread_id"):
-            yield "codex", meta.get("cwd"), meta.get("id"), meta.get("forked_from_id"), found
+            yield ("codex", meta.get("cwd"), meta.get("id"), meta.get("forked_from_id"),
+                   meta.get("timestamp") or "", found)
 
-skipped = collections.Counter()
-found_in = [(host, workspace, session, parent, [(ts, text) for ts, text in found if text])
-            for host, workspace, session, parent, found in sessions()]
-texts = {session: [text for _, text in found] for _, _, session, _, found in found_in if session}
+found_in, started, texts = [], {}, {}
+for host, workspace, session, parent, began, found in sessions():
+    if session and session in texts:
+        skipped["session id seen twice, first copy kept"] += 1
+        continue
+    found = [(ts, text) for ts, text in found if text]
+    found_in.append((host, workspace, session, parent, found))
+    if session:
+        started[session], texts[session] = began, [text for _, text in found]
 for host, workspace, session, parent, found in found_in:
+    replayed = 0
     if parent and parent not in texts:
         skipped["fork whose parent is missing, replay kept"] += 1
-    replayed = 0
-    for (_, mine), theirs in zip(found, texts.get(parent, []) if parent else []):
-        if mine != theirs:
-            break
-        replayed += 1
+    elif parent and started[parent] >= started[session]:
+        skipped["fork not older than its parent, replay kept"] += 1  # a cycle, or a damaged store
+    elif parent:
+        for (_, mine), theirs in zip(found, texts[parent]):
+            if mine != theirs:
+                break
+            replayed += 1
+        skipped["prompt folded as a fork's replay, by text"] += replayed
     for n, (ts, text) in enumerate(found[replayed:], replayed):
         if not ts:
             skipped["prompt without timestamp, kept"] += 1
@@ -95,5 +117,6 @@ for reason, count in skipped.items():
 
 Run it with a since-date and redirect the rows to scratch; count and classify from that file. The
 rows hold raw prompt text, so they stay in scratch and only counts reach durable output. Every
-`partial:` line on stderr goes into the report. A store this
+`partial:` line on stderr goes into the report. The store does not mark where a fork's replay
+ends, so an owner who retypes the parent's next prompt in the fork loses that one to the fold. A store this
 script does not know yields nothing: locate it first, or mark the result partial.

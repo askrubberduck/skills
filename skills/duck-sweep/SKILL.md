@@ -41,8 +41,8 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
    only the owner may decide to delete one**. Uncommitted work is the case with no second copy to
    recover from, which is why this decision is never the doer's however obvious it looks; queue it
    via `duck-decide` and keep the file meanwhile. Then — only once nothing in the worktree remains
-   marked keep — `git worktree remove <path>`, `git branch -d <branch>` (`-D` only on the Unmerged
-   path, against its recorded decision), and `git worktree prune` for leftovers.
+   marked keep — `git worktree remove <path>`, `git branch -d <branch>` (`-D` only against a recorded landed SHA, which `-d` cannot
+   see after a squash, or on the Unmerged path against its recorded decision), and `git worktree prune` for leftovers.
 4. Scratch dirs: hunt ad-hoc temp dirs outside the sanctioned scratchpad (e.g. `~/<repo>-tmp*`,
    `/tmp/<repo>*`, stray review-tmp dirs; the sanctioned scratchpad itself is disposable by design
    and never swept per-file). A non-git dir has no merge evidence, so inventory every entry

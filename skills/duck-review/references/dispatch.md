@@ -44,8 +44,8 @@ Run from a neutral scratch directory, never the target checkout. Close stdin, us
 and run in the background because reviews can take 10–45 minutes. Minimum shapes:
 
 ```bash
-codex exec -m <pinned-model> --skip-git-repo-check "$(cat $SP/prompt.md)" </dev/null > $SP/codex-rN.out 2>&1
-agy --model <verified-non-doer> --add-dir "$SP" --print-timeout 45m -p "..." </dev/null > $SP/agy-rN.out 2>&1
+codex exec -m <pinned-model> --skip-git-repo-check "$(cat "$SP/prompt.md")" </dev/null > "$SP/codex-rN.out" 2>&1
+agy --model <verified-non-doer> --add-dir "$SP" --print-timeout 45m -p "..." </dev/null > "$SP/agy-rN.out" 2>&1
 ```
 
 **The prompt is an argument; the material under review is a path inside it.** Hand the reviewer

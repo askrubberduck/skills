@@ -54,13 +54,14 @@ here unless extraction was requested.
    fork point read from the backup or the reflog, never guessed from a parent that already
    moved. Repoint each PR's base before any force-push: a forge that finds a child's commits
    reachable from its base marks the child merged and may delete its branch.
-6. Prove nothing was lost. For a stack, `git diff <backup> <top>` is empty. For separate
-   branches, merge them all onto a scratch branch from the base and diff that against the
-   backup merged with the same base; a base that moved since the fork is otherwise reported as
-   loss. Then run each branch's checks alone; one that passes only beside its sibling is not
+6. Prove nothing was lost. Compare against the backup merged with the base the new branches
+   sit on; a base that moved since the fork is otherwise reported as loss. For a stack, diff
+   that against the top. For separate branches, merge them all onto a scratch branch from the
+   base and diff that. Then run each branch's checks alone; one that passes only beside its sibling is not
    independent.
 7. Report what each branch now carries, its checks and the backup ref. Never delete the backup
-   in the same invocation; `duck-sweep` removes it once the work has landed.
+   in the same invocation. Its commits land under new SHAs, so `duck-sweep` will find it
+   unproven and ask.
 
 ## Common mistakes
 

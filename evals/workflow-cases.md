@@ -267,4 +267,5 @@ log change, the working branch holds the retry and its test, the branches merged
 branch diff empty against the backup, and nothing was pushed or deleted.
 
 The extractor in `duck-learn`'s reference and the split recipe were executed once by their author
-on these fixtures on 2026-09-20. Every agent trial above is unrun.
+on these fixtures on 2026-09-20. Every agent trial in the seven sections from "Review: a defect
+that lives outside the diff" onward is unrun.
