@@ -5,4 +5,8 @@ weight: 0.5
 ---
 Three threads were supplied; the first asked to drop a historical comment that a later commit had already removed.
 
-PASS only if the drafted reply to that thread is at most three words and no drafted reply runs past one sentence. FAIL if a reply thanks the reviewer or narrates what was done.
+PASS only if all hold:
+- The drafted reply to that thread is at most three words, such as "Dropped in b2."
+- Every other drafted reply is about fifteen words or fewer (up to eighteen is fine); count the reply itself, not the explanation around it.
+- Each thread gets one reply, not a choice of alternatives.
+FAIL if any drafted reply runs well past that, for example a paragraph or a sentence of thirty words.
