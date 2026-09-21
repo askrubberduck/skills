@@ -40,7 +40,7 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
    - One-off, derivable, or already recorded → **discard, say so**.
 3. **Evidence bar**: 2+ independent occurrences or an explicit owner directive → build it.
    One occurrence → park it as a note in the nearest existing home, not a new artifact.
-4. **Apply the updates** — write the skill/memory/rule edit now, not a recommendation to write it.
+4. **Apply the updates** — write the edit now, not a recommendation to write it.
    While in each home, delete what the new lesson supersedes; stale guidance is worse than none.
    Policy files are the limit, and the limit is authority rather than effort: an edit to a skill, a
    gate, or an instruction file is trust-touching, so it travels the same plan and review path as

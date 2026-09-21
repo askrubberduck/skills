@@ -11,12 +11,12 @@ and is the owner's directive: keep both. A row that opens "Another Claude sessio
 is a subagent reporting back. Delegated logs sit apart, in `<session>/subagents/`, so a
 one-level glob already reports roots only.
 
-**Codex**, `$CODEX_HOME/sessions/**` and `archived_sessions/**`. An owner prompt is a row whose
-`payload` has `type == "message"` and `role == "user"`, its words in `content[].text`. The first
-row, `session_meta`, says whose session it is: `originator` `codex_exec` is a non-interactive
-dispatch, and a spawned
-agent carries `parent_thread_id`. Count neither; a store full of reviewer briefs otherwise reads
-as an owner who types briefs. An SDK originator can be an app the owner types into, so it is
+**Codex**, `$CODEX_HOME/sessions/**` and `archived_sessions/**`: every project on the host, where
+the Claude path names one. Counts may span projects; say which workspaces each came from. An owner
+prompt is a row whose `payload` has `type == "message"` and `role == "user"`, its words in
+`content[].text`. The first row, `session_meta`, says whose session it is: `originator`
+`codex_exec` is a non-interactive dispatch, and a spawned agent carries `parent_thread_id`. Count
+neither; a store full of reviewer briefs otherwise reads as an owner who types briefs. An SDK originator can be an app the owner types into, so it is
 counted: name the originators you counted. A fork names its parent in `forked_from_id` and
 replays the parent's prompts under new timestamps: drop that replayed prefix. Never fold by text
 alone, which also folds every honest repeat of a short directive.
