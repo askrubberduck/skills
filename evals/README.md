@@ -262,3 +262,65 @@ first run let replies be "one sentence" and got sentences of 22 to 55 words; wit
 to fifteen words the plugin arm wrote 14 to 17 and passed one run of three, the no-plugin arm none.
 The rubric was rewritten once in between, to grade the rule as written rather than a stricter one.
 
+### `shape` with the six harder cases, 2026-09-21
+
+Master `f640d34`, same host, judge and run count. Thirteen cases, $10.16.
+
+| Case | With | Without | `duck-shape` loaded |
+|---|---|---|---|
+| `shape-01` to `shape-05` | 1.00, 0.92, 1.00, 1.00, 1.00 | 1.00 each | 3, 1, 3, 1, 3 of 3 |
+| `shape-08-tempting-validation` | 1.00 | 0.83 | 0/3 |
+| `shape-09-flag-with-one-live-caller` | 1.00 | 1.00 | 0/3 |
+| `shape-10-wrapper-that-earns-it` | 0.33 | 0.33 | 0/3 |
+| `shape-11-mirror-test` | 1.00 | 1.00 | 0/3 |
+| `shape-12-deep-simplify` | 1.00 | 1.00 | 3/3 |
+| `shape-06`, `-07`, `-13` (should not load) | 1.00 each | 1.00, 0.83, 1.00 | 0/9, as required |
+
+Flow mean Δ +0.02. The new cases do not show what `duck-shape` adds, because on four of the five
+it never loaded: 0 of 12 runs, though two of those prompts say "simplify". The skill loaded for
+the short prompts that name no target ("Simplify this deeply", "full of AI slop") and not for the
+ones that name what to cut in a multi-file fixture; the cause is not known. With nothing loaded the
+two arms are the same agent, so the scores on those four say the fixtures are passable unaided,
+except `shape-10`: asked to inline a wrapper that pins a timeout and maps an exception, the agent
+names both and inlines it anyway, six runs of six. That is the one fixture here where guidance
+could change the outcome, and it has not yet been tried with the skill loaded.
+
+### Why `duck-shape` does not load on the harder cases, 2026-09-21
+
+Plugin arm only, three runs per variant, scratch clone of `f640d34`; variants are not checked in.
+
+| Variant | `duck-shape` loaded |
+|---|---|
+| `shape-09` request over the `shape-09` fixture (plain functions) | 0/3 |
+| "Simplify this deeply." over the `shape-09` fixture | 0/3 |
+| `shape-09`-style request over the `shape-12` fixture (five classes) | 3/3 |
+| "Simplify this deeply." over the `shape-12` fixture | 3/3 |
+| `shape-09` fixture folded into one code block | 0/3 |
+| `shape-12` fixture with a second block of call-site evidence | 2/3 |
+| `shape-09` rewritten as an ABC, three subclasses and a factory: same request, behaviour and call-site evidence | 3/3 |
+| `shape-10` request prefixed with "full of AI slop" | 0/3 |
+
+The request's wording does not decide it and neither does the number of code blocks. The code
+does: the host loads `duck-shape` when the code looks over-built and not when it is plain, whatever
+is asked of it. So the skill arrives where the unaided agent already cuts well, and stays away from
+the cases written to need restraint, where plain code carries a tempting cut.
+
+A description clause naming that case ("asks to remove, inline or cut a specific check, wrapper,
+flag or test that may be load-bearing") moved the four non-loading cases from 0 of 12 to 3 of 12,
+kept the three negatives at 0 of 9, and their scores fell rather than rose (1.00, 1.00, 0.33, 1.00
+to 0.78, 0.67, 0.47, 0.67) at three runs. It is not applied.
+
+`shape-14-named-wrapper` is `shape-10` with "Use the duck-shape skill on this." in front, so the
+skill loads whatever the code looks like; it runs six times per arm because three had called this
+one wrong (one kept wrapper in three, read as a weak effect). At six, twice:
+
+| Arm | Kept the wrapper and named what it protects |
+|---|---|
+| with the plugin, skill loaded | 5 of 6, and 5 of 6 |
+| without the plugin | 1 of 6; and 0 of 6 on `shape-10` in the suite |
+
+Case Δ +0.44. This is the first fixture where `duck-shape` changes the outcome: asked to inline a
+wrapper that pins a timeout and maps an exception, the unaided agent names both and inlines it
+anyway; with the skill loaded it pushes back. The body needed no new line. What `duck-shape` lacks
+is not guidance but arrival: on plain code it is loaded by name, or by `duck-run`'s execute step,
+and not by the request.
