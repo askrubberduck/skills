@@ -40,10 +40,11 @@ remain separate actions.
 ## Answer a received review
 
 When the user is the author and a review has landed, judge each thread against the current
-candidate, not the revision the reviewer saw, and give it one disposition with its evidence. A
-thread that questions the mechanism rather than a line gets no patch: `duck-shape` over the
-problem, and a proposed shape, come before any edit. Draft one reply per thread: at most three
-words when agreeing or reporting a fix, fifteen otherwise. "Resolve all" covers resolving only, and only
+candidate, not the revision the reviewer saw, and give it one disposition with its evidence:
+still valid, already fixed, disagree, out of scope, or a challenge to the approach. A thread that
+questions the mechanism rather than a line gets no patch: `duck-shape` over the problem, and a
+proposed shape, come before any edit. Draft one reply per thread: at most three words when
+agreeing or reporting a fix, fifteen otherwise. "Resolve all" covers resolving only, and only
 threads already fixed; the rest stay open and are listed.
 
 ## Prepare the review

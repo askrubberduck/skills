@@ -32,7 +32,8 @@ the diff. For a dirty worktree drop the second argument, add each untracked file
 candidate has no SHA.
 
 A brief for round two or later carries the prior adjudication and the settled causes by stable
-ID, with the instruction not to re-report them in any rewording. A settled cause re-raised
+ID, with the instruction not to re-report them in any rewording and to refute one only with new
+evidence. A settled cause re-raised
 without new evidence is a malformed finding; the rest of that result still counts.
 
 ## Run the reviewers
