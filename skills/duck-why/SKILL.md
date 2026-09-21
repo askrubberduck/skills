@@ -1,6 +1,6 @@
 ---
 name: duck-why
-description: Name the cause of a failure before anyone writes a fix, because the symptom is not the defect. Use when a test fails, a bug is reported, a build breaks, a traceback or error is pasted, something passes in one environment and fails in another, behavior differs from what was expected, a fix keeps not sticking, or the user asks why something is broken, including when the code is pasted inline and the cause looks obvious. Also when the user asks when or why an existing constant, check or behavior was introduced.
+description: Name the cause of a failure before anyone writes a fix, because the symptom is not the defect. Use when a test fails, a bug is reported, a build breaks, a traceback or error is pasted, something passes in one environment and fails in another, behavior differs from what was expected, a fix keeps not sticking, or the user asks why something is broken, including when the code is pasted inline and the cause looks obvious. Also when the user asks who added a value, flag, guard or behavior and why, or whether that reason still holds; not for a plain explanation of how something works.
 ---
 
 # Duck Why
@@ -15,12 +15,13 @@ repair permission again or imply that diagnosis satisfies a release gate.
 
 ## Reproduce and trace
 
-Obtain a reproducing command and inspect its output and relevant state. If the environment is
+Obtain a reproduction and inspect its output and relevant state. If the environment is
 unavailable or the fault intermittent, use logs, traces and history, state the reproduction limit,
 and distinguish observations from provisional explanations.
 
 Trace the failing path to the first point where behavior diverges from the required contract.
-Read the function's callers and relevant configuration; classify which can reach the failure and
+Read what depends on the failing part, callers and configuration for code, the sections and
+decisions that cite it otherwise; classify which can reach the failure and
 which enforce preconditions that prevent it. State search limits when external or dynamic callers
 cannot be enumerated. Shared code does not imply every caller is broken.
 
@@ -40,17 +41,17 @@ errors that could affect the causal chain; record why a consequential competing 
 
 ## Trace an existing decision
 
-A question about when or why something was introduced has no failure to reproduce. Find the
-introducing commit with `git log -S` or `-G` on the symbol and blame at the current line, then the
-change request behind it and its stated reason: description, linked ticket, review thread. Check
-that reason against today's callers. Return the commit, the change request, the reason, and whether
-it holds, lapsed or is unknown. A lapsed reason is a finding, not a deletion; removal belongs to
-`duck-shape`. Explaining how something works, with no decision to trace, needs no diagnosis.
+A question about when or why something was introduced has no failure to reproduce. Trace it
+through the artifact's own history: for code, `git log -S` or `-G` on the symbol and blame at the
+current line; for a document or plan, its revisions. Then find where the reason was stated:
+description, linked ticket, review thread. Keep the recorded reason apart from your inference.
+Check it against today's callers and later changes. Return the introducing change, its record,
+the reason, and whether it holds, lapsed (name the change that removed the reason) or is
+unknown. A lapsed reason is a finding, not a deletion; removal belongs to `duck-shape`.
 
 ## Return an actionable diagnosis
 
-A traced decision returns what its section lists. For a failure, lead with the cause or the
-unresolved question, then provide:
+For a failure, lead with the cause or the unresolved question, then provide:
 
 - The reproducer or available trace, actual result and expected contract.
 - Source and observations connecting the failure to the cause, including affected sibling paths.

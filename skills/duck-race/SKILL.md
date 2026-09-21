@@ -79,8 +79,7 @@ git -C "$WT_RIVAL" add -A && git -C "$WT_RIVAL" diff "$BASE_SHA" > "$SP/rival.di
    required behavior or shape. If you combine candidates, **rerun the common outcome checks and
    relevant suites on the assembled result**; per-candidate green does not compose. Resolve
    divergences against permitted behavior, including ordering and tolerances, never by vote.
-4. Two finished attempts minimum. An outage that survives one re-dispatch downgrades the run to a
-   single attempt — say so and stop calling it a race.
+4. Two finished attempts minimum.
 
 ## Rally mode
 
@@ -120,6 +119,8 @@ the turn cap — and how a review loop outlives its budget.
 
 ## Contract (both modes)
 
+- An outage that survives one re-dispatch leaves one family playing: say so and stop calling the
+  work decorrelated.
 - Receipt to `race-rN.md` in the project's durable records home as `duck-proof` resolves it —
   never the scratchpad, never a commit on the candidate branch: problem hash, base SHA,
   participant identities with pinned model ids — a
@@ -139,13 +140,5 @@ the turn cap — and how a review loop outlives its budget.
 
 - Racing a problem statement that names an implementation approach — you get two copies of the same
   assumption and pay double for one attempt.
-- Adjudicating on diff elegance instead of executed tests — prose taste is how correlated errors
-  win races.
-- Skipping the divergence findings because both candidates pass — passing twice for different
-  reasons is the cheapest spec-review available.
-- Accepting a red that fails on a typo or missing import — red for the wrong reason proves nothing;
-  the serve is re-run, not patched by the returner.
 - Implementing past the test because the next requirement is obvious — the extra code is untested by
   construction, and the next serve was the place to demand it.
-- Playing both sides from one family because the rival CLI is slow or down — that is solo work
-  wearing a costume; say so and stop claiming decorrelation.

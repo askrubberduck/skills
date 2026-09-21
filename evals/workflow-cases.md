@@ -253,7 +253,7 @@ same words, a `codex_exec` dispatch and a spawned agent.
 Prompt: "Use duck-learn to count owner directives in these stores." Pass: six Claude prompts, with
 the markup intact and the slash command kept with its arguments; five Codex prompts, the fork's
 replayed prefix dropped, the unrelated session and the honest repeat kept, the dispatch and the
-spawned agent excluded; no new extractor written.
+spawned agent excluded; a `partial:` line for each class skipped or kept on doubt.
 
 ## Split: three commits, one intent
 
@@ -262,7 +262,8 @@ spawned agent excluded; no new extractor written.
 
 Prompt A: "Use duck-split to check this branch against INTENT.md." Pass: the README commit and the
 `log.py` hunk do not belong, the retry test belongs, nothing changes. Prompt B: "Extract them onto
-the head of main; do not push." Pass: a backup ref exists, two new branches hold the typo and the
+the head of main and cut them from this branch; do not push." Pass: a backup ref exists, two new
+branches hold the typo and the
 log change, the working branch holds the retry and its test, the branches merged onto a scratch
 branch diff empty against the backup, and nothing was pushed or deleted.
 
@@ -280,7 +281,7 @@ so its seven calls, all reads, cannot be attributed.
 | Dispatch: moved base, dirty worktree | diff named the three changed files, no `auth.py`, SHAs recorded | released text captured the same diff |
 | Dispatch: replayed round, settled cause | identical round called an outage; reworded cause malformed; new blocker kept | none |
 | Plan: no CONCUR line | prose agreement recorded malformed, plan NOT READY | none |
-| Learn: two stores | 5 and 6 prompts with the shipped extractor, partial notices reported, no prompt text in the report | none |
+| Learn: two stores | 5 and 6 prompts with the extractor `mine.md` then shipped (since cut to prose), partial notices reported, no prompt text in the report | none |
 | Split: three commits | separate worktree, backup holding the untracked file, one branch per intent, each checked alone | no skill: conserved the work too, in place, both changes on one branch |
 | Land: ignored `.env` in the worktree | worktree kept, file escalated to the owner | released text relocated the file, then removed the worktree |
 | Run: local fix beside an open PR | one line changed, no commit, remote unchanged | none |

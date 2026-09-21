@@ -1,72 +1,74 @@
 ---
 name: duck-split
-description: Hold a branch to the one change it was opened for; whatever hitched a ride gets a branch of its own, and nothing falls off on the way. Use when the user asks what in a branch or PR does not belong to the original task, asks to extract a change into its own branch or PR, to split a branch into separate or stacked ones, or whether a branch or open PR still carries only what it was meant to.
+description: Hold a branch, PR or document to the one thing it was opened for; nothing rides along, nothing falls off. Use when the user asks what in a branch, PR, document or plan does not belong to the original task, asks to extract or split part of it into its own branch, PR or document, or whether it still carries only what it was meant to.
 ---
 
 # Duck Split
 
-A branch collects work that belongs elsewhere: a fix found on the way, a refactor the reviewer
-asked to separate, a migration from another line of work. Sort it against the branch's intent,
-hunk by hunk, and move what does not belong without losing a line of it.
+A unit of work collects what belongs elsewhere. Sort it against the unit's intent, part by part,
+and show that the pieces sum to the original before anything leaves it.
 
 Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and verdicts.
-The check is the default and changes nothing. Extraction rewrites branches, so it needs its own
-authorization; pushing, opening a PR, changing a PR's base and force-pushing each need theirs.
+A question ("what doesn't belong?") gets the classification and no edits. An instruction to
+extract authorizes creating the new units only. Taking the moved parts out of the original needs
+an explicit removal instruction, "cut it from here" or any paraphrase; "extract it" alone is not
+one. A unit others already hold is not rewritten even then: report it and leave the choice to the
+owner. Pushing or force-pushing anything, publishing a unit and every forge action each need
+their own.
 
 ## Name the intent
 
-Use the recorded intent: the `duck-frame` outcome, the work item, or the PR title and body. With
-none recorded, state the intent the first commits imply as an assumption and classify against
-that; never sort hunks against an intent nobody can read.
+Use the recorded intent: the `duck-frame` outcome, the work item, or the unit's own title and
+description. With none recorded, state the intent its first parts imply as an assumption and
+classify against that; never sort against an intent nobody can read. A doubt about the intent
+itself is not a scope finding; leave it open.
 
-## Check
+## Judge each part
 
-Take the base from `git merge-base`, not from a base branch that has moved. Include staged,
-uncommitted and untracked work. For an open PR, compare the local branch with the pushed head and
-report what exists on one side only.
+Read part by part — a hunk, a section, a plan item — not commit by commit or file by file; one
+commit often mixes two intents.
 
-Classify every hunk, not every commit or file; one commit often mixes two intents.
+- **Belongs**: removing it weakens the intent. A test, fixture or migration the change needs in
+  order to work belongs with it.
+- **Does not belong**: the intent survives without it. Name where it would go. A good fix found
+  on the way still does not belong.
+- **Unsure**: it serves both, or a named fact would decide it. Unsure stays.
 
-- **Belongs**: cite the part of the intent it serves. A test, fixture or migration the change
-  needs in order to work belongs with it.
-- **Does not belong**: name where it would go. A good fix found on the way still does not belong.
-- **Unsure**: name the fact that would decide it.
-
-Answer two questions: does the branch carry only its intent, and does it carry all of it. Stop
-here unless extraction was requested.
+Answer two questions: does the unit carry only its intent, and does it carry all of it. Stop here
+unless extraction was asked for.
 
 ## Extract
 
-1. Create a backup ref at the current tip and commit staged, uncommitted and untracked work onto
-   it. A stash will not do: step 6 compares commits and cannot see one. Confirm the ref resolves
-   before touching anything else. Ignored files stay out of the backup, and a checkout overwrites
-   one without asking when the target tracks its path: build the new branches in a separate
-   worktree so this checkout never switches, and list `git status --ignored` first.
-2. Place each extracted change as told: on the head of the base, or stacked. When not told, a
-   change that applies to the base and passes its checks alone goes on the base; one that needs
-   the rest, or conflicts with a sibling, is stacked. Say which and why.
-3. Build each branch from hunks. Cherry-pick a commit that holds one intent; split a mixed one by
-   applying the selected hunks to the index. Use no interactive command.
-4. Rebuild the working branch without the extracted hunks. A branch others have pulled is not
-   rebuilt, and reverting there makes the extracted commit vanish when the branches meet again:
-   report it and leave the choice to the owner.
-5. For a stack, rebase each layer with `git rebase --onto <new-parent> <old-fork-point>`, the
-   fork point read from the backup or the reflog, never guessed from a parent that already
-   moved. Where the layers are open PRs, repoint each base before any force-push: a forge that finds a child's commits
-   reachable from its base marks the child merged and may delete its branch.
-6. Prove nothing was lost. Compare against the backup merged with the base the new branches
-   sit on; a base that moved since the fork is otherwise reported as loss. Work committed onto
-   the backup only for safekeeping, and still uncommitted in the checkout, is the one difference
-   allowed: name each such file. For a stack, diff
-   that against the top. For separate branches, merge them all onto a scratch branch from the
-   base and diff that. Then run each branch's checks alone; one that passes only beside its sibling is not
-   independent.
-7. Report what each branch now carries, its checks and the backup ref. Never delete the backup
-   in the same invocation. Its commits land under new SHAs, so `duck-sweep` will find it
-   unproven and ask.
+1. Back up the original first, in a copy or ref this pass never deletes. Confirm it resolves
+   before anything else is touched.
+2. Build one new unit per destination from the original's parts. A part that cannot stand
+   without the rest, or collides with a sibling, depends on another new unit; say which and why.
+3. Only on a removal instruction, take the moved parts out of the original.
+   Otherwise the original keeps them, and the report says those parts now exist in two places.
+4. Prove nothing was lost: recombine every resulting unit and compare with the backup. Then run
+   each unit's checks alone; one that passes only beside its sibling is not independent.
+5. Report what each unit carries and sits on, the backup, the comparison, the checks, whether the
+   original was rewritten, and the publishing steps left unrun.
 
-## Common mistakes
+## On a git branch
 
-- Deleting an unrelated change instead of moving it. Removal is not extraction; the work
-  is gone rather than moved.
-- Narrowing a commit to the files its title names without reading what else it carried.
+- Take the base from `git merge-base`, not from a base branch that has moved. Include staged,
+  uncommitted and untracked work. For an open PR, compare the local branch with the pushed head
+  and report what exists on one side only.
+- The backup is a ref at the current tip with staged, uncommitted and untracked work committed
+  onto it. A stash will not do: the comparison reads commits and cannot see one. Those files stay
+  uncommitted in the checkout, so they are the one difference the comparison may show: name each.
+- Ignored files stay out of the backup, and a checkout overwrites one without asking when the
+  target tracks its path. List `git status --ignored`, and build the new branches in a separate
+  worktree so this checkout never switches.
+- Split a mixed commit by applying the selected hunks to the index; use no interactive command.
+- Compare against the backup merged with the base the new branches sit on; a base that moved
+  since the fork is otherwise reported as loss. For a stack, diff that against the top; for
+  separate branches, merge them all onto a scratch branch from the base and diff that.
+- With the removal instruction, push and forge authority, rebase each stacked layer with
+  `git rebase --onto <new-parent> <old-fork-point>`, the fork point read from the backup or the
+  reflog, never guessed from a parent that already moved. Where
+  the layers are open PRs, repoint each base before any force-push: a forge that finds a child's
+  commits reachable from its base marks the child merged and may delete its branch.
+- The backup's commits land under new SHAs, so `duck-sweep` will find it unproven: name it in
+  the report as the work item its Unmerged path reads.

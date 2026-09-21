@@ -353,8 +353,8 @@ CASES: list[tuple[str, str, Callable[[Path], None]]] = [
      lambda c: (shutil.rmtree(c / "skills/duck-shape"),
                 (c / ".claude/skills/duck-shape").unlink())),
     ("required reference deleted", "must reference `duck-shape`",
-     lambda c: edit(c, "skills/duck-review/SKILL.md",
-                    "`duck-shape` owns this lens at change time; ", "")),
+     lambda c: (c / "skills/duck-review/SKILL.md").write_text(
+         (c / "skills/duck-review/SKILL.md").read_text().replace("`duck-shape`", "shape"))),
     ("description ends a plain YAML scalar", "no host can load the skill",
      lambda c: edit(c, SCAN, "Find ready, blocked", "Note: find ready, blocked")),
     ("description over budget", "over the 600 budget",

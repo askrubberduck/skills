@@ -1,6 +1,6 @@
 ---
 name: duck-review
-description: Review work from multiple angles or deliver an independent judgment. Use for designs, plans, documents, code, local changes, completed work or PRs; findings-only reviews; an independent second opinion; or a release gate. Findings-only review stays in-session; independent and release reviews use cross-model scrutiny and return APPROVE, REJECT, or NOTE. It does not fix, repeat, or land.
+description: Review work from multiple angles or deliver an independent judgment. Use for designs, plans, documents, code, local changes, completed work or PRs; findings-only reviews; an independent second opinion; a release gate; or to answer a review you received, saying which comments still apply to what you pushed since and drafting the replies. Findings-only review stays in-session; independent and release reviews use cross-model scrutiny and return APPROVE, REJECT, or NOTE. It does not fix, repeat, or land.
 ---
 
 # Duck Review
@@ -9,9 +9,7 @@ Review the specified work at its current stage. Test a design's assumptions with
 implementation; judge completed work against observable results.
 
 Independent scrutiny precedes release approval. The builder must validate the candidate first;
-a reviewer is not a substitute for the doer's own breaking attempts. If the builder adjudicates
-the independent findings, identify that limited independence rather than claiming the final
-judgment was wholly external.
+a reviewer is not a substitute for the doer's own breaking attempts.
 
 Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
@@ -22,8 +20,9 @@ until reviewers approve, or land it. The caller owns repairs and the next author
 ## Findings or independent judgment
 
 An explicit independent, cross-model or release-gate review uses the workflow below. Otherwise a
-findings-only, analysis-only or "multiple angles" request uses this in-session path. With no such
-scope specified, use the independent workflow. A findings pass never satisfies a required gate.
+findings-only, analysis-only or "multiple angles" request, or an answer to a received review,
+uses this in-session path. With no such scope specified, use the independent workflow. A findings
+pass never satisfies a required gate.
 
 Resolve the target, applicable base, constraints and prior dispositions as in preparation steps 1–2;
 for re-review also apply step 5. Inspect relevant risk surfaces such as behavior, failure recovery
@@ -38,6 +37,16 @@ their own existing authorization. Then return to the caller: a later selection a
 caller's scoped local fixes, not another review or a new approval round. Commit and publication
 remain separate actions.
 
+## Answer a received review
+
+When the user is the author and a review has landed, judge each thread against the current
+candidate, not the revision the reviewer saw, and give it one disposition with its evidence:
+still valid, already fixed, disagree, out of scope, or a challenge to the approach. A thread that
+questions the mechanism rather than a line gets no patch: `duck-shape` over the problem, and a
+proposed shape, come before any edit. Draft one reply per thread: at most three words when
+agreeing or reporting a fix, fifteen otherwise. "Resolve all" covers resolving only, and only
+threads already fixed; the rest stay open and are listed.
+
 ## Prepare the review
 
 1. Resolve the exact target, its version and the requested judgment. For a code release use the last
@@ -45,11 +54,9 @@ remain separate actions.
    intentionally captured dirty worktree can be reviewed, but landing later needs an authorized
    exact commit. For a design, plan or document, identify the supplied revision or snapshot; no
    PR, commit or invented Git base is needed.
-   A code change is reviewed with its neighbourhood: the callers of each changed symbol, the
-   config, migrations and tests that read a changed value, and the flow the change sits in. A
-   finding in a file outside the diff is in scope. When a changed symbol has more callers than
-   the review can read, sample them and say so. Report which files beyond the diff were read;
-   diff-only is a coverage limit to state, never the default.
+   A change is reviewed with what depends on it: callers, config and tests for code; the sections
+   and consumers that cite it for a document. A finding outside the change is in scope. Report
+   what was read beyond it; the change alone is a coverage limit to state, never the default.
 2. Use the caller's recorded outcome, constraints and acceptance baseline across review rounds.
    For a standalone review, establish that baseline once. Name the coordinating caller who owns
    convergence, prior findings and the remaining round bound; `duck-run` defines the default loop
@@ -92,15 +99,10 @@ that survives. Neither owner preference nor a mandate to be negative is evidence
 ## Reviewer result contract
 
 Require each reviewer to return `APPROVE | REJECT | NOTE` and findings ranked
-`BLOCKER | SHOULD | NOTE`:
-
-- `APPROVE` claims no release-blocking defect was found.
-- `REJECT` claims at least one finding is release-blocking.
-- `NOTE` says something material stands out without making a gate decision. It neither authorizes
-  nor rejects, is not `APPROVE-W-CONDITIONS`, and is not an outage.
-
-These are inputs to the superreview, not votes. A reviewer that does not rank its findings has not
-finished; use whatever evidence is present, but record the malformed result.
+`BLOCKER | SHOULD | NOTE`. A reviewer's `APPROVE` claims no release-blocking defect and its
+`REJECT` claims at least one; its `NOTE` is not `APPROVE-W-CONDITIONS` and not an outage. These
+are inputs to the superreview, not votes. A reviewer that does not rank its findings has not finished; use whatever evidence is
+present, but record the malformed result.
 
 ## Adjudicate the claims
 
@@ -115,6 +117,13 @@ party can re-check from the artifacts, and let a finding you cannot settle stand
 A substantiated blocker stands until resolved. An unsubstantiated suspicion is not a blocker;
 if missing evidence prevents a gate decision, return NOTE and name the uncertainty.
 
+- Judge a code change where it will run: a system that upgrades from an older state and can roll
+  back, not a fresh one. A new way to fail is a change to that system.
+- A guard added to cover a race that appeared when another guard was removed says the removed
+  one was load-bearing.
+- A changed contract is incomplete until every other party to it moves in the same change or is
+  named as follow-up.
+- A delta nobody asked for is a finding until someone explains it.
 - Check the repository's own conventions before accepting a demand for a new artifact. Existing
   evidence beats reviewer-invented ceremony.
 - Ask what the code is for before recommending a patch. If removing the feature, flag, branch, or

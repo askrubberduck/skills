@@ -36,10 +36,11 @@ Routing evidence: two English selection probes, plus with/without runs for four 
 | "simplify it deeply" | `duck-shape`: take the mechanism apart, keep the contracts, rebuild the path with less to remember. Then check it. |
 | "gate it" | `duck-review`: one verdict, the reviewers named, and the evidence behind every finding. No participation trophies. |
 | "review this work from multiple angles" | `duck-review`: evidenced findings on a design, plan, document or implementation, reported in-session. No edits or publication. |
+| "are these review comments still valid?" | `duck-review`: each thread judged against what you pushed since, with a drafted reply. Nothing posted or resolved for you. |
 | "try to break it" | `duck-break`: attacks actually run, with inputs and results. Imagining a crash is not crashing it. |
 | "dry it" | `duck-dry`: prose that earns its place, with checks that the sweep did not smuggle in a code change. |
 | "trim the backlog" | `duck-cut`: retire obsolete work, merge duplicates, unblock what still matters. Every task earns its place. |
-| "what doesn't belong in this branch?" | `duck-split`: every hunk sorted against the branch's intent, the hitchhikers moved to their own branches, and a diff that shows nothing fell off. |
+| "what doesn't belong in this branch?" | `duck-split`: every part sorted against the intent, and where each hitchhiker belongs. Moving them is a separate ask, and comes with proof nothing fell off. |
 | "what's next?" | `duck-scan`: what is ready, what is blocked, and why. Looking is free. |
 | "race it" | `duck-race`: two independent attempts, the same outcome checks, and a winner that earned it. |
 | "roast it" | `duck-roast`: the findings that stand up, what to do about them, and an end to the round. |
@@ -144,7 +145,7 @@ resolves.
 | `duck-run` | Challenge the goal, shape the plan, build it, and make it prove itself; local means local |
 | `duck-scan` | Find ready, blocked, and remaining work without changing anything; looking is free |
 | `duck-shape` | Make every layer earn its place; cut the machinery the problem never asked for |
-| `duck-split` | Hold a branch to the one change it was opened for; whatever hitched a ride gets a branch of its own, and nothing falls off on the way |
+| `duck-split` | Hold a branch, PR or document to the one thing it was opened for; nothing rides along, nothing falls off |
 | `duck-sweep` | Clean out stale branches, worktrees, checkouts, scratch directories, and ignore rules; the pond stays clean |
 | `duck-why` | Name the cause of a failure before anyone writes a fix, because the symptom is not the defect |
 <!-- skills-table:end -->
@@ -187,8 +188,8 @@ just because the code reached it.
    clean up. Asked for local changes? The verified local diff is the finish line.
 
 Around the run: `duck-scan`, `duck-cut`, `duck-decide`, and `duck-campaign` before it;
-`duck-diet` throughout; `duck-split` when a branch has picked up passengers; `duck-sweep` and
-`duck-learn` after.
+`duck-diet` throughout; `duck-split` before review, when a branch or document picked up
+hitchhikers; `duck-sweep` and `duck-learn` after.
 
 ## How many ducks review your work?
 

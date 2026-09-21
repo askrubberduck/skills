@@ -239,3 +239,26 @@ answer rubric, in both arms. `why` as a flow scored 0.94 with and 0.77 without, 
 21 of 21 should-fire runs. `duck-split` routes and adds nothing the graders can see: the agent
 without it already sorts a mixed commit by hunk. Both phrasings come from the prompts the skills
 were written for, so neither says how unseen wording routes.
+
+Both tables above predate a rewrite of the `duck-why`, `duck-split` and `duck-review` descriptions
+on 2026-09-21.
+
+### Rerun on the rewritten descriptions, 2026-09-21
+
+Candidate `d8c0cf8`, same host, judge and run count.
+
+| Case | With | Without | Skill fired |
+|---|---|---|---|
+| `why-07-neg-history` | 0.83 | 1.00 | 0/3, as required |
+| `why-09-lapsed-constant` | 1.00 | 1.00 | 3/3 |
+| `split-01-mixed-commit` | 1.00 | 1.00 | 3/3 |
+| `split-02-neg-rebase` | 1.00 | 1.00 | 0/3, as required |
+| `review-02-received-threads` | 0.87 | 0.80 | 3/3 |
+
+Routing held on the new wording. The +0.22 that `why-09` showed a day earlier is gone: the
+no-plugin arm passed three of three this time, so that uplift was noise. `review-02` fails in both
+arms on reply length alone; dispositions and nothing-resolved passed eighteen of eighteen. The
+first run let replies be "one sentence" and got sentences of 22 to 55 words; with the rule changed
+to fifteen words the plugin arm wrote 14 to 17 and passed one run of three, the no-plugin arm none.
+The rubric was rewritten once in between, to grade the rule as written rather than a stricter one.
+

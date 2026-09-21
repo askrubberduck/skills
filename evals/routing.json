@@ -155,12 +155,14 @@
           "Review this PR, including uncommitted changes, from multiple angles. Report findings first; do not post comments.",
           "Review this design document from multiple angles against its stated constraints. Report findings only.",
           "Review the completed implementation in this local folder. There is no PR; report correctness and maintainability findings.",
-          "Rereview with the latest updates."
+          "Rereview with the latest updates.",
+          "The reviewer left eight comments on my PR and I've pushed twice since. Which of them do I still need to act on?"
         ],
         "ru": [
           "сделай независимое ревью",
           "проверь пулреквест",
-          "перепроверь с последними изменениями"
+          "перепроверь с последними изменениями",
+          "ревьюер накидал восемь замечаний, я с тех пор дважды пушил — что из этого ещё в силе?"
         ]
       }
     },
@@ -218,11 +220,13 @@
       "prompts": {
         "en": [
           "What in this branch doesn't belong to the original task?",
-          "Extract the healthcheck change into its own PR."
+          "Extract the healthcheck change into its own PR.",
+          "Half of this design doc is really a second project. Pull that half out and leave this one focused."
         ],
         "ru": [
           "что в этой ветке не относится к задаче?",
-          "вынеси healthcheck в отдельный PR"
+          "вынеси healthcheck в отдельный PR",
+          "тут на самом деле две разные задачи, вторую унеси отдельно, а здесь оставь только первую"
         ]
       }
     },
@@ -245,12 +249,12 @@
           "Find the cause of this build failure before writing a fix.",
           "Trunk is still failing in CI after this PR. Find the cause.",
           "The retry fix did not stick; investigate what still breaks.",
-          "Why does MAX_ROWS exist and when was it added?"
+          "Who put this 30-second timeout here, and is the reason still good?"
         ],
         "ru": [
           "почему падает сборка",
           "найди причину ошибки",
-          "зачем нужен MAX_ROWS и когда его добавили?"
+          "кто поставил здесь таймаут в 30 секунд и актуальна ли ещё причина?"
         ]
       }
     },
@@ -259,7 +263,8 @@
       "prompts": {
         "en": [
           "Explain how this API worked in version 1 compared with version 2. Nothing is failing; I only want a historical explanation.",
-          "Rebase this branch onto main."
+          "Rebase this branch onto main.",
+          "Why does this endpoint return 409 instead of 404? Nothing is broken, I just want to understand the design."
         ]
       }
     }
