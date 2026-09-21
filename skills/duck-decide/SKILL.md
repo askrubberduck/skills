@@ -23,8 +23,9 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
    pending decision to the caller so separately authorized independent work can continue. Silence
    never supplies an answer or permission.
 
-After the answer: record it in the owning registry/doc (decision log, obligations registry —
-whatever the repo uses) before presenting the next decision, so a dropped session loses nothing.
+After the answer: record it, and whether it is executed or still outstanding, in the owning
+registry/doc (decision log, obligations registry — whatever the repo uses) before presenting the
+next decision, so a dropped session loses nothing.
 
 ## Order
 

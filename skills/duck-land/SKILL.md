@@ -72,19 +72,20 @@ candidate branch and merges nothing.
      the base at merge time**: a base that advances between the precondition check and the merge
      lands a combination nobody reviewed, and no later check can un-land it. The merge must FAIL
      when the base moved — so **verify your mechanism blocks, never infer it from its name.** Prove
-     it on a moved base before trusting it: advance the base, run the mechanism, and require it to
-     refuse. Pin an explicitly recorded base SHA, never a ref — a ref a background fetch refreshes
-     pins nothing, and the cost of a false pin is the other branch's commit.
+     it on a throwaway copy of the remote before trusting it: advance the base there, run the
+     mechanism, and require it to refuse. Pin an explicitly recorded base SHA, never a ref — a ref
+     a background fetch refreshes pins nothing, and the cost of a false pin is the other branch's
+     commit.
 2. **Confirm the merge landed**: the new SHA is on the default branch and **its tree matches the
    candidate tree** — read it back, don't assume. Read the push's full output too, not its exit
    status: the remote prints policy objections ("Changes must be made through a pull request")
    even when the ref moves, and an objection inside a green push is a finding, never noise. This
    is the backstop for whatever step 1's pinning could not prevent: on a mismatch the landed
-   commit goes through the gate before it is recorded. This check runs **after** the branch has
-   already moved, so where a push triggers deployment the hold has to exist before step 1 — a
-   promise to quarantine afterwards is one this step cannot keep.
+   commit goes through the gate before it is recorded. It runs **after** the branch has moved, so
+   it cannot hold a deployment that a push triggers.
 3. Record the outcome where the repo keeps truth: shipped log / status doc / delivery board — with
-   PR number, merged SHA, and what changed. One recorded outcome per landing.
+   PR number, merged SHA, and what changed. One recorded outcome per landing. Where that record
+   lives in the repo, landing it by the same route is part of this landing's authorization.
 4. Close or queue obligations the change touched — the doer never closes an item that needs the
    owner's sign-off; queue those (`duck-decide` presents them).
 5. Clean up: delete the merged branch and its worktree under `duck-sweep`'s step 3, which settles

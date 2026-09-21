@@ -25,6 +25,7 @@ in the work record before disposing of scratch output.
 The brief states the language to answer in — the user's, unless they asked otherwise — and that
 verdicts, rankings, paths and quoted errors stay verbatim whatever the prose language. A reviewer
 told nothing answers in its own default and returns findings nobody asked for in that language.
+It also says the participant is one perspective and dispatches no reviewers of its own.
 
 Capture a code candidate from its fork point: `git diff $(git merge-base <base> <candidate>)
 <candidate>`, and record both SHAs in the brief; a base that moved otherwise shows up reversed in
@@ -39,11 +40,12 @@ without new evidence is a malformed finding; the rest of that result still count
 ## Run the reviewers
 
 Run from a neutral scratch directory, never the target checkout. Close stdin, use absolute paths,
-and run in the background because reviews can take 10–45 minutes. Minimum shapes:
+and run in the background because reviews can take 10–45 minutes; where the CLI has no timeout of
+its own, bound the wait yourself. Minimum shapes:
 
 ```bash
-codex exec -m <pinned-model> --skip-git-repo-check "$(cat "$SP/prompt.md")" </dev/null > "$SP/codex-rN.out" 2>&1
-agy --model <verified-non-doer> --add-dir "$SP" --print-timeout 45m -p "..." </dev/null > "$SP/agy-rN.out" 2>&1
+codex exec -m <pinned-model> --skip-git-repo-check "$(cat "$SP/codex/prompt.md")" </dev/null > "$SP/codex/rN.out" 2>&1
+agy --model <verified-non-doer> --add-dir "$SP/material" --print-timeout 45m -p "..." </dev/null > "$SP/agy/rN.out" 2>&1
 ```
 
 **The prompt is an argument; the material under review is a path inside it.** Hand the reviewer

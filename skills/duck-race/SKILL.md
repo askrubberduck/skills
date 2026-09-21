@@ -50,7 +50,7 @@ rival's diff only **after its dispatch has finished**:
 codex exec -C "$WT_RIVAL" -s workspace-write -m <pinned> "$(cat "$SP/problem.md")" </dev/null > "$SP/rival.out" 2>&1 &
 RIVAL=$!
 # ... the doer works its own attempt here, in its own worktree ...
-wait "$RIVAL"
+wait "$RIVAL"   # bound it: a rival that never returns is an outage
 git -C "$WT_RIVAL" add -A && git -C "$WT_RIVAL" diff "$BASE_SHA" > "$SP/rival.diff"
 ```
 
@@ -105,7 +105,7 @@ A rally is one red-green pair, and the serve alternates each rally.
    Editing the test you were served is the void condition; a test the returner believes is wrong
    goes back to the server with the objection in writing instead.
 3. Log the rally in `$SP/rally-rN.md` before the next serve: who served, red proof, green proof,
-   objections raised, and the served test file's hash at handoff and again at green — unequal
+   objections raised, and a hash over the suite's test files at handoff and again at green — unequal
    hashes are the returner's void condition caught after the fact.
 
 Stop when any holds: every acceptance criterion has a passing test; the turn cap set at start
