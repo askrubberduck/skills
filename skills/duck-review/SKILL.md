@@ -40,19 +40,11 @@ remain separate actions.
 ## Answer a received review
 
 When the user is the author and a review has landed, judge each thread against the current
-candidate, not the revision the reviewer saw. Give each thread one disposition with its evidence:
-
-- **valid**: the caller repairs it within the thread's scope, on a selection or existing authority.
-- **already fixed**: cite the revision.
-- **disagree**: one source-backed reason.
-- **out of scope**: name where it goes.
-- **approach challenged**: the reviewer questions the mechanism, not a line. No patch answers
-  that; `duck-shape` over the problem, and a proposed shape, come before any edit.
-
-Track threads by stable cause. Draft replies of at most three words when agreeing or reporting a
-fix, one sentence otherwise; no thanks, no narration. "Resolve all" covers resolving only, and
-only threads already fixed; the rest stay open and are listed. Where a handoff needs them, record
-the dispositions with the work record; a second checkout does not re-answer the threads.
+candidate, not the revision the reviewer saw, and give it one disposition with its evidence. A
+thread that questions the mechanism rather than a line gets no patch: `duck-shape` over the
+problem, and a proposed shape, come before any edit. Draft replies of at most three words when
+agreeing or reporting a fix, one sentence otherwise. "Resolve all" covers resolving only, and only
+threads already fixed; the rest stay open and are listed.
 
 ## Prepare the review
 
@@ -131,8 +123,6 @@ if missing evidence prevents a gate decision, return NOTE and name the uncertain
 - A changed contract is incomplete until every other party to it moves in the same change or is
   named as follow-up.
 - A delta nobody asked for is a finding until someone explains it.
-- Generated or unfamiliar work is judged by what it claims about the system; a claim the system
-  does not support fails the approach built on it.
 - Check the repository's own conventions before accepting a demand for a new artifact. Existing
   evidence beats reviewer-invented ceremony.
 - Ask what the code is for before recommending a patch. If removing the feature, flag, branch, or

@@ -11,17 +11,14 @@ editing safely, and behavior nobody can predict from the interface. A smaller di
 impressive design is not evidence of improvement.
 
 Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and verdicts.
-When the host forbids edits, as a plan-only mode does, say so once, finish the analysis it permits and leave the mode alone; findings are not a plan awaiting approval.
 Apply scoped local edits unless the request is report-only or analysis-only. Selected findings
 limit repairs. Continue through verification; commits and publication need separate authorization.
 
 ## Establish the scope and behavior
 
 Default to the current task's changed code; an explicit file or subsystem bounds a wider cleanup.
-Reading goes further than the edits: a duplicate rule or a second owner of the same state
-usually sits in a file the diff never touched. Read the affected path through its callers, state
-owners and observable effects. Inspect shared helpers and project conventions before replacing
-anything. Do not expand a cleanup into a repo audit.
+Read the affected path through its callers, state owners and observable effects. Inspect shared
+helpers and project conventions before replacing anything. Do not expand a cleanup into a repo audit.
 
 Identify the outcomes that must survive, including errors, recovery and public contracts. Run the
 relevant existing checks before editing. Add a focused regression check when a material contract

@@ -60,9 +60,8 @@ that resolves the uncertainty; do not require both. Compare alternative decompos
 they change feasibility, dependencies or verification. Do not blend incompatible designs to retain
 every participant's contribution.
 
-An independent participant opens with one line, `PLAN: CONCUR` or `PLAN: OBJECT`, then numbered
-objections, each naming a `path:line`, an unexecuted assumption or a missing check. A result without
-that line is malformed, never a silent CONCUR.
+An independent participant opens with `PLAN: CONCUR` or `PLAN: OBJECT`; a result without that
+line is malformed, never a silent CONCUR.
 
 Resolve factual disagreements with source or execution. A genuine owner tradeoff goes to
 `duck-decide`; routine technical choices do not. Evidence refuting the design returns to frame.

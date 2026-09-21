@@ -27,15 +27,13 @@ verdicts, rankings, paths and quoted errors stay verbatim whatever the prose lan
 told nothing answers in its own default and returns findings nobody asked for in that language.
 
 Capture a code candidate from its fork point: `git diff $(git merge-base <base> <candidate>)
-<candidate>`, and record both SHAs in the brief. For a dirty worktree drop the second argument so
-the diff reaches the working tree, add each untracked file, and say the candidate has no SHA. A
-plain `git diff <base>` against a base that has moved shows the base's newer commits reversed, and
-the reviewer reports a blocker in a file the branch never touched.
+<candidate>`, and record both SHAs in the brief; a base that moved otherwise shows up reversed in
+the diff. For a dirty worktree drop the second argument, add each untracked file, and say the
+candidate has no SHA.
 
-A brief for round two or later carries the prior adjudication — each finding accepted with the
-check that proves the fix, or refuted with evidence — and the settled causes by stable ID, with the
-instruction not to re-report them in any rewording and to refute one only with new evidence. A
-settled cause re-raised without new evidence is a malformed finding; the rest of that result still counts.
+A brief for round two or later carries the prior adjudication and the settled causes by stable
+ID, with the instruction not to re-report them in any rewording. A settled cause re-raised
+without new evidence is a malformed finding; the rest of that result still counts.
 
 ## Run the reviewers
 

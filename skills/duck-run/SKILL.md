@@ -11,7 +11,8 @@ reason to ask for another go-ahead.
 
 Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
-When the host forbids edits, as a plan-only mode does, say so once, finish the analysis it permits and leave the mode alone; findings are not a plan awaiting approval.
+When the host forbids edits, as a plan-only mode does, say so once, finish the analysis it
+permits and leave the mode alone; findings are not a plan awaiting approval.
 
 ## Scope, endpoint and isolation
 
@@ -57,9 +58,9 @@ For each meaningful behavior change: establish the failing outcome, implement th
 satisfies it, apply `duck-shape`, then take the unit's diff through
 [the prose bar](../duck-dry/references/bar.md). Use existing checks where possible; trivial edits
 need no invented test. Shape and dry apply within the unit before later work depends on it, as
-their own commits when committing is authorized: a structural change and a behavior change never
-share a diff. Tidy first when it makes this change easier, after when it makes the next one
-easier, never on speculation.
+their own commits when committing is authorized, so a structural change and a behavior change
+are reviewed apart; landing may squash them. Tidy first when it makes this change easier, after
+when it makes the next one easier, never on speculation.
 
 Remove superseded paths once the replacement is verified. Preserve required compatibility and
 public contracts; do not add speculative shims or delete a real edge case because scope is unclear.
