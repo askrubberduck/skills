@@ -66,7 +66,7 @@ unless extraction was asked for.
   since the fork is otherwise reported as loss. For a stack, diff that against the top; for
   separate branches, merge them all onto a scratch branch from the base and diff that.
 - With the removal instruction, push and forge authority, rebase each stacked layer with
-  `git rebase --onto <new-parent> <old-fork-point>`, the fork point read from the backup or the
+  `git rebase --onto <new-parent> <old-fork-point> <layer>`, the fork point read from the backup or the
   reflog, never guessed from a parent that already moved. Where
   the layers are open PRs, repoint each base before any force-push: a forge that finds a child's
   commits reachable from its base marks the child merged and may delete its branch.
