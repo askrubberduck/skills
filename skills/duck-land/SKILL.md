@@ -84,7 +84,7 @@ candidate branch and merges nothing.
    commit goes through the gate before it is recorded. It runs **after** the branch has moved, so
    it cannot hold a deployment that a push triggers.
 3. Record the outcome where the repo keeps truth: shipped log / status doc / delivery board — with
-   PR number, merged SHA, and what changed. One recorded outcome per landing. Where that record
+   PR number, candidate SHA, merged SHA, and what changed. One recorded outcome per landing. Where that record
    lives in the repo, landing it by the same route is part of this landing's authorization.
 4. Close or queue obligations the change touched — the doer never closes an item that needs the
    owner's sign-off; queue those (`duck-decide` presents them).
@@ -92,8 +92,8 @@ candidate branch and merges nothing.
    untracked and ignored files before a worktree goes; a matching tree says nothing about a
    `.env` beside it. Step 2's read-back is what makes the branch safe to delete and what
    `duck-sweep` cannot derive on its own — a squash leaves no metadata linking the branch
-   to the commit that replaced it, so **record the landed SHA in step 3's outcome entry** and delete
-   against that, not against a classifier's guess. Record a resumable boundary; continue other
+   to the commit that replaced it, so **record the candidate and landed SHAs in step 3's outcome
+   entry** and delete against that, not against a classifier's guess. Record a resumable boundary; continue other
    authorized work if the host and task allow it.
 
 ## Common mistakes

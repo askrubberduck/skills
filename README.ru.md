@@ -1,4 +1,4 @@
-<!-- translation-source: README.md sha256=c50aae197cc08c98ed5a498d3cf88020ace8f3262765b07eb9f20821314622fe -->
+<!-- translation-source: README.md sha256=0e26c88158a60b55f1d3c12409c9085df47c08e70de8bf261472e0482a1e128b -->
 
 <p align="center">
   <img src="assets/logo.svg" width="112" alt="askrubberduck">

@@ -23,9 +23,10 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
      (`git branch --merged origin/<default>`, then `-d`, never `-D`; `-d` alone checks
      HEAD-or-upstream, a narrower promise than its name). These outlive their ref. Delete.
    - **Preserved by record** — squash-merged, rebased, or cherry-picked, *and* the project's
-     outcome record names the landed SHA for this branch (`duck-land` writes it there for exactly
-     this reason). The record is evidence the objects cannot supply. Confirm the named SHA is on
-     `origin/<default>`, then delete.
+     outcome record names the landed SHA and the candidate SHA for this branch (`duck-land` writes
+     them there for exactly this reason). The record is evidence the objects cannot supply. Confirm
+     the landed SHA is on `origin/<default>` **and the branch tip is still that candidate**, then
+     delete. A branch that gained commits after it landed is Unproven, whatever the record says.
    - **Not preserved** — squash-merged, rebased, or cherry-picked with **no such record**: the
      default branch holds an equivalent *new* commit, never these objects, and no merge metadata
      recovers the link — PR records, `git cherry`, tree diffs, and revert greps can each produce a
@@ -41,8 +42,9 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
    only the owner may decide to delete one**. Uncommitted work is the case with no second copy to
    recover from, which is why this decision is never the doer's however obvious it looks; queue it
    via `duck-decide` and keep the file meanwhile. Then — only once nothing in the worktree remains
-   marked keep — `git worktree remove <path>`, `git branch -d <branch>` (`-D` only against a recorded landed SHA, which `-d` cannot
-   see after a squash, or on the Unmerged path against its recorded decision), and `git worktree prune` for leftovers.
+   marked keep — `git worktree remove <path>`, `git branch -d <branch>` (`-D` only for a branch
+   Preserved by record, which `-d` cannot see after a squash, or on the Unmerged path against its
+   recorded decision), and `git worktree prune` for leftovers.
 4. Scratch dirs: hunt ad-hoc temp dirs outside the sanctioned scratchpad (e.g. `~/<repo>-tmp*`,
    `/tmp/<repo>*`, stray review-tmp dirs; the sanctioned scratchpad itself is disposable by design
    and never swept per-file). A non-git dir has no merge evidence, so inventory every entry
