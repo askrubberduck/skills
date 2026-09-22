@@ -47,11 +47,18 @@ Dispatch the rival into the background first, then work the doer's attempt inlin
 rival's diff only **after its dispatch has finished**:
 
 ```bash
-codex exec -C "$WT_RIVAL" -s workspace-write -m <pinned> "$(cat "$SP/problem.md")" </dev/null > "$SP/rival.out" 2>&1 &
+set -um   # -u: an unbound name fails here, not as a 0-byte diff; -m: the rival gets its own process group
+: "${RIVAL_MODEL:?pinned id, proven per dispatch.md}" "${WT_RIVAL:?rival worktree}" "${BASE_SHA:?from problem.md}"
+DEADLINE=$((SECONDS + 2700))   # 45 min; past it the rival is an outage, not a forfeit
+codex exec -C "$WT_RIVAL" -s workspace-write -m "$RIVAL_MODEL" "$(cat "$SP/problem.md")" </dev/null > "$SP/rival.out" 2>&1 &
 RIVAL=$!
 # ... the doer works its own attempt here, in its own worktree ...
-wait "$RIVAL"   # bound it: a rival that never returns is an outage
-git -C "$WT_RIVAL" add -A && git -C "$WT_RIVAL" diff "$BASE_SHA" > "$SP/rival.diff"
+while kill -0 -- "-$RIVAL" 2>/dev/null && [ "$SECONDS" -lt "$DEADLINE" ]; do sleep 30; done   # the group, not the leader
+if kill -0 "$RIVAL" 2>/dev/null; then kill -KILL -- "-$RIVAL"; wait "$RIVAL"; STATUS=deadline   # KILL: TERM can be ignored
+else wait "$RIVAL"; STATUS=$?; fi
+kill -KILL -- "-$RIVAL" 2>/dev/null   # a straggler the leader left behind writes nothing more
+if [ "$STATUS" = 0 ]; then git -C "$WT_RIVAL" add -A && git -C "$WT_RIVAL" diff "$BASE_SHA" > "$SP/rival.diff"
+else echo "rival outage: $STATUS" >> "$SP/rival.out"; fi   # an outage captures nothing: re-dispatch, never diff
 ```
 
 - **Wait before you capture.** Backgrounding the dispatch and diffing immediately records an empty
@@ -89,7 +96,7 @@ file paths) **by file**, never inlined. `$SP/turn.md` states the role for this t
 path, and the current state.
 
 ```bash
-codex exec -C "$WT" -s workspace-write -m <pinned> "$(cat "$SP/turn.md")" </dev/null > "$SP/rival-tN.out" 2>&1
+codex exec -C "$WT" -s workspace-write -m "$RIVAL_MODEL" "$(cat "$SP/turn.md")" </dev/null > "$SP/rival-tN.out" 2>&1
 ```
 
 A rally is one red-green pair, and the serve alternates each rally.

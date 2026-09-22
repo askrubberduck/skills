@@ -48,7 +48,9 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
 5. **Close the loop**: procedural guidance (a skill, a workflow rule) gets one rep before it's
    trusted. Reserve one occurrence as a holdout BEFORE deriving — at exactly two, derive from the
    other — state the expected outcome, then run the guidance against that holdout and attack the
-   result with `duck-proof` discipline; a failed rep sends the guidance back to draft. Check
+   result with `duck-proof` discipline; a failed rep sends the guidance back to draft, and the
+   redraft waits for a fresh occurrence to serve as its holdout — the used one cannot validate
+   twice, so at exactly two a failed rep parks the lesson until a third arrives. Check
    observable behavior, not whether the agent repeats the new rule: execute a counterexample,
    verify final artifacts, and record the candidate guidance, prompt, oracle and result. Pair
    opposite user preferences when testing agreement bias. Use an old-guidance baseline before
