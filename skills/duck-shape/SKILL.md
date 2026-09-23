@@ -10,7 +10,8 @@ the code hard to change: a small edit that touches many places, facts a reader m
 editing safely, and behavior nobody can predict from the interface. A smaller diff or a more
 impressive design is not evidence of improvement.
 
-Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and verdicts.
+Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 Apply scoped local edits unless the request is report-only or analysis-only. Selected findings
 limit repairs. Continue through verification; commits and publication need separate authorization.
 

@@ -17,7 +17,8 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
 
 1. Inventory: `git worktree list`, `git branch -vv`, `git fetch --prune` first so remote state is
    current. Use absolute paths; don't cd back and forth. An unreachable remote or an unreadable
-   worktree is recorded and the sweep carries on around it.
+   worktree is recorded and the sweep carries on around it. A multi-repo setup means every
+   sibling repo asked for, not only the one you are in.
 2. Classify by one invariant: **delete only what is provably preserved elsewhere**.
    - **Preserved** — the branch's commits are reachable from `origin/<default>`
      (`git branch --merged origin/<default>` is the proof). These outlive their ref. Delete with
@@ -61,6 +62,3 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
 Per repo: deleted (with merge evidence), kept (with the work item justifying it), decisions made.
 A deletion without stated merge evidence is not done.
 
-## Common mistakes
-
-- Cleaning only the repo you're in when the setup is multi-repo — sweep all sibling repos asked for.

@@ -28,7 +28,8 @@ release-gate path when they call it. A findings pass never satisfies a required 
 Resolve the target, applicable base, constraints and prior dispositions as in preparation steps 1–2;
 for re-review also apply step 5. Inspect relevant risk surfaces such as behavior, failure recovery
 and maintainability. Use distinct lenses rather than a fixed reviewer count; delegate only when
-useful and authorized. Same-family perspectives do not establish cross-family independence.
+useful and authorized; what counts as a different family is in
+[challenge selection](references/challenge.md).
 
 Substantiate and adjudicate findings against the current target using the criteria below. Return one
 consolidated list with stable IDs, severity, evidence and proposed fixes, plus coverage limits.
