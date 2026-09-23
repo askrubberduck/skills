@@ -43,8 +43,7 @@ Do not add an abstraction just to make its comment unnecessary; first establish 
 
 Commit messages and PR prose should carry intent, constraints and verification the reader needs,
 without narrating the editing process or restating each changed line. Preserve the repository's
-required format. When an authorized commit deletes a backlog or registry record, retain that item's
-text in the message for retrievability, as required by `duck-cut`.
+required format.
 
 ## Verify the actual edit
 

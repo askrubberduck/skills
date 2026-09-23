@@ -21,10 +21,10 @@ runtime correctness. Instruction changes need realistic agent trials with action
 checks; a packaging validator does not establish behavior.
 
 Attack a disposable copy for mutations or destructive tests, never the candidate checkout or live
-user data. Git worktrees/clones carry committed state only: capture any staged, unstaged and
-relevant untracked changes too. Verify the copied content matches the intended candidate before
-attacking. Record the pre-attack state and restore that state between attacks, not an assumed clean
-base. Use isolated data, ports and process groups for crash tests; verify no children survive
+user data. Git worktrees/clones carry committed state only: capture staged, unstaged and relevant
+untracked changes the way `duck-split` does, as a ref, not a stash. Verify the copied content
+matches the intended candidate before attacking. Record the pre-attack state and restore that
+state between attacks, not an assumed clean base. Use isolated data, ports and process groups for crash tests; verify no children survive
 before restart. A disposable copy still holds the candidate's real configuration: point every
 database, queue, external API and cloud account it reaches at a disposable or stubbed target and
 strip live credentials first, or leave that attack unattempted and say so. Preserve original
@@ -60,8 +60,10 @@ implementations wrong; identical results can share a defect.
 
 Capture each command/input, candidate identity, expected violation, observed output and final state.
 Read exit status directly: a pipeline can report the status of a filter instead of the artifact.
-Reproduce findings before calling them defects; distinguish suspected failures from substantiated
-ones. Retain the complete finding list, grouped by affected claim and consequence; rank when the
+A defect is a contract violation observed directly — a captured invariant breach counts once even
+when a race will not trigger twice; reproduce when the capture is inconclusive, and record
+repeatability apart from strength. Distinguish suspected failures from substantiated ones.
+Retain the complete finding list, grouped by affected claim and consequence; rank when the
 owner requests it. Report no-finding attacks and limits under the same evidence standard.
 
 Use `duck-proof`'s durable-home rules for a downstream handoff: `break-rN.md` or an explicit section

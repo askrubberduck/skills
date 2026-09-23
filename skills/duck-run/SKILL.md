@@ -24,8 +24,9 @@ cannot run stays unapproved; finish the authorized local work and report what re
 Use a dedicated worktree or equivalent copy when runs write concurrently or destructive checks
 need isolation. Worktrees are siblings under the repo root, never nested under another run's tree.
 A small single-worker local edit can use the existing checkout after checking its state. Preserve
-unrelated changes. Worktrees carry committed state only, so capture and verify relevant dirty
-candidate content when making test copies. Step out of a worktree before deleting it.
+unrelated changes. Worktrees carry committed state only, so capture dirty candidate content for
+test copies the way `duck-split` does — a ref, not a stash — and verify it. Step out of a
+worktree before deleting it.
 
 ## 1. Ground and challenge
 
@@ -34,8 +35,9 @@ Challenge the link between the requested mechanism and the desired benefit. If t
 recommend the smaller or corrected path; do not silently substitute a new goal. A material owner
 tradeoff goes to `duck-decide`; separately authorized independent work may continue.
 
-READY continues; CUT ends work that is demonstrably unnecessary under the owner's criteria. A
-small settled task uses the short form.
+READY continues; CUT ends work that is demonstrably unnecessary under the owner's criteria; OWNER
+DECISION goes to `duck-decide` and holds only the dependent work. A small settled task uses the
+short form.
 
 ## 2. Plan with proof
 

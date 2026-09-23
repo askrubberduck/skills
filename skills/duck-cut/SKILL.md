@@ -17,12 +17,13 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
 1. Enumerate all items from the repo's registries by running `duck-scan` — it owns the locator, and
    this skill does not carry a second copy of where registries live. Not installed? Say so and ask
    where the backlog is, once; a guessed location is how a sweep reports an empty backlog that is
-   merely somewhere else. Grep-first; read only surviving items in full.
+   merely somewhere else.
 2. Per item, argue **against its existence** before anything else (the necessity check). Verdict,
    one of:
    - **CLOSE NOW** — already satisfied, obsolete, or superseded; close with evidence.
-   - **CUT** — the need was speculative or the product moved past it; delete, don't park — a
-     parked item is still backlog.
+   - **CUT** — the need was speculative or the product moved past it; cite the requirement that
+     no longer exists or the decision that superseded it — the irreversible verdict carries the
+     same evidence bar as CLOSE NOW. Delete, don't park — a parked item is still backlog.
    - **MERGE** — duplicate or subset of another item; fold and close.
    - **UNBLOCK** — the stated blocker no longer holds (verify, don't assume); make it pickable.
      `duck-scan`'s attribution rule decides whether an entry lifting it counts: unattributed stays
@@ -31,9 +32,8 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
 3. Act autonomously on everything that doesn't need the owner: land CLOSE/CUT/MERGE/UNBLOCK edits in
    the registries with evidence. Local edits do not authorize a commit or publication. CUT deletes;
    a cut item counted in the report but left standing in the registry is the rot this skill exists
-   to remove. Preserve deleted text in existing history or the local change record until committed.
-   When a commit is authorized, **a CUT commit carries the deleted item's own text** — the one
-   exception `duck-dry` names, and it states why.
+   to remove. A versioned registry keeps the cut text in its history; for one outside version
+   control, keep it in the report until the owner has read it.
 4. Items needing the owner (sign-offs, policy calls, anything the doer may not close): queue them
    and run `duck-decide` — never close an owner-gated item yourself, never drop it silently. Queuing
    one is not a reason to stop; the sweep continues past it.

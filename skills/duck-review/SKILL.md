@@ -51,15 +51,18 @@ threads already fixed; the rest stay open and are listed.
 
 1. Resolve the exact target, its version and the requested judgment. For a code release use the last
    released tag through the candidate, not adjacent commits; for a PR use its own base. An
-   intentionally captured dirty worktree can be reviewed, but landing later needs an authorized
-   exact commit. For a design, plan or document, identify the supplied revision or snapshot; no
-   PR, commit or invented Git base is needed.
+   intentionally captured dirty worktree (captured as `duck-split` describes: a ref, not a stash)
+   can be reviewed, but landing later needs an authorized exact commit. For a design, plan or
+   document, identify the supplied revision or snapshot; no PR, commit or invented Git base is
+   needed.
    A change is reviewed with what depends on it: callers, config and tests for code; the sections
    and consumers that cite it for a document. A finding outside the change is in scope. Report
    what was read beyond it; the change alone is a coverage limit to state, never the default.
 2. Use the caller's recorded outcome, constraints and acceptance baseline across review rounds.
-   For a standalone review, establish that baseline once. Name the coordinating caller who owns
-   convergence, prior findings and the remaining round bound; `duck-run` defines the default loop
+   For a standalone review, establish that baseline and the effort bound once — by default one
+   dispatch per required participant plus one outage retry — so steps 5–6 have a bound to read.
+   Name the coordinating caller who owns convergence, prior findings and the remaining round
+   bound; `duck-run` defines the default loop
    contract for an executing caller, including stable cause IDs, reopening and what counts as a
    blocker versus a proposal. Treat the mechanism and its benefit as claims to challenge. If new
    evidence refutes the goal or criteria, return that contradiction; do not silently rewrite
@@ -101,8 +104,9 @@ that survives. Neither owner preference nor a mandate to be negative is evidence
 Require each reviewer to return `APPROVE | REJECT | NOTE` and findings ranked
 `BLOCKER | SHOULD | NOTE`. A reviewer's `APPROVE` claims no release-blocking defect and its
 `REJECT` claims at least one; its `NOTE` is not `APPROVE-W-CONDITIONS` and not an outage. These
-are inputs to the superreview, not votes. A reviewer that does not rank its findings has not finished; use whatever evidence is
-present, but record the malformed result.
+are inputs to the superreview, not votes. A result with no verdict is not a usable one: the gate
+treats it as an outage. A verdict with unranked findings is usable — a `REJECT` is never an
+outage — and its findings, ranked or not, are claims to adjudicate.
 
 ## Adjudicate the claims
 

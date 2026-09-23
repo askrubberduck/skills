@@ -25,15 +25,17 @@ and verification without asking again. Selected finding IDs limit the work. Comm
 merge, external dispatch and messages need their own existing authority; this skill grants none.
 
 For code, record the base and candidate; read the full relevant diff, including staged and
-uncommitted changes. Include relevant untracked files when they are part of the candidate.
+uncommitted changes. Include relevant untracked files when they are part of the candidate; a
+test copy carries them the way `duck-split` captures a dirty tree — a ref, not a stash.
 `git diff <base>..<candidate>`, `git diff`, and `git diff --staged` cover different states. Read
 callers and the complete affected path, not just changed lines. A goal or plan needs no invented
 candidate SHA or code diff.
 
 ## 1. Find what would disprove it
 
-Read relevant project constraints and any existing defect ledger. Do not create a ledger or
-block a narrow check just because none exists; state the gap when it limits coverage.
+Read relevant project constraints and the defect ledger, `defect-classes.md` at the durable
+records home (section "Evidence and handoff"), when one exists. Never block a narrow check
+because none exists; state the gap when it limits coverage.
 
 - **Goal:** establish the pain and success measure. Compare no change, removal, or reuse when
   they could meet the same outcome. An unsupported benefit stays unproven.
@@ -83,11 +85,14 @@ classify which can reach the cause; shared code does not imply every caller is b
 When repairs are authorized, fix the cause locally, then rerun every affected check against the
 edited candidate. Earlier green results are invalidated by relevant changes. Run the relevant
 project gates before declaring completion; broaden for affected seams or unresolved risks, not
-ceremony. A repair that fails sends the claim back through the challenge.
+ceremony. A repair that fails sends the claim back through the challenge, at most twice per
+claim; at that bound the claim stays UNPROVEN with the failed repairs named.
 
 If the same defect class recurs, extend an executable check over its reachable surface, using
-instances as cases. Record the class in an existing ledger when appropriate. Repeated one-off
-patches and increasingly long checklists are not closure of the class.
+instances as cases. Two independent occurrences record the class in `defect-classes.md` at the
+durable records home, creating the file on the first class; that record is what `duck-review`'s
+circuit breaker reads. Repeated one-off patches and increasingly long checklists are not closure
+of the class.
 
 ## 4. Prove the completed shape
 
