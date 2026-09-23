@@ -21,7 +21,7 @@ candidate branch and merges nothing.
 ## Preconditions (fail closed — any miss stops the landing)
 
 - The gate actually returned **`APPROVE`** per the repo's policy, and its receipt records the
-  required decorrelated reviewer identities, evidence, and adjudication — `duck-review` is how
+  required different-family reviewer identities, evidence, and adjudication — `duck-review` is how
   this collection produces that authorization; any gate yielding the same proof qualifies.
   `NOTE`, a raw reviewer approval, and "probably fine" are not gate-passed states.
 - **The branch head equals the candidate SHA** — the exact commit the authorization covers — and
@@ -82,10 +82,16 @@ candidate branch and merges nothing.
      the base at merge time**: a base that advances between the precondition check and the merge
      lands a combination nobody reviewed, and no later check can un-land it. The merge must FAIL
      when the base moved — so **verify your mechanism blocks, never infer it from its name.** Prove
-     it on a throwaway copy of the remote before trusting it: advance the base there, run the
-     mechanism, and require it to refuse. Pin an explicitly recorded base SHA, never a ref — a ref
-     a background fetch refreshes pins nothing, and the cost of a false pin is the other branch's
-     commit.
+     it once per host, mechanism and CLI version on a throwaway copy of the remote: run the exact
+     invocation with its expected-base argument against a stationary base and record the success,
+     advance the base and record the refusal, quoted. That record — `merge-pin-<host>.md` at the
+     durable records home, with the invocation string, CLI version and date — is reused while the
+     invocation and version match, and re-proven when either changes; a refusal alone also fits
+     bad credentials, which is why both observations are kept. Where no throwaway remote is
+     possible, use only a mechanism whose vendor documentation names the base-SHA comparison for
+     that exact operation, record that as tier `documentary`, and rely on step 2's read-back.
+     Pin an explicitly recorded base SHA, never a ref — a ref a background fetch refreshes pins
+     nothing, and the cost of a false pin is the other branch's commit.
 2. **Confirm the merge landed**: the new SHA is on the default branch and **its tree matches the
    candidate tree** — read it back, don't assume. Read the push's full output too, not its exit
    status: the remote prints policy objections ("Changes must be made through a pull request")
@@ -103,8 +109,10 @@ candidate branch and merges nothing.
    `.env` beside it. Step 2's read-back is what makes the branch safe to delete and what
    `duck-sweep` cannot derive on its own — a squash leaves no metadata linking the branch
    to the commit that replaced it, so **record the candidate and landed SHAs in step 3's outcome
-   entry** and delete against that, not against a classifier's guess. Record a resumable boundary; continue other
-   authorized work if the host and task allow it.
+   entry** and delete against that, not against a classifier's guess. A cleanup held on a queued
+   `duck-sweep` keep decision leaves the landing complete and recorded, with the pending worktree
+   named in step 3's entry. Record a resumable boundary; continue other authorized work if the
+   host and task allow it.
 
 ## Common mistakes
 

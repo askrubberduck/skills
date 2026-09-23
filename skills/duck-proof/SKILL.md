@@ -133,7 +133,10 @@ When another stage consumes the pass, write or update the project's existing dur
 claim, candidate identity, relevant environment, attack, observation, repairs and final reruns.
 Resolve the home from instructions — including a location outside the tree — then existing
 convention, then an owner-provided task directory; ask only if a durable handoff is required and
-none is available. Do not invent a records branch.
+none is available. Do not invent a records branch. The home holds `proof-rN.md`, `break-rN.md`,
+`race-rN.md`, review reports, landing outcomes, `defect-classes.md` and `merge-pin-<host>.md`;
+the dispatch measurements live apart, in `~/.askrubberduck/`, because they pool across
+repositories and never need a reader in the tree.
 
 Use `proof-rN.md` when the consumer expects it, or give the consumer the exact section in a shared
 work record. Evidence and referenced artifacts must survive that handoff; scratch paths that will

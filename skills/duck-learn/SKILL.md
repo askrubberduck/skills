@@ -14,6 +14,9 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
 ## Recipe
 
 1. **Gather evidence, don't reminisce.**
+   - **Numbers first.** `scripts/ledger.py thresholds` reads `~/.askrubberduck/dispatches.tsv`
+     and prints lesson candidates — a reviewer's outage rate, a family with no unique catch over
+     its last twenty dispatches, a cost that drifted — each one an occurrence for step 3's bar.
    - **Sources.** Transcript-store locations — Claude `~/.claude/projects/<dir>/*.jsonl`, Codex
      `$CODEX_HOME/sessions` and `archived_sessions` — are the hosts whose stores are known, not the
      whole set: another host has its store located before the mine, or the result is partial and

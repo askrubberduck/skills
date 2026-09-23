@@ -58,6 +58,12 @@ For a failure, lead with the cause or the unresolved question, then provide:
 - The shared repair location and the check that would show the failure is gone.
 - Material uncertainty and the next discriminator, if the cause remains unresolved.
 
+A cause located in code that a reviewed candidate landed is the ground truth every gate lacks:
+append a row to `~/.askrubberduck/findings.tsv` with `dispatch_id = -`, `tier = production`,
+`substantiated = 1`, and in `candidate` the SHA the gate reviewed — `duck-land`'s outcome record
+maps the landed commit back to it, since a squash gives the same tree a new identity;
+`scripts/ledger.py missed` joins that SHA to every dispatch that returned `APPROVE` on it.
+
 Keep ruled-out hypotheses only when their evidence prevents repeating a consequential dead end.
 Do not create a design or work item merely to explain a local defect. An unsettled architectural
 contract belongs to `duck-frame`; an actual owner policy choice belongs to `duck-decide`.

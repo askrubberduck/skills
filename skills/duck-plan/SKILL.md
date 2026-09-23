@@ -77,9 +77,10 @@ Return READY when the units and checks are actionable with no substantiated bloc
 the refuted premise, missing evidence or owner decision and which work depends on it. Report actual
 challenge participants and unresolved findings; a solo draft stays labeled solo.
 
-Bound critique before dispatch: at most two critique rounds after the initial draft unless the
-owner supplies another limit. Another round needs new evidence or a materially changed approach.
-Stop redispatching at the bound and preserve unresolved claims; do not loop until everyone agrees.
+Bound critique before dispatch: `[bounds].plan_rounds` in `~/.askrubberduck/config.toml` (default 2)
+critique rounds after the initial draft unless the owner supplies another limit. Another round needs
+new evidence or a materially changed approach. Stop redispatching at the bound and preserve
+unresolved claims; do not loop until everyone agrees.
 
 Update one existing plan when a durable execution handoff is needed, using `duck-proof`'s durable-home
 rules. A short standalone plan can stay in the response. Record decisive checks and disagreements,

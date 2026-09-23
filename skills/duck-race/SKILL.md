@@ -1,11 +1,11 @@
 ---
 name: duck-race
-description: Put two decorrelated model families on the same problem and let executed evidence pick the result. Use when the user says "race it", "duck race", or "ping-pong", wants two models tackling one problem, a task has several plausible implementations worth comparing, generated tests keep passing without catching real defects, single-attempt builds of similar work kept failing review, or a review-fix loop keeps faulting the fixes instead of the original change.
+description: Put two different model families on the same problem and let executed evidence pick the result. Use when the user says "race it", "duck race", or "ping-pong", wants two models tackling one problem, a task has several plausible implementations worth comparing, generated tests keep passing without catching real defects, single-attempt builds of similar work kept failing review, or a review-fix loop keeps faulting the fixes instead of the original change.
 ---
 
 # Duck Race
 
-Decorrelated generation. Two model families work the same problem, and executed evidence decides
+Different-family generation. Two model families work the same problem, and executed evidence decides
 what survives — never prose taste, never a vote. Same-family work lets one set of blind spots
 write both sides of the proof.
 
@@ -30,7 +30,8 @@ assumptions; rally turns them into tests. Pick by which of those the work needs.
    is not OpenAI/GPT; a doer of that family uses another proven family (`agy --model <pinned>`)
    instead. Executable names are not identities, and a harness may host several families: prove
    the rival's family and pin to `duck-review`'s reviewer bar — roster line and pinned id recorded
-   — before spending a round. Unknown identity never counts as decorrelated.
+   — before spending a round. Unknown identity never counts as a different family. The pinned
+   id comes from `[families].reviewers` in `~/.askrubberduck/config.toml` or the owner's setup.
 3. Confirm the owner has authorized sending this repository to the rival's vendor, per
    `duck-review`'s export precondition — a rival dispatch ships the same material a review does.
    Sanity-check a new invocation form and classify a failed one by
@@ -49,14 +50,14 @@ rival's diff only **after its dispatch has finished**:
 ```bash
 set -um   # -u: an unbound name fails here, not as a 0-byte diff; -m: the rival gets its own process group
 : "${RIVAL_MODEL:?pinned id, proven per dispatch.md}" "${WT_RIVAL:?rival worktree}" "${BASE_SHA:?from problem.md}"
-DEADLINE=$((SECONDS + 2700))   # 45 min; past it the rival is an outage, not a forfeit
+DEADLINE=$((SECONDS + ${DISPATCH_SECONDS:-2700}))   # [bounds].dispatch_timeout in seconds; past it the rival is an outage, not a forfeit
 codex exec -C "$WT_RIVAL" -s workspace-write -m "$RIVAL_MODEL" "$(cat "$SP/problem.md")" </dev/null > "$SP/rival.out" 2>&1 &
 RIVAL=$!
 # ... the doer works its own attempt here, in its own worktree ...
 while kill -0 -- "-$RIVAL" 2>/dev/null && [ "$SECONDS" -lt "$DEADLINE" ]; do sleep 30; done   # the group, not the leader
 if kill -0 "$RIVAL" 2>/dev/null; then kill -KILL -- "-$RIVAL"; wait "$RIVAL"; STATUS=deadline   # KILL: TERM can be ignored
 else wait "$RIVAL"; STATUS=$?; fi
-kill -KILL -- "-$RIVAL" 2>/dev/null   # a straggler the leader left behind writes nothing more
+kill -KILL -- "-$RIVAL" 2>/dev/null; while kill -0 -- "-$RIVAL" 2>/dev/null; do sleep 1; done   # stragglers gone before capture
 if [ "$STATUS" = 0 ]; then git -C "$WT_RIVAL" add -A && git -C "$WT_RIVAL" diff "$BASE_SHA" > "$SP/rival.diff"
 else echo "rival outage: $STATUS" >> "$SP/rival.out"; fi   # an outage captures nothing: re-dispatch, never diff
 ```
@@ -111,13 +112,18 @@ A rally is one red-green pair, and the serve alternates each rally.
    requires proven green — full suite output pasted — and **no edits to any test in the same turn**.
    Editing the test you were served is the void condition; a test the returner believes is wrong
    goes back to the server with the objection in writing instead.
-3. Log the rally in `$SP/rally-rN.md` before the next serve: who served, red proof, green proof,
-   objections raised, and a hash over the suite's test files at handoff and again at green — unequal
-   hashes are the returner's void condition caught after the fact.
+3. Hash the suite's test files at handoff and again at green — unequal hashes are the returner's
+   void condition caught after the fact. Red proof, green proof and objections go straight into
+   the receipt below; nothing else reads a per-rally log.
 
-Stop when any holds: every acceptance criterion has a passing test; the turn cap set at start
-(default 10 rallies) is reached; or both sides serve a no-new-test-ideas pass back to back. Then run
-the full suite once more and record it — the last green is the candidate's evidence.
+A void — a peek, an edited test, a clarification one side did not receive — ends the run: what
+stands is the last green before it, and a re-run starts a new turn count.
+
+Stop when any holds: every acceptance criterion has a passing test; the turn ceiling is reached —
+`[bounds].rally_turns` in `~/.askrubberduck/config.toml` (default 10), counted in turns, where
+every serve, return, rejected serve and objection is one turn; or both sides serve a
+no-new-test-ideas pass back to back. Then run the full suite once more and record it — the last
+green is the candidate's evidence.
 
 **Rally at class level.** When the serves would be instances of one ledger class, the serve is the
 table: one test that drives every position of the surface with the class's catalogue, on every
@@ -127,18 +133,20 @@ the turn cap — and how a review loop outlives its budget.
 ## Contract (both modes)
 
 - An outage that survives one re-dispatch leaves one family playing: say so and stop calling the
-  work decorrelated.
+  work different-family. Each dispatch, outage included, gets its row in
+  `~/.askrubberduck/dispatches.tsv` with verdict `DIFF`.
 - Receipt to `race-rN.md` in the project's durable records home as `duck-proof` resolves it —
   never the scratchpad, never a commit on the candidate branch: problem hash, base SHA,
   participant identities with pinned model ids — a
   receipt without identities cannot prove the run was cross-family at all — the mode, the diffs
   themselves, test output per candidate **and for the merged or final candidate**, divergence
-  findings or the rally log, and the decision with its evidence. A losing diff is evidence, not
-  trash: it documents the road not taken and why, so it travels inside the receipt rather than as
+  findings or the rally's red and green proofs, and the decision with its evidence. A losing
+  diff is evidence, not trash: it documents the road not taken and why, so it travels inside the receipt rather than as
   a `$SP` path that resolves to nothing by the time anyone follows it.
 - One test per serve in rally mode. Batching tests hides which failure drove which code; the rally
   structure is the audit trail.
-- Never commit raw CLI stdout; keep it in `$SP`.
+- Never commit raw CLI stdout; keep it in `$SP` — it is megabytes of tool chatter around a
+  verdict the receipt already quotes.
 - **Adjudication is synthesis, not approval.** The output is a tested candidate, not an approved
   one: it enters the normal pipeline (`duck-proof`, then `duck-review`) like any other work. This
   skill replaces nothing downstream.

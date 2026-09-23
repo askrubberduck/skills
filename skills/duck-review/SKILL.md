@@ -21,8 +21,9 @@ until reviewers approve, or land it. The caller owns repairs and the next author
 
 An explicit independent, cross-model or release-gate review uses the workflow below. Otherwise a
 findings-only, analysis-only or "multiple angles" request, or an answer to a received review,
-uses this in-session path. With no such scope specified, use the independent workflow. A findings
-pass never satisfies a required gate.
+uses this in-session path. With no scope specified, `[review].default` in
+`~/.askrubberduck/config.toml` decides (default `findings`); `duck-run` and `duck-land` name the
+release-gate path when they call it. A findings pass never satisfies a required gate.
 
 Resolve the target, applicable base, constraints and prior dispositions as in preparation steps 1–2;
 for re-review also apply step 5. Inspect relevant risk surfaces such as behavior, failure recovery
@@ -59,8 +60,9 @@ threads already fixed; the rest stay open and are listed.
    and consumers that cite it for a document. A finding outside the change is in scope. Report
    what was read beyond it; the change alone is a coverage limit to state, never the default.
 2. Use the caller's recorded outcome, constraints and acceptance baseline across review rounds.
-   For a standalone review, establish that baseline and the effort bound once — by default one
-   dispatch per required participant plus one outage retry — so steps 5–6 have a bound to read.
+   For a standalone review, establish that baseline and the effort bound once — by default the
+   setup's budget from [challenge selection](references/challenge.md): each required participant's
+   review, its disposition under Broad, and one outage retry — so steps 5–6 have a bound to read.
    Name the coordinating caller who owns convergence, prior findings and the remaining round
    bound; `duck-run` defines the default loop
    contract for an executing caller, including stable cause IDs, reopening and what counts as a
@@ -104,9 +106,9 @@ that survives. Neither owner preference nor a mandate to be negative is evidence
 Require each reviewer to return `APPROVE | REJECT | NOTE` and findings ranked
 `BLOCKER | SHOULD | NOTE`. A reviewer's `APPROVE` claims no release-blocking defect and its
 `REJECT` claims at least one; its `NOTE` is not `APPROVE-W-CONDITIONS` and not an outage. These
-are inputs to the superreview, not votes. A result with no verdict is not a usable one: the gate
-treats it as an outage. A verdict with unranked findings is usable — a `REJECT` is never an
-outage — and its findings, ranked or not, are claims to adjudicate.
+are inputs to the superreview, not votes. A malformed result is *unranked* or *unsupported* as
+[dispatch mechanics](references/dispatch.md) defines them; only *unsupported* leaves the gate
+short a reviewer, and both leave findings that are still claims to adjudicate.
 
 ## Adjudicate the claims
 
@@ -115,9 +117,17 @@ and classify it as a substantiated `BLOCKER`, retained `SHOULD`, retained `NOTE`
 a recorded reason.
 
 **When the actor adjudicating is the actor that built the candidate, adjudication is the weak
-point** — the reviewers are decorrelated but the synthesis is not, and dismissing a true finding
-looks identical to dismissing a false one. Say so in the report, dismiss only on evidence a third
-party can re-check from the artifacts, and let a finding you cannot settle stand rather than fall.
+point** — the reviewers are different families but the synthesis is not, and dismissing a true
+finding looks identical to dismissing a false one. Say so in the report, dismiss only on evidence a
+third party can re-check from the artifacts, and let a finding you cannot settle stand rather
+than fall. Under the Broad setup, each family's findings are dispositioned by the other family
+first — one findings-list dispatch each, smaller than a review, recorded with `stage =
+disposition` so `remaining` never mistakes it for a capture — and the doer synthesizes where
+the dispositions agree; where they disagree, the doer dismisses only on executed evidence.
+A finding that stands unsubstantiated after that is a `NOTE` with the disagreement named, not a
+`BLOCKER`; a disagreement about design intent goes to `duck-decide` at every risk level.
+Record `adjudicated_by` per finding in `~/.askrubberduck/findings.tsv`; `scripts/ledger.py
+precision` turns that history into the prior a `read`-tier finding starts from.
 A substantiated blocker stands until resolved. An unsubstantiated suspicion is not a blocker;
 if missing evidence prevents a gate decision, return NOTE and name the uncertainty.
 
@@ -174,8 +184,11 @@ may land only `APPROVE`; a superreview `NOTE` is a non-decision, not a hidden pa
 
 Report the authoritative result, each reviewer's pinned model id and family, each raw verdict, every
 finding's adjudicated classification and evidence, any outage or downgrade, and the exact target and
-criteria reviewed. Keep raw CLI stdout in scratch; preserve the decisive evidence before scratch
-cleanup.
+criteria reviewed. Finalize each participant's row in `~/.askrubberduck/dispatches.tsv` and append
+one row per adjudicated finding to `findings.tsv`, with a stable `cause_id` shared across
+participants that found the same cause; with two participants, report `scripts/ledger.py
+remaining <gate_id>` — the estimate of defects neither found. Keep raw CLI stdout in scratch;
+preserve the decisive evidence before scratch cleanup.
 
 **Write that report where the landing gate can read it** — the same durable records home as the
 receipts, never only into the caller's context or `$SP`, and never as a commit on the candidate
