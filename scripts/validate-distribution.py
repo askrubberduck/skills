@@ -17,6 +17,8 @@ import importlib.util
 import json
 import re
 import shutil
+import subprocess
+import sys
 import tempfile
 from pathlib import Path
 from typing import Any, Callable
@@ -265,9 +267,44 @@ def check_routing(root: Path, found: set[str], errors: list[str]) -> None:
         errors.append(f"evals/routing.json: no selection probe for {name}")
 
 
+CONFIG_KEY = re.compile(r"`\[(bounds|review|families)\]\.(\w+)`")
+
+
+def check_config_keys(root: Path, readme: str, errors: list[str]) -> None:
+    """Every `[section].key` a skill reads is listed in the README config block, and its
+    built-in default is stated in exactly one skill — the number's single home."""
+    block = re.search(r"```toml\n(.*?)```", readme, re.DOTALL)
+    listed = set(re.findall(r"^\s*(\w+)\s*=", block.group(1) if block else "", re.MULTILINE))
+    referenced: dict[str, set[str]] = {}
+    defaults: dict[str, list[str]] = {}
+    for path in sorted((root / "skills").glob("*/**/*.md")):
+        body = path.read_text(errors="replace")
+        where = str(path.relative_to(root))
+        for section, key in sorted(set(CONFIG_KEY.findall(body))):
+            referenced.setdefault(key, set()).add(where)
+            if key not in listed:
+                errors.append(f"{where}: `[{section}].{key}` is not in README's config block")
+            if re.search(rf"`\[{section}\]\.{key}`[\s\S]{{0,120}}?\(default ", body):
+                defaults.setdefault(key, []).append(where)
+    for key in sorted(referenced):
+        homes = defaults.get(key, [])
+        if len(homes) != 1:
+            errors.append(f"`{key}` states its default in {len(homes)} skills, expected exactly "
+                          f"one: {', '.join(homes) or 'none'}")
+
+
+def check_ledger(root: Path, errors: list[str]) -> None:
+    result = subprocess.run([sys.executable, str(root / "scripts" / "ledger.py"), "--self-check"],
+                            capture_output=True, text=True)
+    if result.returncode != 0:
+        errors.append(f"scripts/ledger.py --self-check failed: {result.stderr.strip()[-300:]}")
+
+
 def validate(root: Path) -> list[str]:
     errors: list[str] = []
     readme = (root / "README.md").read_text()
+    check_config_keys(root, readme, errors)
+    check_ledger(root, errors)
     manifests = {relative: load_json(root, relative, errors) for relative in MANIFESTS}
     check_codex(manifests[".codex-plugin/plugin.json"], errors)
     found = check_skill_tree(root, errors)
@@ -296,6 +333,11 @@ def edit(copy: Path, relative: str, old: str, new: str) -> None:
 SCAN = "skills/duck-scan/SKILL.md"
 RUN = "skills/duck-run/SKILL.md"
 CASES: list[tuple[str, str, Callable[[Path], None]]] = [
+    ("config key with two default homes", "states its default in 2 skills",
+     lambda c: edit(c, "skills/duck-roast/SKILL.md", "`[bounds].roast_passes` in",
+                    "`[bounds].review_rounds` (default 3) `[bounds].roast_passes` in")),
+    ("config key missing from README", "is not in README's config block",
+     lambda c: edit(c, "README.md", "roast_passes = 2", "roast_pass = 2")),
     ("missing dispatch resource", "missing linked resource",
      lambda c: (c / "skills/duck-review/references/dispatch.md").unlink()),
     ("reference dispatch without by-path rule", "never states the by-path rule",

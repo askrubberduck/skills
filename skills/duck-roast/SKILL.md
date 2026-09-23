@@ -46,10 +46,11 @@ execute a relevant counterexample when feasible. Distinguish demonstrated defect
 maintenance findings and untested suspicions. Prefer the smallest fix, including deletion or reuse.
 Do not rank by lines removed, file age or the confidence of the reviewer.
 
-Group findings by cause; retain substantiated ones and explicitly resolve previously disputed claims.
-Do not publish every discarded hunch. Default to at most two passes unless the user supplies another
-bound. Another pass needs an unresolved question and new evidence or a materially different approach;
-never repeat until the finding list is empty or every critic agrees.
+Group findings by cause; retain substantiated ones and explicitly resolve previously disputed
+claims. Do not publish every discarded hunch. The pass ceiling is `[bounds].roast_passes` in
+`~/.askrubberduck/config.toml` (default 2) unless the user supplies another. Another pass needs an
+unresolved question and new evidence or a materially different approach; never repeat until the
+finding list is empty or every critic agrees.
 
 ## Return the useful result
 

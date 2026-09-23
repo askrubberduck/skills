@@ -41,11 +41,17 @@ without new evidence is a malformed finding; the rest of that result still count
 
 Run from a neutral scratch directory, never the target checkout. Close stdin, use absolute paths,
 and run in the background because reviews can take 10–45 minutes; where the CLI has no timeout of
-its own, bound the wait yourself. Minimum shapes:
+its own, bound the wait yourself with `[bounds].dispatch_timeout` (default 45m) the way
+`duck-race`'s block does — and past the deadline kill the process, confirm it exited, then read
+what it wrote: a wait that returns while the worker still writes hands the retry a shared file.
+The pinned ids come from `[families].reviewers` (default empty: the owner's setup names them) in
+`~/.askrubberduck/config.toml`, never from memory. Minimum shapes, with the pins and the timeout
+bound first:
 
 ```bash
-codex exec -m <pinned-model> --skip-git-repo-check "$(cat "$SP/codex/prompt.md")" </dev/null > "$SP/codex/rN.out" 2>&1
-agy --model <verified-non-doer> --add-dir "$SP/material" --print-timeout 45m -p "..." </dev/null > "$SP/agy/rN.out" 2>&1
+: "${CODEX_MODEL:?pinned id, proven below}" "${AGY_MODEL:?pinned id, proven below}" "${DISPATCH_TIMEOUT:?from [bounds], e.g. 45m}"
+codex exec -m "$CODEX_MODEL" --skip-git-repo-check "$(cat "$SP/codex/prompt.md")" </dev/null > "$SP/codex/rN.out" 2>&1
+agy --model "$AGY_MODEL" --add-dir "$SP/material" --print-timeout "$DISPATCH_TIMEOUT" -p "$(cat "$SP/agy/prompt.md")" </dev/null > "$SP/agy/rN.out" 2>&1
 ```
 
 **The prompt is an argument; the material under review is a path inside it.** Hand the reviewer
@@ -67,9 +73,20 @@ reviews at exit 0:
   changed artifact, and compare each round's output with the last: an identical body is an outage, not a verdict.
 
 A zero-byte, greeting-only, timed-out, or crashed dispatch is an outage: a dispatch attempted that
-produced no verdict. An output that holds only a quota or credit error is an outage no retry
-clears: skip the retry and report the missing participant. **A degraded dispatch is the harder
-case — full length, well formed, and wrong.** Nothing in the exit status distinguishes it, so before trusting any result, check that
-its quoted justifications actually support its verdict; one that cites the claim under attack as
-proof of that claim is a malformed result, recorded as such and not counted.
-**A REJECT is never an outage**, and a same-family pass never substitutes for a required reviewer.
+produced no verdict. An output that holds only a quota or credit error, or a rejection of the
+pinned model id, is an outage no retry clears: skip the retry and report the missing participant,
+naming the config file that holds a dead pin. **A degraded dispatch is the harder case — full
+length, well formed, and wrong.** Nothing in the exit status distinguishes it, so before trusting
+any result, check that its quoted justifications actually support its verdict.
+
+Two kinds of malformed result, and every skill that says "malformed" means one of these:
+*unranked* — a verdict with findings that carry no severity: the participant counts, its findings
+are claims to adjudicate; *unsupported* — no verdict, or a verdict whose cited justification is
+the claim under attack: the participant did not answer, the gate is short a reviewer, and its
+findings are still claims. **A REJECT is never an outage**, and a same-family pass never
+substitutes for a required reviewer.
+
+Every dispatch attempt gets a row in `~/.askrubberduck/dispatches.tsv`: `pending` when launched,
+finalized once at synthesis with minutes, verdict and outage. A row left `pending` is an
+interrupted run. `scripts/ledger.py schema` prints the columns and their domains; a plan critic's
+`PLAN: CONCUR | OBJECT` is recorded as verdict `CONCUR | OBJECT`.

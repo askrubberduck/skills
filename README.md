@@ -139,7 +139,7 @@ resolves.
 | `duck-learn` | Turn session and delivery evidence into reusable lessons, so each mistake is only paid for once |
 | `duck-plan` | Find the hole in the plan before building over it; assumptions and acceptance checks must survive challenge |
 | `duck-proof` | Make the goal, the path, and the finished work earn your trust through counterexamples and executed checks |
-| `duck-race` | Put two decorrelated model families on the same problem and let executed evidence pick the result |
+| `duck-race` | Put two different model families on the same problem and let executed evidence pick the result |
 | `duck-review` | Review work from multiple angles or deliver an independent judgment |
 | `duck-roast` | Roast the whole solution until its weak claims show; a finding must earn its place, and a round must end |
 | `duck-run` | Challenge the goal, shape the plan, build it, and make it prove itself; local means local |
@@ -213,6 +213,42 @@ Evidence needs a home someone can find. A standalone proof can answer directly. 
 another stage uses the project's existing record, with the candidate, checks and open claims named.
 Proof and break can share a page. A pile of receipts is not a pile of proof.
 
+### Where the duck keeps score
+
+Who caught the bug last time? The duck writes it down. Every dispatch — a reviewer, a rival, a
+critic — leaves one row in `~/.askrubberduck/dispatches.tsv`; every finding, once judged, one row
+in `findings.tsv`. Your repository gets nothing. The rows stay on your machine, and
+`~/.askrubberduck/config.toml` holds the pins and the ceilings. No file there? The defaults below
+apply, and the duck works as before.
+
+```toml
+[families]
+doer = "anthropic"
+reviewers = ["openai:gpt-6-astra:high", "google:gemini-3.1-pro-high"]  # family:model:effort
+
+[bounds]                    # ceilings; inside them, evidence decides when to stop
+review_rounds = 3           # duck-run
+trust_rounds = 2            # duck-run, trust-touching work
+roast_passes = 2            # duck-roast
+plan_rounds = 2             # duck-plan
+rally_turns = 10            # duck-race, counted in turns
+dispatch_timeout = "45m"    # every background dispatch
+
+[review]
+default = "findings"        # what a bare duck-review runs
+
+[repo."github.com/askrubberduck/skills"]   # one origin's overrides; a list replaces, never merges
+review_rounds = 2
+```
+
+The rows answer questions the duck used to guess at. How many defects did both reviewers miss?
+`scripts/ledger.py remaining` estimates it from what they found in common. Which family catches
+which class? `precision`. Who reviews next? `pick` samples from recorded catches per minute,
+inside the set the gate requires. Did the change help? `paired` compares two arms on the same
+cases. What is drifting? `thresholds` hands `duck-learn` its occurrences. What will this gate
+cost? `cost` reads past gates. `--self-check` runs each of these on a fixture and asserts what it prints. Standard library
+only. A `-` means unknown; unknown never counts as zero.
+
 ### How the duck keeps review rounds bounded
 
 The coordinating agent carries the agreed outcome, constraints and checks through every round.
@@ -223,10 +259,10 @@ A rejection goes back to its cause: `duck-why` if it is hidden, frame if the pre
 if the decomposition failed, race or rally if the method keeps missing the same class of defect.
 Before a third round, the agent must explain what new evidence that round will buy.
 
-The default is three review rounds total. Changing reviewers or renaming the problem does not
-refill the meter. At the limit, the agent stops dispatching, preserves the candidate and unresolved
-findings, and leaves the release unapproved. A different bound comes from you or the repo's policy.
-No endless pursuit of unanimous approval. No passing because everyone got tired.
+The default ceiling is three review rounds total. Changing reviewers or renaming the problem does
+not refill the meter. At the limit, the agent stops dispatching, preserves the candidate and
+unresolved findings, and leaves the release unapproved. A different bound comes from you or the
+repo's policy. No endless pursuit of unanimous approval. No passing because everyone got tired.
 
 When you are away, the agent still owns technical decisions within the task. It continues independent
 work and holds only what needs your answer. Your silence does not choose a new goal.

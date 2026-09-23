@@ -95,6 +95,9 @@ verification limits, without creating a commit, PR or release verdict.
 
 ## 5. Independent review, when requested or required for release
 
+Call `duck-review`'s release-gate path by name; its unscoped default is a findings pass, which
+satisfies no gate.
+
 Prepare the candidate and evidence before invoking `duck-review`. If committing is authorized,
 record the exact commit; otherwise review an explicit worktree snapshot and do not treat that as a
 landable SHA. A gate-policy change is reviewed under PRE-change rules, never its own relaxed rules.
@@ -123,10 +126,12 @@ technical findings within authority, tracks causes and owns the next action; onl
 settle a genuinely new product, policy or scope decision.
 
 Before the first review, record the outcome, non-goals, required contracts, acceptance checks,
-release policy, participants and effort bound. Carry that baseline across rounds. Default to at
-most three review rounds total (initial review plus two re-reviews), unless the user or repository
-sets another bound. Reframing, changing reviewers or renaming the task does not reset it. Transport
-retries follow `duck-review`'s separate bounded outage rule.
+release policy, participants and effort bound. Carry that baseline across rounds. The round
+ceiling is `[bounds].review_rounds` in `~/.askrubberduck/config.toml` (default 3: initial review
+plus two re-reviews; `[bounds].trust_rounds` (default 2) for trust-touching work), unless the user
+or repository sets another; the stop rule inside it is evidence, as the challenge reference
+states. Reframing, changing reviewers or renaming the task does not reset it. Transport retries
+follow `duck-review`'s separate bounded outage rule.
 
 Track findings by stable cause, with the violated criterion, evidence, disposition and closure
 check. A reworded finding is not new. Reopen a closed cause only with contrary evidence or an
