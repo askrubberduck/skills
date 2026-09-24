@@ -55,7 +55,7 @@ codex exec -C "$WT_RIVAL" -s workspace-write -m "$RIVAL_MODEL" "$(cat "$SP/probl
 RIVAL=$!
 # ... the doer works its own attempt here, in its own worktree ...
 while kill -0 -- "-$RIVAL" 2>/dev/null && [ "$SECONDS" -lt "$DEADLINE" ]; do sleep 30; done   # the group, not the leader
-if kill -0 "$RIVAL" 2>/dev/null; then kill -KILL -- "-$RIVAL"; wait "$RIVAL"; STATUS=deadline   # KILL: TERM can be ignored
+if kill -0 -- "-$RIVAL" 2>/dev/null; then kill -KILL -- "-$RIVAL"; wait "$RIVAL"; STATUS=deadline   # KILL: TERM can be ignored
 else wait "$RIVAL"; STATUS=$?; fi
 kill -KILL -- "-$RIVAL" 2>/dev/null; while kill -0 -- "-$RIVAL" 2>/dev/null; do sleep 1; done   # stragglers gone before capture
 if [ "$STATUS" = 0 ]; then git -C "$WT_RIVAL" add -A && git -C "$WT_RIVAL" diff "$BASE_SHA" > "$SP/rival.diff"
