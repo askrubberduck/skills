@@ -30,7 +30,7 @@ Routing evidence: two English selection probes, plus with/without runs for four 
 | You say | What comes back |
 |---|---|
 | "duck it" | `duck-run`: challenge it, plan it, build it, try to break it. Stop where you authorized; local means local. |
-| "why is this broken?" | `duck-why`: the cause and its evidence, or the hypotheses still standing. We know where the fix goes; nobody has written it yet. |
+| "why is this broken?" | `duck-why`: the cause, its evidence and where the fix goes, or the hypotheses still standing and the check that would decide. Nobody has written the fix yet. |
 | "prove this goal or plan" | `duck-proof`: what would make it wrong, what was tried, and what survived. Your favorite answer gets no head start. |
 | "frame it before we plan" | `duck-frame`: the smallest design that meets the contract, traced through what already exists. Deleting something is one of the options. |
 | "plan it" | `duck-plan`: units someone can build and check, and the cheap experiment run before the expensive guess. Everyone agreeing does not make it feasible. |
@@ -50,7 +50,7 @@ Routing evidence: two English selection probes, plus with/without runs for four 
 | "race it" | `duck-race`: two independent attempts, the same outcome checks, and a winner that earned it. |
 | "roast it" | `duck-roast`: the findings that stand up, what to do about them, and an end to the round. |
 | "why does this session cost so much?" | `duck-diet`: measured waste, not a hunch, and cuts that keep the guidance the work needs. |
-| "clean up stale branches" | `duck-sweep`: deletes only what is provably kept elsewhere. Unknown means keep. |
+| "clean up stale branches" | `duck-sweep`: checks that work is preserved before deleting it; discarding unique work takes your explicit decision. Unknown means keep. |
 | "what did we learn?" | `duck-learn`: lessons from sessions and outcomes, each in one home, tried once before it is trusted. |
 
 ## Install
@@ -225,9 +225,10 @@ Proof and break can share a page. A pile of receipts is not a pile of proof.
 
 Who caught the bug last time? The duck writes it down. Every dispatch — a reviewer, a rival, a
 critic — leaves one row in `~/.askrubberduck/dispatches.tsv`; every finding, once judged, one row
-in `findings.tsv`. Your repository gets nothing. The rows stay on your machine, and
-`~/.askrubberduck/config.toml` holds the pins and the ceilings. No file there? The defaults below
-apply, and the duck works as before.
+in `~/.askrubberduck/findings.tsv`. Your repository gets nothing. The rows stay on your machine, and
+`~/.askrubberduck/config.toml` holds the pins and the ceilings. No file there? The bounds below
+are the defaults, and the duck works as before. The reviewer models are an example; the reviewer
+list is empty until you name one.
 
 ```toml
 [families]
@@ -267,7 +268,7 @@ A rejection goes back to its cause: `duck-why` if it is hidden, frame if the pre
 if the decomposition failed, race or rally if the method keeps missing the same class of defect.
 Before a third round, the agent must explain what new evidence that round will buy.
 
-The default ceiling is three review rounds total. Changing reviewers or renaming the problem does
+The default ceiling is three review rounds for ordinary work and two for trust-touching work. Changing reviewers or renaming the problem does
 not reset the clock. At the limit, the agent stops dispatching, preserves the candidate and
 unresolved findings, and leaves the release unapproved. A different bound comes from you or the
 repo's policy. No endless pursuit of unanimous approval. No passing because everyone got tired.
