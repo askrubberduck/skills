@@ -8,7 +8,8 @@ description: Hold a branch, PR or document to the one thing it was opened for; n
 A unit of work collects what belongs elsewhere. Sort it against the unit's intent, part by part,
 and show that the pieces sum to the original before anything leaves it.
 
-Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and verdicts.
+Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 A question ("what doesn't belong?") gets the classification and no edits. An instruction to
 extract authorizes creating the new units only. Taking the moved parts out of the original needs
 an explicit removal instruction, "cut it from here" or any paraphrase; "extract it" alone is not

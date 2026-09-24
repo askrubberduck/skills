@@ -100,6 +100,18 @@ MAX_DESCRIPTION = 600
 # The cross-reference check below proves that references RESOLVE. It cannot prove one still
 # EXISTS, so a load-bearing link can be deleted and every check stays green. Measured: removing
 # duck-review's duck-shape clause passed the whole gate, catalog regenerated.
+# One wording of the per-skill language rule; a second wording drifts (11/9 split, measured).
+LANGUAGE_RULE = ("Follow the user’s language unless they ask otherwise. Keep commands, paths, "
+                 "identifiers,\nquoted errors and machine-readable verdicts unchanged; the duck asks "
+                 "for evidence in any language.")
+
+
+def check_language_rule(root: Path, name: str, errors: list[str]) -> None:
+    body = (root / "skills" / name / "SKILL.md").read_text(errors="replace")
+    if LANGUAGE_RULE not in body:
+        errors.append(f"skills/{name}/SKILL.md: language rule missing or reworded")
+
+
 REQUIRED_REFERENCES = [
     ("duck-review", "duck-shape",
      "the per-change structural check has no owner once the gate stops naming it"),
@@ -311,6 +323,7 @@ def validate(root: Path) -> list[str]:
     check_required_references(root, found, errors)
     for name in sorted(found):
         check_skill(root, name, found, errors)
+        check_language_rule(root, name, errors)
     check_routing(root, found, errors)
     check_versions(manifests, errors)
     check_generated(root, readme, errors)
@@ -338,6 +351,8 @@ CASES: list[tuple[str, str, Callable[[Path], None]]] = [
                     "`[bounds].review_rounds` (default 3) `[bounds].roast_passes` in")),
     ("config key missing from README", "is not in README's config block",
      lambda c: edit(c, "README.md", "roast_passes = 2", "roast_pass = 2")),
+    ("language rule reworded", "language rule missing or reworded",
+     lambda c: edit(c, "skills/duck-scan/SKILL.md", "machine-readable verdicts", "verdicts")),
     ("missing dispatch resource", "missing linked resource",
      lambda c: (c / "skills/duck-review/references/dispatch.md").unlink()),
     ("reference dispatch without by-path rule", "never states the by-path rule",

@@ -83,8 +83,7 @@ Two kinds of malformed result, and every skill that says "malformed" means one o
 *unranked* — a verdict with findings that carry no severity: the participant counts, its findings
 are claims to adjudicate; *unsupported* — no verdict, or a verdict whose cited justification is
 the claim under attack: the participant did not answer, the gate is short a reviewer, and its
-findings are still claims. **A REJECT is never an outage**, and a same-family pass never
-substitutes for a required reviewer.
+findings are still claims. **A REJECT is never an outage.**
 
 Every dispatch attempt gets a row in `~/.askrubberduck/dispatches.tsv`: `pending` when launched,
 finalized once at synthesis with minutes, verdict and outage. A row left `pending` is an

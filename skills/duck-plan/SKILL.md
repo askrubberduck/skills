@@ -8,7 +8,8 @@ description: Find the hole in the plan before building over it; assumptions and 
 Produce a plan someone can execute and verify. Each unit must change a required outcome or resolve
 an uncertainty that blocks it. Agreement among planners does not establish feasibility.
 
-Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and verdicts.
+Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 Planning does not authorize implementation or publication. Return to an executing caller so it can
 continue within existing authority; a standalone planning request ends with the plan.
 

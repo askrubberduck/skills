@@ -9,7 +9,8 @@ Turn the requested outcomes into a manageable set of workstreams and carry each 
 endpoint. Split work when separate execution, ownership or release helps; the ability to ship two
 small changes separately is not by itself a reason to create two packets.
 
-Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and verdicts.
+Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 Carry existing authority through the campaign. Local work ends with verified local changes;
 commits, PRs, pushes and merges require their own authorization. A planning-only request ends with
 the plan. Keep unresolved decisions attached to their dependent work.
@@ -27,7 +28,7 @@ candidate that grows; do not quietly expand the user's goal.
 Use `duck-frame` to settle shared contracts and consequential unknowns before dependent plans.
 Reuse valid design decisions instead of framing each packet afresh. Keep the campaign's shared
 contracts in its existing work record, creating a record only when no adequate home exists.
-CUT ends unnecessary work. An owner decision blocks the work that depends on it; continue other
+An owner decision blocks the work that depends on it; continue other
 settled, authorized work when available, even if the roster has not yet been divided into packets.
 
 ## Group by execution needs

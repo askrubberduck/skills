@@ -17,7 +17,7 @@ parallel, and the diffs are compared. **Rally** when the question is *which edge
 families alternate, one writing a failing test and the other satisfying it. Race exposes divergent
 assumptions; rally turns them into tests. Pick by which of those the work needs.
 
-`$SP` is this session's scratchpad: an absolute path under the host's sanctioned scratchpad root.
+`$SP` is the scratch directory [dispatch mechanics](../duck-review/references/dispatch.md) defines.
 
 ## Freeze (both modes)
 
