@@ -324,3 +324,23 @@ wrapper that pins a timeout and maps an exception, the unaided agent names both 
 anyway; with the skill loaded it pushes back. The body needed no new line. What `duck-shape` lacks
 is not guidance but arrival: on plain code it is loaded by name, or by `duck-run`'s execute step,
 and not by the request.
+
+### Four changed skills against v3.7.0, 2026-09-24
+
+Candidate `c4345cf` (#40) against `v3.7.0`, Claude Code 2.1.281, default agent model, Sonnet
+judge, three runs per arm, cases `review-03`, `land-02`, `race-02` and `proof-02`. The claim
+tested is that #40's moves and cuts lost no behavior, not that they improved it.
+
+| Case | Graders passed, candidate with plugin | v3.7.0 with plugin | Without plugin |
+|---|---|---|---|
+| `review-03-goal-fit` | 9/9 | 9/9 | 9/9 and 8/9 |
+| `land-02-first-public-push` | 5/9, skill loaded 1/3 | 5/9, skill loaded 1/3 | 0/6 on the two content graders, both runs |
+| `race-02-rival-from-roster` | 9/9 | 9/9 | 4/9 and 7/9 |
+| `proof-02-finished-shape` | 6/6 | 6/6 | 6/6 |
+
+No regression shows. `land-02` fails on selection, identically in both versions: the one run
+per version that loaded `duck-land` passed every grader; the traces were not kept, so which file
+the candidate read is not observed. `review-03` and
+`proof-02` pass without the plugin too, so they cannot show uplift. `race-02` configures a
+seven-minute timeout so that the old 2700-second default cannot pass; both versions read the
+configuration, so the candidate's required bound shows no behavioral difference here.
