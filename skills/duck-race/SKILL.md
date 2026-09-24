@@ -26,12 +26,12 @@ assumptions; rally turns them into tests. Pick by which of those the work needs.
    one and not the other voids the run. Ambiguity discovered mid-run is resolved in writing there,
    visible to both.
 2. Name the participants and their model families before starting. The doer (this session's family)
-   is one; the rival must be a **proven different family** — `codex exec` by default when the doer
-   is not OpenAI/GPT; a doer of that family uses another proven family (`agy --model <pinned>`)
-   instead. Executable names are not identities, and a harness may host several families: prove
-   the rival's family and pin to `duck-review`'s reviewer bar — roster line and pinned id recorded
-   — before spending a round. Unknown identity never counts as a different family. The pinned
-   id comes from `[families].reviewers` in `~/.askrubberduck/config.toml` or the owner's setup.
+   is one; the rival is a **proven different family** from `[families].reviewers` in
+   `~/.askrubberduck/config.toml` or the owner's setup, and `scripts/ledger.py pick race` chooses
+   within it. Prove the rival's family and pin to `duck-review`'s reviewer bar — roster line and
+   pinned id recorded — before spending a round. Executable names are not identities, and a
+   harness may host several families; unknown identity never counts as a different family. The
+   blocks below show the `codex` transport; another CLI takes its shape from dispatch mechanics.
 3. Confirm the owner has authorized sending this repository to the rival's vendor, per
    `duck-review`'s export precondition — a rival dispatch ships the same material a review does.
    Sanity-check a new invocation form and classify a failed one by
@@ -50,7 +50,7 @@ rival's diff only **after its dispatch has finished**:
 ```bash
 set -um   # -u: an unbound name fails here, not as a 0-byte diff; -m: the rival gets its own process group
 : "${RIVAL_MODEL:?pinned id, proven per dispatch.md}" "${WT_RIVAL:?rival worktree}" "${BASE_SHA:?from problem.md}"
-DEADLINE=$((SECONDS + ${DISPATCH_SECONDS:-2700}))   # [bounds].dispatch_timeout in seconds; past it the rival is an outage, not a forfeit
+DEADLINE=$((SECONDS + ${DISPATCH_SECONDS:?[bounds].dispatch_timeout in seconds}))   # past it the rival is an outage, not a forfeit
 codex exec -C "$WT_RIVAL" -s workspace-write -m "$RIVAL_MODEL" "$(cat "$SP/problem.md")" </dev/null > "$SP/rival.out" 2>&1 &
 RIVAL=$!
 # ... the doer works its own attempt here, in its own worktree ...

@@ -108,8 +108,9 @@ Act on the single adjudicated result:
 - REJECT: name each substantiated blocker's cause, using `duck-why` when it is not established.
   Repair at the level the evidence refutes: line, shared contract, mechanism, or goal. Rerun
   affected verification before reviewing the changed candidate.
-- NOTE: resolve missing material evidence or criteria if possible. It is neither approval nor a
-  reason to invent a repair. An unavailable gate does not prevent completing authorized local work.
+- NOTE: obtain the missing material evidence or criteria, or report which is missing. It is
+  neither approval nor a reason to invent a repair. An unavailable gate does not prevent
+  completing authorized local work.
 
 Before a third or later review round, record a loop diagnosis. Contradicted premises go to frame;
 wrong decomposition to plan; repeated missed cases to an executable class-level check or

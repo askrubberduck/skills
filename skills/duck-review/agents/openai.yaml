@@ -1,4 +1,4 @@
 interface:
   display_name: "Duck Review"
   short_description: "Make every finding earn its place"
-  default_prompt: "Use $askrubberduck:duck-review to challenge this candidate against the agreed criteria. Return one independent superreview with APPROVE, REJECT, or NOTE and the evidence it earned."
+  default_prompt: "Use $askrubberduck:duck-review to review this work from multiple angles against the agreed criteria. Report evidenced findings, or one independent APPROVE, REJECT, or NOTE when I ask for a gate."

@@ -30,20 +30,28 @@ Routing evidence: two English selection probes, plus with/without runs for four 
 | You say | What comes back |
 |---|---|
 | "duck it" | `duck-run`: challenge it, plan it, build it, try to break it. Stop where you authorized; local means local. |
-| "why is this broken?" | `duck-why`: the cause and its evidence, or the hypotheses still standing. The fix has an address; nobody has written it yet. |
+| "why is this broken?" | `duck-why`: the cause, its evidence and where the fix goes, or the hypotheses still standing and the check that would decide. Nobody has written the fix yet. |
 | "prove this goal or plan" | `duck-proof`: what would make it wrong, what was tried, and what survived. Your favorite answer gets no head start. |
+| "frame it before we plan" | `duck-frame`: the smallest design that meets the contract, traced through what already exists. Deleting something is one of the options. |
+| "plan it" | `duck-plan`: units someone can build and check, and the cheap experiment run before the expensive guess. Everyone agreeing does not make it feasible. |
 | "clean up the AI slop" | `duck-shape`: make every layer earn its place. Cut the needless machinery, keep the contracts, run the checks. |
 | "simplify it deeply" | `duck-shape`: take the mechanism apart, keep the contracts, rebuild the path with less to remember. Then check it. |
 | "gate it" | `duck-review`: one verdict, the reviewers named, and the evidence behind every finding. No participation trophies. |
-| "review this work from multiple angles" | `duck-review`: evidenced findings on a design, plan, document or implementation, reported in-session. No edits or publication. |
+| "review this work from multiple angles" | `duck-review`: findings backed by evidence on a design, plan, document or implementation, reported in-session. No edits or publication. |
 | "are these review comments still valid?" | `duck-review`: each thread judged against what you pushed since, with a drafted reply. Nothing posted or resolved for you. |
+| "land it" | `duck-land`: merge what the gate approved, read back what landed, record it, clean up. A merge nobody recorded is work the repo forgot. |
 | "try to break it" | `duck-break`: attacks actually run, with inputs and results. Imagining a crash is not crashing it. |
 | "dry it" | `duck-dry`: prose that earns its place, with checks that the sweep did not smuggle in a code change. |
 | "trim the backlog" | `duck-cut`: retire obsolete work, merge duplicates, unblock what still matters. Every task earns its place. |
-| "what doesn't belong in this branch?" | `duck-split`: every part sorted against the intent, and where each hitchhiker belongs. Moving them is a separate ask, and comes with proof nothing fell off. |
+| "walk me through my decisions" | `duck-decide`: one decision at a time, options with their costs, and a recommendation. Your silence decides nothing. |
+| "what doesn't belong in this branch?" | `duck-split`: every part sorted against the intent, and where each hitchhiker belongs. Moving them is a separate ask, and comes with proof nothing fell through the cracks. |
 | "what's next?" | `duck-scan`: what is ready, what is blocked, and why. Looking is free. |
+| "do all the plannable work" | `duck-campaign`: workstreams that ship without waiting on each other, and one roster that says what is blocked and why. |
 | "race it" | `duck-race`: two independent attempts, the same outcome checks, and a winner that earned it. |
 | "roast it" | `duck-roast`: the findings that stand up, what to do about them, and an end to the round. |
+| "why does this session cost so much?" | `duck-diet`: measured waste, not a hunch, and cuts that keep the guidance the work needs. |
+| "clean up stale branches" | `duck-sweep`: checks that work is preserved before deleting it; discarding unique work takes your explicit decision. Unknown means keep. |
+| "what did we learn?" | `duck-learn`: lessons from sessions and outcomes, each in one home, tried once before it is trusted. |
 
 ## Install
 
@@ -157,7 +165,7 @@ requirements? What input should break this? Did you run them after the last fix?
 `APPROVE`, `REJECT`, or `NOTE`, with evidence someone else can check. Confidence earns nothing.
 
 **The duck travels light.** One home per fact. One owner per rule. A layer that makes the reader
-open three more files has explaining to do. A comment that repeats the next line goes. A necessary
+open three more files has some explaining to do. A comment that repeats the next line goes. A necessary
 boundary stays, however tempting the deletion count. Shorter code can still leave a bigger mess.
 
 **The duck reads first.** Follow the path from the input to what actually happens. Read the callers.
@@ -207,7 +215,7 @@ A smaller analysis does not satisfy a stronger release gate. A missing participa
 the bar. The [challenge rules](skills/duck-review/references/challenge.md) carry the details.
 
 Sending your repository to another vendor needs your authorization. Once it covers the work,
-the duck remembers it. Asking again is not extra care.
+the duck remembers it. Asking twice is not being careful.
 
 Evidence needs a home someone can find. A standalone proof can answer directly. Work handed to
 another stage uses the project's existing record, with the candidate, checks and open claims named.
@@ -217,9 +225,10 @@ Proof and break can share a page. A pile of receipts is not a pile of proof.
 
 Who caught the bug last time? The duck writes it down. Every dispatch — a reviewer, a rival, a
 critic — leaves one row in `~/.askrubberduck/dispatches.tsv`; every finding, once judged, one row
-in `findings.tsv`. Your repository gets nothing. The rows stay on your machine, and
-`~/.askrubberduck/config.toml` holds the pins and the ceilings. No file there? The defaults below
-apply, and the duck works as before.
+in `~/.askrubberduck/findings.tsv`. Your repository gets nothing. The rows stay on your machine, and
+`~/.askrubberduck/config.toml` holds the pins and the ceilings. No file there? The bounds below
+are the defaults, and the duck works as before. The reviewer models are an example; the reviewer
+list is empty until you name one.
 
 ```toml
 [families]
@@ -259,8 +268,8 @@ A rejection goes back to its cause: `duck-why` if it is hidden, frame if the pre
 if the decomposition failed, race or rally if the method keeps missing the same class of defect.
 Before a third round, the agent must explain what new evidence that round will buy.
 
-The default ceiling is three review rounds total. Changing reviewers or renaming the problem does
-not refill the meter. At the limit, the agent stops dispatching, preserves the candidate and
+The default ceiling is three review rounds for ordinary work and two for trust-touching work. Changing reviewers or renaming the problem does
+not reset the clock. At the limit, the agent stops dispatching, preserves the candidate and
 unresolved findings, and leaves the release unapproved. A different bound comes from you or the
 repo's policy. No endless pursuit of unanimous approval. No passing because everyone got tired.
 
@@ -273,7 +282,7 @@ Every push runs `scripts/validate-distribution.py --self-test`: manifests parse,
 references resolve, generated files match, and deliberate corruptions get caught.
 
 That proves the package holds together. To find out whether the duck does its job, give it a task
-where agreement would be wrong, a green test hides a bug, or a reviewer moves the target. Inspect
+where agreement would be wrong, a green test hides a bug, or a reviewer moves the goalposts. Inspect
 what it actually did. The [eval guide](evals/README.md) links the behavioral cases and records which trials
 have run. An unrun trial stays unrun, even in the duck's own README.
 

@@ -57,7 +57,8 @@ sequentially. Isolate concurrent writers or destructive checks as that skill req
 Maintain one roster in the durable work record: packet, state, dependencies, evidence and next
 action; include branch/worktree only when used. Finish a ready unit and continue to the next without
 another go-ahead. Do not open a new packet while another waits on review or integration that this
-run could finish first; finished work beats started work. Reconcile concurrent changes and verify the combined result before completion.
+run could finish first; finished work beats started work. Reconcile concurrent changes and
+verify the combined result before completion.
 
 When blocked, record the actual blocker and a concrete next action. Continue independent work;
 do not invent consent, rescope away a required outcome or retry an unchanged failure indefinitely.

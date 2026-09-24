@@ -23,7 +23,8 @@ helpers and project conventions before replacing anything. Do not expand a clean
 
 Identify the outcomes that must survive, including errors, recovery and public contracts. Run the
 relevant existing checks before editing. Add a focused regression check when a material contract
-is uncovered, pinning what the code does today, not what it should do; do not manufacture tests for trivial edits or lock in a known bug as intended behavior.
+is uncovered, pinning what the code does today, not what it should do; do not manufacture tests
+for trivial edits or lock in a known bug as intended behavior.
 If execution is unavailable, name the missing check and limit the claim accordingly.
 
 ## Find specific things to remove
@@ -32,7 +33,7 @@ Use these as inspection prompts (the necessity checks), not automatic deletion r
 
 - Duplicate rules or state: locate the authoritative owner and the copies that can drift.
 - A unit that does several unrelated jobs, or two units that always change together: the split
-  should follow what changes together, and callers should pass data, not reach into shared state.
+  follows what changes together, and callers pass data rather than reach into shared state.
 - Dead paths, exports and flags: check callers, configuration and external use before deleting.
 - Pass-through wrappers and speculative options: identify the contract they actually protect.
 - Reimplemented helpers or platform features: compare the existing facility's real guarantees.

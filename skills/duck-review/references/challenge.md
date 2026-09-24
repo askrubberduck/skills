@@ -9,7 +9,7 @@ configure every routine call.
 |---|---|---|
 | Self-check | Narrow local verification with a decisive experiment | No independent review |
 | Independent | Ordinary plan challenge or release review: one reviewer from a verified different family than the doer | One cross-family perspective |
-| Broad | Trust-touching release review: two required reviewers from different families, at least one different from the doer; also useful for several independent risk surfaces. Costs four dispatches per round: two reviews and two cross-family dispositions | Broader independent input |
+| Broad | Trust-touching release review: two required reviewers from different families, at least one different from the doer; also useful for several independent risk surfaces | Broader independent input |
 | Race | Two isolated implementations against common outcome checks | Comparative execution |
 | Rally | Alternating test and implementation turns | Executable counterexamples |
 
