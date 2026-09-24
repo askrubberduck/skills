@@ -41,21 +41,9 @@ candidate branch and merges nothing.
   into history. A claim without its receipt is the overclaim the gate exists to stop.
 - **Where this landing is a repository's first push to a public remote — or the one that flips it
   public — scan the bytes the push will transfer, where they land, never the working
-  repository's view of them**: push the refs into a throwaway bare repository first
-  (`git init --bare "$SP/pub.git" && git push "$SP/pub.git" <refs>`), then read every object
-  there as stored — `git -C "$SP/pub.git" rev-list --objects --all | cut -d' ' -f1 |
-  git -C "$SP/pub.git" cat-file --batch | grep -a -c <pattern>` — and locate a hit with
-  `git -C "$SP/pub.git" grep -a <pattern> $(git -C "$SP/pub.git" rev-list --all)` and
-  `git -C "$SP/pub.git" log --all --grep=<pattern>`. Every view of the working repository has
-  hidden something in a gate round: the current tree misses a file added and deleted before the
-  push, `git grep` reads no messages, `log -p` skips a merge's own content without `-m` and any
-  file under a `.gitattributes -diff` rule, and `cat-file` obeys a local `git replace` that the
-  push ignores. The throwaway receives exactly what the public remote would. The list to scan
-  for: private repo and product
-  names, machine-local paths (`~/…`), internal URLs, and codenames that outlived the rename of the
-  files carrying them. Derive the list from the machine rather than guessing — the other remotes,
-  the sibling private repos, the codenames in the history. A leaked reference is public the
-  moment it pushes; a later deletion leaves it in the history and in every clone.
+  repository's view of them**, as [the public-push scan](references/public-push.md) lays out. A
+  leaked reference is public the moment it pushes; a later deletion leaves it in the history and
+  in every clone.
 - **A precondition the owner directs you to waive is waived only in writing before the push** —
   which precondition, and the owner's decision, recorded where the repo keeps decisions at the
   moment it is given; step 3's outcome record then **names what was waived**. Waiving is the

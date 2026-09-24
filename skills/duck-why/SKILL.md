@@ -68,4 +68,3 @@ maps the landed commit back to it, since a squash gives the same tree a new iden
 Keep ruled-out hypotheses only when their evidence prevents repeating a consequential dead end.
 Do not create a design or work item merely to explain a local defect. An unsettled architectural
 contract belongs to `duck-frame`; an actual owner policy choice belongs to `duck-decide`.
-The executing caller may use `duck-run`; `duck-proof` verifies the eventual repair.

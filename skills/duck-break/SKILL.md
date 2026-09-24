@@ -24,10 +24,10 @@ Attack a disposable copy for mutations or destructive tests, never the candidate
 user data. Git worktrees/clones carry committed state only: capture staged, unstaged and relevant
 untracked changes the way `duck-split` does, as a ref, not a stash. Verify the copied content
 matches the intended candidate before attacking. Record the pre-attack state and restore that
-state between attacks, not an assumed clean base. Use isolated data, ports and process groups for crash tests; verify no children survive
-before restart. A disposable copy still holds the candidate's real configuration: point every
-database, queue, external API and cloud account it reaches at a disposable or stubbed target and
-strip live credentials first, or leave that attack unattempted and say so. Preserve original
+state between attacks, not an assumed clean base. Use isolated data, ports and process groups
+for crash tests; verify no children survive before restart. A disposable copy still holds the
+candidate's real configuration: point every database, queue, external API and cloud account it
+reaches at a disposable or stubbed target and strip live credentials first, or leave that attack unattempted and say so. Preserve original
 uncommitted and ignored files.
 
 ## Select attacks that discriminate

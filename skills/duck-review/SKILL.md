@@ -62,8 +62,8 @@ threads already fixed; the rest stay open and are listed.
    what was read beyond it; the change alone is a coverage limit to state, never the default.
 2. Use the caller's recorded outcome, constraints and acceptance baseline across review rounds.
    For a standalone review, establish that baseline and the effort bound once — by default the
-   setup's budget from [challenge selection](references/challenge.md): each required participant's
-   review, its disposition under Broad, and one outage retry — so steps 5–6 have a bound to read.
+   setup's budget in [challenge selection](references/challenge.md) — so steps 5–6 have a bound
+   to read.
    Name the coordinating caller who owns convergence, prior findings and the remaining round
    bound; `duck-run` defines the default loop
    contract for an executing caller, including stable cause IDs, reopening and what counts as a
@@ -98,7 +98,7 @@ threads already fixed; the rest stay open and are listed.
 
 Use [dispatch mechanics](references/dispatch.md) for identity, isolation, export authority and
 transport checks. Pass review material by absolute path with source access; the brief carries
-requirements and receipts as claims to attack, never as a coverage map. Reviewers should seek a
+requirements and receipts as claims to attack, never as a coverage map. Reviewers seek a
 credible counterexample and a simpler valid path, substantiate their findings, and accept a claim
 that survives. Neither owner preference nor a mandate to be negative is evidence.
 
@@ -133,7 +133,7 @@ A substantiated blocker stands until resolved. An unsubstantiated suspicion is n
 if missing evidence prevents a gate decision, return NOTE and name the uncertainty.
 
 - Judge a code change where it will run: a system that upgrades from an older state and can roll
-  back, not a fresh one. A new way to fail is a change to that system.
+  back, not a fresh one or an invented deployment. A new way to fail is a change to that system.
 - A guard added to cover a race that appeared when another guard was removed says the removed
   one was load-bearing.
 - A changed contract is incomplete until every other party to it moves in the same change or is
@@ -141,13 +141,16 @@ if missing evidence prevents a gate decision, return NOTE and name the uncertain
 - A delta nobody asked for is a finding until someone explains it.
 - Check the repository's own conventions before accepting a demand for a new artifact. Existing
   evidence beats reviewer-invented ceremony.
-- Ask what the code is for before recommending a patch. If removing the feature, flag, branch, or
-  check ends the defect without losing a required outcome, recommend deletion.
+- Ask what the code is for, and whether the mechanism delivers the stated benefit, before
+  recommending a patch; challenge the goal itself only when asked. If removing the feature, flag,
+  branch, or check ends the defect without losing a required outcome, recommend deletion. Sunk
+  effort does not keep a mechanism that fails its outcome.
 - On deletion-heavy diffs, inspect the diff prefix and post-change file before accepting a claim
   that a fact disappeared; context lines and moved facts create false blockers.
 - Resolve disagreement about framework behavior by reading the dependency source, not by vote.
-- Disagreement about what *should* be — a design intent, a public boundary, a policy — has no
-  source to read: route it to the owner via `duck-decide` instead of settling it as the doer.
+- Disagreement about what *should* be — a design intent, a public boundary, a policy, a cost or
+  schedule tradeoff — has no source to read: route it to the owner via `duck-decide` instead of
+  settling it as the doer.
 - If supplied history shows the same rule drawing repeated findings, apply the growth ratchet: ask
   whether that rule should exist rather than proposing another patch. When two consecutive rounds'
   substantiated blockers target code introduced by remediation rather than the original candidate,
@@ -198,11 +201,3 @@ branch. A verdict that exists only in a session transcript cannot be checked lat
 
 Then stop. Acting on the result, executing a fix or deletion, resolving an owner decision,
 reviewing a materially changed candidate, and landing belong to the calling agent or workflow.
-
-## Goal and product fit
-
-Challenge whether the requested mechanism delivers the stated benefit. When the user asks to
-challenge the goal itself, assess its evidence and alternatives too. Ground objections in the real
-product constraints; do not invent deployment states or substitute another goal. Present genuine
-value, cost or schedule tradeoffs to the owner. Sunk implementation effort does not justify keeping
-a mechanism that fails its outcome.

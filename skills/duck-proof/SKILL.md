@@ -96,19 +96,11 @@ of the class.
 
 ## 4. Prove the completed shape
 
-Use `duck-shape`'s realistic change probe on the assembled result: walk one representative path
-end to end, then attempt a likely next change. What rules, state owners, units and ordering facts
-must the reader hold together? What can be removed without losing an outcome? Cause should be
-near effect, with one authoritative home per fact.
-
-Use its cleanup candidates to test that claim. Name a removable mechanism or the actual contract
-that requires it; do not accept "clean architecture" as verification.
-
-Compare credible alternatives after correctness and operational constraints hold. Prefer fewer
-independent obligations and a traceable path; line count and abstraction count are not targets.
-Verify the actual guarantees of a built-in before substituting it. Preserve validation, recovery,
-public contracts and necessary calibration. Shape edits return to section 3's executable checks.
-Run `duck-dry` on authorized edits; a prose cleanup that changes behavior also invalidates evidence.
+Run `duck-shape`'s necessity checks and realistic change probe on the assembled result, after
+correctness and operational constraints hold. For each mechanism, name what removing it loses or
+the contract that requires it; "clean architecture" is not verification, and line or abstraction
+counts are not targets. Shape edits return to section 3's executable checks. Run `duck-dry` on
+authorized edits; a prose cleanup that changes behavior also invalidates evidence.
 
 ## 5. Conclude on evidence, not concurrence
 
