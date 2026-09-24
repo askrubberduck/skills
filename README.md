@@ -177,6 +177,11 @@ that change the goal, scope or policy. Settled decisions stay settled until evid
 Another reviewer wanting another abstraction is not evidence. Nobody gets to move the finish line
 just because the code reached it.
 
+**The duck asks before it acts outside your checkout.** Commits, pushes, pull requests, merges,
+posted review comments and resolved threads each need your go-ahead; a passed review does not
+grant one. So does sending your code to another model vendor, deleting work that exists nowhere
+else, and waiving any rule a gate enforces. Local edits you asked for need no second permission.
+
 ## How the duck carries a task
 
 `duck-run` carries the work. Each stage hands the next something it can check.
@@ -195,9 +200,80 @@ just because the code reached it.
 6. **Land**, `duck-land`. When you authorized a merge: merge, read back what landed, record it,
    clean up. Asked for local changes? The verified local diff is the finish line.
 
-Around the run: `duck-scan`, `duck-cut`, `duck-decide`, and `duck-campaign` before it;
-`duck-diet` throughout; `duck-split` before review, when a branch or document picked up
-hitchhikers; `duck-sweep` and `duck-learn` after.
+Around the run: `duck-scan`, `duck-cut` and `duck-decide` before it; `duck-diet` throughout;
+`duck-split` before review, when a branch or document picked up hitchhikers; `duck-sweep` and
+`duck-learn` after.
+
+## How the duck clears a backlog
+
+A backlog grows by itself. The duck makes it smaller before it makes it busier.
+
+1. **See what is there**, `duck-scan`. Ready, blocked, and why, without touching anything. The
+   backlog lives where your instructions say it does, even outside the repository. A blocker
+   nobody can confirm is unknown, and unknown is never ready.
+2. **Argue against every item**, `duck-cut`. Close what is done, cut what nobody needs any more,
+   merge duplicates, unblock what is no longer blocked. Each verdict carries its evidence. The
+   rest stays, with the sentence that saved it.
+3. **Ask you only what is yours**, `duck-decide`. One decision at a time, with options, costs and a
+   recommendation. Your answer is written down before the next question.
+4. **Run what is left**, `duck-campaign`.
+
+## How the duck runs a campaign
+
+`duck-campaign` takes a vision, a backlog or a list of gaps and carries many tasks at once. Each
+one ships without waiting on the others.
+
+1. **Find what is needed**, `duck-scan` and `duck-cut`. What is open? What already solves it?
+   Which findings share one cause? Speculative work leaves before it becomes a packet.
+2. **Settle what the packets share**, `duck-frame`. A shared contract is decided once, not once
+   per packet.
+3. **Group by how the work runs.** Changes that share a rule or a check stay together. Different
+   owners, release timing or risk split apart. Each packet names its outcome, dependencies and
+   the check that says it is done.
+4. **Run each packet**, `duck-run`. In parallel only where the work is independent. One roster
+   says what is ready, what is blocked, and why.
+5. **Finish before starting.** A packet waiting on a review this run could finish beats a new one.
+   Blocked work waits with its blocker named; everything else keeps moving.
+
+The campaign stops when the authorized work is done or everything left is blocked, and says which.
+Your answer is needed only where a decision is really yours.
+
+## How the duck shapes code
+
+`duck-shape` removes what makes code hard to change without losing what it must do. Smaller is
+not the goal. Easier to change is.
+
+1. **Pin what must survive.** Outcomes, errors, recovery, public contracts. Run the existing checks
+   before touching anything. A material contract with no check gets one that pins what the code
+   does today.
+2. **Look for what can go.** Duplicate rules, dead paths and flags, pass-through wrappers,
+   reimplemented helpers, guards for states that cannot happen, tests that mirror the code.
+3. **Decide each one on evidence**: remove it, replace it with something that already exists, or
+   keep it. A caller, a contract or a failure case decides. "Separation of concerns" and "we might
+   need it" do not.
+4. **Cut the smallest justified piece, then check.** Rerun the checks and try a realistic next
+   change. Is there one rule fewer to remember, one place fewer where a fact lives?
+
+"Nothing to cut" is a valid answer. When local cleanup cannot fix a wrong boundary, `duck-shape`
+takes the mechanism apart and rebuilds it with less to remember. Asked only which of two designs
+carries less, it compares them and edits nothing.
+
+## How the duck races two models
+
+`duck-race` gives one problem to two different model families, and executed checks pick the
+result. It has two modes.
+
+- **Race**: which implementation? Both attempt the problem in isolated worktrees from the same
+  frozen statement. The same outcome checks run on both. The evidence picks the winner; parts are
+  combined only when that improves the result, and the combination is checked again.
+- **Rally**: which edge cases? One side writes a single failing test and proves it fails for the
+  right reason. The other makes it pass without touching the test. Then they swap. The rally ends
+  when every requirement has a passing test, the turn limit is reached, or both sides run out of
+  ideas.
+
+The rival must be a proven different family, and sending it your code needs your authorization.
+The result is a tested candidate, not an approved one: it still goes through `duck-proof` and
+`duck-review`.
 
 ## How many ducks review your work?
 
@@ -251,12 +327,12 @@ review_rounds = 2
 ```
 
 The rows answer questions the duck used to guess at. How many defects did both reviewers miss?
-`scripts/ledger.py remaining` estimates it from what they found in common. Which family catches
-which class? `precision`. Who reviews next? `pick` samples from recorded catches per minute,
+`scripts/ledger.py remaining <gate_id>` estimates it from what they found in common. Which family catches
+which class? `precision`. Who reviews next? `pick <stage>` samples from recorded catches per minute,
 inside the set the gate requires. Did the change help? `paired` compares two arms on the same
 cases. What is drifting? `thresholds` hands `duck-learn` its occurrences. What will this gate
-cost? `cost` reads past gates. `--self-check` runs each of these on a fixture and asserts what it prints. Standard library
-only. A `-` means unknown; unknown never counts as zero.
+cost? `cost <setup>` reads past gates. `scripts/ledger.py --self-check` runs each of these on a
+fixture and asserts what it prints. Standard library only. A `-` means unknown; unknown never counts as zero.
 
 ### How the duck keeps review rounds bounded
 
