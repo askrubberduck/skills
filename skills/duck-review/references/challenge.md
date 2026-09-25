@@ -34,7 +34,7 @@ the first round of a *release* review; an analysis pass is not a round of it.
 After each round, one of these holds, in this order:
 
 1. A substantiated `BLOCKER` → one more round, because defects cluster.
-2. Two eligible captures (Broad, or Independent escalated once) → `scripts/ledger.py remaining`;
+2. Two eligible captures (Broad, or Independent escalated once) → `scripts/ledger.py remaining <gate_id>`;
    another round while its estimate is at least one, stop below; "insufficient evidence" from it
    counts as at least one.
 3. One capture and no `BLOCKER` → stop, unless the round found nothing at all and the reviewer

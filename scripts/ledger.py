@@ -370,7 +370,8 @@ def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
     on_trial = {arm_of(p)[:2] for p in config.get("trial", [])}
     incumbent = next((arm for arm in map(arm_of, roster_for(config, "review"))
                       if arm[0] == family and arm[:2] not in on_trial), None)
-    gate = lambda d: (d["gate_id"], d["round"], d["candidate"])
+    # a gate id names a gate within its repository; "pr43" recurs across repositories
+    gate = lambda d: (d["repo"], d["gate_id"], d["round"], d["candidate"])
     theirs = {gate(d): d for d in dispatches
               if incumbent and d["stage"] == "review" and d["status"] == "final"
               and d["setup"] != "shadow"
@@ -378,12 +379,13 @@ def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
               and (d["family"], d["model"]) == incumbent[:2]}
     by_gate: dict[str, dict] = {}
     for d in shadow_rows(dispatches, pin):  # a gate counts once: its round with a baseline if any
-        kept = by_gate.get(d["gate_id"])
+        kept = by_gate.get((d["repo"], d["gate_id"]))
         if kept is None or (gate(d) in theirs and gate(kept) not in theirs):
-            by_gate[d["gate_id"]] = d
+            by_gate[(d["repo"], d["gate_id"])] = d
     rows = list(by_gate.values())[:2 * needed]
-    counted = {d["gate_id"] for d in rows}  # any round of a counted gate, not just the compared one
-    if any(d["outage"] == "1" for d in shadow_rows(dispatches, pin) if d["gate_id"] in counted):
+    counted = {(d["repo"], d["gate_id"]) for d in rows}  # any round of a counted gate
+    if any(d["outage"] == "1" for d in shadow_rows(dispatches, pin)
+           if (d["repo"], d["gate_id"]) in counted):
         return "drop", "outage on a shadow gate"
     if len(rows) < needed:
         return "shadow", f"{len(rows)}/{needed}"
@@ -683,7 +685,8 @@ def reference_verdict(config: dict, dispatches: list[dict], findings: list[dict]
         for d in dispatches:
             if (incumbent and (d["family"], d["model"]) == incumbent and d["stage"] == "review"
                     and d["status"] == "final" and d["setup"] != "shadow" and d["outage"] == "0"
-                    and d["gate_id"] == row["gate_id"] and d["round"] == row["round"]
+                    and d["repo"] == row["repo"] and d["gate_id"] == row["gate_id"]
+                    and d["round"] == row["round"]
                     and d["candidate"] == row["candidate"]):
                 return d
         return None
@@ -693,10 +696,11 @@ def reference_verdict(config: dict, dispatches: list[dict], findings: list[dict]
         if (d["stage"] == "review" and d["setup"] == "shadow" and d["status"] == "final"
                 and d["outage"] != "-"
                 and (d["family"], d["model"]) == (family, model)):
-            if d["gate_id"] not in by_gate:
-                order.append(d["gate_id"])
-                by_gate[d["gate_id"]] = []
-            by_gate[d["gate_id"]].append(d)
+            key = (d["repo"], d["gate_id"])
+            if key not in by_gate:
+                order.append(key)
+                by_gate[key] = []
+            by_gate[key].append(d)
     picked = []
     for gate_id in order[:2 * needed]:
         rows = by_gate[gate_id]
@@ -732,11 +736,11 @@ def eligibility_check(cases: int = 3000) -> None:
         config = {"doer": "anthropic", "review": review, "trial": [pin], "shadow": needed}
         dispatches, findings, n = [], [], 0
 
-        def add(gate_id, rnd, setup, model, outage):
+        def add(gate_id, rnd, setup, model, outage, repo="r"):
             nonlocal n
             n += 1
             ident = f"x{n}"
-            dispatches.append({"id": ident, "gate_id": gate_id, "round": rnd,
+            dispatches.append({"id": ident, "gate_id": gate_id, "round": rnd, "repo": repo,
                                "candidate": gate_id, "stage": "review", "setup": setup,
                                "status": rng.choice(["final"] * 9 + ["pending"]),
                                "family": "openai", "model": model, "effort": "high",
@@ -750,6 +754,8 @@ def eligibility_check(cases: int = 3000) -> None:
                 add(f"g{g}", rnd, "shadow", "gpt-6-trial", rng.choice(["0"] * 8 + ["1", "-"]))
                 if rng.random() < 0.6:
                     add(f"g{g}", rnd, "broad", "gpt-6-inc", rng.choice(["0"] * 5 + ["1", "-"]))
+                if rng.random() < 0.2:  # the same gate id in another repository is another gate
+                    add(f"g{g}", rnd, "broad", "gpt-6-inc", "0", repo="elsewhere")
                 if rng.random() < 0.2:
                     add(f"g{g}", rnd, "shadow", "gpt-6-other", "0")
         got = trial_verdict(config, dispatches, findings, pin)[0]
@@ -880,12 +886,12 @@ def rally_check(root: Path) -> None:
     # an outage drops a trial before it reaches its gate count
     config = {"doer": "anthropic", "review": ["openai:gpt-6-inc:high"],
               "trial": ["openai:gpt-6-t:high"], "shadow": 3}
-    outage = [{"id": "t1", "gate_id": "g1", "round": "1", "candidate": "c1", "stage": "review",
+    outage = [{"id": "t1", "gate_id": "g1", "round": "1", "candidate": "c1", "stage": "review", "repo": "r",
                "setup": "shadow", "status": "final", "family": "openai", "model": "gpt-6-t",
                "effort": "high", "outage": "1"}]
     assert trial_verdict(config, outage, [], "openai:gpt-6-t:high")[0] == "drop"
     # one cause recorded twice is one cause
-    rows = [{"id": f"{model}-{gate}", "gate_id": gate, "round": "1", "candidate": gate,
+    rows = [{"id": f"{model}-{gate}", "gate_id": gate, "round": "1", "candidate": gate, "repo": "r",
              "stage": "review", "setup": setup, "status": "final", "outage": "0",
              "family": "openai", "model": model}
             for gate in ("g1", "g2", "g3")
@@ -906,6 +912,13 @@ def rally_check(root: Path) -> None:
               * 3 + [{"dispatch_id": "c1", "class": "correctness", "tier": "read",
                       "substantiated": "0"}])
     assert precision_table(vouch, claims, "r")[("openai", "correctness", "read")] == (1, 0)
+    # a gate id recurs across repositories: another repository's gate is no shared baseline
+    other = [dict(rows[0], id="x-inc", repo="elsewhere", gate_id="g9", candidate="g9"),
+             dict(rows[1], id="x-t", gate_id="g9", candidate="g9")]
+    lone = dict(config, shadow=1)
+    assert trial_verdict(lone, other, [{"dispatch_id": "x-inc", "cause_id": "q",
+                                        "substantiated": "1"}],
+                         "openai:gpt-6-t:high")[0] == "shadow"  # no baseline in its own repo yet
     # cost prices a riding shadow
     (root / "config.toml").write_text(
         '[families]\ndoer = "anthropic"\n[learn]\ntrial = ["openai:gpt-6-t:high"]\n')
