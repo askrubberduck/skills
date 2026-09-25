@@ -395,7 +395,5 @@ arm; cells count runs passing every grader (the plugin-fired trigger aside).
 | `review-05-brief-quotes` | 3/3 | 0/3 | 0/3 |
 
 Quoting the rules a brief holds reviewers to changed behavior: without it every draft paraphrased.
-Two other proposed lines were cut. A `duck-land` read-back of the landed message never loaded the
-skill in its case and passed without it, and the gate found it would route a broken trailer to a
-re-gate; a `duck-run` line to split a contested part out met a model that already recommends the
-split unprompted.
+Re-run after its grader stopped accepting a section in place of a line number: 3/3 with the plugin,
+0/3 without.
