@@ -347,9 +347,9 @@ configuration, so the candidate's required bound shows no behavioral difference 
 
 ### Model roles and shadow trials, 2026-09-25
 
-`race-03-role-list` and `review-04-shadow-trial`, Claude Code 2.1.281, default agent model,
-Sonnet judge, three runs per arm. Cells count runs whose content grader passed; `review-04`
-counts runs passing both content graders. `review-04` and the `master` arm of `race-03` ran on
+`race-03-role-list` and `review-04-shadow-trial`, Claude Code 2.1.281 and 2.1.282, default agent
+model, Sonnet judge, three runs per arm. Cells count runs that passed every grader of the case
+(the plugin-fired trigger aside). `review-04` and the `master` arm of `race-03` ran on
 the final text.
 
 | Case | Candidate with plugin | Candidate without | `master` with | `master` without |

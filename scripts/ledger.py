@@ -294,7 +294,11 @@ def pick_arms(config: dict, dispatches: list[dict], findings: list[dict], stage:
     # Arms are the role's configured list and nothing else: history says how an arm has done, never
     # that a one-off dispatch is a reviewer we may send again. An arm is the whole (family, model,
     # effort) triple, so a version change starts a fresh window.
-    arms = [with_effort(arm_of(r), config, trust) for r in roster_for(config, stage)]
+    # a pin on trial never counts toward a review, whatever list also names it; trials are reviews
+    on_trial = ({arm_of(p)[:2] for p in config.get("trial", [])}
+                if stage in ("review", "disposition") else set())
+    arms = [with_effort(arm_of(r), config, trust) for r in roster_for(config, stage)
+            if arm_of(r)[:2] not in on_trial]
     overall = minutes_mean(rows)
 
     stats = {}
@@ -353,12 +357,22 @@ def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
     `add` or `drop`. A trial that cannot decide keeps riding up to twice its shadow count, then
     drops, so no pin sits in `trial` forever and blocks its family's next model."""
     needed = int(config.get("shadow", DEFAULT_SHADOW))
-    rows, seen = [], set()
-    for d in shadow_rows(dispatches, pin):  # a gate counts once, however many rounds it rode
-        if d["gate_id"] not in seen:
-            seen.add(d["gate_id"])
-            rows.append(d)
-    rows = rows[:2 * needed]
+    family = arm_of(pin)[0]
+    on_trial = {arm_of(p)[:2] for p in config.get("trial", [])}
+    incumbent = next((arm for arm in map(arm_of, roster_for(config, "review"))
+                      if arm[0] == family and arm[:2] not in on_trial), None)
+    gate = lambda d: (d["gate_id"], d["round"], d["candidate"])
+    theirs = {gate(d): d for d in dispatches
+              if incumbent and d["stage"] == "review" and d["status"] == "final"
+              and d["setup"] != "shadow"
+              and d["outage"] != "1"  # an incumbent that never answered found nothing to beat
+              and (d["family"], d["model"]) == incumbent[:2]}
+    by_gate: dict[str, dict] = {}
+    for d in shadow_rows(dispatches, pin):  # a gate counts once: its round with a baseline if any
+        kept = by_gate.get(d["gate_id"])
+        if kept is None or (gate(d) in theirs and gate(kept) not in theirs):
+            by_gate[d["gate_id"]] = d
+    rows = list(by_gate.values())[:2 * needed]
     if len(rows) < needed:
         return "shadow", f"{len(rows)}/{needed}"
     if any(d["outage"] == "1" for d in rows):
@@ -367,9 +381,6 @@ def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
     for f in findings:
         if f["substantiated"] == "1":
             caught[f["dispatch_id"]] = caught.get(f["dispatch_id"], 0) + 1
-    family = arm_of(pin)[0]
-    incumbent = next((arm for arm in (arm_of(p) for p in roster_for(config, "review"))
-                      if arm[0] == family), None)
     undecided = "drop" if len(rows) >= 2 * needed else "shadow"
     if incumbent is None:
         if sum(caught.get(d["id"], 0) for d in rows):
@@ -378,14 +389,9 @@ def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
     # ponytail: "not worse on the shared gates" by summed substantiated causes; three gates cannot
     # reach significance, so this only keeps out a clearly worse model. `paired` over more gates is
     # the upgrade.
-    gate = lambda d: (d["gate_id"], d["round"], d["candidate"])
-    theirs = {gate(d): caught.get(d["id"], 0) for d in dispatches
-              if d["stage"] == "review" and d["status"] == "final" and d["setup"] != "shadow"
-              and d["outage"] != "1"  # an incumbent that never answered found nothing to beat
-              and (d["family"], d["model"]) == incumbent[:2]}
     shared = [d for d in rows if gate(d) in theirs]
     own = sum(caught.get(d["id"], 0) for d in shared)
-    found = sum(theirs[gate(d)] for d in shared)
+    found = sum(caught.get(theirs[gate(d)]["id"], 0) for d in shared)
     if len(shared) < needed or not (own or found):
         # too few gates beside the incumbent, or all clean: nothing says which model is better
         return undecided, f"{len(shared)} shared gates, {own} vs {found} causes"
@@ -700,6 +706,21 @@ def roles_check(root: Path) -> None:
     tau_f = findings + [dict(findings[2], dispatch_id="tx", cause_id="u1", candidate="x")]
     assert trial_verdict(three, dispatches + down + ride, tau_f,
                          "openai:gpt-6-tau:high")[0] == "shadow"  # no shared baseline yet
+    # gate review round 2: a trial pin never counts even when a list names it, and a gate's paired
+    # round is the one compared
+    both = dict(config, review=["google:gemini-trial:high", "openai:gpt-6-astra:high"],
+                trial=["google:gemini-trial:high"], select="fixed")  # listed first: no luck
+    chosen, _ = pick_arms(both, dispatches, findings, "review", trust=False)
+    assert ("google", "gemini-trial") not in {a[:2] for a in chosen}, chosen
+    paired_rows, paired_f = [], list(findings)
+    for g in "pqr":
+        paired_rows += [dict(dispatches[2], id=f"{g}1", gate_id=g, candidate=g, model="gpt-6-pi"),
+                        dict(dispatches[2], id=f"{g}2", gate_id=g, candidate=g, round="2",
+                             model="gpt-6-pi"),
+                        dict(dispatches[0], id=f"{g}i", gate_id=g, candidate=g, round="2")]
+        paired_f.append(dict(findings[2], dispatch_id=f"{g}2", cause_id=f"v{g}", candidate=g))
+    assert trial_verdict(three, dispatches + paired_rows, paired_f,
+                         "openai:gpt-6-pi:high")[0] == "replace"
     assert pin_of(("google", "gemini-3.1-pro-high", "-")) == "google:gemini-3.1-pro-high"
     models = root / "models.txt"
     models.write_text("Fetching available models...\ngemini-3.1-pro-high\tGemini 3.1 Pro\n"

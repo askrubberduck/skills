@@ -24,8 +24,8 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
      `[learn].discover` (default `auto`) decides what follows: `off` ignores both; `propose` queues
      each through `duck-decide`; `auto` puts at most one new pin per family into `[learn].trial`
      and applies each `replace`, `add` or `drop` verdict to `~/.askrubberduck/config.toml`,
-     reporting the edit. This is the owner's config, not a policy file: step 4's review path does
-     not apply to it.
+     taking the pin out of `[learn].trial` in the same edit, and reports it. This is the owner's
+     config, not a policy file: step 4's review path does not apply to it.
    - **Sources.** Transcript-store locations — Claude `~/.claude/projects/<dir>/*.jsonl`, Codex
      `$CODEX_HOME/sessions` and `archived_sessions` — are the hosts whose stores are known, not the
      whole set: another host has its store located before the mine, or the result is partial and
