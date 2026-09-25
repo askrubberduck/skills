@@ -642,6 +642,102 @@ ROLES_FINDINGS = [
 ]
 
 
+def reference_verdict(config: dict, dispatches: list[dict], findings: list[dict],
+                      pin: str) -> str:
+    """The trial rules written a second time, straight from dispatch.md and duck-learn, sharing no
+    helper with `trial_verdict`: the class check compares the two over generated ledgers."""
+    needed = int(config.get("shadow", DEFAULT_SHADOW))
+    family, model = pin.split(":")[0], pin.split(":")[1]
+    trialled = {tuple(t.split(":")[:2]) for t in config.get("trial", [])}
+    listed = config.get("review") or config.get("reviewers") or []
+    incumbent = None
+    for entry in listed:
+        fam, mod = entry.split(":")[:2]
+        if fam == family and (fam, mod) not in trialled:
+            incumbent = (fam, mod)
+            break
+    causes = {}
+    for f in findings:
+        if f["substantiated"] == "1":
+            causes[f["dispatch_id"]] = causes.get(f["dispatch_id"], 0) + 1
+
+    def baseline(row):
+        for d in dispatches:
+            if (incumbent and (d["family"], d["model"]) == incumbent and d["stage"] == "review"
+                    and d["status"] == "final" and d["setup"] != "shadow" and d["outage"] != "1"
+                    and d["gate_id"] == row["gate_id"] and d["round"] == row["round"]
+                    and d["candidate"] == row["candidate"]):
+                return d
+        return None
+
+    order, by_gate = [], {}
+    for d in dispatches:
+        if (d["setup"] == "shadow" and d["status"] == "final"
+                and (d["family"], d["model"]) == (family, model)):
+            if d["gate_id"] not in by_gate:
+                order.append(d["gate_id"])
+                by_gate[d["gate_id"]] = []
+            by_gate[d["gate_id"]].append(d)
+    picked = []
+    for gate_id in order[:2 * needed]:
+        rows = by_gate[gate_id]
+        paired = [d for d in rows if baseline(d)]
+        picked.append(paired[0] if paired else rows[0])
+    if len(picked) < needed:
+        return "shadow"
+    if any(d["outage"] == "1" for d in picked):
+        return "drop"
+    out_of_time = len(picked) >= 2 * needed
+    if incumbent is None:
+        if sum(causes.get(d["id"], 0) for d in picked) > 0:
+            return "add"
+        return "drop" if out_of_time else "shadow"
+    shared = [d for d in picked if baseline(d)]
+    own = sum(causes.get(d["id"], 0) for d in shared)
+    theirs = sum(causes.get(baseline(d)["id"], 0) for d in shared)
+    if len(shared) < needed or own + theirs == 0:
+        return "drop" if out_of_time else "shadow"
+    return "replace" if own >= theirs else "drop"
+
+
+def eligibility_check(cases: int = 3000) -> None:
+    """Class check over the trial-eligibility surface: rounds per gate, which round carries the
+    baseline, trial and incumbent outages, missing incumbents, another shadow on the same gate, a
+    trial pin also named in the review list, finding counts, and gate counts around N and 2N."""
+    rng = random.Random(7)
+    pin = "openai:gpt-6-trial:high"
+    for case in range(cases):
+        needed = rng.choice([1, 2, 3])
+        review = rng.choice([["openai:gpt-6-inc:high", "google:gem:high"], ["google:gem:high"],
+                             [pin, "openai:gpt-6-inc:high"]])
+        config = {"doer": "anthropic", "review": review, "trial": [pin], "shadow": needed}
+        dispatches, findings, n = [], [], 0
+
+        def add(gate_id, rnd, setup, model, outage):
+            nonlocal n
+            n += 1
+            ident = f"x{n}"
+            dispatches.append({"id": ident, "gate_id": gate_id, "round": rnd,
+                               "candidate": gate_id, "stage": "review", "setup": setup,
+                               "status": rng.choice(["final"] * 9 + ["pending"]),
+                               "family": "openai", "model": model, "effort": "high",
+                               "outage": outage})
+            for k in range(rng.choice([0, 0, 1, 2])):
+                findings.append({"dispatch_id": ident, "cause_id": f"c{n}{k}",
+                                 "substantiated": rng.choice(["1", "1", "0"])})
+
+        for g in range(rng.randint(0, 2 * needed + 2)):
+            for rnd in rng.sample(["1", "2", "3"], rng.randint(1, 2)):
+                add(f"g{g}", rnd, "shadow", "gpt-6-trial", rng.choice(["0"] * 8 + ["1"]))
+                if rng.random() < 0.6:
+                    add(f"g{g}", rnd, "broad", "gpt-6-inc", rng.choice(["0"] * 5 + ["1"]))
+                if rng.random() < 0.2:
+                    add(f"g{g}", rnd, "shadow", "gpt-6-other", "0")
+        got = trial_verdict(config, dispatches, findings, pin)[0]
+        want = reference_verdict(config, dispatches, findings, pin)
+        assert got == want, (case, got, want, config, dispatches, findings)
+
+
 def roles_check(root: Path) -> None:
     """Role lists, fixed order, effort by risk, and shadow trials, on a fixture of their own."""
     (root / "config.toml").write_text(ROLES_CONFIG)
@@ -813,6 +909,7 @@ def self_check() -> int:
             assert code == expected, (argv, code, out)
             assert all(want in out for want in wanted), (argv, out)
         roles_check(root)
+        eligibility_check()
     print("ledger self-check passed")
     return 0
 
