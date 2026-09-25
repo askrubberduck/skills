@@ -9,7 +9,7 @@ Adversarial sweep over **every** open, blocked, and deferred item with a cut bia
 smaller backlog, not a tidier one. "Cut this" findings are first-class, equal to "do this".
 Differs from a disposition flow (which acts on IDs the owner names) — this one hunts.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 
 ## Sweep
@@ -18,7 +18,7 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
    this skill does not carry a second copy of where registries live. Not installed? Say so and ask
    where the backlog is, once; a guessed location is how a sweep reports an empty backlog that is
    merely somewhere else.
-2. Per item, argue **against its existence** before anything else (the necessity check). Verdict,
+2. Per item, argue **against its existence** before anything else (the existence check). Verdict,
    one of:
    - **CLOSE NOW** — already satisfied, obsolete, or superseded; close with evidence.
    - **CUT** — the need was speculative or the product moved past it; cite the requirement that
@@ -29,7 +29,7 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
      `duck-scan`'s attribution rule decides whether an entry lifting it counts: unattributed stays
      blocked.
    - **KEEP** — survives the critique; record the one-sentence justification that saved it.
-3. Act autonomously on everything that doesn't need the owner: land CLOSE/CUT/MERGE/UNBLOCK edits in
+3. Act autonomously on everything that doesn't need the owner: make CLOSE/CUT/MERGE/UNBLOCK edits in
    the registries with evidence. Local edits do not authorize a commit or publication. CUT deletes;
    a cut item counted in the report but left standing in the registry is the rot this skill exists
    to remove. A versioned registry keeps the cut text in its history; for one outside version
@@ -47,5 +47,5 @@ per-item verdict list with evidence links.
 
 - Closing on assumption — CLOSE NOW requires evidence (the commit, the shipped PR, the doc) that the
   need is met, not a recollection.
-- Sweeping only the obligations registry — blocked delivery items and stale active-work dirs are the
+- Sweeping only one registry — blocked delivery items and stale active-work dirs are the
   same disease.

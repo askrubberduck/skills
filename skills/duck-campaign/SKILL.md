@@ -9,7 +9,7 @@ Turn the requested outcomes into a manageable set of workstreams and carry each 
 endpoint. Split work when separate execution, ownership or release helps; the ability to ship two
 small changes separately is not by itself a reason to create two packets.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 Carry existing authority through the campaign. Local work ends with verified local changes;
 commits, PRs, pushes and merges require their own authorization. A planning-only request ends with
@@ -21,7 +21,7 @@ Use `duck-scan` to locate current work and read relevant product constraints and
 existing records and decisions. Delegate bounded read-only investigation only when it helps;
 a campaign does not need a scout fleet merely to begin.
 
-Apply `duck-cut`'s necessity check to the candidates: what required outcome is missing, what already
+Apply `duck-cut`'s existence check to the candidates: what required outcome is missing, what already
 satisfies it, and which findings share a cause? Remove speculative or superseded work. Recheck a
 candidate that grows; do not quietly expand the user's goal.
 
@@ -35,8 +35,9 @@ settled, authorized work when available, even if the roster has not yet been div
 
 Keep related changes together when they share a rule, verification path or small delivery surface.
 Repeated findings at one boundary usually need one repair with several cases, not one packet per
-finding. Conversely, separate work with different owners, release timing, material risks or genuinely
-independent execution. Avoid overlapping ownership of files that will be edited concurrently.
+finding. Conversely, separate work with different owners, release timing, material risks or
+genuinely independent execution. Avoid overlapping ownership of files that will be edited
+concurrently.
 
 Each packet names its outcome, affected scope, dependencies and completion check. Use the existing
 work-item convention; a small campaign may need only one record with several units. Do not create

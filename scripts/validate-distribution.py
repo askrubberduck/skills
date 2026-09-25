@@ -101,7 +101,7 @@ MAX_DESCRIPTION = 600
 # EXISTS, so a load-bearing link can be deleted and every check stays green. Measured: removing
 # duck-review's duck-shape clause passed the whole gate, catalog regenerated.
 # One wording of the per-skill language rule; a second wording drifts (11/9 split, measured).
-LANGUAGE_RULE = ("Follow the user’s language unless they ask otherwise. Keep commands, paths, "
+LANGUAGE_RULE = ("Follow the user's language unless they ask otherwise. Keep commands, paths, "
                  "identifiers,\nquoted errors and machine-readable verdicts unchanged; the duck asks "
                  "for evidence in any language.")
 

@@ -9,7 +9,7 @@ Different-family generation. Two model families work the same problem, and execu
 what survives — never prose taste, never a vote. Same-family work lets one set of blind spots
 write both sides of the proof.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 
 Two modes. **Race** when the question is *which implementation*: both attempt independently, in
@@ -28,18 +28,19 @@ assumptions; rally turns them into tests. Pick by which of those the work needs.
 2. Name the participants and their model families before starting. The doer (this session's family)
    is one; the rival is a **proven different family** from `[models].race` in
    `~/.askrubberduck/config.toml` (default `[families].reviewers`) or the owner's setup, and
-   `scripts/ledger.py pick race` chooses within it. Prove the rival's family and pin to `duck-review`'s reviewer bar — roster line and
-   pinned id recorded — before spending a round. Executable names are not identities, and a
-   harness may host several families; unknown identity never counts as a different family. The
-   blocks below show the `codex` transport; another CLI takes its shape from dispatch mechanics.
-3. Confirm the owner has authorized sending this repository to the rival's vendor, per
-   `duck-review`'s export precondition — a rival dispatch ships the same material a review does.
-   Sanity-check a new invocation form and classify a failed one by
-   [dispatch mechanics](../duck-review/references/dispatch.md); what it calls an outage is an
-   outage here, not a forfeit: record it and re-dispatch. The problem statement travels as the
-   command's argument, but **anything it refers to — a diff, a corpus, the files to change — is
-   named by absolute path for the participant to open, never pasted in.** Pasted material degrades
-   a dispatch into confident nonsense at exit 0.
+   `scripts/ledger.py pick race` chooses within it. Prove the rival's family and pin by dispatch
+   mechanics' identity checks — roster line and pinned id recorded — before spending a round.
+   Executable names are not identities, and a harness may host several families; unknown identity
+   never counts as a different family. The blocks below show the `codex` transport; another CLI
+   takes its shape from dispatch mechanics.
+3. Confirm the owner has authorized sending this repository to the rival's vendor, as [dispatch
+   mechanics](../duck-review/references/dispatch.md) requires — a rival dispatch ships the same
+   material a review does. Sanity-check a new invocation form and classify a failed one by dispatch
+   mechanics; what it calls an outage is an outage here, not a forfeit: record it, and re-dispatch
+   unless dispatch mechanics rules out a retry. The problem statement travels as the command's
+   argument, but **a diff or a corpus it refers to is named by absolute path, and the files to
+   change by path relative to the participant's worktree; nothing is pasted in.** Pasted material
+   degrades a dispatch into confident nonsense at exit 0.
 
 ## Race mode
 
@@ -53,7 +54,7 @@ set -um   # -u: an unbound name fails here, not as a 0-byte diff; -m: the rival 
 DEADLINE=$((SECONDS + ${DISPATCH_SECONDS:?[bounds].dispatch_timeout in seconds}))   # past it the rival is an outage, not a forfeit
 codex exec -C "$WT_RIVAL" -s workspace-write -m "$RIVAL_MODEL" "$(cat "$SP/problem.md")" </dev/null > "$SP/rival.out" 2>&1 &
 RIVAL=$!
-# ... the doer works its own attempt here, in its own worktree ...
+# run this block as one backgrounded shell call; the doer works its own attempt meanwhile, in its own worktree
 while kill -0 -- "-$RIVAL" 2>/dev/null && [ "$SECONDS" -lt "$DEADLINE" ]; do sleep 30; done   # the group, not the leader
 if kill -0 -- "-$RIVAL" 2>/dev/null; then kill -KILL -- "-$RIVAL"; wait "$RIVAL"; STATUS=deadline   # KILL: TERM can be ignored
 else wait "$RIVAL"; STATUS=$?; fi
@@ -100,18 +101,20 @@ path, and the current state.
 codex exec -C "$WT" -s workspace-write -m "$RIVAL_MODEL" "$(cat "$SP/turn.md")" </dev/null > "$SP/rival-tN.out" 2>&1
 ```
 
+Bound each turn with the race block's deadline, kill and wait before reading its output.
+
 A rally is one red-green pair, and the serve alternates each rally.
 
 1. **Serve (test):** the serving side writes ONE failing test against the frozen outcome contract,
-   not merely the existing implementation. Handoff requires proven red — the test run's output
-   pasted, failing for the intended reason, not an import error. A test without a runnable red proof
-   is rejected and re-served, and the rejected serve still counts against the turn cap; vague
-   untestable tests are how a side dodges the game. Same bar both
+   not merely the existing implementation. Handoff requires proven red — the test run's output saved
+   under `$SP` and named by path, failing for the intended reason, not an import error. A test
+   without a runnable red proof is rejected and re-served, and the rejected serve still counts
+   against the turn cap; vague untestable tests are how a side dodges the game. Same bar both
    directions.
 2. **Return (implement):** the other side writes the minimum that turns the suite green. Handoff
-   requires proven green — full suite output pasted — and **no edits to any test in the same turn**.
-   Editing the test you were served is the void condition; a test the returner believes is wrong
-   goes back to the server with the objection in writing instead.
+   requires proven green — full suite output saved under `$SP` and named by path — and **no edits to
+   any test in the same turn**. Editing the test you were served is the void condition; a test the
+   returner believes is wrong goes back to the server with the objection in writing instead.
 3. Hash the suite's test files at handoff and again at green — unequal hashes are the returner's
    void condition caught after the fact. Red proof, green proof and objections go straight into
    the receipt below; nothing else reads a per-rally log.
@@ -125,7 +128,7 @@ every serve, return, rejected serve and objection is one turn; or both sides ser
 no-new-test-ideas pass back to back. Then run the full suite once more and record it — the last
 green is the candidate's evidence.
 
-**Rally at class level.** When the serves would be instances of one ledger class, the serve is the
+**Rally at class level.** When the serves would be instances of one defect class, the serve is the
 table: one test that drives every position of the surface with the class's catalogue, on every
 implementation, and the return closes the class. One instance per serve is how a class outlives
 the turn cap — and how a review loop outlives its budget.
@@ -133,16 +136,16 @@ the turn cap — and how a review loop outlives its budget.
 ## Contract (both modes)
 
 - An outage that survives one re-dispatch leaves one family playing: say so and stop calling the
-  work different-family. Each dispatch, outage included, gets its row in
-  `~/.askrubberduck/dispatches.tsv` with verdict `DIFF`.
-- Receipt to `race-rN.md` in the project's durable records home as `duck-proof` resolves it —
-  never the scratchpad, never a commit on the candidate branch: problem hash, base SHA,
-  participant identities with pinned model ids — a
-  receipt without identities cannot prove the run was cross-family at all — the mode, the diffs
-  themselves, test output per candidate **and for the merged or final candidate**, divergence
-  findings or the rally's red and green proofs, and the decision with its evidence. A losing
-  diff is evidence, not trash: it documents the road not taken and why, so it travels inside the receipt rather than as
-  a `$SP` path that resolves to nothing by the time anyone follows it.
+  work different-family. Each dispatch gets its row in `~/.askrubberduck/dispatches.tsv`:
+  verdict `DIFF`, or `-` with `outage = 1`.
+- Receipt to `race-rN.md` in the project's durable records home as `duck-proof` resolves it — never
+  the scratchpad, never a commit on the candidate branch: problem hash, base SHA, participant
+  identities with pinned model ids — a receipt without identities cannot prove the run was
+  cross-family at all — the mode, the diffs themselves, test output per candidate **and for the
+  merged or final candidate**, divergence findings or the rally's red and green proofs, and the
+  decision with its evidence. A losing diff is evidence, not trash: it documents the road not taken
+  and why, so it travels inside the receipt rather than as a `$SP` path that resolves to nothing by
+  the time anyone follows it.
 - One test per serve in rally mode. Batching tests hides which failure drove which code; the rally
   structure is the audit trail.
 - Never commit raw CLI stdout; keep it in `$SP` — it is megabytes of tool chatter around a

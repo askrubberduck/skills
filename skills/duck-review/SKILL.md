@@ -11,7 +11,7 @@ implementation; judge completed work against observable results.
 Independent scrutiny precedes release approval. The builder must validate the candidate first;
 a reviewer is not a substitute for the doer's own breaking attempts.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 
 **One invocation, one pass.** Never edit the candidate, create its prerequisite evidence, loop
@@ -34,12 +34,11 @@ useful and authorized; what counts as a different family is in
 Substantiate and adjudicate findings against the current target using the criteria below. Why a
 value, guard or construction already in the history exists is answered by `duck-why`'s decision
 trace, not a guess. Return one consolidated list with stable IDs, severity, evidence and proposed
-fixes, plus coverage limits.
-No gate verdict is issued; a receipt is needed only when policy or a downstream handoff requires one.
-Report in-session. Posting comments, submitting a GitHub review and resolving threads each need
-their own existing authorization. Then return to the caller: a later selection authorizes that
-caller's scoped local fixes, not another review or a new approval round. Commit and publication
-remain separate actions.
+fixes, plus coverage limits. No gate verdict is issued; a receipt is needed only when policy or a
+downstream handoff requires one. Report in-session. Posting comments, submitting a GitHub review and
+resolving threads each need their own existing authorization. Then return to the caller: a later
+selection authorizes that caller's scoped local fixes, not another review or a new approval round.
+Commit and publication remain separate actions.
 
 ## Answer a received review
 
@@ -133,7 +132,7 @@ A finding that stands unsubstantiated after that is a `NOTE` with the disagreeme
 Record `adjudicated_by` per finding in `~/.askrubberduck/findings.tsv`; `scripts/ledger.py
 precision` turns that history into the prior a `read`-tier finding starts from.
 A substantiated blocker stands until resolved. An unsubstantiated suspicion is not a blocker;
-if missing evidence prevents a gate decision, return NOTE and name the uncertainty.
+if missing evidence prevents a gate decision, return `NOTE` and name the uncertainty.
 
 - Judge a code change where it will run: a system that upgrades from an older state and can roll
   back, not a fresh one or an invented deployment. A new way to fail is a change to that system.
@@ -154,8 +153,8 @@ if missing evidence prevents a gate decision, return NOTE and name the uncertain
 - Disagreement about what *should* be — a design intent, a public boundary, a policy, a cost or
   schedule tradeoff — has no source to read: route it to the owner via `duck-decide` instead of
   settling it as the doer.
-- If supplied history shows the same rule drawing repeated findings, apply the growth ratchet: ask
-  whether that rule should exist rather than proposing another patch. When two consecutive rounds'
+- If supplied history shows the same rule drawing repeated findings, ask whether that rule should
+  exist rather than proposing another patch. When two consecutive rounds'
   substantiated blockers target code introduced by remediation rather than the original candidate,
   **or fall in one ledger class whatever code they land on**, say so in the report — naming the
   class, not only the instance — and recommend the caller's circuit breaker — rebuild the
@@ -193,9 +192,9 @@ Report the authoritative result, each reviewer's pinned model id and family, eac
 finding's adjudicated classification and evidence, any outage or downgrade, and the exact target and
 criteria reviewed. Finalize each participant's row in `~/.askrubberduck/dispatches.tsv` and append
 one row per adjudicated finding to `findings.tsv`, with a stable `cause_id` shared across
-participants that found the same cause; with two participants, report `scripts/ledger.py
-remaining <gate_id>` — the estimate of defects neither found. Keep raw CLI stdout in scratch;
-preserve the decisive evidence before scratch cleanup.
+participants that found the same cause; with two eligible captures (shadows excluded), report
+`scripts/ledger.py remaining <gate_id>` — the estimate of defects neither found. Keep raw CLI stdout
+in scratch; preserve the decisive evidence before scratch cleanup.
 
 **Write that report where the landing gate can read it** — the same durable records home as the
 receipts, never only into the caller's context or `$SP`, and never as a commit on the candidate

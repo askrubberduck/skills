@@ -10,7 +10,7 @@ the code hard to change: a small edit that touches many places, facts a reader m
 editing safely, and behavior nobody can predict from the interface. A smaller diff or a more
 impressive design is not evidence of improvement.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 Apply scoped local edits unless the request is report-only or analysis-only. Selected findings
 limit repairs, and the report gives each one applied, skipped with its reason, or parked.
@@ -20,7 +20,8 @@ Continue through verification; commits and publication need separate authorizati
 
 Default to the current task's changed code; an explicit file or subsystem bounds a wider cleanup.
 Read the affected path through its callers, state owners and observable effects. Inspect shared
-helpers and project conventions before replacing anything. Do not expand a cleanup into a repo audit.
+helpers and project conventions before replacing anything. Do not expand a cleanup into a repo
+audit.
 
 Identify the outcomes that must survive, including errors, recovery and public contracts. Run the
 relevant existing checks before editing. Add a focused regression check when a material contract
@@ -43,11 +44,12 @@ Use these as inspection prompts (the necessity checks), not automatic deletion r
 - Tests that mirror implementation: preserve outcome checks; question mocks or assertions that
   can pass while the required behavior fails.
 
-For each material candidate, choose **remove**, **simplify using an existing facility**, or **keep**.
-Ground the choice in a caller, contract, failure case or demonstrated change cost. "Separation of
-concerns" or a possible future use is not sufficient evidence. A single implementation may still
-protect a public API, security boundary or real platform difference. When nothing states why a
-mechanism already in the history exists, trace it with `duck-why` before choosing remove.
+For each material candidate, choose **remove**, **simplify using an existing facility**, or
+**keep**. Ground the choice in a caller, contract, failure case or demonstrated change cost.
+"Separation of concerns" or a possible future use is not sufficient evidence. A single
+implementation may still protect a public API, security boundary or real platform difference. When
+nothing states why a mechanism already in the history exists, trace it with `duck-why` before
+choosing remove.
 
 ## Make the smallest justified cleanup
 
@@ -63,7 +65,7 @@ structure or justify extracting another helper.
 For an explicitly requested deep simplification or a demonstrated wrong boundary that local
 cleanup cannot fix, use [reconstruction](references/reconstruction.md). If the required outcome or
 boundary contract is unsettled, resolve that decision with `duck-frame` before dependent edits.
-Analysis-only use compares proposed mechanisms with the same tests of necessity; it does not edit.
+Analysis mode applies the necessity checks to proposed mechanisms without editing.
 
 ## Verify and finish
 
