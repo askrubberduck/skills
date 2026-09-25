@@ -306,7 +306,7 @@ def pick_arms(config: dict, dispatches: list[dict], findings: list[dict], stage:
     # effort) triple, so a version change starts a fresh window.
     # a pin on trial never counts toward a review, whatever list also names it; trials are reviews
     on_trial = ({arm_of(p)[:2] for p in config.get("trial", [])}
-                if stage in ("review", "disposition") else set())
+                if stage in BROAD_ROLES else set())
     arms = [with_effort(arm_of(r), config, trust) for r in roster_for(config, stage)
             if arm_of(r)[:2] not in on_trial]
     overall = minutes_mean(rows)
