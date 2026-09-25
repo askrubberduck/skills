@@ -27,6 +27,10 @@ verdicts, rankings, paths and quoted errors stay verbatim whatever the prose lan
 told nothing answers in its own default and returns findings nobody asked for in that language.
 It also says the participant is one perspective and dispatches no reviewers of its own.
 
+Each criterion the brief takes from a repository rule is a verbatim quote of that rule, with its
+path and line; the task's own requirements travel with their own source. A paraphrase is a second rule nobody reviewed, and a stricter one yields
+findings the gate's own text dismisses.
+
 Capture a code candidate from its fork point: `git diff $(git merge-base <base> <candidate>)
 <candidate>`, and record both SHAs in the brief; a base that moved otherwise shows up reversed in
 the diff. For a dirty worktree drop the second argument, add each untracked file, and say the
