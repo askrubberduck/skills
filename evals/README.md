@@ -375,11 +375,15 @@ models under the default `[learn].discover`.
 | at most one new pin per family on trial | 3/3 | 0/3 | 1/3 |
 | claims nothing ran | 2/3 | 3/3 | 3/3 |
 
+`review-04-shadow-trial` observes the dispatch.md rule itself: a release-gate plan with a trial pin
+in the config. Every arm passes, candidate and `master`, with and without the plugin, 3/3 each:
+the model infers the non-counting shadow from the pasted config. It shows the candidate text is
+followed and no uplift; the rule's arithmetic is pinned by `ledger.py --self-check`.
+
 `master` has no `promote` and no `discover`, and its duck-learn left the decision to the owner.
 The first run of this case graded "applies" 1/3 on answers that showed the right config: its rubric
 asked the answer to apply an edit the prompt told it not to run. The rubric was reworded and both
-versions re-run; the table is the re-run. An earlier `review-04` case was cut: every arm inferred
-the non-counting shadow from the pasted config.
+versions re-run; the table is the re-run.
 
 ### Session lessons, 2026-09-25
 

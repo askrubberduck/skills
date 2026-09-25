@@ -865,6 +865,54 @@ def roles_check(root: Path) -> None:
     assert code == 0 and out.strip() == "new google:gemini-10-pro-high", out
 
 
+def rally_check(root: Path) -> None:
+    """Cases the duck-race rally on trials served; each failed against the code it was served on."""
+    # a dismissed counted claim takes no shadow's unique credit
+    dispatches = [{"id": "counted", "gate_id": "g1", "round": "1", "candidate": "c1",
+                   "stage": "review", "setup": "independent"},
+                  {"id": "trial", "gate_id": "g1", "round": "1", "candidate": "c1",
+                   "stage": "review", "setup": "shadow"}]
+    findings = [{"dispatch_id": "counted", "cause_id": "bug", "severity": "BLOCKER",
+                 "substantiated": "0"},
+                {"dispatch_id": "trial", "cause_id": "bug", "severity": "BLOCKER",
+                 "substantiated": "1"}]
+    assert unique_blocker_dispatches(dispatches, findings) == {"trial"}
+    # an outage drops a trial before it reaches its gate count
+    config = {"doer": "anthropic", "review": ["openai:gpt-6-inc:high"],
+              "trial": ["openai:gpt-6-t:high"], "shadow": 3}
+    outage = [{"id": "t1", "gate_id": "g1", "round": "1", "candidate": "c1", "stage": "review",
+               "setup": "shadow", "status": "final", "family": "openai", "model": "gpt-6-t",
+               "effort": "high", "outage": "1"}]
+    assert trial_verdict(config, outage, [], "openai:gpt-6-t:high")[0] == "drop"
+    # one cause recorded twice is one cause
+    rows = [{"id": f"{model}-{gate}", "gate_id": gate, "round": "1", "candidate": gate,
+             "stage": "review", "setup": setup, "status": "final", "outage": "0",
+             "family": "openai", "model": model}
+            for gate in ("g1", "g2", "g3")
+            for model, setup in (("gpt-6-inc", "independent"), ("gpt-6-t", "shadow"))]
+    twice = ([{"dispatch_id": "gpt-6-inc-g1", "cause_id": c, "substantiated": "1"} for c in "ab"]
+             + [{"dispatch_id": "gpt-6-t-g1", "cause_id": "c", "substantiated": "1"}] * 2)
+    assert trial_verdict(config, rows, twice, "openai:gpt-6-t:high")[0] == "drop"
+    # only shadow reviews count toward a trial, not dispositions
+    one = dict(config, review=["google:gem:high"], shadow=1)
+    disposition = dict(outage[0], id="d1", stage="disposition", outage="0")
+    assert trial_verdict(one, [disposition],
+                         [{"dispatch_id": "d1", "cause_id": "k", "substantiated": "1"}],
+                         "openai:gpt-6-t:high")[0] == "shadow"
+    # a shadow's findings never vouch for its family's precision
+    vouch = [{"id": "s1", "repo": "r", "family": "openai", "setup": "shadow"},
+             {"id": "c1", "repo": "r", "family": "openai", "setup": "independent"}]
+    claims = ([{"dispatch_id": "s1", "class": "correctness", "tier": "read", "substantiated": "1"}]
+              * 3 + [{"dispatch_id": "c1", "class": "correctness", "tier": "read",
+                      "substantiated": "0"}])
+    assert precision_table(vouch, claims, "r")[("openai", "correctness", "read")] == (1, 0)
+    # cost prices a riding shadow
+    (root / "config.toml").write_text(
+        '[families]\ndoer = "anthropic"\n[learn]\ntrial = ["openai:gpt-6-t:high"]\n')
+    code, out = run(["cost", "broad", "--repo", "r"])
+    assert code == 0 and "dispatches = 5" in out, out
+
+
 def self_check() -> int:
     with tempfile.TemporaryDirectory(prefix="askrubberduck-ledger-") as directory:
         root = Path(directory)
@@ -950,6 +998,7 @@ def self_check() -> int:
             assert all(want in out for want in wanted), (argv, out)
         roles_check(root)
         eligibility_check()
+        rally_check(root)
     print("ledger self-check passed")
     return 0
 
