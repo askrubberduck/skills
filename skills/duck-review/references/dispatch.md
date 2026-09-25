@@ -46,7 +46,7 @@ its own, bound the wait yourself with `[bounds].dispatch_timeout` (default 45m) 
 what it wrote: a wait that returns while the worker still writes hands the retry a shared file.
 The pinned ids come from `~/.askrubberduck/config.toml`, never from memory: `[models].review` for
 a review or a disposition (default `[families].reviewers`), and `[families].reviewers`
-(default empty: the owner's setup names them) for any role without a list of its own. Minimum shapes, with
+(default empty: the owner's setup names them) for a race or plan role without a list of its own. Minimum shapes, with
 the pins and the timeout bound first:
 
 ```bash

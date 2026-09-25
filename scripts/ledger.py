@@ -375,7 +375,8 @@ def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
     rows = list(by_gate.values())[:2 * needed]
     if len(rows) < needed:
         return "shadow", f"{len(rows)}/{needed}"
-    if any(d["outage"] == "1" for d in rows):
+    counted = {d["gate_id"] for d in rows}  # any round of a counted gate, not just the compared one
+    if any(d["outage"] == "1" for d in shadow_rows(dispatches, pin) if d["gate_id"] in counted):
         return "drop", "outage on a shadow gate"
     caught: dict[str, int] = {}
     for f in findings:
@@ -685,7 +686,7 @@ def reference_verdict(config: dict, dispatches: list[dict], findings: list[dict]
         picked.append(paired[0] if paired else rows[0])
     if len(picked) < needed:
         return "shadow"
-    if any(d["outage"] == "1" for d in picked):
+    if any(d["outage"] == "1" for gate_id in order[:2 * needed] for d in by_gate[gate_id]):
         return "drop"
     out_of_time = len(picked) >= 2 * needed
     if incumbent is None:
@@ -817,6 +818,15 @@ def roles_check(root: Path) -> None:
         paired_f.append(dict(findings[2], dispatch_id=f"{g}2", cause_id=f"v{g}", candidate=g))
     assert trial_verdict(three, dispatches + paired_rows, paired_f,
                          "openai:gpt-6-pi:high")[0] == "replace"
+    # gate review round 3: an outage in any round of a counted gate drops the trial, even when a
+    # later round of that gate is the one compared
+    retried = [dict(dispatches[2], id=f"{g}{k}", gate_id=g, candidate=g, model="gpt-6-rho",
+                    round=k, outage="1" if (g, k) == ("m", "1") else "0")
+               for g in "mno" for k in ("1", "2")]
+    base = [dict(dispatches[0], id=f"{g}b", gate_id=g, candidate=g, round="2") for g in "mno"]
+    rho_f = findings + [dict(findings[2], dispatch_id="m2", cause_id="h1", candidate="m")]
+    assert trial_verdict(three, dispatches + retried + base, rho_f,
+                         "openai:gpt-6-rho:high")[0] == "drop"
     assert pin_of(("google", "gemini-3.1-pro-high", "-")) == "google:gemini-3.1-pro-high"
     models = root / "models.txt"
     models.write_text("Fetching available models...\ngemini-3.1-pro-high\tGemini 3.1 Pro\n"
