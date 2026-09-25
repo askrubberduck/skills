@@ -321,7 +321,7 @@ def cmd_pick(args) -> int:
         print(f"arm {pin_of(arm)} s={successes} f={failures} minutes={shown} score={score:.4f}")
     for arm in chosen:
         print(f"chosen {pin_of(arm)}")
-    if len(chosen) < (2 if args.trust else 1):
+    if len(chosen) < (2 if args.trust and args.stage in REVIEWER_FALLBACK else 1):
         missing = "a second family" if chosen else f"an arm outside {config['doer']}"
         print(f"required set unmet: the {args.stage} roster holds no {missing}")
         return 1
@@ -537,6 +537,8 @@ def roles_check(root: Path) -> None:
     assert pick_arms(own, [], [], "review", trust=False)[0] == []
     assert pin_of(("google", "gemini-3.1-pro-high", "-")) == "google:gemini-3.1-pro-high"
     for argv, wanted in ((["pick", "race", "--repo", "r"], "chosen google:gemini-3.8-flash-high\n"),
+                         (["pick", "worker", "--trust", "--repo", "r"],
+                          "chosen anthropic:claude-sonnet-5:xhigh"),  # one worker, no second family
                          (["pick", "review", "--trust", "--repo", "r"],
                           "chosen openai:gpt-6-astra:xhigh")):
         code, out = run(argv)
