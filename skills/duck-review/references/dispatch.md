@@ -86,13 +86,6 @@ are claims to adjudicate; *unsupported* — no verdict, or a verdict whose cited
 the claim under attack: the participant did not answer, the gate is short a reviewer, and its
 findings are still claims. **A REJECT is never an outage.**
 
-**A pin on trial rides along.** A pin in `[learn].trial` (default empty) rides along for its first
-`[learn].shadow` (default 3) gates, and up to twice that while its comparison stays undecided;
-`scripts/ledger.py pick review` names it on a `shadow` line while it does. Dispatch it beside the required set with the same brief and the same export authorization for its
-vendor, or skip it and say so. Its verdict never counts toward the gate, its outage never leaves
-the gate short, and its findings are adjudicated like any other. Its row carries
-`setup = shadow`.
-
 Every dispatch attempt gets a row in `~/.askrubberduck/dispatches.tsv`: `pending` when launched,
 finalized once at synthesis with minutes, verdict and outage. A row left `pending` is an
 interrupted run. `scripts/ledger.py schema` prints the columns and their domains; a plan critic's

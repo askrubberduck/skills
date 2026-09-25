@@ -29,8 +29,7 @@ FINDING_COLUMNS = ("dispatch_id", "gate_id", "candidate", "cause_id", "class", "
 DISPATCH_ENUMS = {
     # `disposition` is Broad's cross-family adjudication call: a dispatch, never a capture.
     "stage": {"review", "disposition", "plan", "proof", "break", "race", "rally"},
-    # `shadow`: a pin on trial riding along as an extra reviewer that never counts toward the gate.
-    "setup": {"self-check", "independent", "broad", "race", "rally", "shadow"},
+    "setup": {"self-check", "independent", "broad", "race", "rally"},
     "trust": {"0", "1"}, "status": {"pending", "final"}, "outage": {"0", "1"},
     "verdict": {"APPROVE", "REJECT", "NOTE", "DIFF", "CONCUR", "OBJECT"},
 }
@@ -42,11 +41,8 @@ NUMERIC_COLUMNS = ("round", "minutes", "tokens")
 # Broad is two reviews plus two cross-family dispositions (challenge.md).
 SETUP_DISPATCHES = {"self-check": 0, "independent": 1, "broad": 4, "race": 1}
 DEFAULT_RALLY_TURNS = 10
-DEFAULT_SHADOW = 3
 # Roles whose unset list falls back to the reviewer roster; worker and explore fall back to the host.
 REVIEWER_FALLBACK = {"review", "disposition", "race", "plan"}
-# Host model ids carry no family field; their prefix names the vendor.
-FAMILY_PREFIXES = (("gemini", "google"), ("claude", "anthropic"), ("gpt", "openai"))
 OUTAGE_LIMIT = 0.2
 DRIFT_LIMIT = 0.5
 
@@ -151,26 +147,18 @@ def chapman(n1: int, n2: int, m: int) -> float:
 def unique_blocker_dispatches(dispatches: list[dict], findings: list[dict]) -> set[str]:
     """A cause seen by exactly one review dispatch of its gate, round and candidate — what a second
     reviewer of that same candidate would have missed. Uniqueness cannot span rounds or candidates:
-    rediscovering a cause later must not retroactively cancel the credit round one earned. Only
-    counted reviewers can take credit from a counted reviewer: a shadow finding the same cause takes
-    none away. A shadow competes with everyone, other shadows included, so two trials that find one
-    cause both go without."""
+    rediscovering a cause later must not retroactively cancel the credit round one earned."""
     scope = {d["id"]: (d["gate_id"], d["round"], d["candidate"]) for d in dispatches
              if d["stage"] == "review"}
-    shadows = {d["id"] for d in dispatches if d["setup"] == "shadow"}
     holders: dict[tuple, set[str]] = {}
     for f in findings:
         if f["dispatch_id"] in scope:
             key = scope[f["dispatch_id"]] + (f["cause_id"],)
             holders.setdefault(key, set()).add(f["dispatch_id"])
-
-    def rivals(f: dict) -> set[str]:
-        others = holders[scope[f["dispatch_id"]] + (f["cause_id"],)] - {f["dispatch_id"]}
-        return others if f["dispatch_id"] in shadows else others - shadows
-
     return {f["dispatch_id"] for f in findings
             if f["dispatch_id"] in scope and f["severity"] == "BLOCKER"
-            and f["substantiated"] == "1" and not rivals(f)}
+            and f["substantiated"] == "1"
+            and len(holders[scope[f["dispatch_id"]] + (f["cause_id"],)]) == 1}
 
 
 def cmd_remaining(args) -> int:
@@ -180,7 +168,7 @@ def cmd_remaining(args) -> int:
     # An outage or a pending run is not a capture, and a plan or break dispatch is not looking for
     # the same causes; only completed reviews of one candidate can be marked against each other.
     eligible = [d for d in dispatches if d["gate_id"] == args.gate_id and d["stage"] == "review"
-                and d["status"] == "final" and d["outage"] == "0" and d["setup"] != "shadow"]
+                and d["status"] == "final" and d["outage"] == "0"]
     latest = args.round or max((d["round"] for d in eligible), key=lambda r: number(r) or 0,
                                default="-")
     eligible = [d for d in eligible if d["round"] == latest]
@@ -294,11 +282,7 @@ def pick_arms(config: dict, dispatches: list[dict], findings: list[dict], stage:
     # Arms are the role's configured list and nothing else: history says how an arm has done, never
     # that a one-off dispatch is a reviewer we may send again. An arm is the whole (family, model,
     # effort) triple, so a version change starts a fresh window.
-    # a pin on trial never counts toward a review, whatever list also names it; trials are reviews
-    on_trial = ({arm_of(p)[:2] for p in config.get("trial", [])}
-                if stage in ("review", "disposition") else set())
-    arms = [with_effort(arm_of(r), config, trust) for r in roster_for(config, stage)
-            if arm_of(r)[:2] not in on_trial]
+    arms = [with_effort(arm_of(r), config, trust) for r in roster_for(config, stage)]
     overall = minutes_mean(rows)
 
     stats = {}
@@ -337,122 +321,10 @@ def cmd_pick(args) -> int:
         print(f"arm {pin_of(arm)} s={successes} f={failures} minutes={shown} score={score:.4f}")
     for arm in chosen:
         print(f"chosen {pin_of(arm)}")
-    if args.stage == "review":
-        for pin, reason in shadow_status(config, dispatches, findings):
-            print(f"shadow {pin_of(with_effort(arm_of(pin), config, args.trust))} {reason}")
     if len(chosen) < (2 if args.trust else 1):
         missing = "a second family" if chosen else f"an arm outside {config['doer']}"
         print(f"required set unmet: the {args.stage} roster holds no {missing}")
         return 1
-    return 0
-
-
-def shadow_rows(dispatches: list[dict], pin: str) -> list[dict]:
-    """Final shadow reviews of a pin whose outage flag is known; an unknown flag is neither a clean
-    run nor an outage, so the row does not count toward a trial either way."""
-    family, model, _ = arm_of(pin)  # effort may be overridden by risk, so it does not identify
-    return [d for d in dispatches if d["setup"] == "shadow" and d["status"] == "final"
-            and d["outage"] in ("0", "1") and (d["family"], d["model"]) == (family, model)]
-
-
-def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
-                  pin: str) -> tuple[str, str]:
-    """(verdict, reason) for a trial pin: `shadow` while it still rides along, then `replace`,
-    `add` or `drop`. A trial that cannot decide keeps riding up to twice its shadow count, then
-    drops, so no pin sits in `trial` forever and blocks its family's next model."""
-    needed = int(config.get("shadow", DEFAULT_SHADOW))
-    family = arm_of(pin)[0]
-    on_trial = {arm_of(p)[:2] for p in config.get("trial", [])}
-    incumbent = next((arm for arm in map(arm_of, roster_for(config, "review"))
-                      if arm[0] == family and arm[:2] not in on_trial), None)
-    gate = lambda d: (d["gate_id"], d["round"], d["candidate"])
-    theirs = {gate(d): d for d in dispatches
-              if incumbent and d["stage"] == "review" and d["status"] == "final"
-              and d["setup"] != "shadow"
-              and d["outage"] == "0"  # an incumbent that never answered, or may not have, is no baseline
-              and (d["family"], d["model"]) == incumbent[:2]}
-    by_gate: dict[str, dict] = {}
-    for d in shadow_rows(dispatches, pin):  # a gate counts once: its round with a baseline if any
-        kept = by_gate.get(d["gate_id"])
-        if kept is None or (gate(d) in theirs and gate(kept) not in theirs):
-            by_gate[d["gate_id"]] = d
-    rows = list(by_gate.values())[:2 * needed]
-    if len(rows) < needed:
-        return "shadow", f"{len(rows)}/{needed}"
-    counted = {d["gate_id"] for d in rows}  # any round of a counted gate, not just the compared one
-    if any(d["outage"] == "1" for d in shadow_rows(dispatches, pin) if d["gate_id"] in counted):
-        return "drop", "outage on a shadow gate"
-    caught: dict[str, int] = {}
-    for f in findings:
-        if f["substantiated"] == "1":
-            caught[f["dispatch_id"]] = caught.get(f["dispatch_id"], 0) + 1
-    undecided = "drop" if len(rows) >= 2 * needed else "shadow"
-    if incumbent is None:
-        if sum(caught.get(d["id"], 0) for d in rows):
-            return "add", "no reviewer of its family; it substantiated a cause"
-        return undecided, "no substantiated cause yet"
-    # ponytail: "not worse on the shared gates" by summed substantiated causes; three gates cannot
-    # reach significance, so this only keeps out a clearly worse model. `paired` over more gates is
-    # the upgrade.
-    shared = [d for d in rows if gate(d) in theirs]
-    own = sum(caught.get(d["id"], 0) for d in shared)
-    found = sum(caught.get(theirs[gate(d)]["id"], 0) for d in shared)
-    if len(shared) < needed or not (own or found):
-        # too few gates beside the incumbent, or all clean: nothing says which model is better
-        return undecided, f"{len(shared)} shared gates, {own} vs {found} causes"
-    if own >= found:
-        return "replace", pin_of(incumbent)
-    return "drop", f"{own} vs {found} causes on shared gates"
-
-
-def shadow_status(config: dict, dispatches: list[dict],
-                  findings: list[dict]) -> list[tuple[str, str]]:
-    return [(pin, reason) for pin in config.get("trial", [])
-            for verdict, reason in [trial_verdict(config, dispatches, findings, pin)]
-            if verdict == "shadow"]
-
-
-def family_of(model: str) -> str | None:
-    return next((family for prefix, family in FAMILY_PREFIXES if model.startswith(prefix)), None)
-
-
-def cmd_roster(args) -> int:
-    """Host model ids nobody has configured, trialled or dispatched yet: the new-model signal."""
-    config = load_config(args.repo or default_origin())
-    dispatches, _ = load_tables()
-    known = {d["model"] for d in dispatches}
-    for value in config.values():
-        if isinstance(value, list):
-            known |= {arm_of(pin)[1] for pin in value if isinstance(pin, str) and ":" in pin}
-    source = sys.stdin if args.models == "-" else open(args.models)
-    new = []
-    for line in source:
-        model = line.split()[0] if line.split() else ""
-        family = family_of(model)
-        if family and model not in known:
-            new.append(f"{family}:{model}")
-    for arm in new:
-        print(f"new {arm}")
-    if not new:
-        print("none")
-    return 0
-
-
-def cmd_promote(args) -> int:
-    """One line per trial pin: keep riding, replace its family's reviewer, join the review list,
-    or leave the trial."""
-    config = load_config(args.repo or default_origin())
-    dispatches, findings = load_tables()
-    for pin in config.get("trial", []):
-        verdict, reason = trial_verdict(config, dispatches, findings, pin)
-        if verdict == "replace":
-            print(f"replace {reason} with {pin} in review")
-        elif verdict == "add":
-            print(f"add {pin} to review")
-        else:
-            print(f"{verdict} {pin}: {reason}")
-    if not config.get("trial"):
-        print("none")
     return 0
 
 
@@ -620,131 +492,23 @@ doer = "anthropic"
 reviewers = ["openai:gpt-6-astra:high", "google:gemini-3.1-pro-high"]
 [models]
 race = ["google:gemini-3.8-flash-high"]
+worker = ["anthropic:claude-sonnet-5:medium"]
 [effort]
 trust = "xhigh"
-[learn]
-shadow = 1
-trial = ["openai:gpt-6-sol:high", "anthropic:claude-x:high", "google:gemini-9-pro:high",
-         "openai:gpt-6-nova:high", "google:gemini-3.8-flash-high"]
 """
 ROLES_DISPATCHES = [
     "s1\tg7\t1\t2026-09-07\tr\treview\tbroad\t1\tc7\topenai\tgpt-6-astra\thigh\t5\t-\tREJECT\tfinal\t0",
     "s2\tg7\t1\t2026-09-07\tr\treview\tbroad\t1\tc7\tgoogle\tgemini-3.1-pro-high\t-\t4\t-\tAPPROVE\tfinal\t0",
-    "s3\tg7\t1\t2026-09-07\tr\treview\tshadow\t1\tc7\topenai\tgpt-6-sol\thigh\t6\t-\tREJECT\tfinal\t0",
-    "s4\tg7\t1\t2026-09-07\tr\treview\tshadow\t1\tc7\tanthropic\tclaude-x\thigh\t6\t-\tREJECT\tfinal\t0",
-    "s5\tg7\t1\t2026-09-07\tr\treview\tshadow\t1\tc7\tgoogle\tgemini-9-pro\thigh\t6\t-\t-\tfinal\t1",
-    "s6\tg8\t1\t2026-09-08\tr\treview\tindependent\t0\tc8\tgoogle\tgemini-3.1-pro-high\t-\t4\t-\tAPPROVE\tfinal\t0",
-    "s7\tg8\t1\t2026-09-08\tr\treview\tshadow\t0\tc8\tgoogle\tgemini-3.8-flash-high\thigh\t3\t-\tAPPROVE\tfinal\t0",
     "s8\tg9\t1\t2026-09-09\tr\treview\tbroad\t1\tc9\topenai\tgpt-6-astra\txhigh\t5\t-\tREJECT\tfinal\t0",
 ]
 ROLES_FINDINGS = [
     "s1\tg7\tc7\tk1\tcorrectness\tread\tBLOCKER\t1\thuman",
-    "s3\tg7\tc7\tk1\tcorrectness\tread\tBLOCKER\t1\thuman",
-    "s3\tg7\tc7\tk2\tcorrectness\tread\tBLOCKER\t1\thuman",
-    "s4\tg7\tc7\tk3\tcorrectness\tread\tSHOULD\t1\thuman",
-    "s4\tg7\tc7\tk2\tcorrectness\tread\tBLOCKER\t1\thuman",
     "s8\tg9\tc9\tk9\tcorrectness\tread\tBLOCKER\t1\thuman",
 ]
 
 
-def reference_verdict(config: dict, dispatches: list[dict], findings: list[dict],
-                      pin: str) -> str:
-    """The trial rules written a second time, straight from dispatch.md and duck-learn, sharing no
-    helper with `trial_verdict`: the class check compares the two over generated ledgers."""
-    needed = int(config.get("shadow", DEFAULT_SHADOW))
-    family, model = pin.split(":")[0], pin.split(":")[1]
-    trialled = {tuple(t.split(":")[:2]) for t in config.get("trial", [])}
-    listed = config["review"] if isinstance(config.get("review"), list) else config.get("reviewers", [])
-    incumbent = None
-    for entry in listed:
-        fam, mod = entry.split(":")[:2]
-        if fam == family and (fam, mod) not in trialled:
-            incumbent = (fam, mod)
-            break
-    causes = {}
-    for f in findings:
-        if f["substantiated"] == "1":
-            causes[f["dispatch_id"]] = causes.get(f["dispatch_id"], 0) + 1
-
-    def baseline(row):
-        for d in dispatches:
-            if (incumbent and (d["family"], d["model"]) == incumbent and d["stage"] == "review"
-                    and d["status"] == "final" and d["setup"] != "shadow" and d["outage"] == "0"
-                    and d["gate_id"] == row["gate_id"] and d["round"] == row["round"]
-                    and d["candidate"] == row["candidate"]):
-                return d
-        return None
-
-    order, by_gate = [], {}
-    for d in dispatches:
-        if (d["setup"] == "shadow" and d["status"] == "final" and d["outage"] != "-"
-                and (d["family"], d["model"]) == (family, model)):
-            if d["gate_id"] not in by_gate:
-                order.append(d["gate_id"])
-                by_gate[d["gate_id"]] = []
-            by_gate[d["gate_id"]].append(d)
-    picked = []
-    for gate_id in order[:2 * needed]:
-        rows = by_gate[gate_id]
-        paired = [d for d in rows if baseline(d)]
-        picked.append(paired[0] if paired else rows[0])
-    if len(picked) < needed:
-        return "shadow"
-    if any(d["outage"] == "1" for gate_id in order[:2 * needed] for d in by_gate[gate_id]):
-        return "drop"
-    out_of_time = len(picked) >= 2 * needed
-    if incumbent is None:
-        if sum(causes.get(d["id"], 0) for d in picked) > 0:
-            return "add"
-        return "drop" if out_of_time else "shadow"
-    shared = [d for d in picked if baseline(d)]
-    own = sum(causes.get(d["id"], 0) for d in shared)
-    theirs = sum(causes.get(baseline(d)["id"], 0) for d in shared)
-    if len(shared) < needed or own + theirs == 0:
-        return "drop" if out_of_time else "shadow"
-    return "replace" if own >= theirs else "drop"
-
-
-def eligibility_check(cases: int = 3000) -> None:
-    """Class check over the trial-eligibility surface: rounds per gate, which round carries the
-    baseline, trial and incumbent outages, missing incumbents, another shadow on the same gate, a
-    trial pin also named in the review list, finding counts, and gate counts around N and 2N."""
-    rng = random.Random(7)
-    pin = "openai:gpt-6-trial:high"
-    for case in range(cases):
-        needed = rng.choice([1, 2, 3])
-        review = rng.choice([["openai:gpt-6-inc:high", "google:gem:high"], ["google:gem:high"],
-                             [pin, "openai:gpt-6-inc:high"], []])
-        config = {"doer": "anthropic", "review": review, "trial": [pin], "shadow": needed}
-        dispatches, findings, n = [], [], 0
-
-        def add(gate_id, rnd, setup, model, outage):
-            nonlocal n
-            n += 1
-            ident = f"x{n}"
-            dispatches.append({"id": ident, "gate_id": gate_id, "round": rnd,
-                               "candidate": gate_id, "stage": "review", "setup": setup,
-                               "status": rng.choice(["final"] * 9 + ["pending"]),
-                               "family": "openai", "model": model, "effort": "high",
-                               "outage": outage})
-            for k in range(rng.choice([0, 0, 1, 2])):
-                findings.append({"dispatch_id": ident, "cause_id": f"c{n}{k}",
-                                 "substantiated": rng.choice(["1", "1", "0"])})
-
-        for g in range(rng.randint(0, 2 * needed + 2)):
-            for rnd in rng.sample(["1", "2", "3"], rng.randint(1, 2)):
-                add(f"g{g}", rnd, "shadow", "gpt-6-trial", rng.choice(["0"] * 8 + ["1", "-"]))
-                if rng.random() < 0.6:
-                    add(f"g{g}", rnd, "broad", "gpt-6-inc", rng.choice(["0"] * 5 + ["1", "-"]))
-                if rng.random() < 0.2:
-                    add(f"g{g}", rnd, "shadow", "gpt-6-other", "0")
-        got = trial_verdict(config, dispatches, findings, pin)[0]
-        want = reference_verdict(config, dispatches, findings, pin)
-        assert got == want, (case, got, want, config, dispatches, findings)
-
-
 def roles_check(root: Path) -> None:
-    """Role lists, fixed order, effort by risk, and shadow trials, on a fixture of their own."""
+    """Role lists, their fallback, fixed order, effort by risk, and who may judge."""
     (root / "config.toml").write_text(ROLES_CONFIG)
     for name, columns, fixture in (("dispatches.tsv", DISPATCH_COLUMNS, ROLES_DISPATCHES),
                                    ("findings.tsv", FINDING_COLUMNS, ROLES_FINDINGS)):
@@ -752,7 +516,9 @@ def roles_check(root: Path) -> None:
     config = load_config()
     assert roster_for(config, "race") == ["google:gemini-3.8-flash-high"]
     assert roster_for(config, "plan") == config["reviewers"]  # unset reviewer-side role falls back
-    assert roster_for(config, "worker") == []  # the host chooses
+    assert roster_for(config, "explore") == []  # the host chooses
+    assert roster_for(dict(config, review=["x:y:z"]), "disposition") == ["x:y:z"]
+    assert roster_for(dict(config, review=[]), "review") == []  # an explicit empty list stays empty
     assert with_effort(("openai", "m", "high"), config, trust=True) == ("openai", "m", "xhigh")
     assert with_effort(("openai", "m", "high"), config, trust=False) == ("openai", "m", "high")
     dispatches, findings = load_tables()
@@ -764,84 +530,17 @@ def roles_check(root: Path) -> None:
     # a trust pick is the xhigh arm, and its history is the xhigh rows it writes (s8), not high's
     _, stats = pick_arms(config, dispatches, findings, "review", trust=True)
     assert stats[("openai", "gpt-6-astra", "xhigh")][:2] == (1, 0), stats
-    # s3 shares k1 with counted s1 (s1 keeps its credit) and k2 with shadow s4 (neither earns it)
-    assert unique_blocker_dispatches(dispatches, findings) == {"s1", "s8"}
-    for argv, expected, wanted, unwanted in (
-            (["pick", "race", "--repo", "r"], 0, ["chosen google:gemini-3.8-flash-high"], ["shadow"]),
-            (["pick", "review", "--trust", "--repo", "r"], 0,
-             ["chosen openai:gpt-6-astra:xhigh", "shadow openai:gpt-6-nova:xhigh 0/1"],
-             ["shadow openai:gpt-6-sol"]),  # past its shadow gates, it no longer rides along
-            (["remaining", "g7"], 0, ["n1 = 1", "n2 = 0"], []),  # shadows are not captures
-            (["promote", "--repo", "r"], 0,
-             ["replace openai:gpt-6-astra:high with openai:gpt-6-sol:high in review",
-              "add anthropic:claude-x:high to review", "drop google:gemini-9-pro:high",
-              "shadow openai:gpt-6-nova:high: 0/1",
-              "shadow google:gemini-3.8-flash-high: 1 shared gates, 0 vs 0 causes"], [])):
-        code, out = run(argv)
-        assert code == expected and all(w in out for w in wanted), (argv, out)
-        assert not any(u in out for u in unwanted), (argv, out)
-    # undecided trials keep riding to twice their count, then leave; the comparison is shared gates
-    assert roster_for(dict(config, review=["x:y:z"]), "disposition") == ["x:y:z"]
-    clean = dict(dispatches[6], id="s9", gate_id="g10", candidate="c10")
-    assert trial_verdict(config, dispatches + [clean], findings,
-                         "google:gemini-3.8-flash-high")[0] == "drop"
-    elsewhere = dict(dispatches[2], id="s10", gate_id="g11", candidate="c11")
-    worse = dispatches + [elsewhere]
-    extra = findings + [dict(findings[2], dispatch_id="s10", cause_id="q1", candidate="c11")]
-    config2 = dict(config, shadow=2)  # s10's cause sits on a gate astra never saw: it cannot count
-    assert trial_verdict(config2, worse, extra, "openai:gpt-6-sol:high")[0] == "shadow"
-    # worse beside the incumbent (0 vs s1's 1 on g7), better only where it ran alone: drop
-    beside = dict(dispatches[2], id="z1", model="gpt-6-zeta")
-    alone = dict(dispatches[2], id="z2", model="gpt-6-zeta", gate_id="g12", candidate="c12")
-    alone_f = findings + [dict(findings[2], dispatch_id="z2", cause_id="q2", candidate="c12")]
-    assert trial_verdict(config, dispatches + [beside, alone], alone_f,
-                         "openai:gpt-6-zeta:high")[0] == "drop"
-    # gate review round 1: three rounds of one gate are one gate; an incumbent outage is no baseline
-    rounds = [dict(dispatches[2], id=f"r{k}", model="gpt-6-omega", round=str(k)) for k in (2, 3)]
-    rounds_f = findings + [dict(findings[2], dispatch_id=f"r{k}", cause_id=f"w{k}") for k in (2, 3)]
-    three = dict(config, shadow=3)
-    assert trial_verdict(three, dispatches + [dict(dispatches[2], id="r1", model="gpt-6-omega")]
-                         + rounds, rounds_f, "openai:gpt-6-omega:high") == ("shadow", "1/3")
-    down = [dict(dispatches[0], id=f"o{g}", gate_id=g, candidate=g, outage="1") for g in "xyz"]
-    ride = [dict(dispatches[2], id=f"t{g}", gate_id=g, candidate=g, model="gpt-6-tau") for g in "xyz"]
-    tau_f = findings + [dict(findings[2], dispatch_id="tx", cause_id="u1", candidate="x")]
-    assert trial_verdict(three, dispatches + down + ride, tau_f,
-                         "openai:gpt-6-tau:high")[0] == "shadow"  # no shared baseline yet
-    # gate review round 2: a trial pin never counts even when a list names it, and a gate's paired
-    # round is the one compared
-    both = dict(config, review=["google:gemini-trial:high", "openai:gpt-6-astra:high"],
-                trial=["google:gemini-trial:high"], select="fixed")  # listed first: no luck
-    chosen, _ = pick_arms(both, dispatches, findings, "review", trust=False)
-    assert ("google", "gemini-trial") not in {a[:2] for a in chosen}, chosen
-    paired_rows, paired_f = [], list(findings)
-    for g in "pqr":
-        paired_rows += [dict(dispatches[2], id=f"{g}1", gate_id=g, candidate=g, model="gpt-6-pi"),
-                        dict(dispatches[2], id=f"{g}2", gate_id=g, candidate=g, round="2",
-                             model="gpt-6-pi"),
-                        dict(dispatches[0], id=f"{g}i", gate_id=g, candidate=g, round="2")]
-        paired_f.append(dict(findings[2], dispatch_id=f"{g}2", cause_id=f"v{g}", candidate=g))
-    assert trial_verdict(three, dispatches + paired_rows, paired_f,
-                         "openai:gpt-6-pi:high")[0] == "replace"
-    # gate review round 3: an outage in any round of a counted gate drops the trial, even when a
-    # later round of that gate is the one compared
-    retried = [dict(dispatches[2], id=f"{g}{k}", gate_id=g, candidate=g, model="gpt-6-rho",
-                    round=k, outage="1" if (g, k) == ("m", "1") else "0")
-               for g in "mno" for k in ("1", "2")]
-    base = [dict(dispatches[0], id=f"{g}b", gate_id=g, candidate=g, round="2") for g in "mno"]
-    rho_f = findings + [dict(findings[2], dispatch_id="m2", cause_id="h1", candidate="m")]
-    assert trial_verdict(three, dispatches + retried + base, rho_f,
-                         "openai:gpt-6-rho:high")[0] == "drop"
-    # gate review round 4: worker and explore pick from their own list, doer's family included
-    own_family = {"doer": "anthropic", "worker": ["anthropic:claude-sonnet-5:medium"]}
-    assert pick_arms(own_family, [], [], "worker", trust=True)[0] == [
-        ("anthropic", "claude-sonnet-5", "medium")]
-    assert pick_arms(own_family, [], [], "review", trust=False)[0] == []  # judges stay independent
+    # workers serve the doer and may share its family; judges may not
+    assert pick_arms(config, [], [], "worker", trust=True)[0] == [
+        ("anthropic", "claude-sonnet-5", "xhigh")]
+    own = {"doer": "anthropic", "review": ["anthropic:claude-x:high"]}
+    assert pick_arms(own, [], [], "review", trust=False)[0] == []
     assert pin_of(("google", "gemini-3.1-pro-high", "-")) == "google:gemini-3.1-pro-high"
-    models = root / "models.txt"
-    models.write_text("Fetching available models...\ngemini-3.1-pro-high\tGemini 3.1 Pro\n"
-                      "gemini-10-pro-high\tGemini 10 Pro\ngpt-6-sol\n")
-    code, out = run(["roster", str(models), "--repo", "r"])
-    assert code == 0 and out.strip() == "new google:gemini-10-pro-high", out
+    for argv, wanted in ((["pick", "race", "--repo", "r"], "chosen google:gemini-3.8-flash-high\n"),
+                         (["pick", "review", "--trust", "--repo", "r"],
+                          "chosen openai:gpt-6-astra:xhigh")):
+        code, out = run(argv)
+        assert code == 0 and wanted in out, (argv, out)
 
 
 def self_check() -> int:
@@ -928,7 +627,6 @@ def self_check() -> int:
             assert code == expected, (argv, code, out)
             assert all(want in out for want in wanted), (argv, out)
         roles_check(root)
-        eligibility_check()
     print("ledger self-check passed")
     return 0
 
@@ -967,13 +665,6 @@ def main(argv: list[str] | None = None) -> int:
     cost.set_defaults(run=cmd_cost)
     subparsers.add_parser("schema", help="the ledger's columns and enum domains"
                           ).set_defaults(run=cmd_schema)
-    roster = subparsers.add_parser("roster", help="host model ids not yet configured or tried")
-    roster.add_argument("models", help="file of host model ids, one per line, or - for stdin")
-    roster.add_argument("--repo", help="default: this checkout's origin")
-    roster.set_defaults(run=cmd_roster)
-    promote = subparsers.add_parser("promote", help="verdict for each trial pin past its shadow")
-    promote.add_argument("--repo", help="default: this checkout's origin")
-    promote.set_defaults(run=cmd_promote)
 
     args = parser.parse_args(argv)
     if args.self_check:
