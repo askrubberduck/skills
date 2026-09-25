@@ -313,6 +313,8 @@ def pick_arms(config: dict, dispatches: list[dict], findings: list[dict], stage:
     doer = config.get("doer")
     ranked = (arms if config.get("select") == "fixed"
               else sorted(arms, key=lambda a: stats[a][3], reverse=True))
+    if stage not in REVIEWER_FALLBACK:  # worker and explore serve the doer; they judge nothing
+        return ranked[:1], stats
     chosen = [a for a in ranked if a[0] != doer][:1]
     if trust and chosen:
         # Broad needs two families, one outside the doer's; the first arm is it, so the second only
@@ -346,9 +348,11 @@ def cmd_pick(args) -> int:
 
 
 def shadow_rows(dispatches: list[dict], pin: str) -> list[dict]:
+    """Final shadow reviews of a pin whose outage flag is known; an unknown flag is neither a clean
+    run nor an outage, so the row does not count toward a trial either way."""
     family, model, _ = arm_of(pin)  # effort may be overridden by risk, so it does not identify
     return [d for d in dispatches if d["setup"] == "shadow" and d["status"] == "final"
-            and (d["family"], d["model"]) == (family, model)]
+            and d["outage"] in ("0", "1") and (d["family"], d["model"]) == (family, model)]
 
 
 def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
@@ -365,7 +369,7 @@ def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
     theirs = {gate(d): d for d in dispatches
               if incumbent and d["stage"] == "review" and d["status"] == "final"
               and d["setup"] != "shadow"
-              and d["outage"] != "1"  # an incumbent that never answered found nothing to beat
+              and d["outage"] == "0"  # an incumbent that never answered, or may not have, is no baseline
               and (d["family"], d["model"]) == incumbent[:2]}
     by_gate: dict[str, dict] = {}
     for d in shadow_rows(dispatches, pin):  # a gate counts once: its round with a baseline if any
@@ -650,7 +654,7 @@ def reference_verdict(config: dict, dispatches: list[dict], findings: list[dict]
     needed = int(config.get("shadow", DEFAULT_SHADOW))
     family, model = pin.split(":")[0], pin.split(":")[1]
     trialled = {tuple(t.split(":")[:2]) for t in config.get("trial", [])}
-    listed = config.get("review") or config.get("reviewers") or []
+    listed = config["review"] if isinstance(config.get("review"), list) else config.get("reviewers", [])
     incumbent = None
     for entry in listed:
         fam, mod = entry.split(":")[:2]
@@ -665,7 +669,7 @@ def reference_verdict(config: dict, dispatches: list[dict], findings: list[dict]
     def baseline(row):
         for d in dispatches:
             if (incumbent and (d["family"], d["model"]) == incumbent and d["stage"] == "review"
-                    and d["status"] == "final" and d["setup"] != "shadow" and d["outage"] != "1"
+                    and d["status"] == "final" and d["setup"] != "shadow" and d["outage"] == "0"
                     and d["gate_id"] == row["gate_id"] and d["round"] == row["round"]
                     and d["candidate"] == row["candidate"]):
                 return d
@@ -673,7 +677,7 @@ def reference_verdict(config: dict, dispatches: list[dict], findings: list[dict]
 
     order, by_gate = [], {}
     for d in dispatches:
-        if (d["setup"] == "shadow" and d["status"] == "final"
+        if (d["setup"] == "shadow" and d["status"] == "final" and d["outage"] != "-"
                 and (d["family"], d["model"]) == (family, model)):
             if d["gate_id"] not in by_gate:
                 order.append(d["gate_id"])
@@ -710,7 +714,7 @@ def eligibility_check(cases: int = 3000) -> None:
     for case in range(cases):
         needed = rng.choice([1, 2, 3])
         review = rng.choice([["openai:gpt-6-inc:high", "google:gem:high"], ["google:gem:high"],
-                             [pin, "openai:gpt-6-inc:high"]])
+                             [pin, "openai:gpt-6-inc:high"], []])
         config = {"doer": "anthropic", "review": review, "trial": [pin], "shadow": needed}
         dispatches, findings, n = [], [], 0
 
@@ -729,9 +733,9 @@ def eligibility_check(cases: int = 3000) -> None:
 
         for g in range(rng.randint(0, 2 * needed + 2)):
             for rnd in rng.sample(["1", "2", "3"], rng.randint(1, 2)):
-                add(f"g{g}", rnd, "shadow", "gpt-6-trial", rng.choice(["0"] * 8 + ["1"]))
+                add(f"g{g}", rnd, "shadow", "gpt-6-trial", rng.choice(["0"] * 8 + ["1", "-"]))
                 if rng.random() < 0.6:
-                    add(f"g{g}", rnd, "broad", "gpt-6-inc", rng.choice(["0"] * 5 + ["1"]))
+                    add(f"g{g}", rnd, "broad", "gpt-6-inc", rng.choice(["0"] * 5 + ["1", "-"]))
                 if rng.random() < 0.2:
                     add(f"g{g}", rnd, "shadow", "gpt-6-other", "0")
         got = trial_verdict(config, dispatches, findings, pin)[0]
@@ -827,6 +831,11 @@ def roles_check(root: Path) -> None:
     rho_f = findings + [dict(findings[2], dispatch_id="m2", cause_id="h1", candidate="m")]
     assert trial_verdict(three, dispatches + retried + base, rho_f,
                          "openai:gpt-6-rho:high")[0] == "drop"
+    # gate review round 4: worker and explore pick from their own list, doer's family included
+    own_family = {"doer": "anthropic", "worker": ["anthropic:claude-sonnet-5:medium"]}
+    assert pick_arms(own_family, [], [], "worker", trust=True)[0] == [
+        ("anthropic", "claude-sonnet-5", "medium")]
+    assert pick_arms(own_family, [], [], "review", trust=False)[0] == []  # judges stay independent
     assert pin_of(("google", "gemini-3.1-pro-high", "-")) == "google:gemini-3.1-pro-high"
     models = root / "models.txt"
     models.write_text("Fetching available models...\ngemini-3.1-pro-high\tGemini 3.1 Pro\n"

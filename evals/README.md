@@ -350,7 +350,8 @@ configuration, so the candidate's required bound shows no behavioral difference 
 `race-03-role-list` and `review-04-shadow-trial`, Claude Code 2.1.281 and 2.1.282, default agent
 model, Sonnet judge, three runs per arm. Cells count runs that passed every grader of the case
 (the plugin-fired trigger aside). `review-04` and the `master` arm of `race-03` ran on
-the final text.
+`64a6295`'s skill text; later commits changed `ledger.py`, `dispatch.md`'s fallback sentence and duck-learn's promotion sentence,
+not the text these cases probe.
 
 | Case | Candidate with plugin | Candidate without | `master` with | `master` without |
 |---|---|---|---|---|
