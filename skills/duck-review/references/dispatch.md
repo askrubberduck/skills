@@ -44,9 +44,10 @@ and run in the background because reviews can take 10–45 minutes; where the CL
 its own, bound the wait yourself with `[bounds].dispatch_timeout` (default 45m) the way
 `duck-race`'s block does — and past the deadline kill the process, confirm it exited, then read
 what it wrote: a wait that returns while the worker still writes hands the retry a shared file.
-The pinned ids come from `[families].reviewers` (default empty: the owner's setup names them) in
-`~/.askrubberduck/config.toml`, never from memory. Minimum shapes, with the pins and the timeout
-bound first:
+The pinned ids come from `~/.askrubberduck/config.toml`, never from memory: `[models].review` for
+a review or a disposition (default `[families].reviewers`), and `[families].reviewers`
+(default empty: the owner's setup names them) for any role without a list of its own. Minimum shapes, with
+the pins and the timeout bound first:
 
 ```bash
 : "${CODEX_MODEL:?pinned id, proven below}" "${AGY_MODEL:?pinned id, proven below}" "${DISPATCH_TIMEOUT:?from [bounds], e.g. 45m}"
@@ -84,6 +85,13 @@ Two kinds of malformed result, and every skill that says "malformed" means one o
 are claims to adjudicate; *unsupported* — no verdict, or a verdict whose cited justification is
 the claim under attack: the participant did not answer, the gate is short a reviewer, and its
 findings are still claims. **A REJECT is never an outage.**
+
+**A pin on trial rides along.** A pin in `[learn].trial` (default empty) rides along for its first
+`[learn].shadow` (default 3) gates, and up to twice that while its comparison stays undecided;
+`scripts/ledger.py pick review` names it on a `shadow` line while it does. Dispatch it beside the required set with the same brief and the same export authorization for its
+vendor, or skip it and say so. Its verdict never counts toward the gate, its outage never leaves
+the gate short, and its findings are adjudicated like any other. Its row carries
+`setup = shadow`.
 
 Every dispatch attempt gets a row in `~/.askrubberduck/dispatches.tsv`: `pending` when launched,
 finalized once at synthesis with minutes, verdict and outage. A row left `pending` is an

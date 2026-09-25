@@ -279,7 +279,7 @@ def check_routing(root: Path, found: set[str], errors: list[str]) -> None:
         errors.append(f"evals/routing.json: no selection probe for {name}")
 
 
-CONFIG_KEY = re.compile(r"`\[(bounds|review|families)\]\.(\w+)`")
+CONFIG_KEY = re.compile(r"`\[(bounds|review|families|models|effort|learn)\]\.(\w+)`")
 
 
 def check_config_keys(root: Path, readme: str, errors: list[str]) -> None:

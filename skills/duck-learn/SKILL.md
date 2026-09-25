@@ -17,6 +17,15 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
    - **Numbers first.** `scripts/ledger.py thresholds` reads `~/.askrubberduck/dispatches.tsv`
      and prints lesson candidates — a reviewer's outage rate, a family with no unique catch over
      its last twenty dispatches, a cost that drifted — each one an occurrence for step 3's bar.
+   - **New models.** `scripts/ledger.py roster -` reads the hosts' model lists (`agy models`;
+     codex prints none, so the owner names its new pins) and prints ids nobody has configured,
+     trialled or dispatched; `promote` prints each trial pin's verdict: still `shadow`, or `replace`,
+     `add` or `drop` once decided.
+     `[learn].discover` (default `auto`) decides what follows: `off` ignores both; `propose` queues
+     each through `duck-decide`; `auto` puts at most one new pin per family into `[learn].trial`
+     and applies each `replace`, `add` or `drop` verdict to `~/.askrubberduck/config.toml`,
+     reporting the edit. This is the owner's config, not a policy file: step 4's review path does
+     not apply to it.
    - **Sources.** Transcript-store locations — Claude `~/.claude/projects/<dir>/*.jsonl`, Codex
      `$CODEX_HOME/sessions` and `archived_sessions` — are the hosts whose stores are known, not the
      whole set: another host has its store located before the mine, or the result is partial and

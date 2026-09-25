@@ -32,8 +32,11 @@ security boundaries and required workflow evidence.
    check before accepting the result; without identity or a suitable check, do not claim a validated
    cheaper route. If it fails, inspect the cause and escalate when capability is the limit, rather
    than retrying the same attempt. Two failed attempts at the same slice end that routing experiment.
-   Use `duck-review`'s challenge-selection policy for independent or high-risk judgments; honor the
-   owner's model choices and repository requirements.
+   `[models].worker` for delegated builders (default the host's choice) and `[models].explore`
+   for read-only search (default the host's choice) name the model to ask the host for; the identity and the check above still
+   apply, and a same-family worker is never an independent reviewer. Use `duck-review`'s
+   challenge-selection policy for independent or high-risk judgments; honor the owner's model
+   choices and repository requirements.
 4. **Batch useful communication.** Dispatch bounded independent tasks with the necessary context.
    Request findings and decisive evidence, not transcripts or repeated idle updates. More workers
    and more rounds need a question they can resolve.

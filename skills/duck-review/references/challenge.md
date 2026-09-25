@@ -55,8 +55,10 @@ an independent plan, an outcome oracle, or a reconstruction. Share requirements 
 keep initial conclusions independent. Different role names or contexts are not different families,
 and different families may share a faulty premise. Test the premise too. Select an available,
 pinned model capable of the challenge — `scripts/ledger.py pick <stage>` chooses within the
-required set from recorded catches per minute, and `[families].reviewers` supplies the roster it
-samples; use the strongest available tier for trust-touching or unfamiliar high-risk judgments
+required set from the stage's list by recorded catches per minute, or in list order when
+`[learn].select` is `fixed` (default `adaptive`). The chosen pin's effort is `[effort].trust`
+(default the pin's own) for trust-touching work and `[effort].ordinary` (default the pin's own)
+otherwise. Use the strongest available tier for trust-touching or unfamiliar high-risk judgments
 unless the owner specifies otherwise. Ordinary work may use a cheaper tier; record the choice
 without making a universal cost or quality claim. The participant counts and tiers above are
 conventions, not measured calibration; the dispatch ledger is where that measurement accumulates.

@@ -1,4 +1,4 @@
-<!-- translation-source: README.md sha256=2cc57077dee6ea85b57b695e69e2348f4f7025ce58bcd9198ad7194e23f83d7e -->
+<!-- translation-source: README.md sha256=d3ae84ace4563ca8fc386413f7148ffdd7ea244f5c946ee2078420877636adf9 -->
 
 <p align="center">
   <img src="assets/logo.svg" width="112" alt="askrubberduck">
@@ -318,14 +318,31 @@ ln -s "$PWD"/askrubberduck-skills/skills/* ~/.agents/skills/
 Кто поймал баг в прошлый раз? Утка записывает. Каждый вызов — ревьюер, соперник, критик —
 оставляет одну строку в `~/.askrubberduck/dispatches.tsv`; каждое замечание после разбора — одну
 строку в `~/.askrubberduck/findings.tsv`. В твой репозиторий не попадает ничего. Всё остаётся на твоей машине, а
-в `~/.askrubberduck/config.toml` лежат выбранные модели и лимиты. Файла нет? Лимиты ниже — значения
-по умолчанию, и утка работает как раньше. Модели ревьюеров — только пример; пока ты их не
-назовёшь, список ревьюеров пуст.
+в `~/.askrubberduck/config.toml` лежат выбранные модели и лимиты. Файла нет? Лимиты и значения `[learn]`
+ниже — это значения по умолчанию, и утка работает как раньше. Модели и уровни усилия — только
+пример; пока ты не назовёшь ревьюеров, их список пуст.
 
 ```toml
 [families]
 doer = "anthropic"
-reviewers = ["openai:gpt-6-astra:high", "google:gemini-3.1-pro-high"]  # семейство:модель:усилие
+reviewers = ["openai:gpt-6-sol:high", "google:gemini-3.1-pro-high"]  # семейство:модель:усилие
+
+[models]                    # по ролям; без списка review, race, plan берут reviewers, worker и explore — хост
+review = ["openai:gpt-6-sol:high", "google:gemini-3.1-pro-high"]
+race = ["google:gemini-3.8-flash-high"]
+plan = ["openai:gpt-6-sol:medium"]
+worker = ["anthropic:claude-sonnet-5:medium"]
+explore = ["anthropic:claude-haiku-4-5:low"]
+
+[effort]                    # по риску; перекрывает усилие модели, без него — как в модели
+ordinary = "medium"
+trust = "high"
+
+[learn]
+select = "adaptive"         # adaptive — по истории; fixed — по порядку списка
+discover = "auto"           # новые модели: off | propose | auto
+shadow = 3                  # сколько гейтов модель на испытании идёт тенью
+trial = []                  # модели на испытании; их вносит и убирает duck-learn
 
 [bounds]                    # лимиты; внутри них, когда остановиться, решают факты
 review_rounds = 3           # duck-run
@@ -347,7 +364,9 @@ review_rounds = 2
 находкам. Какое семейство что лучше ловит? `precision`. Кто ревьюит следующим? `pick <stage>` выбирает по
 записанным находкам в минуту — среди тех, кого требует гейт. Помогло ли изменение? `paired`
 сравнивает два варианта на одних и тех же задачах. Что поползло? `thresholds` отдаёт случаи
-`duck-learn`. Во что обойдётся этот гейт? `cost <setup>` смотрит на прошлые. `scripts/ledger.py --self-check` прогоняет
+`duck-learn`. Во что обойдётся этот гейт? `cost <setup>` смотрит на прошлые. Вышла новая модель? `roster` покажет те, которые
+ещё никто не пробовал; после теневых гейтов `promote` скажет, заменит ли она ревьюера своего
+семейства, войдёт в список или уйдёт. `scripts/ledger.py --self-check` прогоняет
 каждую команду на тестовых данных и проверяет вывод. Только стандартная библиотека. `-` значит
 «неизвестно», а неизвестное никогда не считается нулём.
 

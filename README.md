@@ -302,14 +302,31 @@ Proof and break can share a page. A pile of receipts is not a pile of proof.
 Who caught the bug last time? The duck writes it down. Every dispatch — a reviewer, a rival, a
 critic — leaves one row in `~/.askrubberduck/dispatches.tsv`; every finding, once judged, one row
 in `~/.askrubberduck/findings.tsv`. Your repository gets nothing. The rows stay on your machine, and
-`~/.askrubberduck/config.toml` holds the pins and the ceilings. No file there? The bounds below
-are the defaults, and the duck works as before. The reviewer models are an example; the reviewer
-list is empty until you name one.
+`~/.askrubberduck/config.toml` holds the pins and the ceilings. No file there? The bounds and the
+`[learn]` values below are the defaults, and the duck works as before. The models and effort
+levels are an example; the reviewer list is empty until you name one.
 
 ```toml
 [families]
 doer = "anthropic"
-reviewers = ["openai:gpt-6-astra:high", "google:gemini-3.1-pro-high"]  # family:model:effort
+reviewers = ["openai:gpt-6-sol:high", "google:gemini-3.1-pro-high"]  # family:model:effort
+
+[models]                    # per role; unset review, race, plan use reviewers, worker and explore the host
+review = ["openai:gpt-6-sol:high", "google:gemini-3.1-pro-high"]
+race = ["google:gemini-3.8-flash-high"]
+plan = ["openai:gpt-6-sol:medium"]
+worker = ["anthropic:claude-sonnet-5:medium"]
+explore = ["anthropic:claude-haiku-4-5:low"]
+
+[effort]                    # by risk; overrides a pin's effort, unset keeps it
+ordinary = "medium"
+trust = "high"
+
+[learn]
+select = "adaptive"         # adaptive: by track record; fixed: list order
+discover = "auto"           # new models: off | propose | auto
+shadow = 3                  # gates a trial model rides along without counting
+trial = []                  # models on trial; duck-learn fills and empties it
 
 [bounds]                    # ceilings; inside them, evidence decides when to stop
 review_rounds = 3           # duck-run
@@ -331,7 +348,9 @@ The rows answer questions the duck used to guess at. How many defects did both r
 which class? `precision`. Who reviews next? `pick <stage>` samples from recorded catches per minute,
 inside the set the gate requires. Did the change help? `paired` compares two arms on the same
 cases. What is drifting? `thresholds` hands `duck-learn` its occurrences. What will this gate
-cost? `cost <setup>` reads past gates. `scripts/ledger.py --self-check` runs each of these on a
+cost? `cost <setup>` reads past gates. Is there a new model? `roster` lists the ones nobody has
+tried; after its shadow gates, `promote` says whether it replaces its family's reviewer, joins the
+list, or goes. `scripts/ledger.py --self-check` runs each of these on a
 fixture and asserts what it prints. Standard library only. A `-` means unknown; unknown never counts as zero.
 
 ### How the duck keeps review rounds bounded

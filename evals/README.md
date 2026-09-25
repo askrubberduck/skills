@@ -344,3 +344,22 @@ the candidate read is not observed. `review-03` and
 `proof-02` pass without the plugin too, so they cannot show uplift. `race-02` configures a
 seven-minute timeout so that the old 2700-second default cannot pass; both versions read the
 configuration, so the candidate's required bound shows no behavioral difference here.
+
+### Model roles and shadow trials, 2026-09-25
+
+`race-03-role-list` and `review-04-shadow-trial`, Claude Code 2.1.281, default agent model,
+Sonnet judge, three runs per arm. Cells count runs whose content grader passed; `review-04`
+counts runs passing both content graders. `review-04` and the `master` arm of `race-03` ran on
+the final text.
+
+| Case | Candidate with plugin | Candidate without | `master` with | `master` without |
+|---|---|---|---|---|
+| `race-03-role-list` | 3/3 | 3/3 | 0/3 | 3/3 |
+| `review-04-shadow-trial` | 3/3 | 3/3 | 3/3 | 3/3 |
+
+With the plugin, `master`'s `duck-race` took the rival from the reviewers roster in all three runs,
+overriding the race list the prompt configured; the candidate reads the race list. Without the
+plugin the model follows the pasted config, so `race-03` shows the text now matches the config,
+not uplift. `review-04` does not discriminate: every arm infers the non-counting shadow from the
+pasted config. The shadow rules are pinned by `ledger.py --self-check`, not by this case. An
+earlier `master` run of `race-03` hit the account's weekly limit mid-judging and was discarded.
