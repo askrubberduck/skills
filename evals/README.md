@@ -129,7 +129,9 @@ of `duck-why`, `duck-dry` and `duck-shape` are untested here; the cases check th
 admits that limit. The judge sees the answer and the rubric, never the prompt — a rubric that
 compares against the original file carries that file. A run whose `error` is set, or whose
 grader reports `grader threw` or `judge call failed`, is an outage, not a FAIL: leave it out of
-the count and run it again.
+the count and run it again. Read the judge's evidence on passing runs as well as failing ones: a
+loose rubric once passed a brief whose citations were `⟨line⟩` placeholders, and nothing but a
+reviewer reading that evidence caught it.
 
 ### Run of 2026-09-18
 
@@ -401,3 +403,17 @@ words match the cited line. Under the strict grader no arm passes: candidate bri
 give path and line, but each run leaves at least one placeholder or bare `SKILL.md`; `master`
 briefs quote less and cite looser. The rule moves drafts toward quoting; it does not by itself
 produce a checkable citation for every criterion.
+
+### Rally before the gate, 2026-09-25
+
+`run-03-rally-before-gate`, Claude Code 2.1.282, default agent model, Sonnet judge, three runs per
+arm: a duck-run task whose committed candidate is executable code headed for its release gate.
+
+| | Candidate with plugin | `master` with plugin | Without plugin |
+|---|---|---|---|
+| names a rally with a different family before the gate | 3/3 | 0/3 | 0/3 |
+| describes it as alternating serve and return (grader) | 3/3 | 0/3 | 0/3 |
+
+A first candidate text named the rally in all three runs but only one described its mechanics;
+the rule now says in one clause how a rally runs, and the re-run above is on that text. The
+judge's evidence was read on passing and failing runs alike.

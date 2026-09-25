@@ -98,6 +98,11 @@ verification limits, without creating a commit, PR or release verdict.
 Call `duck-review`'s release-gate path by name; its unscoped default is a findings pass, which
 satisfies no gate.
 
+A change to executable code first goes through a `duck-race` rally with a different family against
+its contract: the sides take turns, one serving a failing test, the other making it pass without
+touching it. The rally's receipt is part of the evidence. A gate round finds one or two defects at
+a time; a rally turns the same class into tests faster.
+
 Prepare the candidate and evidence before invoking `duck-review`. If committing is authorized,
 record the exact commit; otherwise review an explicit worktree snapshot and do not treat that as a
 landable SHA. A gate-policy change is reviewed under PRE-change rules, never its own relaxed rules.
