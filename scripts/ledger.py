@@ -341,7 +341,9 @@ def cmd_pick(args) -> int:
         for pin, reason in shadow_status(config, dispatches, findings):
             print(f"shadow {pin_of(with_effort(arm_of(pin), config, args.trust))} {reason}")
     if len(chosen) < (2 if args.trust and args.stage in REVIEWER_FALLBACK else 1):
-        missing = "a second family" if chosen else f"an arm outside {config['doer']}"
+        missing = ("a second family" if chosen
+                   else f"an arm outside {config['doer']}" if args.stage in REVIEWER_FALLBACK
+                   else "any arm")
         print(f"required set unmet: the {args.stage} roster holds no {missing}")
         return 1
     return 0
@@ -786,6 +788,10 @@ def roles_check(root: Path) -> None:
     assert roster_for(dict(config, review=[]), "review") == []  # an explicit empty list stays empty
     code, out = run(["pick", "worker", "--trust", "--repo", "r"])
     assert code == 0 and "chosen anthropic:claude-sonnet-5" in out, out  # one worker, no 2nd family
+    (root / "config.toml").write_text('[families]\ndoer = "anthropic"\n')
+    code, out = run(["pick", "explore", "--repo", "r"])
+    assert code == 1 and "holds no any arm" in out, out  # not "outside anthropic": explore may share it
+    (root / "config.toml").write_text(ROLES_CONFIG)
     clean = dict(dispatches[6], id="s9", gate_id="g10", candidate="c10")
     assert trial_verdict(config, dispatches + [clean], findings,
                          "google:gemini-3.8-flash-high")[0] == "drop"
