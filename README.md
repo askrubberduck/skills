@@ -195,10 +195,10 @@ you what it changed. Set it to `propose` to be asked first.
    checks that could kill them. Run the cheap experiment before building on the expensive guess.
 3. **Execute.** Make the meaningful check fail, make it pass, then apply `duck-shape` and
    `duck-dry` inside that unit. “We'll simplify it later” has had enough chances.
-4. **Prove**, `duck-proof`. Executable code first goes through a `duck-race` rally with another
-   model family. Attack the goal, the behavior and the finished shape. `duck-break`
-   runs hostile experiments where needed. Fix something? Run the affected checks again. Yesterday's
-   green does not cover today's edit.
+4. **Prove**, `duck-proof`. Executable code headed for independent review first goes through a
+   `duck-race` rally with another model family. Attack the goal, the behavior and the finished
+   shape. `duck-break` runs hostile experiments where needed. Fix something? Run the affected checks
+   again. Yesterday's green does not cover today's edit.
 5. **Review**, `duck-review`. Where the task or release policy requires it, independent reviewers
    challenge the exact candidate. A missing reviewer leaves a missing review, never a quiet pass.
 6. **Land**, `duck-land`. When you authorized a merge: merge, read back what landed, record it,
