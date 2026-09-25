@@ -347,25 +347,39 @@ the candidate read is not observed. `review-03` and
 seven-minute timeout so that the old 2700-second default cannot pass; both versions read the
 configuration, so the candidate's required bound shows no behavioral difference here.
 
-### Model roles and shadow trials, 2026-09-25
+### Model roles, 2026-09-25
 
-`race-03-role-list` and `review-04-shadow-trial`, Claude Code 2.1.281 and 2.1.282, default agent
-model, Sonnet judge, three runs per arm. Cells count runs that passed every grader of the case
-(the plugin-fired trigger aside). `review-04` and the `master` arm of `race-03` ran on
-`64a6295`'s skill text; later commits changed `ledger.py`, `dispatch.md`'s fallback sentence and duck-learn's promotion sentence,
-not the text these cases probe.
+`race-03-role-list`, default agent model, Sonnet judge, three runs per arm. Cells count runs
+that passed every grader of the case (the plugin-fired trigger aside). The candidate arm ran on
+Claude Code 2.1.281 before the gate rounds, which changed `ledger.py` but not `duck-race`'s text;
+the `master` arm ran on `97c4db8` with 2.1.282.
 
 | Case | Candidate with plugin | Candidate without | `master` with | `master` without |
 |---|---|---|---|---|
 | `race-03-role-list` | 3/3 | 3/3 | 0/3 | 3/3 |
-| `review-04-shadow-trial` | 3/3 | 3/3 | 3/3 | 3/3 |
 
 With the plugin, `master`'s `duck-race` took the rival from the reviewers roster in all three runs,
 overriding the race list the prompt configured; the candidate reads the race list. Without the
 plugin the model follows the pasted config, so `race-03` shows the text now matches the config,
-not uplift. `review-04` does not discriminate: every arm infers the non-counting shadow from the
-pasted config. The shadow rules are pinned by `ledger.py --self-check`, not by this case. An
-earlier `master` run of `race-03` hit the account's weekly limit mid-judging and was discarded.
+not uplift. An earlier `master` run of `race-03` hit the account's weekly limit mid-judging and was discarded.
+
+### Model trials, 2026-09-25
+
+`learn-01-promote-auto`, Claude Code 2.1.282, default agent model, Sonnet judge, three runs per
+arm, candidate against `master`. The case hands duck-learn a `promote` verdict and two new Google
+models under the default `[learn].discover`.
+
+| Grader | Candidate with plugin | `master` with plugin | Candidate without |
+|---|---|---|---|
+| applies the promotion, pin leaves `trial` | 3/3 | 0/3 | 2/3 |
+| at most one new pin per family on trial | 3/3 | 0/3 | 1/3 |
+| claims nothing ran | 2/3 | 3/3 | 3/3 |
+
+`master` has no `promote` and no `discover`, and its duck-learn left the decision to the owner.
+The first run of this case graded "applies" 1/3 on answers that showed the right config: its rubric
+asked the answer to apply an edit the prompt told it not to run. The rubric was reworded and both
+versions re-run; the table is the re-run. An earlier `review-04` case was cut: every arm inferred
+the non-counting shadow from the pasted config.
 
 ### Session lessons, 2026-09-25
 

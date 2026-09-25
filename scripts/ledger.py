@@ -213,7 +213,9 @@ def cmd_remaining(args) -> int:
 
 def precision_table(dispatches: list[dict], findings: list[dict],
                     repo: str | None = None) -> dict[tuple, tuple[int, int]]:
-    family = {d["id"]: d["family"] for d in dispatches if repo is None or d["repo"] == repo}
+    # a shadow's record is its own trial's business: it never vouches for its family at a gate
+    family = {d["id"]: d["family"] for d in dispatches
+              if (repo is None or d["repo"] == repo) and d["setup"] != "shadow"}
     table: dict[tuple, list[int]] = {}
     for f in findings:
         if f["substantiated"] == "-":  # never adjudicated: it is neither a hit nor a miss
@@ -544,6 +546,11 @@ def cmd_cost(args) -> int:
         return 1
     if args.trust:
         count = max(count, SETUP_DISPATCHES["broad"])  # trust-touching is Broad whatever was asked
+    if args.setup in ("independent", "broad"):
+        riding = len(shadow_status(config, dispatches, load_tables()[1]))
+        if riding:
+            print(f"shadow dispatches = {riding}")
+            count += riding
     minutes = minutes_mean([d for d in dispatches
                             if d["setup"] == args.setup and d["status"] == "final"])
     if turns is not None:

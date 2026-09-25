@@ -67,6 +67,29 @@ class LedgerTrialsTest(unittest.TestCase):
         verdict, _ = ledger.trial_verdict(config, [row], findings, "openai:gpt-6-t:high")
         self.assertEqual("shadow", verdict)
 
+    def test_shadow_findings_never_vouch_for_their_family(self):
+        # a trial must not shorten a gate: the stop rule reads family precision
+        dispatches = [{"id": "s1", "repo": "r", "family": "openai", "setup": "shadow"},
+                      {"id": "c1", "repo": "r", "family": "openai", "setup": "independent"}]
+        findings = [{"dispatch_id": "s1", "class": "correctness", "tier": "read",
+                     "substantiated": "1"} for _ in range(3)]
+        findings.append({"dispatch_id": "c1", "class": "correctness", "tier": "read",
+                         "substantiated": "0"})
+        table = ledger.precision_table(dispatches, findings, "r")
+        self.assertEqual((1, 0), table[("openai", "correctness", "read")])
+
+    def test_cost_counts_a_riding_shadow(self):
+        import contextlib, io, os, tempfile
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as home:
+            Path(home, "config.toml").write_text(
+                '[families]\ndoer = "anthropic"\n[learn]\ntrial = ["openai:gpt-6-t:high"]\n')
+            with patch.dict(os.environ, {"ASKRUBBERDUCK_HOME": home}):
+                out = io.StringIO()
+                with contextlib.redirect_stdout(out):
+                    ledger.main(["cost", "broad", "--repo", "r"])
+        self.assertIn("dispatches = 5", out.getvalue())
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,5 +1,5 @@
 ---
 type: tool_used
 tool: Skill
-input_match: duck-review
+input_match: duck-learn
 ---
