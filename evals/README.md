@@ -127,7 +127,9 @@ describes none of them:
 Cases grant only the Skill tool, so nothing is edited or executed. The reproduce and verify halves
 of `duck-why`, `duck-dry` and `duck-shape` are untested here; the cases check that the answer
 admits that limit. The judge sees the answer and the rubric, never the prompt — a rubric that
-compares against the original file carries that file.
+compares against the original file carries that file. A run whose `error` is set, or whose
+grader reports `grader threw` or `judge call failed`, is an outage, not a FAIL: leave it out of
+the count and run it again.
 
 ### Run of 2026-09-18
 
@@ -360,3 +362,18 @@ With the plugin, `master`'s `duck-race` took the rival from the reviewers roster
 overriding the race list the prompt configured; the candidate reads the race list. Without the
 plugin the model follows the pasted config, so `race-03` shows the text now matches the config,
 not uplift. An earlier `master` run of `race-03` hit the account's weekly limit mid-judging and was discarded.
+
+### Session lessons, 2026-09-25
+
+Candidate against `master`, Claude Code 2.1.282, default agent model, Sonnet judge, three runs per
+arm; cells count runs passing every grader (the plugin-fired trigger aside).
+
+| Case | Candidate with plugin | `master` with plugin | Without plugin |
+|---|---|---|---|
+| `review-05-brief-quotes` | 3/3 | 0/3 | 0/3 |
+
+Quoting the rules a brief holds reviewers to changed behavior: without it every draft paraphrased.
+Two other proposed lines were cut. A `duck-land` read-back of the landed message never loaded the
+skill in its case and passed without it, and the gate found it would route a broken trailer to a
+re-gate; a `duck-run` line to split a contested part out met a model that already recommends the
+split unprompted.
