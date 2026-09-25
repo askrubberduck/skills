@@ -408,12 +408,13 @@ produce a checkable citation for every criterion.
 
 `run-03-rally-before-gate`, Claude Code 2.1.282, default agent model, Sonnet judge, three runs per
 arm: a duck-run task whose committed candidate is executable code headed for its release gate.
+The grader passes a plan that runs a `duck-race` rally with a different family before the final
+proof pass and before the gate.
 
 | | Candidate with plugin | `master` with plugin | Without plugin |
 |---|---|---|---|
-| names a rally with a different family before the gate | 3/3 | 0/3 | 0/3 |
-| describes it as alternating serve and return (grader) | 3/3 | 0/3 | 0/3 |
+| rally with another family, before final proof and the gate | 3/3 | 0/3 | 0/3 |
 
-A first candidate text named the rally in all three runs but only one described its mechanics;
-the rule now says in one clause how a rally runs, and the re-run above is on that text. The
-judge's evidence was read on passing and failing runs alike.
+The case sees a plan, not an executed rally; the sandbox has no model CLIs. The executed
+observation is the rally on PR #44 (ten turns, four defects closed), recorded outside this
+repository. The judge's evidence was read on passing and failing runs alike.

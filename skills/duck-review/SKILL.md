@@ -78,10 +78,11 @@ threads already fixed; the rest stay open and are listed.
 4. Check the caller's evidence using `duck-proof`'s durable-home rules. A release gate requires a
    proof receipt tied to the final candidate; packet-sized or trust-touching work also needs the
    settled `duck-plan` record, including its actual challenge and any required independent input.
-   Trust-touching work needs `duck-break` evidence appropriate to the changed surface. Instruction
-   changes need agent behavior trials, not invented service crash tests. A shared work record with
-   explicit proof/plan/break sections is equivalent to separate named receipts when all consumers
-   can resolve it. Existing `proof-rN.md` and `break-rN.md` conventions remain valid.
+   Trust-touching work needs `duck-break` evidence appropriate to the changed surface; executable
+   code arriving from `duck-run` carries its rally receipt or the reason the rally did not run.
+   Instruction changes need agent behavior trials, not invented service crash tests. A shared work
+   record with explicit proof/plan/break sections is equivalent to separate named receipts when all
+   consumers can resolve it. Existing `proof-rN.md` and `break-rN.md` conventions remain valid.
 5. Spot-check cited commands or artifacts; file presence alone is not evidence. A repair invalidates
    relevant earlier checks. For re-review, identify the previous reviewed revision or snapshot and
    the current target. Inspect the new delta and affected contracts or paths, reopen impacted
