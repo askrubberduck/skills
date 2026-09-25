@@ -28,7 +28,7 @@ FINDING_COLUMNS = ("dispatch_id", "gate_id", "candidate", "cause_id", "class", "
                    "substantiated", "adjudicated_by")
 DISPATCH_ENUMS = {
     # `disposition` is Broad's cross-family adjudication call: a dispatch, never a capture.
-    "stage": {"review", "disposition", "plan", "proof", "break", "race", "rally"},
+    "stage": {"review", "disposition", "plan", "proof", "break", "race", "rally", "roast"},
     # `shadow`: a pin on trial riding along as an extra reviewer that never counts toward the gate.
     "setup": {"self-check", "independent", "broad", "race", "rally", "shadow"},
     "trust": {"0", "1"}, "status": {"pending", "final"}, "outage": {"0", "1"},
@@ -230,7 +230,8 @@ def precision_table(dispatches: list[dict], findings: list[dict],
                     repo: str | None = None) -> dict[tuple, tuple[int, int]]:
     # a shadow's record is its own trial's business: it never vouches for its family at a gate
     family = {d["id"]: d["family"] for d in dispatches
-              if (repo is None or d["repo"] == repo) and d["setup"] != "shadow"}
+              if (repo is None or d["repo"] == repo) and d.get("stage", "review") == "review"
+              and d["setup"] != "shadow"}
     table: dict[tuple, list[int]] = {}
     for f in findings:
         if f["substantiated"] == "-":  # never adjudicated: it is neither a hit nor a miss
@@ -976,7 +977,7 @@ def home_check(parent: Path) -> None:
 
     def call(root: Path, argv: list[str]) -> subprocess.CompletedProcess:
         return subprocess.run([sys.executable, __file__, *argv], capture_output=True, text=True,
-                              env={**os.environ, "ASKRUBBERDUCK_HOME": str(root)})
+                              cwd=parent, env={**os.environ, "ASKRUBBERDUCK_HOME": str(root)})
 
     for n, argv in enumerate(readers):
         root = parent / f"r{n}"
@@ -1024,6 +1025,19 @@ def home_check(parent: Path) -> None:
     dangling.symlink_to(parent / "gone")
     done = call(dangling, ["promote"])
     assert done.returncode != 0 and "dangling symlink" in done.stderr, done
+    roast = parent / "roast"  # a roast row is recorded, yet never a review capture
+    roast.mkdir()
+    (roast / "dispatches.tsv").write_text(header["dispatches.tsv"] + "\t".join(
+        ["x", "g", "1", "-", "r", "roast", "independent", "0", "c", "openai", "gpt-r", "-", "3",
+         "-", "NOTE", "final", "0"]) + "\n")
+    done = call(roast, ["thresholds"])
+    assert done.returncode == 0 and done.stderr == "" and "gpt-r n=1" in done.stdout, done
+    done = call(roast, ["remaining", "g", "--repo", "r"])
+    assert "gpt-r" not in done.stdout, done
+    (roast / "findings.tsv").write_text(header["findings.tsv"] + "\t".join(
+        ["x", "g", "c", "cause", "roastclass", "read", "SHOULD", "0", "doer"]) + "\n")
+    done = call(roast, ["precision", "--all"])
+    assert done.returncode == 0 and "roastclass" not in done.stdout, done
     latin = parent / "latin"  # the table is UTF-8 whatever the reader's locale says
     latin.mkdir()
     (latin / "dispatches.tsv").write_text(header["dispatches.tsv"] + "\t".join(

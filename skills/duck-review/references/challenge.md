@@ -13,7 +13,8 @@ configure every routine call.
 | Race | Two isolated implementations against common outcome checks | Comparative execution |
 | Rally | Alternating test and implementation turns | Executable counterexamples |
 
-Trust-touching means security-, privacy-, or data-sensitive work, or gate-semantics changes.
+Trust-touching means security-, privacy-, or data-sensitive work, gate-semantics changes, or an
+edit to a skill, a gate or an instruction file.
 Repository requirements bind release gates. An explicit smaller analysis can return useful evidence
 without satisfying a stronger release gate. A change to gate policy is judged under PRE-change
 rules; it never grants its own approval. Never shrink the required set after an outage or an adverse

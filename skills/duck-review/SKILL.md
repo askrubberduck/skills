@@ -138,8 +138,8 @@ if missing evidence prevents a gate decision, return `NOTE` and name the uncerta
   back, not a fresh one or an invented deployment. A new way to fail is a change to that system.
 - A guard added to cover a race that appeared when another guard was removed says the removed
   one was load-bearing.
-- A changed contract is incomplete until every other party to it moves in the same change or is
-  named as follow-up.
+- A changed contract is incomplete until every other party to it moves in the same change or
+  compatibility keeps the old contract working until a named follow-up.
 - A delta nobody asked for is a finding until someone explains it.
 - Check the repository's own conventions before accepting a demand for a new artifact. Existing
   evidence beats reviewer-invented ceremony.

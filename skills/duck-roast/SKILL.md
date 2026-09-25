@@ -40,7 +40,8 @@ instances may have one shared fix; repetition alone does not make that fix an ow
 Choose method, participants and effort bound with `duck-review`'s [challenge
 selection](../duck-review/references/challenge.md). A focused self-critique stays labeled as such.
 Use its [dispatch mechanics](../duck-review/references/dispatch.md) for external participants;
-required authorization and identity checks still apply. Give independent critics the same
+required authorization and identity checks still apply, and their ledger rows carry
+`stage = roast`. Give independent critics the same
 constraints and complementary questions, not each other's conclusions.
 
 For each proposed finding, identify the violated contract or concrete cost, cite its source and

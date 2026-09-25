@@ -353,7 +353,7 @@ configuration, so the candidate's required bound shows no behavioral difference 
 
 `race-03-role-list`, default agent model, Sonnet judge, three runs per arm. Cells count runs
 that passed every grader of the case (the plugin-fired trigger aside). The candidate arm ran on
-Claude Code 2.1.281 before the gate rounds, which changed `ledger.py` but not `duck-race`'s text;
+Claude Code 2.1.281 before the gate rounds, which changed `skills/duck-review/scripts/ledger.py` but not `duck-race`'s text;
 the `master` arm ran on `97c4db8` with 2.1.282.
 
 | Case | Candidate with plugin | Candidate without | `master` with | `master` without |
@@ -380,7 +380,7 @@ models under the default `[learn].discover`.
 `review-04-shadow-trial` observes the dispatch.md rule itself: a release-gate plan with a trial pin
 in the config. Every arm passes, candidate and `master`, with and without the plugin, 3/3 each:
 the model infers the non-counting shadow from the pasted config. It shows the candidate text is
-followed and no uplift; the rule's arithmetic is pinned by `ledger.py --self-check`.
+followed and no uplift; the rule's arithmetic is pinned by `skills/duck-review/scripts/ledger.py --self-check`.
 
 `master` has no `promote` and no `discover`, and its duck-learn left the decision to the owner.
 The first run of this case graded "applies" 1/3 on answers that showed the right config: its rubric

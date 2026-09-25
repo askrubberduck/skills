@@ -16,13 +16,13 @@ trial = ["google:gemini-4-pro:high"]
 shadow = 3
 ```
 
-`scripts/ledger.py promote` printed:
+`skills/duck-review/scripts/ledger.py promote` printed:
 
 ```
 add google:gemini-4-pro:high to review
 ```
 
-`agy models | scripts/ledger.py roster -` printed:
+`agy models | skills/duck-review/scripts/ledger.py roster -` printed:
 
 ```
 new google:gemini-4-flash:high
