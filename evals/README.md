@@ -392,10 +392,12 @@ arm; cells count runs passing every grader (the plugin-fired trigger aside).
 
 | Case | Candidate with plugin | `master` with plugin | Without plugin |
 |---|---|---|---|
-| `review-05-brief-quotes` | 3/3 | 0/3 | 0/3 |
+| `review-05-brief-quotes`, first grader: quoted with a source | 3/3 | 0/3 | 0/3 |
+| `review-05-brief-quotes`, strict grader: every criterion with full path and numeric line | 0/3 | 0/3 | 0/3 |
 
-Quoting the rules a brief holds reviewers to changed behavior: without it every draft paraphrased.
-Two other proposed lines were cut. A `duck-land` read-back of the landed message never loaded the
-skill in its case and passed without it, and the gate found it would route a broken trailer to a
-re-gate; a `duck-run` line to split a contested part out met a model that already recommends the
-split unprompted.
+The first grader accepted a bare file name; an intermediate grader once passed `⟨line⟩`
+placeholders. Both graders judge a citation's form from the answer alone, never that the quoted
+words match the cited line. Under the strict grader no arm passes: candidate briefs quote the rules and mostly
+give path and line, but each run leaves at least one placeholder or bare `SKILL.md`; `master`
+briefs quote less and cite looser. The rule moves drafts toward quoting; it does not by itself
+produce a checkable citation for every criterion.
