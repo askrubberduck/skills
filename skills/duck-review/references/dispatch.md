@@ -95,7 +95,9 @@ findings are still claims. **A REJECT is never an outage.**
 `scripts/ledger.py pick review` names it on a `shadow` line while it does. Dispatch it beside the required set with the same brief and the same export authorization for its
 vendor, or skip it and say so. Its verdict never counts toward the gate, its outage never leaves
 the gate short, and its findings are adjudicated like any other. Its row carries
-`setup = shadow`.
+`setup = shadow`. A trial's gates count in whichever repository they ran, since a model's record
+is not a repository's; its comparison pairs it with its family's reviewer on the same gate of the
+same repository.
 
 Every dispatch attempt gets a row in `~/.askrubberduck/dispatches.tsv`: `pending` when launched,
 finalized once at synthesis with minutes, verdict and outage. A row left `pending` is an

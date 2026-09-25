@@ -181,6 +181,9 @@ just because the code reached it.
 posted review comments and resolved threads each need your go-ahead; a passed review does not
 grant one. So does sending your code to another model vendor, deleting work that exists nowhere
 else, and waiving any rule a gate enforces. Local edits you asked for need no second permission.
+One exception is the duck's own config: with `[learn].discover` left at `auto`, `duck-learn` puts a
+new model on trial and applies trial verdicts to `~/.askrubberduck/config.toml` itself, then tells
+you what it changed. Set it to `propose` to be asked first.
 
 ## How the duck carries a task
 
@@ -348,8 +351,8 @@ The rows answer questions the duck used to guess at. How many defects did both r
 which class? `precision`. Who reviews next? `pick <stage>` samples from recorded catches per minute,
 inside the set the gate requires. Did the change help? `paired` compares two arms on the same
 cases. What is drifting? `thresholds` hands `duck-learn` its occurrences. What will this gate
-cost? `cost <setup>` reads past gates. Is there a new model? `roster` lists the ones nobody has
-tried; after its shadow gates, `promote` says whether it replaces its family's reviewer, joins the
+cost? `cost <setup>` reads past gates. Is there a new model? `roster <models|->` lists host
+models that are in no role list, no trial and no ledger row; after its shadow gates, `promote` says whether it replaces its family's reviewer, joins the
 list, or goes. `scripts/ledger.py --self-check` runs each of these on a
 fixture and asserts what it prints. Standard library only. A `-` means unknown; unknown never counts as zero.
 
