@@ -395,8 +395,9 @@ arm; cells count runs passing every grader (the plugin-fired trigger aside).
 | `review-05-brief-quotes`, first grader: quoted with a source | 3/3 | 0/3 | 0/3 |
 | `review-05-brief-quotes`, strict grader: every criterion with full path and numeric line | 0/3 | 0/3 | 0/3 |
 
-The first grader accepted a section or a bare file name, and one of its passes cited `⟨line⟩`
-placeholders. Under the strict grader no arm passes: candidate briefs quote the rules and mostly
+The first grader accepted a bare file name; an intermediate grader once passed `⟨line⟩`
+placeholders. Both graders judge a citation's form from the answer alone, never that the quoted
+words match the cited line. Under the strict grader no arm passes: candidate briefs quote the rules and mostly
 give path and line, but each run leaves at least one placeholder or bare `SKILL.md`; `master`
 briefs quote less and cite looser. The rule moves drafts toward quoting; it does not by itself
 produce a checkable citation for every criterion.
