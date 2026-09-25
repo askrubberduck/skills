@@ -46,8 +46,9 @@ without new evidence is a malformed finding; the rest of that result still count
 Run from a neutral scratch directory, never the target checkout. Close stdin, use absolute paths,
 and run in the background because reviews can take 10–45 minutes; where the CLI has no timeout of
 its own, bound the wait yourself with `[bounds].dispatch_timeout` (default 45m) the way
-`duck-race`'s block does — and past the deadline kill the process, confirm it exited, then read
-what it wrote: a wait that returns while the worker still writes hands the retry a shared file.
+`duck-race`'s block does (macOS ships no `timeout`) — and past the deadline kill the process,
+confirm it exited, then read what it wrote: a wait that returns while the worker still writes
+hands the retry a shared file.
 The pinned ids come from `~/.askrubberduck/config.toml`, never from memory: `[models].review` for
 a review or a disposition (default `[families].reviewers`), and `[families].reviewers`
 (default empty: the owner's setup names them) for a race or plan role without a list of its own. Minimum shapes, with
@@ -99,7 +100,7 @@ the gate short, and its findings are adjudicated like any other. Its row carries
 is not a repository's; its comparison pairs it with its family's reviewer on the same gate of the
 same repository.
 
-Every dispatch attempt gets a row in `~/.askrubberduck/dispatches.tsv`: `pending` when launched,
-finalized once at synthesis with minutes, verdict and outage. A row left `pending` is an
-interrupted run. `scripts/ledger.py schema` prints the columns and their domains; a plan critic's
-`PLAN: CONCUR | OBJECT` is recorded as verdict `CONCUR | OBJECT`.
+Every dispatch attempt gets a row in `~/.askrubberduck/dispatches.tsv`: `pending` written before
+the seat launches, finalized once at synthesis with minutes, verdict and outage. A row left
+`pending` is an interrupted run. `scripts/ledger.py schema` prints the columns and their
+domains; a plan critic's `PLAN: CONCUR | OBJECT` is recorded as verdict `CONCUR | OBJECT`.

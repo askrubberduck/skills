@@ -1,6 +1,6 @@
 ---
 name: duck-split
-description: Hold a branch, PR or document to the one thing it was opened for; nothing rides along, nothing falls off. Use when the user asks what in a branch, PR, document or plan does not belong to the original task, asks to extract or split part of it into its own branch, PR or document, or whether it still carries only what it was meant to.
+description: Hold a branch, PR or document to the one thing it was opened for; nothing rides along, nothing falls off. Use when the user asks what in a branch, PR, document or plan does not belong to the original task, asks to extract, split or move part of it into its own branch, PR or document, or whether it still carries only what it was meant to.
 ---
 
 # Duck Split
