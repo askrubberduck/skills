@@ -310,6 +310,10 @@ def check_ledger(root: Path, errors: list[str]) -> None:
                             capture_output=True, text=True)
     if result.returncode != 0:
         errors.append(f"scripts/ledger.py --self-check failed: {result.stderr.strip()[-300:]}")
+    trials = subprocess.run([sys.executable, "-m", "unittest", "scripts/test_ledger_trials.py"],
+                            capture_output=True, text=True, cwd=root)
+    if trials.returncode != 0:
+        errors.append(f"scripts/test_ledger_trials.py failed: {trials.stderr.strip()[-300:]}")
 
 
 def validate(root: Path) -> list[str]:

@@ -160,7 +160,7 @@ def unique_blocker_dispatches(dispatches: list[dict], findings: list[dict]) -> s
     shadows = {d["id"] for d in dispatches if d["setup"] == "shadow"}
     holders: dict[tuple, set[str]] = {}
     for f in findings:
-        if f["dispatch_id"] in scope:
+        if f["dispatch_id"] in scope and f["substantiated"] == "1":  # a dismissed claim held nothing
             key = scope[f["dispatch_id"]] + (f["cause_id"],)
             holders.setdefault(key, set()).add(f["dispatch_id"])
 
@@ -353,7 +353,8 @@ def shadow_rows(dispatches: list[dict], pin: str) -> list[dict]:
     """Final shadow reviews of a pin whose outage flag is known; an unknown flag is neither a clean
     run nor an outage, so the row does not count toward a trial either way."""
     family, model, _ = arm_of(pin)  # effort may be overridden by risk, so it does not identify
-    return [d for d in dispatches if d["setup"] == "shadow" and d["status"] == "final"
+    return [d for d in dispatches if d["stage"] == "review" and d["setup"] == "shadow"
+            and d["status"] == "final"
             and d["outage"] in ("0", "1") and (d["family"], d["model"]) == (family, model)]
 
 
@@ -379,15 +380,16 @@ def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
         if kept is None or (gate(d) in theirs and gate(kept) not in theirs):
             by_gate[d["gate_id"]] = d
     rows = list(by_gate.values())[:2 * needed]
-    if len(rows) < needed:
-        return "shadow", f"{len(rows)}/{needed}"
     counted = {d["gate_id"] for d in rows}  # any round of a counted gate, not just the compared one
     if any(d["outage"] == "1" for d in shadow_rows(dispatches, pin) if d["gate_id"] in counted):
         return "drop", "outage on a shadow gate"
-    caught: dict[str, int] = {}
+    if len(rows) < needed:
+        return "shadow", f"{len(rows)}/{needed}"
+    distinct: dict[str, set[str]] = {}  # a cause recorded twice is still one cause
     for f in findings:
         if f["substantiated"] == "1":
-            caught[f["dispatch_id"]] = caught.get(f["dispatch_id"], 0) + 1
+            distinct.setdefault(f["dispatch_id"], set()).add(f["cause_id"])
+    caught = {ident: len(found) for ident, found in distinct.items()}
     undecided = "drop" if len(rows) >= 2 * needed else "shadow"
     if incumbent is None:
         if sum(caught.get(d["id"], 0) for d in rows):
@@ -667,7 +669,8 @@ def reference_verdict(config: dict, dispatches: list[dict], findings: list[dict]
     causes = {}
     for f in findings:
         if f["substantiated"] == "1":
-            causes[f["dispatch_id"]] = causes.get(f["dispatch_id"], 0) + 1
+            causes.setdefault(f["dispatch_id"], set()).add(f["cause_id"])
+    causes = {ident: len(found) for ident, found in causes.items()}
 
     def baseline(row):
         for d in dispatches:
@@ -680,7 +683,8 @@ def reference_verdict(config: dict, dispatches: list[dict], findings: list[dict]
 
     order, by_gate = [], {}
     for d in dispatches:
-        if (d["setup"] == "shadow" and d["status"] == "final" and d["outage"] != "-"
+        if (d["stage"] == "review" and d["setup"] == "shadow" and d["status"] == "final"
+                and d["outage"] != "-"
                 and (d["family"], d["model"]) == (family, model)):
             if d["gate_id"] not in by_gate:
                 order.append(d["gate_id"])
@@ -691,10 +695,10 @@ def reference_verdict(config: dict, dispatches: list[dict], findings: list[dict]
         rows = by_gate[gate_id]
         paired = [d for d in rows if baseline(d)]
         picked.append(paired[0] if paired else rows[0])
-    if len(picked) < needed:
-        return "shadow"
     if any(d["outage"] == "1" for gate_id in order[:2 * needed] for d in by_gate[gate_id]):
         return "drop"
+    if len(picked) < needed:
+        return "shadow"
     out_of_time = len(picked) >= 2 * needed
     if incumbent is None:
         if sum(causes.get(d["id"], 0) for d in picked) > 0:
