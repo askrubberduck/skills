@@ -533,7 +533,7 @@ def cmd_thresholds(args) -> int:
 
 def cmd_cost(args) -> int:
     config = load_config(args.repo or default_origin())
-    dispatches, _ = load_tables()
+    dispatches, findings = load_tables()
     turns = None
     if args.setup == "rally":
         # Only the rival's turns are dispatches; the doer answers inline, on this side of the wire.
@@ -547,7 +547,7 @@ def cmd_cost(args) -> int:
     if args.trust:
         count = max(count, SETUP_DISPATCHES["broad"])  # trust-touching is Broad whatever was asked
     if args.setup in ("independent", "broad"):
-        riding = len(shadow_status(config, dispatches, load_tables()[1]))
+        riding = len(shadow_status(config, dispatches, findings))
         if riding:
             print(f"shadow dispatches = {riding}")
             count += riding
