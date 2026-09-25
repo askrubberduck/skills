@@ -1,4 +1,4 @@
-<!-- translation-source: README.md sha256=2cc57077dee6ea85b57b695e69e2348f4f7025ce58bcd9198ad7194e23f83d7e -->
+<!-- translation-source: README.md sha256=cb44323c82a2550a7279184f23f9852f32f5d52a470222bbbfd3e9bff5cc0118 -->
 
 <p align="center">
   <img src="assets/logo.svg" width="112" alt="askrubberduck">
@@ -318,14 +318,28 @@ ln -s "$PWD"/askrubberduck-skills/skills/* ~/.agents/skills/
 Кто поймал баг в прошлый раз? Утка записывает. Каждый вызов — ревьюер, соперник, критик —
 оставляет одну строку в `~/.askrubberduck/dispatches.tsv`; каждое замечание после разбора — одну
 строку в `~/.askrubberduck/findings.tsv`. В твой репозиторий не попадает ничего. Всё остаётся на твоей машине, а
-в `~/.askrubberduck/config.toml` лежат выбранные модели и лимиты. Файла нет? Лимиты ниже — значения
-по умолчанию, и утка работает как раньше. Модели ревьюеров — только пример; пока ты их не
-назовёшь, список ревьюеров пуст.
+в `~/.askrubberduck/config.toml` лежат выбранные модели и лимиты. Файла нет? Лимиты и значение `[learn]`
+ниже — это значения по умолчанию, и утка работает как раньше. Модели и уровни усилия — только
+пример; пока ты не назовёшь ревьюеров, их список пуст.
 
 ```toml
 [families]
 doer = "anthropic"
-reviewers = ["openai:gpt-6-astra:high", "google:gemini-3.1-pro-high"]  # семейство:модель:усилие
+reviewers = ["openai:gpt-6-sol:high", "google:gemini-3.1-pro-high"]  # семейство:модель:усилие
+
+[models]                    # по ролям; без списка review, race, plan берут reviewers, worker и explore — хост
+review = ["openai:gpt-6-sol:high", "google:gemini-3.1-pro-high"]
+race = ["google:gemini-3.8-flash-high"]
+plan = ["openai:gpt-6-sol:medium"]
+worker = ["anthropic:claude-sonnet-5:medium"]
+explore = ["anthropic:claude-haiku-4-5:low"]
+
+[effort]                    # по риску; перекрывает усилие модели, без него — как в модели
+ordinary = "medium"
+trust = "high"
+
+[learn]
+select = "adaptive"         # adaptive — по истории; fixed — по порядку списка
 
 [bounds]                    # лимиты; внутри них, когда остановиться, решают факты
 review_rounds = 3           # duck-run

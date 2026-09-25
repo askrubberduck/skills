@@ -41,6 +41,8 @@ NUMERIC_COLUMNS = ("round", "minutes", "tokens")
 # Broad is two reviews plus two cross-family dispositions (challenge.md).
 SETUP_DISPATCHES = {"self-check": 0, "independent": 1, "broad": 4, "race": 1}
 DEFAULT_RALLY_TURNS = 10
+# Roles whose unset list falls back to the reviewer roster; worker and explore fall back to the host.
+REVIEWER_FALLBACK = {"review", "disposition", "race", "plan"}
 OUTAGE_LIMIT = 0.2
 DRIFT_LIMIT = 0.5
 
@@ -249,19 +251,38 @@ def cmd_missed(args) -> int:
     return 0
 
 
+def pin_of(arm: tuple[str, str, str]) -> str:
+    """The config spelling of an arm: an unknown effort is left out, not written as `-`."""
+    return ":".join(arm if arm[2] != "-" else arm[:2])
+
+
 def arm_of(reviewer: str) -> tuple[str, str, str]:
     parts = reviewer.split(":")
     return (parts[0], parts[1] if len(parts) > 1 else "-", parts[2] if len(parts) > 2 else "-")
+
+
+def roster_for(config: dict, role: str) -> list[str]:
+    if role == "disposition":  # dispositions are reviews of findings: same list
+        role = "review"
+    listed = config.get(role)
+    if isinstance(listed, list):
+        return listed
+    return config.get("reviewers", []) if role in REVIEWER_FALLBACK else []
+
+
+def with_effort(arm: tuple[str, str, str], config: dict, trust: bool) -> tuple[str, str, str]:
+    level = config.get("trust" if trust else "ordinary")
+    return (arm[0], arm[1], level) if isinstance(level, str) else arm
 
 
 def pick_arms(config: dict, dispatches: list[dict], findings: list[dict], stage: str,
               trust: bool) -> tuple[list[tuple], dict[tuple, tuple]]:
     wins = unique_blocker_dispatches(dispatches, findings)
     rows = [d for d in dispatches if d["stage"] == stage and d["status"] == "final"]
-    # Arms are the configured roster and nothing else: history says how an arm has done, never that
-    # a one-off dispatch is a reviewer we may send again. An arm is the whole (family, model,
+    # Arms are the role's configured list and nothing else: history says how an arm has done, never
+    # that a one-off dispatch is a reviewer we may send again. An arm is the whole (family, model,
     # effort) triple, so a version change starts a fresh window.
-    arms = [arm_of(r) for r in config.get("reviewers", [])]
+    arms = [with_effort(arm_of(r), config, trust) for r in roster_for(config, stage)]
     overall = minutes_mean(rows)
 
     stats = {}
@@ -274,7 +295,10 @@ def pick_arms(config: dict, dispatches: list[dict], findings: list[dict], stage:
         stats[arm] = (successes, len(mine) - successes, minutes, theta / divisor)
 
     doer = config.get("doer")
-    ranked = sorted(arms, key=lambda a: stats[a][3], reverse=True)
+    ranked = (arms if config.get("select") == "fixed"
+              else sorted(arms, key=lambda a: stats[a][3], reverse=True))
+    if stage not in REVIEWER_FALLBACK:  # worker and explore serve the doer; they judge nothing
+        return ranked[:1], stats
     chosen = [a for a in ranked if a[0] != doer][:1]
     if trust and chosen:
         # Broad needs two families, one outside the doer's; the first arm is it, so the second only
@@ -294,12 +318,12 @@ def cmd_pick(args) -> int:
     chosen, stats = pick_arms(config, dispatches, findings, args.stage, args.trust)
     for arm, (successes, failures, minutes, score) in stats.items():
         shown = "-" if minutes is None else f"{minutes:.1f}"
-        print(f"arm {':'.join(arm)} s={successes} f={failures} minutes={shown} score={score:.4f}")
+        print(f"arm {pin_of(arm)} s={successes} f={failures} minutes={shown} score={score:.4f}")
     for arm in chosen:
-        print(f"chosen {':'.join(arm)}")
-    if len(chosen) < (2 if args.trust else 1):
+        print(f"chosen {pin_of(arm)}")
+    if len(chosen) < (2 if args.trust and args.stage in REVIEWER_FALLBACK else 1):
         missing = "a second family" if chosen else f"an arm outside {config['doer']}"
-        print(f"required set unmet: the reviewers roster holds no {missing}")
+        print(f"required set unmet: the {args.stage} roster holds no {missing}")
         return 1
     return 0
 
@@ -462,6 +486,65 @@ def run(argv: list[str]) -> tuple[int, str]:
     return code, out.getvalue()
 
 
+ROLES_CONFIG = """\
+[families]
+doer = "anthropic"
+reviewers = ["openai:gpt-6-astra:high", "google:gemini-3.1-pro-high"]
+[models]
+race = ["google:gemini-3.8-flash-high"]
+worker = ["anthropic:claude-sonnet-5:medium"]
+[effort]
+trust = "xhigh"
+"""
+ROLES_DISPATCHES = [
+    "s1\tg7\t1\t2026-09-07\tr\treview\tbroad\t1\tc7\topenai\tgpt-6-astra\thigh\t5\t-\tREJECT\tfinal\t0",
+    "s2\tg7\t1\t2026-09-07\tr\treview\tbroad\t1\tc7\tgoogle\tgemini-3.1-pro-high\t-\t4\t-\tAPPROVE\tfinal\t0",
+    "s8\tg9\t1\t2026-09-09\tr\treview\tbroad\t1\tc9\topenai\tgpt-6-astra\txhigh\t5\t-\tREJECT\tfinal\t0",
+]
+ROLES_FINDINGS = [
+    "s1\tg7\tc7\tk1\tcorrectness\tread\tBLOCKER\t1\thuman",
+    "s8\tg9\tc9\tk9\tcorrectness\tread\tBLOCKER\t1\thuman",
+]
+
+
+def roles_check(root: Path) -> None:
+    """Role lists, their fallback, fixed order, effort by risk, and who may judge."""
+    (root / "config.toml").write_text(ROLES_CONFIG)
+    for name, columns, fixture in (("dispatches.tsv", DISPATCH_COLUMNS, ROLES_DISPATCHES),
+                                   ("findings.tsv", FINDING_COLUMNS, ROLES_FINDINGS)):
+        (root / name).write_text("\t".join(columns) + "\n" + "\n".join(fixture) + "\n")
+    config = load_config()
+    assert roster_for(config, "race") == ["google:gemini-3.8-flash-high"]
+    assert roster_for(config, "plan") == config["reviewers"]  # unset reviewer-side role falls back
+    assert roster_for(config, "explore") == []  # the host chooses
+    assert roster_for(dict(config, review=["x:y:z"]), "disposition") == ["x:y:z"]
+    assert roster_for(dict(config, review=[]), "review") == []  # an explicit empty list stays empty
+    assert with_effort(("openai", "m", "high"), config, trust=True) == ("openai", "m", "xhigh")
+    assert with_effort(("openai", "m", "high"), config, trust=False) == ("openai", "m", "high")
+    dispatches, findings = load_tables()
+    fixed = dict(config, select="fixed")
+    for seed in range(10):
+        random.seed(seed)
+        chosen, _ = pick_arms(fixed, dispatches, findings, "review", trust=True)
+        assert chosen == [with_effort(arm_of(p), config, True) for p in config["reviewers"]], chosen
+    # a trust pick is the xhigh arm, and its history is the xhigh rows it writes (s8), not high's
+    _, stats = pick_arms(config, dispatches, findings, "review", trust=True)
+    assert stats[("openai", "gpt-6-astra", "xhigh")][:2] == (1, 0), stats
+    # workers serve the doer and may share its family; judges may not
+    assert pick_arms(config, [], [], "worker", trust=True)[0] == [
+        ("anthropic", "claude-sonnet-5", "xhigh")]
+    own = {"doer": "anthropic", "review": ["anthropic:claude-x:high"]}
+    assert pick_arms(own, [], [], "review", trust=False)[0] == []
+    assert pin_of(("google", "gemini-3.1-pro-high", "-")) == "google:gemini-3.1-pro-high"
+    for argv, wanted in ((["pick", "race", "--repo", "r"], "chosen google:gemini-3.8-flash-high\n"),
+                         (["pick", "worker", "--trust", "--repo", "r"],
+                          "chosen anthropic:claude-sonnet-5:xhigh"),  # one worker, no second family
+                         (["pick", "review", "--trust", "--repo", "r"],
+                          "chosen openai:gpt-6-astra:xhigh")):
+        code, out = run(argv)
+        assert code == 0 and wanted in out, (argv, out)
+
+
 def self_check() -> int:
     with tempfile.TemporaryDirectory(prefix="askrubberduck-ledger-") as directory:
         root = Path(directory)
@@ -534,7 +617,7 @@ def self_check() -> int:
                 (["missed"], 0, ["anthropic claude-opus-5 missed=1"]),  # the c4 production row is unsubstantiated: openai is not charged
                 (["remaining", "g5"], 0, ["n1 = 1", "n2 = 2", "m = 1", "remaining = 0.000"]),  # two dispositions present, not captures
                 (["pick", "review", "--trust", "--seed", "1", *repo], 0,
-                 ["chosen openai:gpt-6-astra:high", "chosen google:gemini-3.1-pro-high:-"]),
+                 ["chosen openai:gpt-6-astra:high", "chosen google:gemini-3.1-pro-high\n"]),
                 (["paired", str(results)], 0, ["discordant = 8", "sprt = arm A better"]),
                 (["thresholds"], 0, ["anthropic claude-opus-5 n=4"]),
                 (["cost", "broad", *repo], 0, ["dispatches = 4"]),
@@ -545,6 +628,7 @@ def self_check() -> int:
             code, out = run(argv)
             assert code == expected, (argv, code, out)
             assert all(want in out for want in wanted), (argv, out)
+        roles_check(root)
     print("ledger self-check passed")
     return 0
 
@@ -565,7 +649,7 @@ def main(argv: list[str] | None = None) -> int:
     precision.set_defaults(run=cmd_precision)
     subparsers.add_parser("missed", help="production causes per arm that approved the candidate"
                           ).set_defaults(run=cmd_missed)
-    pick = subparsers.add_parser("pick", help="Thompson-sample the next reviewer arm")
+    pick = subparsers.add_parser("pick", help="Thompson-sample the next arm for a stage")
     pick.add_argument("stage")
     pick.add_argument("--trust", action="store_true")
     pick.add_argument("--seed", type=int)

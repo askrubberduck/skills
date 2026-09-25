@@ -53,7 +53,8 @@ and what remains untested. A plan for an unbuilt implementation cannot prove run
 Choose challenge method and participants using [challenge selection](../duck-review/references/challenge.md).
 A narrow plan may use a self-check with a decisive experiment; otherwise use the independent input
 that reference and repository policy require. For external calls use `duck-review`'s
-[dispatch mechanics](../duck-review/references/dispatch.md). Do not claim independence that did not run.
+[dispatch mechanics](../duck-review/references/dispatch.md), with the critic's pin from
+`[models].plan` (default `[families].reviewers`). Do not claim independence that did not run.
 
 Independent authors receive the outcome, constraints and source before seeing the preferred plan.
 A critic instead receives the proposed plan and seeks a concrete counterexample. Choose the method

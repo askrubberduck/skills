@@ -26,9 +26,9 @@ assumptions; rally turns them into tests. Pick by which of those the work needs.
    one and not the other voids the run. Ambiguity discovered mid-run is resolved in writing there,
    visible to both.
 2. Name the participants and their model families before starting. The doer (this session's family)
-   is one; the rival is a **proven different family** from `[families].reviewers` in
-   `~/.askrubberduck/config.toml` or the owner's setup, and `scripts/ledger.py pick race` chooses
-   within it. Prove the rival's family and pin to `duck-review`'s reviewer bar — roster line and
+   is one; the rival is a **proven different family** from `[models].race` in
+   `~/.askrubberduck/config.toml` (default `[families].reviewers`) or the owner's setup, and
+   `scripts/ledger.py pick race` chooses within it. Prove the rival's family and pin to `duck-review`'s reviewer bar — roster line and
    pinned id recorded — before spending a round. Executable names are not identities, and a
    harness may host several families; unknown identity never counts as a different family. The
    blocks below show the `codex` transport; another CLI takes its shape from dispatch mechanics.
