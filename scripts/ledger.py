@@ -43,8 +43,11 @@ NUMERIC_COLUMNS = ("round", "minutes", "tokens")
 SETUP_DISPATCHES = {"self-check": 0, "independent": 1, "broad": 4, "race": 1}
 DEFAULT_RALLY_TURNS = 10
 DEFAULT_SHADOW = 3
-# Roles whose unset list falls back to the reviewer roster; worker and explore fall back to the host.
-REVIEWER_FALLBACK = {"review", "disposition", "race", "plan"}
+# Judging roles draw on the reviewer roster when unset and must come from a family other than the
+# doer's; worker and explore serve the doer and fall back to the host.
+JUDGING_ROLES = {"review", "disposition", "race", "plan"}
+# Trust-touching review is Broad: two families. A race or plan still takes one rival.
+BROAD_ROLES = {"review", "disposition"}
 # Host model ids carry no family field; their prefix names the vendor.
 FAMILY_PREFIXES = (("gemini", "google"), ("claude", "anthropic"), ("gpt", "openai"))
 OUTAGE_LIMIT = 0.2
@@ -155,7 +158,7 @@ def unique_blocker_dispatches(dispatches: list[dict], findings: list[dict]) -> s
     counted reviewers can take credit from a counted reviewer: a shadow finding the same cause takes
     none away. A shadow competes with everyone, other shadows included, so two trials that find one
     cause both go without."""
-    scope = {d["id"]: (d["gate_id"], d["round"], d["candidate"]) for d in dispatches
+    scope = {d["id"]: (d["repo"], d["gate_id"], d["round"], d["candidate"]) for d in dispatches
              if d["stage"] == "review"}
     shadows = {d["id"] for d in dispatches if d["setup"] == "shadow"}
     holders: dict[tuple, set[str]] = {}
@@ -174,12 +177,17 @@ def unique_blocker_dispatches(dispatches: list[dict], findings: list[dict]) -> s
 
 
 def cmd_remaining(args) -> int:
+    repo = args.repo or default_origin()
+    if repo is None:  # a gate id names a gate only within its repository
+        print("no origin resolved: pass --repo <origin>", file=sys.stderr)
+        return 1
     dispatches, findings = load_tables()
     # Only substantiated findings are captures: a dismissed claim caught nothing.
     gate = [f for f in findings if f["gate_id"] == args.gate_id and f["substantiated"] == "1"]
     # An outage or a pending run is not a capture, and a plan or break dispatch is not looking for
     # the same causes; only completed reviews of one candidate can be marked against each other.
-    eligible = [d for d in dispatches if d["gate_id"] == args.gate_id and d["stage"] == "review"
+    eligible = [d for d in dispatches if d["repo"] == repo and d["gate_id"] == args.gate_id
+                and d["stage"] == "review"
                 and d["status"] == "final" and d["outage"] == "0" and d["setup"] != "shadow"]
     latest = args.round or max((d["round"] for d in eligible), key=lambda r: number(r) or 0,
                                default="-")
@@ -281,7 +289,7 @@ def roster_for(config: dict, role: str) -> list[str]:
     listed = config.get(role)
     if isinstance(listed, list):
         return listed
-    return config.get("reviewers", []) if role in REVIEWER_FALLBACK else []
+    return config.get("reviewers", []) if role in JUDGING_ROLES else []
 
 
 def with_effort(arm: tuple[str, str, str], config: dict, trust: bool) -> tuple[str, str, str]:
@@ -315,10 +323,10 @@ def pick_arms(config: dict, dispatches: list[dict], findings: list[dict], stage:
     doer = config.get("doer")
     ranked = (arms if config.get("select") == "fixed"
               else sorted(arms, key=lambda a: stats[a][3], reverse=True))
-    if stage not in REVIEWER_FALLBACK:  # worker and explore serve the doer; they judge nothing
+    if stage not in JUDGING_ROLES:  # worker and explore serve the doer; they judge nothing
         return ranked[:1], stats
     chosen = [a for a in ranked if a[0] != doer][:1]
-    if trust and chosen:
+    if trust and chosen and stage in BROAD_ROLES:
         # Broad needs two families, one outside the doer's; the first arm is it, so the second only
         # has to differ from the first.
         chosen += [a for a in ranked if a[0] != chosen[0][0]][:1]
@@ -342,9 +350,9 @@ def cmd_pick(args) -> int:
     if args.stage == "review":
         for pin, reason in shadow_status(config, dispatches, findings):
             print(f"shadow {pin_of(with_effort(arm_of(pin), config, args.trust))} {reason}")
-    if len(chosen) < (2 if args.trust and args.stage in REVIEWER_FALLBACK else 1):
+    if len(chosen) < (2 if args.trust and args.stage in BROAD_ROLES else 1):
         missing = ("a second family" if chosen
-                   else f"an arm outside {config['doer']}" if args.stage in REVIEWER_FALLBACK
+                   else f"an arm outside {config['doer']}" if args.stage in JUDGING_ROLES
                    else "any arm")
         print(f"required set unmet: the {args.stage} roster holds no {missing}")
         return 1
@@ -788,10 +796,11 @@ def roles_check(root: Path) -> None:
     assert unique_blocker_dispatches(dispatches, findings) == {"s1", "s8"}
     for argv, expected, wanted, unwanted in (
             (["pick", "race", "--repo", "r"], 0, ["chosen google:gemini-3.8-flash-high"], ["shadow"]),
+            (["remaining", "g7", "--repo", "elsewhere"], 0, ["insufficient evidence: 0"], []),
             (["pick", "review", "--trust", "--repo", "r"], 0,
              ["chosen openai:gpt-6-astra:xhigh", "shadow openai:gpt-6-nova:xhigh 0/1"],
              ["shadow openai:gpt-6-sol"]),  # past its shadow gates, it no longer rides along
-            (["remaining", "g7"], 0, ["n1 = 1", "n2 = 0"], []),  # shadows are not captures
+            (["remaining", "g7", "--repo", "r"], 0, ["n1 = 1", "n2 = 0"], []),  # shadows are not captures
             (["promote", "--repo", "r"], 0,
              ["replace openai:gpt-6-astra:high with openai:gpt-6-sol:high in review",
               "add anthropic:claude-x:high to review", "drop google:gemini-9-pro:high",
@@ -875,9 +884,9 @@ def rally_check(root: Path) -> None:
     """Cases the duck-race rally on trials served; each failed against the code it was served on."""
     # a dismissed counted claim takes no shadow's unique credit
     dispatches = [{"id": "counted", "gate_id": "g1", "round": "1", "candidate": "c1",
-                   "stage": "review", "setup": "independent"},
+                   "stage": "review", "setup": "independent", "repo": "r"},
                   {"id": "trial", "gate_id": "g1", "round": "1", "candidate": "c1",
-                   "stage": "review", "setup": "shadow"}]
+                   "stage": "review", "setup": "shadow", "repo": "r"}]
     findings = [{"dispatch_id": "counted", "cause_id": "bug", "severity": "BLOCKER",
                  "substantiated": "0"},
                 {"dispatch_id": "trial", "cause_id": "bug", "severity": "BLOCKER",
@@ -919,6 +928,25 @@ def rally_check(root: Path) -> None:
     assert trial_verdict(lone, other, [{"dispatch_id": "x-inc", "cause_id": "q",
                                         "substantiated": "1"}],
                          "openai:gpt-6-t:high")[0] == "shadow"  # no baseline in its own repo yet
+    # a race takes one rival even when the work is trust-touching; review still takes two
+    race_cfg = {"doer": "anthropic", "race": ["google:gem:high", "openai:o:high"],
+                "trust": "xhigh", "select": "fixed"}
+    assert pick_arms(race_cfg, [], [], "race", trust=True)[0] == [("google", "gem", "xhigh")]
+    (root / "config.toml").write_text('[families]\ndoer = "anthropic"\n[models]\n'
+                                      'race = ["google:gem:high"]\n')
+    code, out = run(["pick", "race", "--trust", "--repo", "r"])
+    assert code == 0 and "chosen google:gem:high" in out, out  # one rival, no second family
+    with contextlib.redirect_stderr(io.StringIO()):
+        code, out = run(["remaining", "g1"])
+    assert code == 1, out  # no origin, no --repo: a gate id alone names no gate
+    # same gate id, another repository: no shared uniqueness, no shared capture
+    twin = [dict(rows[0], id="a1", stage="review", setup="independent", gate_id="gx",
+                 candidate="gx"),
+            dict(rows[0], id="b1", stage="review", setup="independent", gate_id="gx",
+                 candidate="gx", repo="elsewhere")]
+    both = [{"dispatch_id": d, "cause_id": "same", "severity": "BLOCKER",
+             "substantiated": "1"} for d in ("a1", "b1")]
+    assert unique_blocker_dispatches(twin, both) == {"a1", "b1"}
     # cost prices a riding shadow
     (root / "config.toml").write_text(
         '[families]\ndoer = "anthropic"\n[learn]\ntrial = ["openai:gpt-6-t:high"]\n')
@@ -991,12 +1019,12 @@ def self_check() -> int:
             code, out = run(["precision"])
         assert code == 1 and "no origin resolved" in err.getvalue(), (code, out)
         for argv, expected, wanted in (
-                (["remaining", "g1"], 0, ["remaining = 0.500"]),
-                (["remaining", "g4"], 0, ["n2 = 0", "remaining = 0.000"]),
-                (["remaining", "g3"], 0, ["insufficient evidence: 1 eligible captures"]),
+                (["remaining", "g1", "--repo", "r"], 0, ["remaining = 0.500"]),
+                (["remaining", "g4", "--repo", "r"], 0, ["n2 = 0", "remaining = 0.000"]),
+                (["remaining", "g3", "--repo", "r"], 0, ["insufficient evidence: 1 eligible captures"]),
                 (["precision", "--repo", "r"], 0, ["anthropic correctness executed claimed=4"]),
                 (["missed"], 0, ["anthropic claude-opus-5 missed=1"]),  # the c4 production row is unsubstantiated: openai is not charged
-                (["remaining", "g5"], 0, ["n1 = 1", "n2 = 2", "m = 1", "remaining = 0.000"]),  # two dispositions present, not captures
+                (["remaining", "g5", "--repo", "r"], 0, ["n1 = 1", "n2 = 2", "m = 1", "remaining = 0.000"]),  # two dispositions present, not captures
                 (["pick", "review", "--trust", "--seed", "1", *repo], 0,
                  ["chosen openai:gpt-6-astra:high", "chosen google:gemini-3.1-pro-high\n"]),
                 (["paired", str(results)], 0, ["discordant = 8", "sprt = arm A better"]),
@@ -1024,6 +1052,7 @@ def main(argv: list[str] | None = None) -> int:
     remaining.add_argument("gate_id")
     remaining.add_argument("--round", help="default: the gate's latest round")
     remaining.add_argument("--candidate", help="default: the round's only candidate")
+    remaining.add_argument("--repo", help="default: this checkout's origin")
     remaining.set_defaults(run=cmd_remaining)
     precision = subparsers.add_parser("precision",
                                       help="substantiation rate per family, class and tier")
