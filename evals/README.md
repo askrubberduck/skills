@@ -363,6 +363,28 @@ overriding the race list the prompt configured; the candidate reads the race lis
 plugin the model follows the pasted config, so `race-03` shows the text now matches the config,
 not uplift. An earlier `master` run of `race-03` hit the account's weekly limit mid-judging and was discarded.
 
+### Model trials, 2026-09-25
+
+`learn-01-promote-auto`, Claude Code 2.1.282, default agent model, Sonnet judge, three runs per
+arm, candidate against `master`. The case hands duck-learn a `promote` verdict and two new Google
+models under the default `[learn].discover`.
+
+| Grader | Candidate with plugin | `master` with plugin | Candidate without |
+|---|---|---|---|
+| applies the promotion, pin leaves `trial` | 3/3 | 0/3 | 2/3 |
+| at most one new pin per family on trial | 3/3 | 0/3 | 1/3 |
+| claims nothing ran | 2/3 | 3/3 | 3/3 |
+
+`review-04-shadow-trial` observes the dispatch.md rule itself: a release-gate plan with a trial pin
+in the config. Every arm passes, candidate and `master`, with and without the plugin, 3/3 each:
+the model infers the non-counting shadow from the pasted config. It shows the candidate text is
+followed and no uplift; the rule's arithmetic is pinned by `ledger.py --self-check`.
+
+`master` has no `promote` and no `discover`, and its duck-learn left the decision to the owner.
+The first run of this case graded "applies" 1/3 on answers that showed the right config: its rubric
+asked the answer to apply an edit the prompt told it not to run. The rubric was reworded and both
+versions re-run; the table is the re-run.
+
 ### Session lessons, 2026-09-25
 
 Candidate against `master`, Claude Code 2.1.282, default agent model, Sonnet judge, three runs per
