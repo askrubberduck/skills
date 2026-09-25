@@ -9,9 +9,9 @@ Reduce measured waste in agent context and work. Find repeated reads, duplicated
 unnecessary dispatches or retries before recommending a new setup. Smaller output alone does not
 establish lower cost or better results.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
-Respect existing edit authority. An audit alone reports proposed changes; a request to trim applies
+An audit alone reports proposed changes; a request to trim applies
 justified local edits and verifies them without another approval request. Preserve owner decisions,
 security boundaries and required workflow evidence.
 
@@ -31,12 +31,12 @@ security boundaries and required workflow evidence.
    needs a verified pinned identity and a named executable check that catches its failure. Run that
    check before accepting the result; without identity or a suitable check, do not claim a validated
    cheaper route. If it fails, inspect the cause and escalate when capability is the limit, rather
-   than retrying the same attempt. Two failed attempts at the same slice end that routing experiment.
-   `[models].worker` for delegated builders (default the host's choice) and `[models].explore`
-   for read-only search (default the host's choice) name the model to ask the host for; the identity and the check above still
-   apply, and a same-family worker is never an independent reviewer. Use `duck-review`'s
-   challenge-selection policy for independent or high-risk judgments; honor the owner's model
-   choices and repository requirements.
+   than retrying the same attempt. Two failed attempts at the same slice end that routing
+   experiment. `[models].worker` for delegated builders (default the host's choice) and
+   `[models].explore` for read-only search (default the host's choice) name the model to ask the
+   host for; the identity and the check above still apply, and a same-family worker is never an
+   independent reviewer. Use `duck-review`'s challenge-selection policy for independent or high-risk
+   judgments; honor the owner's model choices and repository requirements.
 4. **Batch useful communication.** Dispatch bounded independent tasks with the necessary context.
    Request findings and decisive evidence, not transcripts or repeated idle updates. More workers
    and more rounds need a question they can resolve.
@@ -47,8 +47,8 @@ security boundaries and required workflow evidence.
 ## Session cost audit
 
 Use actual host usage records. `duck-learn` owns the known transcript-store locations and how owner
-tasks are told from derived logs. Usage is counted here;
-include subagents and retries without double-counting derived logs. Report available input, cached
+tasks are told from derived logs. Usage is counted here; include subagents and retries without
+double-counting derived logs. Report available input, cached
 input and output usage, measured elapsed time, repeated reads/dispatches and retry outcomes.
 A missing field or inaccessible store is unknown, never zero.
 

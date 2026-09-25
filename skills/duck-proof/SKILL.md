@@ -9,7 +9,7 @@ Try to falsify the claim, including the owner's preferred goal or mechanism. Agr
 aggressive review, and a green suite are not substitutes for a discriminating test. A supported
 claim may survive unchanged; do not manufacture defects to look skeptical.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 
 ## Scope and authority
@@ -26,9 +26,8 @@ applied, skipped with its reason, or parked. Commit, PR, push, merge, external d
 messages need their own existing authority; this skill grants none.
 
 For code, record the base and candidate; read the full relevant diff, including staged and
-uncommitted changes. Include relevant untracked files when they are part of the candidate; a
-test copy carries them the way `duck-split` captures a dirty tree — a ref, not a stash.
-`git diff <base>..<candidate>`, `git diff`, and `git diff --staged` cover different states. Read
+uncommitted changes. Include relevant untracked files when they are part of the candidate.
+`git diff <base>...<candidate>`, `git diff`, and `git diff --staged` cover different states. Read
 callers and the complete affected path, not just changed lines. A goal or plan needs no invented
 candidate SHA or code diff.
 
@@ -91,9 +90,9 @@ claim; at that bound the claim stays UNPROVEN with the failed repairs named.
 
 If the same defect class recurs, extend an executable check over its reachable surface, using
 instances as cases. Two independent occurrences record the class in `defect-classes.md` at the
-durable records home, creating the file on the first class; that record is what `duck-review`'s
-circuit breaker reads. Repeated one-off patches and increasingly long checklists are not closure
-of the class.
+durable records home, creating the file on the first class; `duck-review` names that class when it
+recommends the caller's circuit breaker. Repeated one-off patches and increasingly long checklists
+are not closure of the class.
 
 ## 4. Prove the completed shape
 
@@ -133,6 +132,6 @@ repositories and never need a reader in the tree.
 
 Use `proof-rN.md` when the consumer expects it, or give the consumer the exact section in a shared
 work record. Evidence and referenced artifacts must survive that handoff; scratch paths that will
-vanish are not durable citations. Raw logs need not be committed. Do not advance a reviewed
-candidate or its base merely to save a receipt. Local work needs no commit just to record a pass;
+vanish are not durable citations. Raw logs and CLI stdout stay in scratch, never in a commit. Do
+not advance a candidate or its base merely to save a receipt. Local work needs no commit just to record a pass;
 `duck-run` and `duck-land` handle authorized release transitions and exact target checks.

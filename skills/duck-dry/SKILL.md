@@ -8,16 +8,16 @@ description: Strip comments, docstrings, commit messages, and PR descriptions un
 Remove commentary that repeats the code or records an obsolete story. Keep the facts a maintainer
 needs but cannot recover from the code: constraints, external contracts, traps and calibration.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 Default to the current task's diff, including staged changes. Sweep committed files or a tree only
 when named. Report-only means no edits. Local cleanup does not authorize commits or publication.
 
 ## Read before deleting
 
-Read the code each comment describes and apply [the prose bar](references/bar.md). Check whether
-tools consume the text: directives, licenses, doctests and published docstrings are not disposable
-commentary. Fix generated prose at its source, or leave it when that generator is outside scope.
+Read the code each comment describes and apply [the prose bar](references/bar.md), including whether
+tools consume the text. Fix generated prose at its source, or leave it when that generator is
+outside scope.
 
 A contradiction between code and commentary needs resolution against the actual contract. Do not
 silently delete the only evidence of a defect or change behavior during a prose sweep. Report a
@@ -54,10 +54,11 @@ regex that can consume strings or URLs. Parsed directives need their own preserv
 when the language parser ignores them. Docstring or string changes are not token-identical; state
 what changed and run the checks that consume them rather than claiming comment-only equivalence.
 
-Run affected lint, type, test or documentation checks and repository-required gates. Check formatting
-when deletion can change alignment. Keep declaration regrouping, renames and behavior changes out
-of a comment-only sweep. If a needed check cannot run, report the gap instead of claiming equivalence.
-The prose introduced by an authorized code change can be dried in that same change.
+Run affected lint, type, test or documentation checks and repository-required gates. Check
+formatting when deletion can change alignment. Keep declaration regrouping, renames and behavior
+changes out of a comment-only sweep. If a needed check cannot run, report the gap instead of
+claiming equivalence. The prose introduced by an authorized code change can be dried in that same
+change.
 
 Report material deletions, retained constraints and actual verification; no deletion quota or new
 receipt is needed for a standalone cleanup. Stop when the scoped prose meets the keep test and

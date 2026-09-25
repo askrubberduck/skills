@@ -8,8 +8,7 @@ to the subsystem under discussion. Compare with a smaller in-place correction be
    for a class or file per piece.
 3. Classify mechanisms as required by the problem, required by the platform, or accidental. Attack
    duplicate state, parallel paths, mode flags, translation layers and caller ordering obligations.
-4. Assemble the smallest path with one owner per rule and state transition. Reuse existing
-   facilities and keep security, validation, accessibility and necessary calibration intact.
+4. Assemble the smallest path, reusing existing facilities.
 5. Replace within the authorized scope, test the contracts, and remove superseded code, config and
    tests that only encode the old mechanism. Preserve tests of required outcomes. Intentional
    behavior changes need explicit checks rather than blind equivalence to the original bug.

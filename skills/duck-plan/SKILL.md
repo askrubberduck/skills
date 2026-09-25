@@ -8,17 +8,17 @@ description: Find the hole in the plan before building over it; assumptions and 
 Produce a plan someone can execute and verify. Each unit must change a required outcome or resolve
 an uncertainty that blocks it. Agreement among planners does not establish feasibility.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 Planning does not authorize implementation or publication. Return to an executing caller so it can
 continue within existing authority; a standalone planning request ends with the plan.
 
 ## Start from the actual decision
 
-Reuse the outcome, constraints, affected flow and decisions established by `duck-frame`. If they
-are missing or contradicted, resolve only the unsettled design before planning dependent work.
-A small settled task can use the short form; no separate architecture document is required merely
-to restate the request. Read relevant source, tests and project instructions before naming changes.
+Reuse the outcome, constraints, affected flow and decisions established by `duck-frame`. If they are
+missing or contradicted, resolve only the unsettled design before planning dependent work. No
+separate architecture document is required merely to restate the request. Read relevant source,
+tests and project instructions before naming changes.
 
 Use `duck-shape` in analysis mode on proposed mechanisms, reusing valid analysis already done.
 Search for existing helpers and platform capabilities. Remove speculative layers, migration paths,
@@ -50,11 +50,12 @@ Ask whether its checks could pass while the outcome fails. Test the consequentia
 the cheapest available experiment before endorsing dependent work. Record what ran, what happened
 and what remains untested. A plan for an unbuilt implementation cannot prove runtime correctness.
 
-Choose challenge method and participants using [challenge selection](../duck-review/references/challenge.md).
-A narrow plan may use a self-check with a decisive experiment; otherwise use the independent input
-that reference and repository policy require. For external calls use `duck-review`'s
-[dispatch mechanics](../duck-review/references/dispatch.md), with the critic's pin from
-`[models].plan` (default `[families].reviewers`). Do not claim independence that did not run.
+Choose challenge method and participants using [challenge
+selection](../duck-review/references/challenge.md). A narrow plan may use a self-check with a
+decisive experiment; otherwise use the independent input that reference and repository policy
+require. For external calls use `duck-review`'s [dispatch
+mechanics](../duck-review/references/dispatch.md), with the critic's pin from `[models].plan`
+(default `[families].reviewers`). Do not claim independence that did not run.
 
 Independent authors receive the outcome, constraints and source before seeing the preferred plan.
 A critic instead receives the proposed plan and seeks a concrete counterexample. Choose the method
@@ -84,6 +85,7 @@ critique rounds after the initial draft unless the owner supplies another limit.
 new evidence or a materially changed approach. Stop redispatching at the bound and preserve
 unresolved claims; do not loop until everyone agrees.
 
-Update one existing plan when a durable execution handoff is needed, using `duck-proof`'s durable-home
-rules. A short standalone plan can stay in the response. Record decisive checks and disagreements,
-not a transcript of the planning process. This does not replace a required `duck-review` release gate.
+Update one existing plan when a durable execution handoff is needed, using `duck-proof`'s
+durable-home rules. A short standalone plan can stay in the response. Record decisive checks and
+disagreements, not a transcript of the planning process. This does not replace a required
+`duck-review` release gate.

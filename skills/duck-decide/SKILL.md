@@ -8,13 +8,12 @@ description: Walk the owner through the decisions they have been ducking, one at
 Blocking decisions are presented **one at a time, in full, in plain language**. Batching decisions
 produces rushed answers on exactly the items that were queued because they need judgment.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 
 ## Per decision, present
 
-1. **Context** — what the decision unblocks and why it's the owner's call, in plain language the
-   owner can read at a glance.
+1. **Context** — what the decision unblocks and why it's the owner's call.
 2. **Options** — each with tradeoffs, gains, and risks stated concretely. Two to four real options;
    one option enumerated is no decision offered.
 3. **Recommendation** — pick one and say why, in one sentence.

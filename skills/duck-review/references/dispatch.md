@@ -1,9 +1,8 @@
 # Independent dispatch
 
-Read this only when dispatching a participant. Prefer a native isolated agent or supported API when
-it supplies the required model identity, tools and authority; a CLI is one transport, not the test
-of independence. Native same-family agents can provide useful forward tests but do not count as
-cross-family reviewers.
+Prefer a native isolated agent or supported API when it supplies the required model identity, tools
+and authority; a CLI is one transport, not the test of independence. Native same-family agents can
+provide useful forward tests but do not count as cross-family reviewers.
 
 Confirm existing authorization covers sending this repository to the named vendor. Record its
 source and reuse it; do not ask again when it already covers this dispatch. A permission rejection
@@ -28,18 +27,18 @@ told nothing answers in its own default and returns findings nobody asked for in
 It also says the participant is one perspective and dispatches no reviewers of its own.
 
 Each criterion the brief takes from a repository rule is a verbatim quote of that rule, with its
-path and line; the task's own requirements travel with their own source. A paraphrase is a second rule nobody reviewed, and a stricter one yields
-findings the gate's own text dismisses.
+path and line; the task's own requirements travel with their own source. A paraphrase is a second
+rule nobody reviewed, and a stricter one yields findings the gate's own text dismisses.
 
 Capture a code candidate from its fork point: `git diff $(git merge-base <base> <candidate>)
 <candidate>`, and record both SHAs in the brief; a base that moved otherwise shows up reversed in
-the diff. For a dirty worktree drop the second argument, add each untracked file, and say the
-candidate has no SHA.
+the diff. A dirty worktree is first captured as a ref the way `duck-split` does; that ref is the
+candidate.
 
 A brief for round two or later carries the prior adjudication and the settled causes by stable
 ID, with the instruction not to re-report them in any rewording and to refute one only with new
-evidence. A settled cause re-raised
-without new evidence is a malformed finding; the rest of that result still counts.
+evidence. A settled cause re-raised without new evidence is dismissed; the rest of that result
+still counts.
 
 ## Run the reviewers
 
@@ -51,8 +50,8 @@ confirm it exited, then read what it wrote: a wait that returns while the worker
 hands the retry a shared file.
 The pinned ids come from `~/.askrubberduck/config.toml`, never from memory: `[models].review` for
 a review or a disposition (default `[families].reviewers`), and `[families].reviewers`
-(default empty: the owner's setup names them) for a race or plan role without a list of its own. Minimum shapes, with
-the pins and the timeout bound first:
+(default empty: the owner's setup names them) for a race or plan role without a list of its own.
+Minimum shapes, with the pins and the timeout bound first:
 
 ```bash
 : "${CODEX_MODEL:?pinned id, proven below}" "${AGY_MODEL:?pinned id, proven below}" "${DISPATCH_TIMEOUT:?from [bounds], e.g. 45m}"
@@ -67,16 +66,17 @@ material degrades the verdict — the reviewer quotes the corpus fluently and wr
 toward letting findings stand — and forces a no-tools constraint, the prompt shape that provokes
 the permission-denied outage.
 
-Sanity-check a new invocation form with `-p "Reply with exactly: OK"`. These traps yield plausible
-reviews at exit 0:
+Sanity-check a new invocation form with the prompt `Reply with exactly: OK`. These traps yield
+plausible reviews at exit 0:
 
 - An unpinned invocation can silently use the wrong model family. Always pin `--model`, and prove
   the pin using the identity checks above.
-- The prompt must be an **argument**. `--print "<text>"` can drop it, and a prompt redirected on
-  **stdin** is discarded entirely — the reviewer answers with a greeting at exit 0.
+- The prompt must be an **argument**: a prompt redirected on **stdin** is discarded entirely — the
+  reviewer answers with a greeting at exit 0.
 - After a repair, a reviewer can replay its previous round instead of reading the new candidate.
   Have it open its result with the candidate's revision and one current line quoted from a named
-  changed artifact, and compare each round's output with the last: an identical body is an outage, not a verdict.
+  changed artifact, and compare each round's output with the last: an identical body is an
+  outage, not a verdict.
 
 A zero-byte, greeting-only, timed-out, or crashed dispatch is an outage: a dispatch attempted that
 produced no verdict. An output that holds only a quota or credit error, or a rejection of the
@@ -85,7 +85,7 @@ naming the config file that holds a dead pin. **A degraded dispatch is the harde
 length, well formed, and wrong.** Nothing in the exit status distinguishes it, so before trusting
 any result, check that its quoted justifications actually support its verdict.
 
-Two kinds of malformed result, and every skill that says "malformed" means one of these:
+Two kinds of malformed result:
 *unranked* — a verdict with findings that carry no severity: the participant counts, its findings
 are claims to adjudicate; *unsupported* — no verdict, or a verdict whose cited justification is
 the claim under attack: the participant did not answer, the gate is short a reviewer, and its
@@ -93,8 +93,9 @@ findings are still claims. **A REJECT is never an outage.**
 
 **A pin on trial rides along.** A pin in `[learn].trial` (default empty) rides along for its first
 `[learn].shadow` (default 3) gates, and up to twice that while its comparison stays undecided;
-`scripts/ledger.py pick review` names it on a `shadow` line while it does. Dispatch it beside the required set with the same brief and the same export authorization for its
-vendor, or skip it and say so. Its verdict never counts toward the gate, its outage never leaves
+`scripts/ledger.py pick review` names it on a `shadow` line while it does. Dispatch it beside the
+required set with the same brief and the same export authorization for its vendor, or skip it
+and say so. Its verdict never counts toward the gate, its outage never leaves
 the gate short, and its findings are adjudicated like any other. Its row carries
 `setup = shadow`. A trial's gates count in whichever repository they ran, since a model's record
 is not a repository's; its comparison pairs it with its family's reviewer on the same gate of the

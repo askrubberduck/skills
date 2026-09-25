@@ -15,11 +15,10 @@ configure every routine call.
 
 Trust-touching means security-, privacy-, or data-sensitive work, or gate-semantics changes.
 Repository requirements bind release gates. An explicit smaller analysis can return useful evidence
-without satisfying a stronger release gate. A change to gate policy is judged under PRE-change
-rules; it never grants its own approval. Never shrink the required set after an outage or an adverse
-finding to manufacture a pass. A roster that cannot supply a row's required families is a missing
-participant, never a quietly smaller gate. Report incomplete participation and its effect on the
-claim.
+without satisfying a stronger release gate. Never shrink the required set after an outage or an
+adverse finding to manufacture a pass. A roster that cannot supply a row's required families is a
+missing participant, never a quietly smaller gate. Report incomplete participation and its effect on
+the claim.
 
 ## Start level, then escalate on evidence
 
@@ -34,11 +33,11 @@ the first round of a *release* review; an analysis pass is not a round of it.
 After each round, one of these holds, in this order:
 
 1. A substantiated `BLOCKER` → one more round, because defects cluster.
-2. Two eligible captures (Broad, or Independent escalated once) → `scripts/ledger.py remaining <gate_id>`;
-   another round while its estimate is at least one, stop below; "insufficient evidence" from it
-   counts as at least one.
-3. One capture and no `BLOCKER` → stop, unless the round found nothing at all and the reviewer
-   has no recorded precision at or above 0.8 for any class on this repository
+2. Two eligible captures (Broad, or Independent escalated once) → `scripts/ledger.py remaining
+   <gate_id>`; another round while its estimate is at least one, stop below; "insufficient evidence"
+   from it counts as at least one.
+3. One capture and no `BLOCKER` → stop, unless the round found nothing at all and the reviewer's
+   family has no recorded precision at or above 0.8 for any class on this repository
    (`scripts/ledger.py precision`, which filters by origin) — then escalate
    once to Broad, because a silent review with no history is the case with the least evidence.
    Precision measures substantiation of what was claimed, not what was missed; it earns a stop
@@ -46,8 +45,8 @@ After each round, one of these holds, in this order:
 
 Ceilings against a wrong estimate: `[bounds].review_rounds` and `[bounds].trust_rounds` in
 `~/.askrubberduck/config.toml`, whose defaults `duck-run` states. Broad's budget is its two
-reviews, their two cross-family dispositions, and one outage retry per participant. Never reduce
-the set mid-gate; a smaller start applies to the next gate. Before the first dispatch, say what
+reviews, their two cross-family dispositions, and one outage retry per participant. Before the
+first dispatch, say what
 it will cost: `scripts/ledger.py cost <setup>` reads it from past dispatches.
 
 Choose the method that separates plausible explanations: rival causes, a deletion alternative,

@@ -8,7 +8,7 @@ description: Name the cause of a failure before anyone writes a fix, because the
 Find the demonstrated cause of the failure and the paths it affects. Stop when that explanation
 accounts for the evidence; a typo need not become an architectural or organizational diagnosis.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 This skill diagnoses without editing the candidate. Return the cause and repair location to the
 caller, which continues any already-authorized fix and verification. Do not request the same local
@@ -21,14 +21,14 @@ unavailable or the fault intermittent, use logs, traces and history, state the r
 and distinguish observations from provisional explanations.
 
 Trace the failing path to the first point where behavior diverges from the required contract.
-Read what depends on the failing part, callers and configuration for code, the sections and
-decisions that cite it otherwise; classify which can reach the failure and
-which enforce preconditions that prevent it. State search limits when external or dynamic callers
+Read what depends on the failing part (callers and configuration for code; the sections and
+decisions that cite it otherwise) and classify which can reach the failure and which enforce
+preconditions that prevent it. State search limits when external or dynamic callers
 cannot be enumerated. Shared code does not imply every caller is broken.
 
-Identify the cause at the level needed to explain those paths. A shared rule may need one repair
-at its owner rather than a guard in each caller. An incorrect comparison may need only that
-comparison corrected. Investigate a deeper design or policy decision only when evidence points to it.
+Identify the cause at the level needed to explain those paths. A shared rule may need one repair at
+its owner rather than a guard in each caller. An incorrect comparison may need only that comparison
+corrected. Investigate a deeper design or policy decision only when evidence points to it.
 
 ## Separate plausible causes
 
@@ -59,11 +59,11 @@ For a failure, lead with the cause or the unresolved question, then provide:
 - The shared repair location and the check that would show the failure is gone.
 - Material uncertainty and the next discriminator, if the cause remains unresolved.
 
-A cause located in code that a reviewed candidate landed is the ground truth every gate lacks:
-append a row to `~/.askrubberduck/findings.tsv` with `dispatch_id = -`, `tier = production`,
-`substantiated = 1`, and in `candidate` the SHA the gate reviewed — `duck-land`'s outcome record
-maps the landed commit back to it, since a squash gives the same tree a new identity;
-`scripts/ledger.py missed` joins that SHA to every dispatch that returned `APPROVE` on it.
+A cause in code landed from a reviewed candidate is the ground truth every gate lacks: append a row
+to `~/.askrubberduck/findings.tsv` with `dispatch_id = -`, `tier = production`, `substantiated = 1`,
+a new `cause_id`, and in `candidate` the SHA the gate reviewed — `duck-land`'s outcome record maps
+the landed commit back to it, since a squash gives the same tree a new identity; `scripts/ledger.py
+missed` joins that SHA to every dispatch that returned `APPROVE` on it.
 
 Keep ruled-out hypotheses only when their evidence prevents repeating a consequential dead end.
 Do not create a design or work item merely to explain a local defect. An unsettled architectural

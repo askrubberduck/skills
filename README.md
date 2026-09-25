@@ -24,8 +24,8 @@ Your preferred answer gets the same treatment as every other answer. So does the
 
 Install once, then talk to your agent as usual. The descriptions do the routing.
 
-Ask in your language; the skill descriptions stay in English.
-Routing evidence: two English selection probes, plus with/without runs for four skills — see the [eval guide](evals/README.md).
+Ask in your language; the skill descriptions stay in English. Routing evidence: two English
+selection probes, plus with/without runs for four skills — see the [eval guide](evals/README.md).
 
 | You say | What comes back |
 |---|---|
@@ -165,8 +165,9 @@ requirements? What input should break this? Did you run them after the last fix?
 `APPROVE`, `REJECT`, or `NOTE`, with evidence someone else can check. Confidence earns nothing.
 
 **The duck travels light.** One home per fact. One owner per rule. A layer that makes the reader
-open three more files has some explaining to do. A comment that repeats the next line goes. A necessary
-boundary stays, however tempting the deletion count. Shorter code can still leave a bigger mess.
+open three more files has some explaining to do. A comment that repeats the next line goes. A
+necessary boundary stays, however tempting the deletion count. Shorter code can still leave a bigger
+mess.
 
 **The duck reads first.** Follow the path from the input to what actually happens. Read the callers.
 Find the constraint that made the ugly bit necessary before removing it. When the cause is still a
@@ -288,11 +289,11 @@ needs two isolated attempts; a rally alternates a failing test and a repair. Cho
 can expose the mistake, and set the bound before starting. The agent picks a sensible setup unless
 you specify one; you do not have to configure a committee for every change.
 
-Release review has a firmer bar: by default, one reviewer from a verified different model family
-for ordinary work; two reviewers of different families, at least one different from the builder,
-for security, privacy, data or gate-policy changes. Your explicit setup and repository policy govern.
-A smaller analysis does not satisfy a stronger release gate. A missing participant does not lower
-the bar. The [challenge rules](skills/duck-review/references/challenge.md) carry the details.
+Release review has a firmer bar: by default, one reviewer from a verified different model family for
+ordinary work; two reviewers of different families, at least one different from the builder, for
+security, privacy, data or gate-policy changes. Your explicit setup and repository policy govern. A
+smaller analysis does not satisfy a stronger release gate. A missing participant does not lower the
+bar. The [challenge rules](skills/duck-review/references/challenge.md) carry the details.
 
 Sending your repository to another vendor needs your authorization. Once it covers the work,
 the duck remembers it. Asking twice is not being careful.
@@ -348,14 +349,15 @@ review_rounds = 2
 ```
 
 The rows answer questions the duck used to guess at. How many defects did both reviewers miss?
-`scripts/ledger.py remaining <gate_id>` estimates it from what they found in common. Which family catches
-which class? `precision`. Who reviews next? `pick <stage>` samples from recorded catches per minute,
-inside the set the gate requires. Did the change help? `paired` compares two arms on the same
-cases. What is drifting? `thresholds` hands `duck-learn` its occurrences. What will this gate
-cost? `cost <setup>` reads past gates. Is there a new model? `roster <models|->` lists host
-models that are in no role list, no trial and no ledger row; after its shadow gates, `promote` says whether it replaces its family's reviewer, joins the
-list, or goes. `scripts/ledger.py --self-check` runs each of these on a
-fixture and asserts what it prints. Standard library only. A `-` means unknown; unknown never counts as zero.
+`scripts/ledger.py remaining <gate_id>` estimates it from what they found in common. Which family
+catches which class? `precision`. Who reviews next? `pick <stage>` samples from recorded catches per
+minute, inside the set the gate requires. Did the change help? `paired` compares two arms on the
+same cases. What is drifting? `thresholds` hands `duck-learn` its occurrences. What will this gate
+cost? `cost <setup>` reads past gates. Is there a new model? `roster <models|->` lists host models
+that are in no role list, no trial and no ledger row; after its shadow gates, `promote` says whether
+it replaces its family's reviewer, joins the list, or goes. `scripts/ledger.py --self-check` runs
+each of these on a fixture and asserts what it prints. Standard library only. A `-` means unknown;
+unknown never counts as zero.
 
 ### How the duck keeps review rounds bounded
 
@@ -367,13 +369,14 @@ A rejection goes back to its cause: `duck-why` if it is hidden, frame if the pre
 if the decomposition failed, race or rally if the method keeps missing the same class of defect.
 Before a third round, the agent must explain what new evidence that round will buy.
 
-The default ceiling is three review rounds for ordinary work and two for trust-touching work. Changing reviewers or renaming the problem does
-not reset the clock. At the limit, the agent stops dispatching, preserves the candidate and
-unresolved findings, and leaves the release unapproved. A different bound comes from you or the
-repo's policy. No endless pursuit of unanimous approval. No passing because everyone got tired.
+The default ceiling is three review rounds for ordinary work and two for trust-touching work.
+Changing reviewers or renaming the problem does not reset the clock. At the limit, the agent stops
+dispatching, preserves the candidate and unresolved findings, and leaves the release unapproved. A
+different bound comes from you or the repo's policy. No endless pursuit of unanimous approval. No
+passing because everyone got tired.
 
-When you are away, the agent still owns technical decisions within the task. It continues independent
-work and holds only what needs your answer. Your silence does not choose a new goal.
+When you are away, the agent still owns technical decisions within the task. It continues
+independent work and holds only what needs your answer. Your silence does not choose a new goal.
 
 ## How the duck proves its work
 
@@ -382,8 +385,8 @@ references resolve, generated files match, and deliberate corruptions get caught
 
 That proves the package holds together. To find out whether the duck does its job, give it a task
 where agreement would be wrong, a green test hides a bug, or a reviewer moves the goalposts. Inspect
-what it actually did. The [eval guide](evals/README.md) links the behavioral cases and records which trials
-have run. An unrun trial stays unrun, even in the duck's own README.
+what it actually did. The [eval guide](evals/README.md) links the behavioral cases and records which
+trials have run. An unrun trial stays unrun, even in the duck's own README.
 
 Versions and what changed: the [releases page](https://github.com/askrubberduck/skills/releases).
 

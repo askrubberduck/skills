@@ -9,7 +9,7 @@ An attack names the claim it could refute, executes the attempt, and observes th
 and opining is not an executed attack. Surviving the selected attacks establishes only that scope.
 The breaker reports findings; the authorized caller repairs them and reruns the invalidated checks.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 
 ## Bound the target and isolate destructive work
@@ -27,8 +27,8 @@ matches the intended candidate before attacking. Record the pre-attack state and
 state between attacks, not an assumed clean base. Use isolated data, ports and process groups
 for crash tests; verify no children survive before restart. A disposable copy still holds the
 candidate's real configuration: point every database, queue, external API and cloud account it
-reaches at a disposable or stubbed target and strip live credentials first, or leave that attack unattempted and say so. Preserve original
-uncommitted and ignored files.
+reaches at a disposable or stubbed target and strip live credentials first, or leave that attack
+unattempted and say so. Preserve original uncommitted and ignored files.
 
 ## Select attacks that discriminate
 
@@ -42,8 +42,7 @@ uncommitted and ignored files.
 - **Invariant attack:** try to violate the required isolation, authorization, state transition or
   other contract from outside the boundary. Inspect the resulting state, not just the return code.
 - **Crash/recovery:** interrupt a consequential operation, restart and inspect persisted state when
-  recovery is part of the contract. Kill an isolated process group rather than leaving orphaned
-  children to contaminate the result.
+  recovery is part of the contract.
 - **Real artifact:** exercise a critical path in the built binary or app. Test doubles and a green
   suite may omit the integration that determines the user-visible outcome.
 
@@ -68,6 +67,5 @@ owner requests it. Report no-finding attacks and limits under the same evidence 
 
 Use `duck-proof`'s durable-home rules for a downstream handoff: `break-rN.md` or an explicit section
 of the shared work record, with restored-state confirmation and evidence that survives scratch
-cleanup. A standalone report can stay in the response. Do not advance the candidate just to save
-the report. `duck-review` consumes required break evidence for release; a successful attack suite
-is not independent approval.
+cleanup. A standalone report can stay in the response. `duck-review` consumes required break
+evidence for release; a successful attack suite is not independent approval.

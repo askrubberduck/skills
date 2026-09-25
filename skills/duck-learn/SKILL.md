@@ -8,19 +8,20 @@ description: Turn session and delivery evidence into reusable lessons, so each m
 The feedback loop: evidence from past work becomes durable updates — a skill, a memory, a rule —
 or gets consciously discarded. Lessons that live only in a chat transcript are lessons lost.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 
 ## Recipe
 
 1. **Gather evidence, don't reminisce.**
    - **Numbers first.** `scripts/ledger.py thresholds` reads `~/.askrubberduck/dispatches.tsv`
-     and prints lesson candidates — a reviewer's outage rate, a family with no unique catch over
-     its last twenty dispatches, a cost that drifted — each one an occurrence for step 3's bar.
-   - **New models.** `scripts/ledger.py roster -` reads the hosts' model lists (`agy models`;
-     codex prints none, so the owner names its new pins) and prints ids nobody has configured,
-     trialled or dispatched; `promote` prints each trial pin's verdict: still `shadow`, or `replace`,
-     `add` or `drop` once decided.
+     and prints lesson candidates — a pin's outage rate, a pin whose reviews among its last twenty
+     dispatches found no unique blocker, minutes that drifted — each one an occurrence for step
+     3's bar.
+   - **New models.** `scripts/ledger.py roster -` reads host model ids on stdin
+     (`agy models | scripts/ledger.py roster -`; codex prints none, so the owner names its new
+     pins) and prints ids nobody has configured, trialled or dispatched; `promote` prints each
+     trial pin's verdict: still `shadow`, or `replace`, `add` or `drop` once decided.
      `[learn].discover` (default `auto`) decides what follows: `off` ignores both; `propose` queues
      each through `duck-decide`; `auto` puts at most one new pin per family into `[learn].trial`
      and applies each `replace`, `add` or `drop` verdict to `~/.askrubberduck/config.toml`,
@@ -29,16 +30,16 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
    - **Sources.** Transcript-store locations — Claude `~/.claude/projects/<dir>/*.jsonl`, Codex
      `$CODEX_HOME/sessions` and `archived_sessions` — are the hosts whose stores are known, not the
      whole set: another host has its store located before the mine, or the result is partial and
-     says so. Alongside them, recorded outcomes, review trajectories, and token stats. Missing or
-     malformed store? Say so and mark the result partial.
+     says so. Alongside them, recorded outcomes, review trajectories, and token stats.
    - **Count.** Extract counts: repeated directives, repeated failures, repeated tool patterns.
      Count independent owner tasks, not files: fold every derived log — subagents, retries,
      forwarded copies — into its parent, by event timestamp rather than file mtime, roots and
      delegated logs reported apart. Generated prompts, task notifications, and tool results are
      tool evidence, never owner directives.
    - **Never raw.** Big transcripts are mined by script or subagent, never read raw into the main
-     context, and no raw prompt text goes into durable output. [Mining the stores](references/mine.md)
-     has the row shapes, the wrappers to strip and what any extractor must report.
+     context, and no raw prompt text goes into durable output. [Mining the
+     stores](references/mine.md) has the row shapes, the wrappers to strip and what any extractor
+     must report.
 2. **Classify each candidate lesson** by its durable home — one authoritative home per lesson:
    - Repeatable multi-step workflow **the user asks for in words** → a **skill** (new, or a section
      of an existing one — prefer extending; a new skill is a cost).
@@ -46,7 +47,7 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
      pending, a stale base — → the checked-in instructions doc. **A skill description matches words;
      it cannot see state.**
    - Fact, preference, or project state → **memory**.
-   - A **defect class** the doer repeated → the repo's defect ledger, which `duck-proof` reads
+   - A **defect class** the doer repeated → `defect-classes.md`, which `duck-proof` reads
      before every pass. Classes compound; instances do not.
    - Rule that must bind every turn → the checked-in instructions doc (CLAUDE.md/AGENTS.md).
    - One-off, derivable, or already recorded → **discard, say so**.
@@ -73,7 +74,5 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
 
 ## Common mistakes
 
-- Saving what the repo already records (git history, code structure) — memory duplicating the repo
-  rots; link, don't copy.
 - Mining only failures — validated approaches that WORKED are equally worth encoding (with their
   evidence), or they'll be re-derived at full cost next time.

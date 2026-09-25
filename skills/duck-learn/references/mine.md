@@ -26,13 +26,12 @@ alone, which also folds every honest repeat of a short directive.
 Strip only wrappers the host is known to inject. A pattern that removes any paired tag also
 removes the markup an owner pasted.
 
-A one-off extractor is a few lines over two globs. Whatever it looks like, it folds a fork by
-walking its prompts beside the parent's and dropping the matching prefix; it keeps a fork whose
-parent is missing, or not older than it, and says so; it counts each session id once; and it prints
-one `partial:` line per class of thing it skipped or kept on doubt: a store that is empty or
-missing, a malformed row, a prompt without a readable timestamp, a prompt folded as replay.
+Any extractor folds a fork by walking its prompts beside the parent's and dropping the matching
+prefix; it keeps a fork whose parent is missing, or not older than it, and says so; it counts each
+session id once; and it prints one `partial:` line per class of thing it skipped or kept on doubt:
+a store that is empty or missing, a malformed row, a prompt without a readable timestamp, a prompt
+folded as replay.
 
 Keep the extracted rows in scratch: they hold raw prompt text, and only counts reach durable
 output. Every `partial:` line goes into the report. The store does not mark where a fork's replay
-ends, so an owner who retypes the parent's next prompt in the fork loses that one to the fold. A
-store this page does not describe yields nothing: locate it first, or mark the result partial.
+ends, so an owner who retypes the parent's next prompt in the fork loses that one to the fold.

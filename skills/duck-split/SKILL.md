@@ -8,7 +8,7 @@ description: Hold a branch, PR or document to the one thing it was opened for; n
 A unit of work collects what belongs elsewhere. Sort it against the unit's intent, part by part,
 and show that the pieces sum to the original before anything leaves it.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 A question ("what doesn't belong?") gets the classification and no edits. An instruction to
 extract authorizes creating the new units only. Taking the moved parts out of the original needs
@@ -44,8 +44,8 @@ unless extraction was asked for.
    before anything else is touched.
 2. Build one new unit per destination from the original's parts. A part that cannot stand
    without the rest, or collides with a sibling, depends on another new unit; say which and why.
-3. Only on a removal instruction, take the moved parts out of the original.
-   Otherwise the original keeps them, and the report says those parts now exist in two places.
+3. Only on a removal instruction, take the moved parts out of the original. Otherwise the
+   original keeps them, and the report says those parts now exist in two places.
 4. Prove nothing was lost: recombine every resulting unit and compare with the backup, counting
    each source part once — when extraction left a copy in the original, the original's copy is
    the one in the comparison, not both. Then run each unit's checks alone; one that passes only
@@ -71,10 +71,10 @@ unless extraction was asked for.
   since the fork is otherwise reported as loss. For a stack, diff that against the top; for
   separate branches, merge them all onto a scratch branch from the base and diff that.
 - With the removal instruction, push and forge authority, rebase each stacked layer with
-  `git rebase --onto <new-parent> <old-fork-point> <layer>`, the fork point read from the backup or the
-  reflog, never guessed from a parent that already moved. Where
-  the layers are open PRs, repoint each base before any force-push: a forge that finds a child's
-  commits reachable from its base marks the child merged and may delete its branch.
-- The backup's commits land under new SHAs, so `duck-sweep` will find it unproven: name it in
+  `git rebase --onto <new-parent> <old-fork-point> <layer>`, the fork point read from the backup
+  or the reflog, never guessed from a parent that already moved. Where the layers are open PRs,
+  repoint each base before any force-push: a forge that finds a child's commits reachable from
+  its base marks the child merged and may delete its branch.
+- The backup's commits land under new SHAs, so `duck-sweep` will find it Unproven: name it in
   the report as the work item its Unmerged path reads, with the comparison result as the
   decision that lets it be deleted.

@@ -8,7 +8,7 @@ description: Merge approved work, update project records, and clean up the branc
 The ship step: gate passed → merge → record → clean. A merge without a recorded outcome is work
 the repo forgot; a record without a verified merge is fiction.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 
 A passed gate establishes readiness, not permission to merge. Use the endpoint already authorized
@@ -33,8 +33,9 @@ candidate branch and merges nothing.
 - Re-verify the base: `git fetch`, compare origin/<base> to what was branched from. **If it
   advanced, integrating it produces a new head nobody authorized** — conflict resolutions and
   semantic merges ride in unexamined. Integrate, re-run the repo's checks, and **re-authorize the
-  resulting SHA** the same way this landing was authorized — the review gate, or the owner's renewed
-  written waiver; landing on the strength of the old authorization merges an unexamined diff.
+  resulting SHA** the same way this landing was authorized — `duck-review`'s release-gate path, or
+  the owner's renewed written waiver; landing on the strength of the old authorization merges an
+  unexamined diff.
 - CI green on the exact head being merged.
 - **Commit messages and the PR description meet `duck-dry`'s prose bar**, checked before
   merge: a squash merge promotes the description into the commit body, so slop in either ships
@@ -44,14 +45,14 @@ candidate branch and merges nothing.
   repository's view of them**, as [the public-push scan](references/public-push.md) lays out. A
   leaked reference is public the moment it pushes; a later deletion leaves it in the history and
   in every clone.
-- **A precondition the owner directs you to waive is waived only in writing before the push** —
+- **A precondition the owner directs you to waive is waived only in writing before the landing** —
   which precondition, and the owner's decision, recorded where the repo keeps decisions at the
   moment it is given; step 3's outcome record then **names what was waived**. Waiving is the
   owner's call on a named precondition, never the doer's, and never a blanket exemption from the
   rest; a waiver a reviewer discovers afterward is a second violation, not a footnote.
 - **A registry entry is not an authorization unless it says who authorized it** — `duck-scan`'s
-  attribution rule. The doer writes to the same decision log the owner does, so an unattributed
-  entry is the doer's note, and reading one as permission is how a run authorizes itself in writing.
+  attribution rule. The doer writes to the same decision log the owner does, so reading an
+  unattributed entry as permission is how a run authorizes itself in writing.
 
 ## Land
 
@@ -65,7 +66,6 @@ candidate branch and merges nothing.
    - **Shape.** Where the last 20 commits on `origin/<base>` carry no merge commit, the branch is
      flat and this landing is not the one that mints the first — rebase or squash, one commit per
      packet; a stray merge in an otherwise flat log is not a license, match the dominant shape.
-     No config enforces this; the history is the only guard.
    - **Pin the base.** Squash-merge the PR, or direct push where that is the standard, **pinning
      the base at merge time**: a base that advances between the precondition check and the merge
      lands a combination nobody reviewed, and no later check can un-land it. The merge must FAIL
@@ -88,21 +88,20 @@ candidate branch and merges nothing.
    commit goes through the gate before it is recorded. It runs **after** the branch has moved, so
    it cannot hold a deployment that a push triggers.
 3. Record the outcome where the repo keeps truth: shipped log / status doc / delivery board — with
-   PR number, candidate SHA, merged SHA, and what changed. One recorded outcome per landing. Where that record
-   lives in the repo, landing it by the same route is part of this landing's authorization.
+   PR number, candidate SHA, landed SHA, and what changed. One recorded outcome per landing.
+   Where that record lives in the repo, landing it by the same route is part of this landing's
+   authorization.
 4. Close or queue obligations the change touched — the doer never closes an item that needs the
    owner's sign-off; queue those (`duck-decide` presents them).
 5. Clean up: delete the merged branch and its worktree under `duck-sweep`'s step 3, which settles
-   untracked and ignored files before a worktree goes; a matching tree says nothing about a
-   `.env` beside it. Step 2's read-back is what makes the branch safe to delete and what
-   `duck-sweep` cannot derive on its own — a squash leaves no metadata linking the branch
-   to the commit that replaced it, so **record the candidate and landed SHAs in step 3's outcome
-   entry** and delete against that, not against a classifier's guess. A cleanup held on a queued
-   `duck-sweep` keep decision leaves the landing complete and recorded, with the pending worktree
-   named in step 3's entry. Record a resumable boundary; continue other authorized work if the
-   host and task allow it.
+   untracked and ignored files before a worktree goes; a matching tree says nothing about a `.env`
+   beside it. Step 2's read-back is what makes the branch safe to delete and what `duck-sweep`
+   cannot derive on its own — a squash leaves no metadata linking the branch to the commit that
+   replaced it, so delete against step 3's recorded SHAs, not a classifier's guess. A cleanup held
+   on a queued `duck-sweep` keep decision leaves the landing complete and recorded, with the pending
+   worktree named in step 3's entry. Record a resumable boundary; continue other authorized work if
+   the host and task allow it.
 
 ## Common mistakes
 
 - Leaving the worktree "for reference" — the record is the reference; the worktree is debt.
-- Skipping the base re-verify because the branch is "fresh" — fresh was true when you last fetched.

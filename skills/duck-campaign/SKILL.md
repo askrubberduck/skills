@@ -9,11 +9,9 @@ Turn the requested outcomes into a manageable set of workstreams and carry each 
 endpoint. Split work when separate execution, ownership or release helps; the ability to ship two
 small changes separately is not by itself a reason to create two packets.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
-Carry existing authority through the campaign. Local work ends with verified local changes;
-commits, PRs, pushes and merges require their own authorization. A planning-only request ends with
-the plan. Keep unresolved decisions attached to their dependent work.
+Carry existing authority through the campaign. A planning-only request ends with the plan.
 
 ## Establish the work that is needed
 
@@ -21,22 +19,23 @@ Use `duck-scan` to locate current work and read relevant product constraints and
 existing records and decisions. Delegate bounded read-only investigation only when it helps;
 a campaign does not need a scout fleet merely to begin.
 
-Apply `duck-cut`'s necessity check to the candidates: what required outcome is missing, what already
+Apply `duck-cut`'s existence check to the candidates: what required outcome is missing, what already
 satisfies it, and which findings share a cause? Remove speculative or superseded work. Recheck a
 candidate that grows; do not quietly expand the user's goal.
 
 Use `duck-frame` to settle shared contracts and consequential unknowns before dependent plans.
 Reuse valid design decisions instead of framing each packet afresh. Keep the campaign's shared
 contracts in its existing work record, creating a record only when no adequate home exists.
-An owner decision blocks the work that depends on it; continue other
-settled, authorized work when available, even if the roster has not yet been divided into packets.
+An owner decision blocks the work that depends on it; continue other settled, authorized work when
+available, even if the roster has not yet been divided into packets.
 
 ## Group by execution needs
 
 Keep related changes together when they share a rule, verification path or small delivery surface.
 Repeated findings at one boundary usually need one repair with several cases, not one packet per
-finding. Conversely, separate work with different owners, release timing, material risks or genuinely
-independent execution. Avoid overlapping ownership of files that will be edited concurrently.
+finding. Conversely, separate work with different owners, release timing, material risks or
+genuinely independent execution. Avoid overlapping ownership of files that will be edited
+concurrently.
 
 Each packet names its outcome, affected scope, dependencies and completion check. Use the existing
 work-item convention; a small campaign may need only one record with several units. Do not create
@@ -66,6 +65,5 @@ Contrary execution evidence reopens the affected shared design before dependent 
 Stop when the authorized work is complete or all remaining work is blocked, and state which.
 
 At a context boundary, preserve the roster, candidate identities and valid evidence using
-`duck-diet`. Schedule a continuation only through a supported, authorized host mechanism and verify
-it was booked. Do not claim that a written next step schedules anything. Use `duck-sweep` for
+`duck-diet`. Use `duck-sweep` for
 already-authorized cleanup when needed; do not delete work just to make the roster appear empty.
