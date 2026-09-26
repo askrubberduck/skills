@@ -105,13 +105,20 @@ def validate_row(name: str, line: int, row: dict) -> bool:
 def read_table(name: str, columns: tuple[str, ...], enums: dict[str, set]) -> list[dict]:
     path = home() / name
     try:
-        lines = path.read_text().splitlines()
-    except OSError:
-        return []
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except FileNotFoundError:
+        if path.is_symlink() or home().is_symlink():  # dangling: configured, not absent
+            raise SystemExit(f"{path}: dangling symlink")
+        if name == "dispatches.tsv":
+            print(f"{path}: no dispatch recorded yet", file=sys.stderr)
+        return []  # no findings.tsv is a clean history
+    except OSError as error:
+        raise SystemExit(f"{path}: {error.strerror}")  # an unread table is no answer, not an empty one
+    except UnicodeDecodeError as error:
+        raise SystemExit(f"{path}: not UTF-8 ({error.reason} at byte {error.start})")
     reader = csv.reader(lines, delimiter="\t")
     if next(reader, None) != list(columns):
-        print(f"{name}:1: header does not match {', '.join(columns)}", file=sys.stderr)
-        return []
+        raise SystemExit(f"{path}:1: header does not match {', '.join(columns)}")
     rows = []
     for line, values in enumerate(reader, start=2):
         if len(values) != len(columns):
@@ -954,11 +961,86 @@ def rally_check(root: Path) -> None:
     assert code == 0 and "dispatches = 5" in out, out
 
 
+def home_check(parent: Path) -> None:
+    """Through the command: a missing ledger warns once, a missing findings table is a clean
+    history, and a table that exists but cannot be read ends the command instead of answering."""
+    header = {"dispatches.tsv": "\t".join(DISPATCH_COLUMNS) + "\n",
+              "findings.tsv": "\t".join(FINDING_COLUMNS) + "\n"}
+    parent.mkdir()
+    models = parent / "models.txt"
+    models.write_text("gpt-6-sol\n")
+    readers = (["remaining", "g", "--repo", "r"], ["precision", "--all"], ["missed"],
+               ["pick", "review", "--repo", "r", "--seed", "1"], ["thresholds"],
+               ["cost", "broad", "--repo", "r"], ["roster", str(models), "--repo", "r"],
+               ["promote", "--repo", "r"])
+
+    def call(root: Path, argv: list[str]) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, __file__, *argv], capture_output=True, text=True,
+                              env={**os.environ, "ASKRUBBERDUCK_HOME": str(root)})
+
+    for n, argv in enumerate(readers):
+        root = parent / f"r{n}"
+        root.mkdir()
+        (root / "config.toml").write_text('[families]\ndoer = "anthropic"\n'
+                                          'reviewers = ["openai:gpt-6-sol:high"]\n')
+        missing = call(root, argv)
+        (root / "dispatches.tsv").write_text(header["dispatches.tsv"])
+        empty = call(root, argv)
+        assert missing.returncode == 0 and (missing.returncode, missing.stdout) == \
+            (empty.returncode, empty.stdout), argv
+        assert empty.stderr == "", (argv, empty.stderr)
+        assert missing.stderr == f"{root / 'dispatches.tsv'}: no dispatch recorded yet\n", missing
+
+    ways = {"Is a directory": lambda path: path.mkdir(),
+            "header does not match": lambda path: path.write_text("id\tother\n"),
+            "not UTF-8": lambda path: path.write_bytes(b"\xff\xfe\n"),
+            "dangling symlink": lambda path: path.symlink_to(path.parent / "gone")}
+    if os.geteuid() != 0:  # root reads a mode-0 file
+        ways["Permission denied"] = lambda path: (path.write_text(header[path.name]),
+                                                  path.chmod(0))
+    for name in header:
+        for reason, spoil in ways.items():
+            root = parent / f"{len(reason)}-{name}"
+            root.mkdir()
+            for other in set(header) - {name}:
+                (root / other).write_text(header[other])
+            spoil(root / name)
+            done = call(root, ["promote"])
+            if (root / name).is_file():
+                (root / name).chmod(0o600)
+            assert done.returncode != 0 and done.stdout == "", (reason, name, done)
+            assert done.stderr.startswith(f"{root / name}") and reason in done.stderr, \
+                (reason, name, done.stderr)
+    if os.geteuid() != 0:
+        locked = parent / "locked"
+        locked.mkdir()
+        (locked / "dispatches.tsv").write_text(header["dispatches.tsv"])
+        locked.chmod(0)
+        done = call(locked, ["promote"])
+        locked.chmod(0o700)
+        assert done.returncode != 0 and done.stdout == "", done
+        assert done.stderr == f"{locked / 'dispatches.tsv'}: Permission denied\n", done.stderr
+    dangling = parent / "dangling"
+    dangling.symlink_to(parent / "gone")
+    done = call(dangling, ["promote"])
+    assert done.returncode != 0 and "dangling symlink" in done.stderr, done
+    latin = parent / "latin"  # the table is UTF-8 whatever the reader's locale says
+    latin.mkdir()
+    (latin / "dispatches.tsv").write_text(header["dispatches.tsv"] + "\t".join(
+        ["x", "g", "1", "-", "r", "review", "independent", "0", "c", "openai", "gpt-é", "-", "-",
+         "-", "-", "final", "0"]) + "\n", encoding="utf-8")
+    done = subprocess.run([sys.executable, __file__, "thresholds"], capture_output=True,
+                          env={**os.environ, "ASKRUBBERDUCK_HOME": str(latin), "PYTHONUTF8": "0",
+                               "LC_ALL": "en_US.ISO8859-1", "PYTHONIOENCODING": "utf-8"})
+    assert done.returncode == 0 and "gpt-é".encode() in done.stdout, done
+
+
 def self_check() -> int:
     with tempfile.TemporaryDirectory(prefix="askrubberduck-ledger-") as directory:
         root = Path(directory)
         os.environ["ASKRUBBERDUCK_HOME"] = str(root)
         (root / "config.toml").write_text(CONFIG_FIXTURE)
+        home_check(root / "homes")
         for name, columns, fixture in (("dispatches.tsv", DISPATCH_COLUMNS, DISPATCH_FIXTURE),
                                        ("findings.tsv", FINDING_COLUMNS, FINDING_FIXTURE)):
             (root / name).write_text("\t".join(columns) + "\n" + "\n".join(fixture) + "\n")
