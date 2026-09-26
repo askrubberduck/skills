@@ -94,15 +94,15 @@ findings are still claims. **A REJECT is never an outage.**
 
 **A pin on trial rides along.** A pin in `[learn].trial` (default empty) rides along for its first
 `[learn].shadow` (default 3) gates, and up to twice that while its comparison stays undecided;
-`scripts/ledger.py pick review` names it on a `shadow` line while it does. Dispatch it beside the
-required set with the same brief and the same export authorization for its vendor, or skip it and
-say so. Its verdict never counts toward the gate, its outage never leaves the gate short, and its
-findings are adjudicated like any other. Its row carries `setup = shadow`. A trial's gates count in
-whichever repository they ran, since a model's record is not a repository's; its comparison pairs it
-with its family's reviewer on the same gate of the same repository.
+`$LEDGER pick review` names it on a `shadow` line while it does (`$LEDGER` is `python3` with the
+absolute path of `duck-review`'s `scripts/ledger.py`, whatever the working directory). Dispatch it
+beside the required set with the same brief and the same export authorization for its vendor, or
+skip it and say so. Its verdict never counts toward the gate, its outage never leaves the gate
+short, and its findings are adjudicated like any other. Its row carries `setup = shadow`. A trial's
+gates count in whichever repository they ran, since a model's record is not a repository's; its
+comparison pairs it with its family's reviewer on the same gate of the same repository.
 
 Every dispatch attempt gets a row in `~/.askrubberduck/dispatches.tsv`: `pending` written before the
 seat launches, finalized once at synthesis with minutes, verdict and outage. A row left `pending` is
-an interrupted run. `scripts/ledger.py` sits in `duck-review`'s skill directory; run it by that
-absolute path, whatever the working directory. `scripts/ledger.py schema` prints the columns and
+an interrupted run. `$LEDGER schema` prints the columns and
 their domains; a plan critic's `PLAN: CONCUR | OBJECT` is recorded as verdict `CONCUR | OBJECT`.

@@ -35,12 +35,12 @@ the first round of a *release* review; an analysis pass is not a round of it.
 After each round, one of these holds, in this order:
 
 1. A substantiated `BLOCKER` → one more round, because defects cluster.
-2. Two eligible captures (Broad, or Independent escalated once) → `scripts/ledger.py remaining
-   <gate_id>`; another round while its estimate is at least one, stop below; "insufficient evidence"
-   from it counts as at least one.
+2. Two eligible captures (Broad, or Independent escalated once) → `$LEDGER remaining <gate_id>`
+   (`python3` with the absolute path of `duck-review`'s `scripts/ledger.py`); another round while
+   its estimate is at least one, stop below; "insufficient evidence" from it counts as at least one.
 3. One capture and no `BLOCKER` → stop, unless the round found nothing at all and the reviewer's
    family has no recorded precision at or above 0.8 for any class on this repository
-   (`scripts/ledger.py precision`, which filters by origin) — then escalate
+   (`$LEDGER precision`, which filters by origin) — then escalate
    once to Broad, because a silent review with no history is the case with the least evidence.
    Precision measures substantiation of what was claimed, not what was missed; it earns a stop
    only together with a clean round.
@@ -49,13 +49,13 @@ Ceilings against a wrong estimate: `[bounds].review_rounds` and `[bounds].trust_
 `~/.askrubberduck/config.toml`, whose defaults `duck-run` states. Broad's budget is its two
 reviews, their two cross-family dispositions, and one outage retry per participant. Never reduce
 the set mid-gate; a smaller start applies to the next gate. Before the first dispatch, say what
-it will cost: `scripts/ledger.py cost <setup>` reads it from past dispatches.
+it will cost: `$LEDGER cost <setup>` reads it from past dispatches.
 
 Choose the method that separates plausible explanations: rival causes, a deletion alternative,
 an independent plan, an outcome oracle, or a reconstruction. Share requirements and source access;
 keep initial conclusions independent. Different role names or contexts are not different families,
 and different families may share a faulty premise. Test the premise too. Select an available,
-pinned model capable of the challenge — `scripts/ledger.py pick <stage>` chooses within the
+pinned model capable of the challenge — `$LEDGER pick <stage>` chooses within the
 required set from the stage's list by recorded catches per minute, or in list order when
 `[learn].select` is `fixed` (default `adaptive`). The chosen pin's effort is `[effort].trust`
 (default the pin's own) for trust-touching work and `[effort].ordinary` (default the pin's own)

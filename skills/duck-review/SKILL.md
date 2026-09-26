@@ -129,8 +129,8 @@ disposition` so `remaining` never mistakes it for a capture — and the doer syn
 the dispositions agree; where they disagree, the doer dismisses only on executed evidence.
 A finding that stands unsubstantiated after that is a `NOTE` with the disagreement named, not a
 `BLOCKER`; a disagreement about design intent goes to `duck-decide` at every risk level.
-Record `adjudicated_by` per finding in `~/.askrubberduck/findings.tsv`; `scripts/ledger.py
-precision` turns that history into the prior a `read`-tier finding starts from.
+Record `adjudicated_by` per finding in `~/.askrubberduck/findings.tsv`; `$LEDGER precision` turns
+that history into the prior a `read`-tier finding starts from.
 A substantiated blocker stands until resolved. An unsubstantiated suspicion is not a blocker;
 if missing evidence prevents a gate decision, return `NOTE` and name the uncertainty.
 
@@ -193,8 +193,9 @@ finding's adjudicated classification and evidence, any outage or downgrade, and 
 criteria reviewed. Finalize each participant's row in `~/.askrubberduck/dispatches.tsv` and append
 one row per adjudicated finding to `findings.tsv`, with a stable `cause_id` shared across
 participants that found the same cause; with two eligible captures (shadows excluded), report
-`scripts/ledger.py remaining <gate_id>` — the estimate of defects neither found. Keep raw CLI stdout
-in scratch; preserve the decisive evidence before scratch cleanup.
+`$LEDGER remaining <gate_id>` — the estimate of defects neither found. `$LEDGER` is `python3` with
+the absolute path of this skill's `scripts/ledger.py`, whatever the working directory. Keep raw CLI
+stdout in scratch; preserve the decisive evidence before scratch cleanup.
 
 **Write that report where the landing gate can read it** — the same durable records home as the
 receipts, never only into the caller's context or `$SP`, and never as a commit on the candidate

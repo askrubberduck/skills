@@ -62,9 +62,9 @@ For a failure, lead with the cause or the unresolved question, then provide:
 A cause in code landed from a reviewed candidate is the ground truth every gate lacks: append a row
 to `~/.askrubberduck/findings.tsv` with `dispatch_id = -`, `tier = production`, `substantiated = 1`,
 a new `cause_id`, and in `candidate` the SHA the gate reviewed — `duck-land`'s outcome record maps
-the landed commit back to it, since a squash gives the same tree a new identity;
-`../duck-review/scripts/ledger.py missed` joins that SHA to every dispatch that returned `APPROVE`
-on it.
+the landed commit back to it, since a squash gives the same tree a new identity; `$LEDGER missed`
+(`python3` with the absolute path of `../duck-review/scripts/ledger.py`, resolved from this skill's
+directory) joins that SHA to every dispatch that returned `APPROVE` on it.
 
 Keep ruled-out hypotheses only when their evidence prevents repeating a consequential dead end.
 Do not create a design or work item merely to explain a local defect. An unsettled architectural

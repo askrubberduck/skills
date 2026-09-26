@@ -13,13 +13,14 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
 
 ## Recipe
 
-1. **Gather evidence, don't reminisce.**
-   - **Numbers first.** `../duck-review/scripts/ledger.py thresholds` reads
+1. **Gather evidence, don't reminisce.** `$LEDGER` below is `python3` with the absolute path of
+   `../duck-review/scripts/ledger.py`, resolved from this skill's directory.
+   - **Numbers first.** `$LEDGER thresholds` reads
      `~/.askrubberduck/dispatches.tsv` and prints lesson candidates — a pin's outage rate, a pin
      whose reviews among its last twenty dispatches found no unique blocker, minutes that drifted —
      each one an occurrence for step 3's bar.
-   - **New models.** `../duck-review/scripts/ledger.py roster -` reads host model ids on stdin (`agy
-     models | ../duck-review/scripts/ledger.py roster -`; codex prints none, so the owner names its
+   - **New models.** `$LEDGER roster -` reads host model ids on stdin (`agy models | $LEDGER
+     roster -`; codex prints none, so the owner names its
      new pins) and prints ids nobody has configured, trialled or dispatched; `promote` prints each
      trial pin's verdict: still `shadow`, or `replace`, `add` or `drop` once decided.
      `[learn].discover` (default `auto`) decides what follows: `off` ignores both; `propose` queues
