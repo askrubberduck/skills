@@ -418,3 +418,23 @@ proof pass and before the gate.
 The case sees a plan, not an executed rally; the sandbox has no model CLIs. The executed
 observation is the rally on PR #44 (ten turns, four defects closed), recorded outside this
 repository. The judge's evidence was read on passing and failing runs alike.
+
+### Four flows through `ledger.py paired`, 2026-09-26
+
+`why-*`, `dry-*`, `shape-*` and `scan-*` on `29c72a3` (the working-tree edits touched only
+`duck-review`, which none of these cases loads), Claude Code 2.1.283, default agent model, Sonnet
+judge, three runs per arm, no outage runs. Each case is one pair: an arm passes when most of its
+runs passed every grader. The TSV (`arm`, `case_id`, `pass`) is built from the runner's `--json`
+output.
+
+| Flow | Cases | Mean Δ | Discordant pairs, with plugin winning |
+|---|---|---|---|
+| `why` | 9 | +0.11 | 3 of 3 |
+| `dry` | 7 | +0.06 | 2 of 3 (`dry-02-directives` goes to the no-plugin arm) |
+| `shape` | 14 | +0.02 | none |
+| `scan` | 8 | +0.23 | 4 of 4 |
+
+`paired`: 38 pairs, 10 discordant, 9 to the plugin arm; sign test p = 0.021, SPRT stops at "arm A
+better". The sequential test stops only on the four flows together, not on any one flow. Pairing
+the 117 runs by run index instead gives p = 0.0003, but that pairing is arbitrary, so the per-case
+figure is the one to quote. `shape` stays flat for the reason given above.

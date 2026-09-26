@@ -569,8 +569,9 @@ def cmd_cost(args) -> int:
         if riding:
             print(f"shadow dispatches = {riding}")
             count += riding
-    minutes = minutes_mean([d for d in dispatches
-                            if d["setup"] == args.setup and d["status"] == "final"])
+    # A roast shares the independent setup but critiques the whole solution: not a review's price.
+    minutes = minutes_mean([d for d in dispatches if d["setup"] == args.setup
+                            and d["stage"] != "roast" and d["status"] == "final"])
     if turns is not None:
         print(f"turns = {turns}")
     print(f"dispatches = {count}")
@@ -1033,7 +1034,9 @@ def home_check(parent: Path) -> None:
     done = call(roast, ["thresholds"])
     assert done.returncode == 0 and done.stderr == "" and "gpt-r n=1" in done.stdout, done
     done = call(roast, ["remaining", "g", "--repo", "r"])
-    assert "gpt-r" not in done.stdout, done
+    assert "insufficient evidence: 0 eligible captures" in done.stdout, done
+    done = call(roast, ["cost", "independent", "--repo", "r"])
+    assert done.returncode == 0 and "mean minutes = -" in done.stdout, done
     (roast / "findings.tsv").write_text(header["findings.tsv"] + "\t".join(
         ["x", "g", "c", "cause", "roastclass", "read", "SHOULD", "0", "doer"]) + "\n")
     done = call(roast, ["precision", "--all"])
