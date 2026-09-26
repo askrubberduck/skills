@@ -67,7 +67,8 @@ when it makes the next one easier, never on speculation.
 Remove superseded paths once the replacement is verified. Preserve required compatibility and
 public contracts; do not add speculative shims or delete a real edge case because scope is unclear.
 An unrelated restructure is separate work. Selected finding IDs delimit repairs; do not silently
-fix every item in the report.
+fix every item in the report. The receipt gives each selected ID applied, skipped with its
+reason, or parked.
 
 Use native staged or parallel execution only where it helps independent work. `duck-diet` governs
 context and model routing; a cheap worker still needs a check that catches its failure. Converge

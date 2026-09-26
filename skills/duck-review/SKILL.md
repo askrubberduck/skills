@@ -31,8 +31,10 @@ and maintainability. Use distinct lenses rather than a fixed reviewer count; del
 useful and authorized; what counts as a different family is in
 [challenge selection](references/challenge.md).
 
-Substantiate and adjudicate findings against the current target using the criteria below. Return one
-consolidated list with stable IDs, severity, evidence and proposed fixes, plus coverage limits.
+Substantiate and adjudicate findings against the current target using the criteria below. Why a
+value, guard or construction already in the history exists is answered by `duck-why`'s decision
+trace, not a guess. Return one consolidated list with stable IDs, severity, evidence and proposed
+fixes, plus coverage limits.
 No gate verdict is issued; a receipt is needed only when policy or a downstream handoff requires one.
 Report in-session. Posting comments, submitting a GitHub review and resolving threads each need
 their own existing authorization. Then return to the caller: a later selection authorizes that

@@ -13,7 +13,8 @@ impressive design is not evidence of improvement.
 Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 Apply scoped local edits unless the request is report-only or analysis-only. Selected findings
-limit repairs. Continue through verification; commits and publication need separate authorization.
+limit repairs, and the report gives each one applied, skipped with its reason, or parked.
+Continue through verification; commits and publication need separate authorization.
 
 ## Establish the scope and behavior
 
@@ -45,7 +46,8 @@ Use these as inspection prompts (the necessity checks), not automatic deletion r
 For each material candidate, choose **remove**, **simplify using an existing facility**, or **keep**.
 Ground the choice in a caller, contract, failure case or demonstrated change cost. "Separation of
 concerns" or a possible future use is not sufficient evidence. A single implementation may still
-protect a public API, security boundary or real platform difference.
+protect a public API, security boundary or real platform difference. When nothing states why a
+mechanism already in the history exists, trace it with `duck-why` before choosing remove.
 
 ## Make the smallest justified cleanup
 

@@ -21,8 +21,9 @@ never silently replace the owner's values or goal. New evidence can reopen a set
 
 Analysis-only or report-only means no candidate edits. A request to prove work authorizes local
 checks; apply repairs only when execution or fixes are authorized. Continue through those repairs
-and verification without asking again. Selected finding IDs limit the work. Commit, PR, push,
-merge, external dispatch and messages need their own existing authority; this skill grants none.
+and verification without asking again. Selected finding IDs limit the work; report each as
+applied, skipped with its reason, or parked. Commit, PR, push, merge, external dispatch and
+messages need their own existing authority; this skill grants none.
 
 For code, record the base and candidate; read the full relevant diff, including staged and
 uncommitted changes. Include relevant untracked files when they are part of the candidate; a
