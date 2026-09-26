@@ -423,7 +423,7 @@ repository. The judge's evidence was read on passing and failing runs alike.
 
 `why-*`, `dry-*`, `shape-*` and `scan-*` on `29c72a3` (the working-tree edits touched only
 `duck-review`, which none of these cases loads), Claude Code 2.1.283, default agent model, Sonnet
-judge, three runs per arm, no outage runs. Each case is one pair: an arm passes when most of its
+judge, three runs per arm (six for `shape-14-named-wrapper`, which sets `runs: 6`), no outage runs. Each case is one pair: an arm passes when most of its
 runs passed every grader. The TSV (`arm`, `case_id`, `pass`) is built from the runner's `--json`
 output.
 
