@@ -8,7 +8,7 @@ description: Walk the owner through the decisions they have been ducking, one at
 Blocking decisions are presented **one at a time, in full, in plain language**. Batching decisions
 produces rushed answers on exactly the items that were queued because they need judgment.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 
 ## Per decision, present

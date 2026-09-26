@@ -9,7 +9,7 @@ Own the whole authorized task. Carry the outcome, constraints, candidate, valid 
 action across stages. A skill returning a finding is a handoff to this caller, not an automatic
 reason to ask for another go-ahead.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 When the host forbids edits, as a plan-only mode does, say so once, finish the analysis it
 permits and leave the mode alone; findings are not a plan awaiting approval.
@@ -22,7 +22,7 @@ them only when authorized. A passed review does not expand that authority. A rel
 cannot run stays unapproved; finish the authorized local work and report what remains.
 
 Use a dedicated worktree or equivalent copy when runs write concurrently or destructive checks
-need isolation. Worktrees are siblings under the repo root, never nested under another run's tree.
+need isolation. Each run's worktree sits at the repo root, never nested under another run's tree.
 A small single-worker local edit can use the existing checkout after checking its state. Preserve
 unrelated changes. Worktrees carry committed state only, so capture dirty candidate content for
 test copies the way `duck-split` does — a ref, not a stash — and verify it. Step out of a
@@ -83,7 +83,7 @@ defects at a time, a rally turns their class into tests. Without export authorit
 record that the rally did not run and why. Its receipt joins the handoff evidence.
 
 Run relevant project gates and `duck-proof` on the actual candidate. Proof owns claim-specific
-counterexamples, final-state observations and the completed-shape probe. **Any proof or shape edit
+counterexamples, final-state observations and the realistic change probe. **Any proof or shape edit
 returns to affected executable checks before completion or dispatch.** Earlier green evidence does
 not survive a relevant repair. Read the outputs and the resulting state, not just exit codes.
 A red check stops new work on that surface until it is green or its cause is named; do not build
@@ -118,9 +118,10 @@ Act on the single adjudicated result:
   neither approval nor a reason to invent a repair. An unavailable gate does not prevent
   completing authorized local work.
 
-Before a third or later review round, record a loop diagnosis. Contradicted premises go to frame;
-wrong decomposition to plan; repeated missed cases to an executable class-level check or
-`duck-race` rally; rival implementations to race; real owner tradeoffs to decide. Continue review
+Before a third or later review round, record a loop diagnosis. Contradicted premises go to
+`duck-frame`; wrong decomposition to `duck-plan`; repeated missed cases to an executable
+class-level check or a `duck-race` rally; rival implementations to a `duck-race` race; real owner
+tradeoffs to `duck-decide`. Continue review
 only when a named unresolved cause is shrinking and new evidence will be available. Repeated
 blockers from one class require repairing the method, not buying another round on the same basis.
 

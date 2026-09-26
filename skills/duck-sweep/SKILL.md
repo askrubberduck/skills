@@ -10,16 +10,16 @@ case"** — unmerged work gets an explicit merge-or-delete decision, not a repri
 preservation invariant covers every deletion path: an entry marked **keep** relocates to its
 durable home and is verified there before its container is removed.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 
 ## Sweep per repo
 
-1. Inventory: `git worktree list`, `git branch -vv`, `git fetch --prune` first so remote state is
-   current. Use absolute paths; don't cd back and forth. An unreachable remote or an unreadable
-   worktree is recorded and the sweep carries on around it. A multi-repo setup means every
-   sibling repo asked for, not only the one you are in.
-2. Classify by one invariant: **delete only what is provably preserved elsewhere**.
+1. Inventory: `git fetch --prune` first so remote state is current, then `git worktree list` and
+   `git branch -vv`. Use absolute paths; don't cd back and forth. An unreachable remote or an
+   unreadable worktree is recorded and the sweep carries on around it. A multi-repo setup means
+   every sibling repo asked for, not only the one you are in.
+2. Classify: **delete only what is provably preserved elsewhere**.
    - **Preserved** — the branch's commits are reachable from `origin/<default>`
      (`git branch --merged origin/<default>` is the proof). These outlive their ref. Delete with
      `-D`: `-d` re-checks against HEAD or the upstream and refuses when either is behind.
@@ -32,7 +32,7 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
      default branch holds an equivalent *new* commit, never these objects, and no merge metadata
      recovers the link — PR records, `git cherry`, tree diffs, and revert greps can each produce a
      false positive, and a false positive here is destroyed work. Do not build a cleverer
-     classifier; route to a decision instead.
+     classifier; treat it as Unproven.
    - **Unproven** → the Unmerged path: open the work item and decide on its state. Merge: land
      it, then reclassify by the paths above — Preserved when ancestry shows it, Preserved by
      record when the landing was a squash — and delete under that path. Delete: record the
@@ -52,7 +52,7 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
 4. Scratch dirs: hunt ad-hoc temp dirs outside the sanctioned scratchpad (e.g. `~/<repo>-tmp*`,
    `/tmp/<repo>*`, stray review-tmp dirs; the sanctioned scratchpad itself is disposable by design
    and never swept per-file). A non-git dir has no merge evidence, so inventory every entry
-   including dotfiles (`ls -laR`), decide keep-or-delete per entry — unknown means keep. The
+   including dotfiles (`ls -laR`); each entry takes step 3's keep-or-delete decision. The
    preservation invariant applies; `rm -rf` the dir only when nothing in it remains marked keep.
 5. `.gitignore` audit: worktree dirs (`.worktrees/`), build output, and local-config paths present
    and ignored; `git status --ignored` sanity check.

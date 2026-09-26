@@ -9,10 +9,11 @@ Find consequential defects and unnecessary mechanisms in the requested solution.
 whole relevant flow; a convincing criticism names what fails or what can disappear without losing
 a required outcome. No finding is a valid result when the claims survive inspection.
 
-Follow the user’s language unless they ask otherwise. Keep commands, paths, identifiers,
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
-Roast reports findings and proposed dispositions; it does not edit the candidate. One change belongs
-to `duck-review`, a backlog sweep to `duck-cut`, and verification of your own candidate to `duck-proof`.
+Roast reports findings and proposed dispositions; it does not edit the candidate. One change
+belongs to `duck-review`, a backlog sweep to `duck-cut`, and verification of your own candidate to
+`duck-proof`.
 
 ## Ground the critique
 
@@ -30,15 +31,15 @@ Choose relevant questions rather than filling every category:
 - Which required operation can fail, how is it noticed, and what recovery is available?
 - Does an evidenced upcoming change expose misplaced ownership or coupling?
 
-Trace callers and consequences before calling a pattern defective. Co-changing files, dense
-comments and old code are investigation leads, not proof of a wrong boundary or harmless debt.
-Repeated instances may have one shared fix; repetition alone does not make that fix an owner decision.
+Trace callers and consequences before calling a pattern defective. Co-changing files, dense comments
+and old code are investigation leads, not proof of a wrong boundary or harmless debt. Repeated
+instances may have one shared fix; repetition alone does not make that fix an owner decision.
 
 ## Substantiate and bound the pass
 
-Choose method, participants and effort bound with `duck-review`'s
-[challenge selection](../duck-review/references/challenge.md). A focused self-critique stays labeled
-as such. Use its [dispatch mechanics](../duck-review/references/dispatch.md) for external participants;
+Choose method, participants and effort bound with `duck-review`'s [challenge
+selection](../duck-review/references/challenge.md). A focused self-critique stays labeled as such.
+Use its [dispatch mechanics](../duck-review/references/dispatch.md) for external participants;
 required authorization and identity checks still apply. Give independent critics the same
 constraints and complementary questions, not each other's conclusions.
 
@@ -64,5 +65,5 @@ required by policy or needed for a downstream handoff, using `duck-proof`'s dura
 Do not create a packet or backlog entry merely because a finding exists.
 
 Return to the caller for already-authorized repairs. Small local fixes need their relevant checks;
-substantial work may need `duck-plan`, and release follows the required `duck-review` gate. The roast
-itself grants neither repair authority nor release approval.
+substantial work may need `duck-plan`, and release follows the required `duck-review` gate. The
+roast itself grants neither repair authority nor release approval.

@@ -3,8 +3,10 @@
 Read this when a landing is a repository's first push to a public remote, or the one that flips
 it public. `$SP` is the scratch directory `duck-review`'s dispatch mechanics defines.
 
-Push the refs into a throwaway bare repository first
-(`git init --bare "$SP/pub.git" && git push "$SP/pub.git" <refs>`), then read every object there
+Build a throwaway bare repository holding what will be public: for a first push,
+`git init --bare "$SP/pub.git"`; for a visibility flip, `git clone --mirror <remote> "$SP/pub.git"`,
+since every ref already there goes public too. Push the refs there
+(`git push "$SP/pub.git" <refs>`), then read every object there
 as stored — `git -C "$SP/pub.git" rev-list --objects --all | cut -d' ' -f1 |
 git -C "$SP/pub.git" cat-file --batch | grep -a -c <pattern>` — and locate a hit with
 `git -C "$SP/pub.git" grep -a <pattern> $(git -C "$SP/pub.git" rev-list --all)` and
