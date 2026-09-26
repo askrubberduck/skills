@@ -291,9 +291,10 @@ you specify one; you do not have to configure a committee for every change.
 
 Release review has a firmer bar: by default, one reviewer from a verified different model family for
 ordinary work; two reviewers of different families, at least one different from the builder, for
-security, privacy, data or gate-policy changes. Your explicit setup and repository policy govern. A
-smaller analysis does not satisfy a stronger release gate. A missing participant does not lower the
-bar. The [challenge rules](skills/duck-review/references/challenge.md) carry the details.
+security, privacy, data or gate-policy changes and for edits to skills or instruction files. Your
+explicit setup and repository policy govern. A smaller analysis does not satisfy a stronger release
+gate. A missing participant does not lower the bar. The [challenge
+rules](skills/duck-review/references/challenge.md) carry the details.
 
 Sending your repository to another vendor needs your authorization. Once it covers the work,
 the duck remembers it. Asking twice is not being careful.
