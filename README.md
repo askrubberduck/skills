@@ -349,15 +349,15 @@ review_rounds = 2
 ```
 
 The rows answer questions the duck used to guess at. How many defects did both reviewers miss?
-`scripts/ledger.py remaining <gate_id>` estimates it from what they found in common. Which family
-catches which class? `precision`. Who reviews next? `pick <stage>` samples from recorded catches per
-minute, inside the set the gate requires. Did the change help? `paired` compares two arms on the
-same cases. What is drifting? `thresholds` hands `duck-learn` its occurrences. What will this gate
-cost? `cost <setup>` reads past gates. Is there a new model? `roster <models|->` lists host models
-that are in no role list, no trial and no ledger row; after its shadow gates, `promote` says whether
-it replaces its family's reviewer, joins the list, or goes. `scripts/ledger.py --self-check` runs
-each of these on a fixture and asserts what it prints. Standard library only. A `-` means unknown;
-unknown never counts as zero.
+`skills/duck-review/scripts/ledger.py remaining <gate_id>` estimates it from what they found in
+common. Which family catches which class? `precision`. Who reviews next? `pick <stage>` samples from
+recorded catches per minute, inside the set the gate requires. Did the change help? `paired`
+compares two arms on the same cases. What is drifting? `thresholds` hands `duck-learn` its
+occurrences. What will this gate cost? `cost <setup>` reads past gates. Is there a new model?
+`roster <models|->` lists host models that are in no role list, no trial and no ledger row; after
+its shadow gates, `promote` says whether it replaces its family's reviewer, joins the list, or goes.
+`skills/duck-review/scripts/ledger.py --self-check` runs each of these on a fixture and asserts what
+it prints. Standard library only. A `-` means unknown; unknown never counts as zero.
 
 ### How the duck keeps review rounds bounded
 

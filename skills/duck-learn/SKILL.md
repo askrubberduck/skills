@@ -14,19 +14,19 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
 ## Recipe
 
 1. **Gather evidence, don't reminisce.**
-   - **Numbers first.** `scripts/ledger.py thresholds` reads `~/.askrubberduck/dispatches.tsv`
-     and prints lesson candidates — a pin's outage rate, a pin whose reviews among its last twenty
-     dispatches found no unique blocker, minutes that drifted — each one an occurrence for step
-     3's bar.
-   - **New models.** `scripts/ledger.py roster -` reads host model ids on stdin
-     (`agy models | scripts/ledger.py roster -`; codex prints none, so the owner names its new
-     pins) and prints ids nobody has configured, trialled or dispatched; `promote` prints each
+   - **Numbers first.** `../duck-review/scripts/ledger.py thresholds` reads
+     `~/.askrubberduck/dispatches.tsv` and prints lesson candidates — a pin's outage rate, a pin
+     whose reviews among its last twenty dispatches found no unique blocker, minutes that drifted —
+     each one an occurrence for step 3's bar.
+   - **New models.** `../duck-review/scripts/ledger.py roster -` reads host model ids on stdin (`agy
+     models | ../duck-review/scripts/ledger.py roster -`; codex prints none, so the owner names its
+     new pins) and prints ids nobody has configured, trialled or dispatched; `promote` prints each
      trial pin's verdict: still `shadow`, or `replace`, `add` or `drop` once decided.
      `[learn].discover` (default `auto`) decides what follows: `off` ignores both; `propose` queues
-     each through `duck-decide`; `auto` puts at most one new pin per family into `[learn].trial`
-     and applies each `replace`, `add` or `drop` verdict to `~/.askrubberduck/config.toml`,
-     taking the pin out of `[learn].trial` in the same edit, and reports it. This is the owner's
-     config, not a policy file: step 4's review path does not apply to it.
+     each through `duck-decide`; `auto` puts at most one new pin per family into `[learn].trial` and
+     applies each `replace`, `add` or `drop` verdict to `~/.askrubberduck/config.toml`, taking the
+     pin out of `[learn].trial` in the same edit, and reports it. This is the owner's config, not a
+     policy file: step 4's review path does not apply to it.
    - **Sources.** Transcript-store locations — Claude `~/.claude/projects/<dir>/*.jsonl`, Codex
      `$CODEX_HOME/sessions` and `archived_sessions` — are the hosts whose stores are known, not the
      whole set: another host has its store located before the mine, or the result is partial and

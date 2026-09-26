@@ -48,7 +48,8 @@ and run in the background because reviews can take 10–45 minutes; where the CL
 its own, bound the wait yourself with `[bounds].dispatch_timeout` (default 45m) the way
 `duck-race`'s block does (macOS ships no `timeout`) — and past the deadline kill the process,
 confirm it exited, then read what it wrote: a wait that returns while the worker still writes hands
-the retry a shared file. The pinned ids come from `~/.askrubberduck/config.toml`, never from memory:
+the retry a shared file. The pinned ids come from `~/.askrubberduck/config.toml`, never from memory
+(a `[repo."<origin>"]` table there overrides any key for that origin):
 `[models].review` for a review or a disposition (default `[families].reviewers`), and
 `[families].reviewers` (default empty: the owner's setup names them) for a race or plan role without
 a list of its own. Minimum shapes, with the pins and the timeout bound first:
@@ -100,7 +101,8 @@ findings are adjudicated like any other. Its row carries `setup = shadow`. A tri
 whichever repository they ran, since a model's record is not a repository's; its comparison pairs it
 with its family's reviewer on the same gate of the same repository.
 
-Every dispatch attempt gets a row in `~/.askrubberduck/dispatches.tsv`: `pending` written before
-the seat launches, finalized once at synthesis with minutes, verdict and outage. A row left
-`pending` is an interrupted run. `scripts/ledger.py schema` prints the columns and their
-domains; a plan critic's `PLAN: CONCUR | OBJECT` is recorded as verdict `CONCUR | OBJECT`.
+Every dispatch attempt gets a row in `~/.askrubberduck/dispatches.tsv`: `pending` written before the
+seat launches, finalized once at synthesis with minutes, verdict and outage. A row left `pending` is
+an interrupted run. `scripts/ledger.py` sits in `duck-review`'s skill directory; run it by that
+absolute path, whatever the working directory. `scripts/ledger.py schema` prints the columns and
+their domains; a plan critic's `PLAN: CONCUR | OBJECT` is recorded as verdict `CONCUR | OBJECT`.

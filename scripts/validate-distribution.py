@@ -306,10 +306,11 @@ def check_config_keys(root: Path, readme: str, errors: list[str]) -> None:
 
 
 def check_ledger(root: Path, errors: list[str]) -> None:
-    result = subprocess.run([sys.executable, str(root / "scripts" / "ledger.py"), "--self-check"],
+    ledger = root / "skills" / "duck-review" / "scripts" / "ledger.py"
+    result = subprocess.run([sys.executable, str(ledger), "--self-check"],
                             capture_output=True, text=True)
     if result.returncode != 0:
-        errors.append(f"scripts/ledger.py --self-check failed: {result.stderr.strip()[-300:]}")
+        errors.append(f"{ledger.relative_to(root)} --self-check failed: {result.stderr.strip()[-300:]}")
 
 
 def validate(root: Path) -> list[str]:
