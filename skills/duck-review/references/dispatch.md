@@ -44,8 +44,10 @@ still counts.
 ## Run the reviewers
 
 Run from a neutral scratch directory, never the target checkout. Close stdin, use absolute paths,
-and run in the background because reviews can take 10–45 minutes; where the CLI has no timeout of
-its own, bound the wait yourself with `[bounds].dispatch_timeout` (default 45m) the way
+and run in the background because reviews can take 10–45 minutes. Where the turn is the whole
+session (`claude -p`), its end kills a background seat (`error: interrupted`) and strands its row
+`pending`: poll the seat's exit in bounded waits and end the turn only after it. Where the CLI has
+no timeout of its own, bound the wait yourself with `[bounds].dispatch_timeout` (default 45m) the way
 `duck-race`'s block does (macOS ships no `timeout`) — and past the deadline kill the process,
 confirm it exited, then read what it wrote: a wait that returns while the worker still writes hands
 the retry a shared file. The pinned ids come from `~/.askrubberduck/config.toml`, never from memory
@@ -72,8 +74,9 @@ plausible reviews at exit 0:
 
 - An unpinned invocation can silently use the wrong model family. Always pin `--model`, and prove
   the pin using the identity checks above.
-- The prompt must be an **argument**. `--print "<text>"` can drop it, and a prompt redirected on
-  **stdin** is discarded entirely — the reviewer answers with a greeting at exit 0.
+- The prompt must be an **argument**. agy's `--print "<text>"` can drop it, and a prompt it gets
+  on **stdin** is discarded entirely — the reviewer answers with a greeting at exit 0. `codex exec`
+  reads a stdin prompt, but appends piped stdin to an argument prompt: close stdin all the same.
 - After a repair, a reviewer can replay its previous round instead of reading the new candidate.
   Have it open its result with the candidate's revision and one current line quoted from a named
   changed artifact, and compare each round's output with the last: an identical body is an outage,
