@@ -27,7 +27,7 @@ assumptions; rally turns them into tests. Pick by which of those the work needs.
    visible to both.
 2. Name the participants and their model families before starting. The doer (this session's family)
    is one; the rival is a **proven different family** from `[models].race` in
-   `~/.askrubberduck/config.toml` (default `[families].reviewers`) or the owner's setup, and
+   `~/.askrubberduck/config.toml` or the owner's setup, and
    `$LEDGER pick race` chooses within it (`$LEDGER` is `python3` with the absolute path of
    `../duck-review/scripts/ledger.py`, resolved from this skill's directory). Prove the rival's
    family and pin by dispatch mechanics' identity checks — roster line and pinned id recorded —

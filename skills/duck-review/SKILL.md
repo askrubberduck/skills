@@ -15,7 +15,8 @@ Follow the user's language unless they ask otherwise. Keep commands, paths, iden
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 
 **One invocation, one pass.** Never edit the candidate, create its prerequisite evidence, loop
-until reviewers approve, or land it. The caller owns repairs and the next authorized action.
+until reviewers approve, or land it. The caller owns repairs, owner decisions and the next
+authorized action.
 
 ## Findings or independent judgment
 
@@ -202,5 +203,4 @@ receipts, never only into the caller's context or `$SP`, and never as a commit o
 branch. A verdict that exists only in a session transcript cannot be checked later, and
 `duck-land` needs the authorization itself, not a recollection that one was granted.
 
-Then stop. Acting on the result, executing a fix or deletion, resolving an owner decision,
-reviewing a materially changed candidate, and landing belong to the calling agent or workflow.
+Then stop.
