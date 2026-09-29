@@ -1,20 +1,27 @@
 {
   "name": "askrubberduck",
   "description": "Make the work prove itself. Challenge the goal, cut the clutter, and check what actually happened. English workflows. Ask in your language; check what the duck did.",
-  "version": "3.10.1",
+  "version": "3.10.2",
   "author": {
-    "name": "askrubberduck"
+    "name": "askrubberduck",
+    "url": "https://github.com/askrubberduck"
   },
   "repository": "https://github.com/askrubberduck/skills",
-  "homepage": "https://github.com/askrubberduck/skills",
+  "homepage": "https://askrubberduck.github.io/skills/",
   "keywords": [
-    "review",
-    "red-team",
+    "code-review",
+    "debugging",
     "planning",
-    "backlog",
-    "git-hygiene",
+    "architecture",
+    "refactoring",
+    "code-quality",
+    "testing",
+    "verification",
+    "red-team",
+    "git",
     "workflows",
-    "russian"
+    "multi-agent",
+    "rubber-duck"
   ],
   "license": "MIT"
 }

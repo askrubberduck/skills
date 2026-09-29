@@ -11,7 +11,29 @@
       "name": "askrubberduck",
       "description": "Make the work prove itself. Challenge the goal, cut the clutter, and check what actually happened. English workflows. Ask in your language; check what the duck did.",
       "source": "./",
-      "category": "productivity"
+      "category": "development",
+      "author": {
+        "name": "askrubberduck",
+        "url": "https://github.com/askrubberduck"
+      },
+      "homepage": "https://askrubberduck.github.io/skills/",
+      "repository": "https://github.com/askrubberduck/skills",
+      "license": "MIT",
+      "keywords": [
+        "code-review",
+        "debugging",
+        "planning",
+        "architecture",
+        "refactoring",
+        "code-quality",
+        "testing",
+        "verification",
+        "red-team",
+        "git",
+        "workflows",
+        "multi-agent",
+        "rubber-duck"
+      ]
     }
   ]
 }
