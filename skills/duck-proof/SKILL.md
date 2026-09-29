@@ -133,6 +133,7 @@ repositories and never need a reader in the tree.
 
 Use `proof-rN.md` when the consumer expects it, or give the consumer the exact section in a shared
 work record. Evidence and referenced artifacts must survive that handoff; scratch paths that will
-vanish are not durable citations. Raw logs need not be committed. Do not advance a reviewed
-candidate or its base merely to save a receipt. Local work needs no commit just to record a pass;
-`duck-run` and `duck-land` handle authorized release transitions and exact target checks.
+vanish are not durable citations. Raw logs and CLI stdout stay in scratch, never in a commit. Do
+not advance a candidate or its base merely to save a receipt. Local work needs no commit just to
+record a pass; `duck-run` and `duck-land` handle authorized release transitions and exact target
+checks.
