@@ -68,5 +68,6 @@ owner requests it. Report no-finding attacks and limits under the same evidence 
 
 Use `duck-proof`'s durable-home rules for a downstream handoff: `break-rN.md` or an explicit section
 of the shared work record, with restored-state confirmation and evidence that survives scratch
-cleanup. A standalone report can stay in the response. `duck-review` consumes required break
-evidence for release; a successful attack suite is not independent approval.
+cleanup. A standalone report can stay in the response. Do not advance the candidate just to save
+the report. `duck-review` consumes required break evidence for release; a successful attack suite
+is not independent approval.
