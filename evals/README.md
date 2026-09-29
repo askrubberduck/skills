@@ -438,3 +438,29 @@ output.
 better". The sequential test stops only on the four flows together, not on any one flow. Pairing
 the 117 runs by run index instead gives p = 0.0003, but that pairing is arbitrary, so the per-case
 figure is the one to quote. `shape` stays flat for the reason given above.
+
+### Release through duck-land, 2026-09-29
+
+`land-03`, `land-04` and `land-05`, Claude Code, default agent model, Sonnet judge, three runs per
+arm. Each asks "release version" on a gated candidate, with nothing run yet. `land-03` describes
+no release procedure; `land-04` gives only a private procedure named in the duck's config;
+`land-05` gives both, and they disagree on the title.
+
+| Grader | Candidate with plugin | `master` with plugin | Without plugin |
+|---|---|---|---|
+| `land-03`: a plain landing, no invented release steps | 3/3 | 0/3 | 0/6 |
+| `land-04`: tag, title and version file from the private procedure | 3/3 | — | 3/3 |
+| `land-04`: nothing private in the proposed public text | 2/3 | — | 3/3 |
+| `land-05`: the repository's title wins, the private extra step stays | 3/3 | 2/3 | 3/6 |
+| duck-land loaded | 9/9 | 1/6 | — |
+
+On `master` "release version" loads duck-land once in six runs. `land-03` was rerun after its
+grader stopped passing an answer that only asks for a procedure: 3/3 with the candidate, 0/3 without.
+Its grader now also requires the cleanup; rerun, 3/3 with, 0/3 without. Without a described procedure every
+arm but the candidate invents a release. With the procedure pasted into the prompt, following it
+needs no skill. Reading a procedure file named in a real config is untested here: the sandbox
+has no home directory. The one `land-04` privacy failure was the judge counting the plan's own note to keep
+the tracker out as public text; the grader now says what counts as public, and the 2/3 is
+from the earlier wording. `land-04`'s first
+grader required a new VERSION bump, which contradicts a gated candidate that already carries it;
+it was rewritten before these runs.

@@ -39,7 +39,7 @@ selection probes, plus with/without runs for four skills — see the [eval guide
 | "gate it" | `duck-review`: one verdict, the reviewers named, and the evidence behind every finding. No participation trophies. |
 | "review this work from multiple angles" | `duck-review`: findings backed by evidence on a design, plan, document or implementation, reported in-session. No edits or publication. |
 | "are these review comments still valid?" | `duck-review`: each thread judged against what you pushed since, with a drafted reply. Nothing posted or resolved for you. |
-| "land it" | `duck-land`: merge what the gate approved, read back what landed, record it, clean up. A merge nobody recorded is work the repo forgot. |
+| "land it", "release it" | `duck-land`: merge what the gate approved, read back what landed, record it, clean up; on a release, follow the release process you described. A merge nobody recorded is work the repo forgot. |
 | "try to break it" | `duck-break`: attacks actually run, with inputs and results. Imagining a crash is not crashing it. |
 | "dry it" | `duck-dry`: prose that earns its place, with checks that the sweep did not smuggle in a code change. |
 | "trim the backlog" | `duck-cut`: retire obsolete work, merge duplicates, unblock what still matters. Every task earns its place. |
@@ -143,7 +143,7 @@ resolves.
 | `duck-diet` | Put agent context, memory, and token costs on a diet without starving the essential guidance |
 | `duck-dry` | Strip comments, docstrings, commit messages, and PR descriptions until only unobvious decisions, contracts, and traps survive |
 | `duck-frame` | Settle a system's target design before planning begins, because 'we'll figure out the architecture later' means never |
-| `duck-land` | Merge approved work, update project records, and clean up the branch and worktree; landed means nothing left behind |
+| `duck-land` | Merge approved work, run a described release process when asked, update project records, and clean up the branch and worktree; landed means nothing left behind |
 | `duck-learn` | Turn session and delivery evidence into reusable lessons, so each mistake is only paid for once |
 | `duck-plan` | Find the hole in the plan before building over it; assumptions and acceptance checks must survive challenge |
 | `duck-proof` | Make the goal, the path, and the finished work earn your trust through counterexamples and executed checks |
@@ -344,6 +344,9 @@ dispatch_timeout = "45m"    # every background dispatch
 
 [review]
 default = "findings"        # what a bare duck-review runs
+
+[release]
+procedure = "~/notes/releasing.md"   # your release process, kept outside the repository; the repository's own rules come first
 
 [repo."github.com/askrubberduck/skills"]   # one origin's overrides; a list replaces, never merges
 review_rounds = 2
