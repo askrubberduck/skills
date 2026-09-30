@@ -1,6 +1,6 @@
 ---
 name: duck-land
-description: Merge approved work, update project records, and clean up the branch and worktree; landed means nothing left behind. Use when a change has passed its review gate, the user authorizes landing or merging, an authorized gate-passed PR is ready, or merged work was never recorded in status or outcome documentation.
+description: Merge approved work, run a described release process when asked, update project records, and clean up the branch and worktree; landed means nothing left behind. Use when a change has passed its review gate, the user authorizes landing, merging or a release, an authorized gate-passed PR or version bump is ready, or merged work was never recorded in status or outcome documentation.
 ---
 
 # Duck Land
@@ -103,6 +103,26 @@ candidate branch and merges nothing.
    `duck-sweep` keep decision leaves the landing complete and recorded, with the pending worktree
    named in step 3's entry. Record a resumable boundary; continue other authorized work if the
    host and task allow it.
+
+## Release
+
+A release runs the process someone described, never one this skill invents: people version, tag
+and publish differently. Two places can describe it:
+
+1. The repository's own release procedure. Find it by what it says — versioning, tagging,
+   publishing — not by a file name. Its rules come first.
+2. `procedure` under `[release]` in `~/.askrubberduck/config.toml`, or in the origin's
+   `[repo."<origin>"]` table: a path to a procedure the owner keeps outside the repository. It fills
+   what the repository leaves open, and replaces a repository rule only where it says so. Quote
+   nothing from it into public text.
+
+Found one: a request to release authorizes what the procedure describes as well as the merge.
+The preconditions above still bind, the gate covers the last release tag through the candidate
+(`duck-review`'s code-release target), and the landing ends by reading back what the procedure
+produced; step 3's outcome record names the version and tag.
+
+Found none: the request is a landing — merge, read back, record, clean up — and the report says
+no release procedure was found. Tagging and publishing wait for one.
 
 ## Common mistakes
 
