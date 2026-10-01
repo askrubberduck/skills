@@ -16,10 +16,10 @@
       "id": 2,
       "type": "positive",
       "skill": "duck-why",
-      "prompt": "python3 scripts/validate-distribution.py fails with \".claude/skills/duck-cut: missing link — the skill is invisible to cloud sessions\". Why?",
-      "expect": "duck-why fires and names the cause before any fix: the symlink .claude/skills/duck-cut is absent while skills/duck-cut/SKILL.md exists, so cloud sessions that clone the repo never see the skill. Does not propose deleting the skill or silencing the check.",
-      "result_shape": "One-sentence cause, the evidence that established it (the check in scripts/validate-distribution.py and the state of .claude/skills/), then the fix — in that order.",
-      "fixture": "repo clone with .claude/skills/duck-cut removed"
+      "prompt": "python3 scripts/validate-distribution.py fails with \"skills/duck-cut: directory without a SKILL.md\". Why?",
+      "expect": "duck-why fires and names the cause before any fix: skills/duck-cut/ exists but its SKILL.md is gone, so the directory ships and no host can load the skill. Does not propose deleting the skill or silencing the check.",
+      "result_shape": "One-sentence cause, the evidence that established it (the check in scripts/validate-distribution.py and the contents of skills/duck-cut/), then the fix — in that order.",
+      "fixture": "repo clone with skills/duck-cut/SKILL.md removed"
     },
     {
       "id": 3,
@@ -79,10 +79,10 @@
       "id": 9,
       "type": "positive",
       "skill": "duck-why",
-      "prompt": "python3 scripts/validate-distribution.py падает с ошибкой \".claude/skills/duck-cut: missing link — the skill is invisible to cloud sessions\". Почему?",
-      "expect": "duck-why fires on the Russian prompt and names the cause before any fix: the symlink .claude/skills/duck-cut is absent while skills/duck-cut/SKILL.md exists, so cloud sessions that clone the repo never see the skill. The answer is written in Russian. Does not propose deleting the skill or silencing the check.",
-      "result_shape": "Case 2's shape in Russian — one-sentence cause, the evidence that established it (the check in scripts/validate-distribution.py and the state of .claude/skills/), then the fix. Paths, commands, and the quoted error text stay verbatim.",
-      "fixture": "repo clone with .claude/skills/duck-cut removed"
+      "prompt": "python3 scripts/validate-distribution.py падает с ошибкой \"skills/duck-cut: directory without a SKILL.md\". Почему?",
+      "expect": "duck-why fires on the Russian prompt and names the cause before any fix: skills/duck-cut/ exists but its SKILL.md is gone, so the directory ships and no host can load the skill. The answer is written in Russian. Does not propose deleting the skill or silencing the check.",
+      "result_shape": "Case 2's shape in Russian — one-sentence cause, the evidence that established it (the check in scripts/validate-distribution.py and the contents of skills/duck-cut/), then the fix. Paths, commands, and the quoted error text stay verbatim.",
+      "fixture": "repo clone with skills/duck-cut/SKILL.md removed"
     },
     {
       "id": 10,

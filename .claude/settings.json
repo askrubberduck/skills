@@ -1,0 +1,6 @@
+{
+  "extraKnownMarketplaces": {
+    "askrubberduck": { "source": { "source": "github", "repo": "askrubberduck/skills" } }
+  },
+  "enabledPlugins": { "askrubberduck@askrubberduck": true }
+}
