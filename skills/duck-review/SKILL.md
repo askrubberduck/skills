@@ -188,7 +188,7 @@ may land only `APPROVE`; a superreview `NOTE` is a non-decision, not a hidden pa
 
 Report the authoritative result, each reviewer's pinned model id and family, each raw verdict, every
 finding's adjudicated classification and evidence, any outage or downgrade, and the exact target and
-criteria reviewed. Finalize each participant's row in `~/.askrubberduck/dispatches.tsv` and append
+criteria reviewed. `$DISPATCH` finalizes each participant's row in `dispatches.tsv`; append
 one row per adjudicated finding to `findings.tsv`, with a stable `cause_id` shared across
 participants that found the same cause; with two eligible captures (shadows excluded), report
 `$LEDGER remaining <gate_id>` — the estimate of defects neither found. `$LEDGER` is `python3` with

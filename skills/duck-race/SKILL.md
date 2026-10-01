@@ -54,11 +54,13 @@ assumptions; rally turns them into tests. Pick by which of those the work needs.
 One worktree per racer from the same base SHA, at the repo root. Racers never share a checkout.
 Launch the block below as one backgrounded call, with every name set inside it — each call is a
 fresh shell — and work the doer's attempt in its own worktree meanwhile. `$GATE` names the run;
-`$N` counts from 1:
+`$N` counts from 1; `$TRUST` is 1 for trust-touching work, else 0:
 
 ```bash
-: "${DISPATCH:?}" "${GATE:?}" "${N:?}" "${RIVAL_PIN:?}" "${SP:?}" "${WT_RIVAL:?}" "${BASE_SHA:?}"
-python3 "$DISPATCH" --gate "$GATE" --round "$N" --stage race --setup race --trust 0 --pin "$RIVAL_PIN" \
+: "${DISPATCH:?}" "${GATE:?}" "${N:?}" "${TRUST:?}" "${RIVAL_PIN:?}" "${SP:?}" "${WT_RIVAL:?}" \
+  "${BASE_SHA:?}"
+python3 "$DISPATCH" --gate "$GATE" --round "$N" --stage race --setup race --trust "$TRUST" \
+  --pin "$RIVAL_PIN" \
   --prompt "$SP/problem.md" --out "$SP/rival-r$N.out" --workdir "$WT_RIVAL" \
   --diff-base "$BASE_SHA" --diff-out "$SP/rival-r$N.diff"
 ```
@@ -96,8 +98,9 @@ file paths) **by file**, never inlined. `$SP/turn.md` states the role for this t
 path, and the current state.
 
 ```bash
-: "${DISPATCH:?}" "${GATE:?}" "${N:?}" "${RIVAL_PIN:?}" "${SP:?}" "${WT:?}"
-python3 "$DISPATCH" --gate "$GATE" --round "$N" --stage rally --setup rally --trust 0 --pin "$RIVAL_PIN" \
+: "${DISPATCH:?}" "${GATE:?}" "${N:?}" "${TRUST:?}" "${RIVAL_PIN:?}" "${SP:?}" "${WT:?}"
+python3 "$DISPATCH" --gate "$GATE" --round "$N" --stage rally --setup rally --trust "$TRUST" \
+  --pin "$RIVAL_PIN" \
   --prompt "$SP/turn.md" --out "$SP/rival-t$N.out" --workdir "$WT"
 ```
 

@@ -94,7 +94,7 @@ and publish differently. Two places can describe it:
 
 1. The repository's own release procedure. Find it by what it says — versioning, tagging,
    publishing — not by a file name. Its rules come first.
-2. `procedure` under `[release]` in `~/.askrubberduck/config.toml`, or in the origin's
+2. `[release].procedure` (default unset) in `~/.askrubberduck/config.toml`, or in the origin's
    `[repo."<origin>"]` table: a path to a procedure the owner keeps outside the repository. It fills
    what the repository leaves open, and replaces a repository rule only where it says so. Quote
    nothing from it into public text.
