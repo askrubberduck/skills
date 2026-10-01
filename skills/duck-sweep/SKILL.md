@@ -46,11 +46,12 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
    queue it via `duck-decide` and keep the file meanwhile. Then — only once nothing in the
    worktree remains marked keep — `git worktree remove <path>`, `git branch -D <branch>` against
    the classification above, and `git worktree prune` for leftovers.
-4. Scratch dirs: hunt ad-hoc temp dirs outside the sanctioned scratchpad (e.g. `~/<repo>-tmp*`,
-   `/tmp/<repo>*`, stray review-tmp dirs; the sanctioned scratchpad itself is disposable by design
-   and never swept per-file). A non-git dir has no merge evidence, so inventory every entry
-   including dotfiles (`ls -laR`); each entry takes step 3's keep-or-delete decision. The
-   preservation invariant applies; `rm -rf` the dir only when nothing in it remains marked keep.
+4. Scratch dirs: hunt ad-hoc temp dirs outside the sanctioned scratchpad (e.g. `<repo>-tmp*` in
+   the home directory, `<repo>*` in the system temp directory, stray review-tmp dirs; the
+   sanctioned scratchpad itself is disposable by design and never swept per-file). A non-git dir
+   has no merge evidence, so inventory every entry, hidden ones included (`ls -laR`); each entry
+   takes step 3's keep-or-delete decision. The preservation invariant applies; `rm -rf` the dir
+   only when nothing in it remains marked keep.
 5. `.gitignore` audit: worktree dirs (`.worktrees/`), build output, and local-config paths present
    and ignored; `git status --ignored` sanity check.
 
