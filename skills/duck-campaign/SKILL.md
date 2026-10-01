@@ -61,6 +61,12 @@ another go-ahead. Do not open a new packet while another waits on review or inte
 run could finish first; finished work beats started work. Reconcile concurrent changes and
 verify the combined result before completion.
 
+A worker's message counts once. A status notice older than your last instruction to that worker
+repeats its previous report; a cut-off report is not accepted until its tail arrives, because the
+tail is where the gates and the open items sit. Brief each worker so a replacement can start from
+the brief alone — worktree, base, candidate identity, findings with evidence paths, gates and
+rules — and ask for reports that lead with gates and unsettled items.
+
 When blocked, record the actual blocker and a concrete next action. Continue independent work;
 do not invent consent, rescope away a required outcome or retry an unchanged failure indefinitely.
 Contrary execution evidence reopens the affected shared design before dependent work continues.

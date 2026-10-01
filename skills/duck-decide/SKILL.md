@@ -32,6 +32,13 @@ next decision, so a dropped session loses nothing.
 Owner-specified order first; otherwise most-blocking first (the decision gating the most downstream
 work). Say how many are in the queue up front ("4 decisions queued; here is 1 of 4").
 
+A queue longer than five gets one question first, because eighteen walkthroughs in a row get the
+answer "later". Offer: one at a time; take every recommendation; take every recommendation except
+the policy items; later. Name the policy items — money, risk, anything that changes what an
+operator or user can do — since they never ride in a batch. Then walk only the ones the owner kept,
+and record each batched decision as the owner's answer with the words that took it. The owner may
+batch; the doer never does.
+
 ## Common mistakes
 
 - Hiding material cost or schedule tradeoffs. Include them when relevant to the owner's decision,

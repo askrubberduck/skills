@@ -29,6 +29,10 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
      `duck-scan`'s attribution rule decides whether an entry lifting it counts: unattributed stays
      blocked.
    - **KEEP** — survives the critique; record the one-sentence justification that saved it.
+
+   Read the landing, not the label. An item still marked in progress or in review whose work already
+   reached the default branch — its branch merged, or its candidate's tree matching a landed commit —
+   and a closed item still filed under an open heading are CLOSE NOW candidates.
 3. Act autonomously on everything that doesn't need the owner: make CLOSE/CUT/MERGE/UNBLOCK edits in
    the registries with evidence. Local edits do not authorize a commit or publication. CUT deletes;
    a cut item counted in the report but left standing in the registry is the rot this skill exists
