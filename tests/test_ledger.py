@@ -577,6 +577,10 @@ def self_check() -> int:
         roles_check(root)
         eligibility_check()
         rally_check(root)
+    for gone in (["--self-check"], ["pick", "review", "--seed", "1"]):  # test hooks stay in tests/
+        result = subprocess.run([sys.executable, "-B", str(LEDGER), *gone], capture_output=True,
+                                text=True)
+        assert result.returncode == 2 and "unrecognized arguments" in result.stderr, (gone, result)
     print("ledger self-check passed")
     return 0
 

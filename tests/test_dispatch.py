@@ -289,11 +289,26 @@ def self_check() -> int:
         assert code == 2 and "needs --workdir" in out and len(rows()) == count, out
         code, out = run("race", "g11", *race, base, "--id", "g11-half")
         assert code == 2 and "go together" in out and len(rows()) == count, out
+        code, out = run("reject", "g12", "--pin", "anthropic:claude:high")  # transport by family only
+        assert code == 2 and "no transport" in out and "--via" not in out, out
+        code, out = run("reject", "g12", rnd=0)
+        assert code == 2 and "--round counts from 1" in out, out
+        for gone in (["--self-check"], ["--cmd", "true"], ["--sha", "abc"], ["--via", "codex"]):
+            code, out = run("reject", "g12", *gone)
+            assert code == 2 and "unrecognized arguments" in out, (gone, out)
+        assert len(rows()) == count, rows()
+        out = subprocess.run([sys.executable, str(DISPATCH)], capture_output=True, text=True).stderr
+        assert "required: --gate, --round, --stage, --setup, --trust, --pin, --prompt, --out" in out, out
 
         # a launch that raises still finalizes its row
         code, out = run("absent", "g8", PATH=str(root / "bin" / "absent"))  # no codex anywhere
         assert code == 1 and final("g8-r1-review-gpt-6-sol") == ("-", "final", "1"), out
         assert "outage: [Errno 2]" in out and "'codex'" in out, out
+    # the rally bound's default is ledger's, read at import, not a second literal
+    import ledger
+    ledger.DEFAULT_RALLY_TURNS = 7
+    import dispatch
+    assert dispatch.STAGE_BOUNDS["rally"] == ("rally_turns", 7), dispatch.STAGE_BOUNDS
     print("dispatch self-check passed")
     return 0
 

@@ -320,11 +320,11 @@ def check_ledger_citations(root: Path, errors: list[str]) -> None:
             errors.append(f"{where}: uses `$LEDGER` without saying what it is")
 
 
-def check_tests(root: Path, errors: list[str]) -> None:
+def check_tests(root: Path, errors: list[str], run: bool) -> None:
     tests = sorted((root / "tests").glob("test_*.py"))
     if not tests:
         errors.append("tests/: no test_*.py to run")
-    for test in tests:
+    for test in tests if run else []:
         result = subprocess.run([sys.executable, str(test)], capture_output=True, text=True)
         if result.returncode != 0:
             errors.append(f"{test.relative_to(root)} failed: {result.stderr.strip()[-300:]}")
@@ -334,8 +334,8 @@ def validate(root: Path, run_scripts: bool = True) -> list[str]:
     errors: list[str] = []
     readme = (root / "README.md").read_text()
     check_config_keys(root, readme, errors)
-    if run_scripts:  # the corruption copies only change text; their scripts are the root's
-        check_tests(root, errors)
+    # the corruption copies only change text; their tests are the root's
+    check_tests(root, errors, run=run_scripts)
     check_ledger_citations(root, errors)
     manifests = {relative: load_json(root, relative, errors) for relative in MANIFESTS}
     check_codex(manifests[".codex-plugin/plugin.json"], errors)
@@ -445,6 +445,7 @@ CASES: list[tuple[str, str, Callable[[Path], None]]] = [
      lambda c: edit(c, "evals/routing.json", '"skill": "duck-scan"', '"skill": "duck-scam"')),
     ("skill directory without a SKILL.md", "directory without a SKILL.md",
      lambda c: (c / "skills" / "duck-ghost").mkdir()),
+    ("tests deleted", "no test_*.py to run", lambda c: shutil.rmtree(c / "tests")),
 ]
 
 
