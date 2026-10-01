@@ -56,7 +56,7 @@ python3 "$DISPATCH" --gate "$GATE" --round "$N" --stage review --setup independe
   --candidate "$CHECKOUT"
 ```
 
-The script picks `codex exec` or `agy` by the pin's family (`--via` overrides), runs from the
+The script picks `codex exec` or `agy` by the pin's family, runs from the
 `--out` file's directory — the seat's own scratch directory, never the target checkout, unless
 `--workdir` names a worktree the seat is meant to change (codex `-C`; refused for agy) — closes
 stdin, kills the whole process group past `[bounds].dispatch_timeout` (default 45m) and confirms it

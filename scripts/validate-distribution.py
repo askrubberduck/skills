@@ -320,20 +320,14 @@ def check_ledger_citations(root: Path, errors: list[str]) -> None:
             errors.append(f"{where}: uses `$LEDGER` without saying what it is")
 
 
-def check_ledger(root: Path, errors: list[str]) -> None:
-    ledger = root / "skills" / "duck-review" / "scripts" / "ledger.py"
-    result = subprocess.run([sys.executable, str(ledger), "--self-check"],
-                            capture_output=True, text=True)
-    if result.returncode != 0:
-        errors.append(f"{ledger.relative_to(root)} --self-check failed: {result.stderr.strip()[-300:]}")
-
-
-def check_dispatch(root: Path, errors: list[str]) -> None:
-    dispatch = root / "skills" / "duck-review" / "scripts" / "dispatch.py"
-    result = subprocess.run([sys.executable, str(dispatch), "--self-check"],
-                            capture_output=True, text=True)
-    if result.returncode != 0:
-        errors.append(f"{dispatch.relative_to(root)} --self-check failed: {result.stderr.strip()[-300:]}")
+def check_tests(root: Path, errors: list[str]) -> None:
+    tests = sorted((root / "tests").glob("test_*.py"))
+    if not tests:
+        errors.append("tests/: no test_*.py to run")
+    for test in tests:
+        result = subprocess.run([sys.executable, str(test)], capture_output=True, text=True)
+        if result.returncode != 0:
+            errors.append(f"{test.relative_to(root)} failed: {result.stderr.strip()[-300:]}")
 
 
 def validate(root: Path, run_scripts: bool = True) -> list[str]:
@@ -341,8 +335,7 @@ def validate(root: Path, run_scripts: bool = True) -> list[str]:
     readme = (root / "README.md").read_text()
     check_config_keys(root, readme, errors)
     if run_scripts:  # the corruption copies only change text; their scripts are the root's
-        check_ledger(root, errors)
-        check_dispatch(root, errors)
+        check_tests(root, errors)
     check_ledger_citations(root, errors)
     manifests = {relative: load_json(root, relative, errors) for relative in MANIFESTS}
     check_codex(manifests[".codex-plugin/plugin.json"], errors)

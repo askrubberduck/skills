@@ -360,8 +360,7 @@ compares two arms on the same cases. What is drifting? `thresholds` hands `duck-
 occurrences. What will this gate cost? `cost <setup>` reads past gates. Is there a new model?
 `roster <models|->` lists host models that are in no role list, no trial and no ledger row; after
 its shadow gates, `promote` says whether it replaces its family's reviewer, joins the list, or goes.
-`skills/duck-review/scripts/ledger.py --self-check` runs each of these on a fixture and asserts what
-it prints. Standard library only. A `-` means unknown; unknown never counts as zero.
+Standard library only. A `-` means unknown; unknown never counts as zero.
 
 ### How the duck keeps review rounds bounded
 
@@ -385,7 +384,9 @@ independent work and holds only what needs your answer. Your silence does not ch
 ## How the duck proves its work
 
 Every push runs `scripts/validate-distribution.py --self-test`: manifests parse, skills are linked,
-references resolve, generated files match, and deliberate corruptions get caught.
+references resolve, generated files match, and deliberate corruptions get caught. It also runs
+`tests/`, which drives the ledger commands and the dispatch outcomes on fixtures and asserts what
+they print.
 
 That proves the package holds together. To find out whether the duck does its job, give it a task
 where agreement would be wrong, a green test hides a bug, or a reviewer moves the goalposts. Inspect

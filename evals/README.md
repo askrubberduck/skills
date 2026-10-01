@@ -380,7 +380,7 @@ models under the default `[learn].discover`.
 `review-04-shadow-trial` observes the dispatch.md rule itself: a release-gate plan with a trial pin
 in the config. Every arm passes, candidate and `master`, with and without the plugin, 3/3 each:
 the model infers the non-counting shadow from the pasted config. It shows the candidate text is
-followed and no uplift; the rule's arithmetic is pinned by `skills/duck-review/scripts/ledger.py --self-check`.
+followed and no uplift; the rule's arithmetic is pinned by `tests/test_ledger.py`.
 
 `master` has no `promote` and no `discover`, and its duck-learn left the decision to the owner.
 The first run of this case graded "applies" 1/3 on answers that showed the right config: its rubric
