@@ -28,7 +28,7 @@ assumptions; rally turns them into tests. Pick by which of those the work needs.
 2. Name the participants and their model families before starting. The doer (this session's family)
    is one; the rival is a **proven different family** from `[models].race` in
    `~/.askrubberduck/config.toml` or the owner's setup, and `$LEDGER pick race` chooses
-   `$RIVAL_PIN` within it (`$LEDGER` is `python3` with the absolute path of
+   `$RIVAL_MODEL` within it (`$LEDGER` is `python3` with the absolute path of
    `../duck-review/scripts/ledger.py`, resolved from this skill's directory, typed out as
    `python3 "<path>" <subcommand>` rather than held in one variable; `$DISPATCH`, which
    bounds the rival's seat and records its row, is the absolute path of `dispatch.py` beside it,
@@ -57,10 +57,10 @@ fresh shell — and work the doer's attempt in its own worktree meanwhile. `$GAT
 `$N` counts from 1; `$TRUST` is 1 for trust-touching work, else 0:
 
 ```bash
-: "${DISPATCH:?}" "${GATE:?}" "${N:?}" "${TRUST:?}" "${RIVAL_PIN:?}" "${SP:?}" "${WT_RIVAL:?}" \
+: "${DISPATCH:?}" "${GATE:?}" "${N:?}" "${TRUST:?}" "${RIVAL_MODEL:?}" "${SP:?}" "${WT_RIVAL:?}" \
   "${BASE_SHA:?}"
 python3 "$DISPATCH" --gate "$GATE" --round "$N" --stage race --setup race --trust "$TRUST" \
-  --pin "$RIVAL_PIN" \
+  --pin "$RIVAL_MODEL" \
   --prompt "$SP/problem.md" --out "$SP/rival-r$N.out" --workdir "$WT_RIVAL" \
   --diff-base "$BASE_SHA" --diff-out "$SP/rival-r$N.diff"
 ```
@@ -98,9 +98,9 @@ file paths) **by file**, never inlined. `$SP/turn.md` states the role for this t
 path, and the current state.
 
 ```bash
-: "${DISPATCH:?}" "${GATE:?}" "${N:?}" "${TRUST:?}" "${RIVAL_PIN:?}" "${SP:?}" "${WT:?}"
+: "${DISPATCH:?}" "${GATE:?}" "${N:?}" "${TRUST:?}" "${RIVAL_MODEL:?}" "${SP:?}" "${WT:?}"
 python3 "$DISPATCH" --gate "$GATE" --round "$N" --stage rally --setup rally --trust "$TRUST" \
-  --pin "$RIVAL_PIN" \
+  --pin "$RIVAL_MODEL" \
   --prompt "$SP/turn.md" --out "$SP/rival-t$N.out" --workdir "$WT"
 ```
 
