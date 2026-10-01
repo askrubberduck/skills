@@ -94,7 +94,8 @@ threads already fixed; the rest stay open and are listed.
    the review accordingly. Missing material evidence means the gate cannot
    approve; a standalone opinion may still report what it can establish.
 6. Do not dispatch beyond the caller's recorded bound; return the unresolved status and evidence
-   without approval. For a third or later review round, require the caller's recorded loop
+   without approval. The dispatch script refuses a round past it without the owner's recorded
+   extension. For a third or later review round, require the caller's recorded loop
    diagnosis. Judge progress by unresolved causes, not wording or finding counts. A local
    record needs no commit unless the repository requires one. Do not dispatch an unchanged candidate
    just to seek a friendlier verdict.
