@@ -13,10 +13,10 @@ git -C "$SP/pub.git" cat-file --batch | grep -a -c <pattern>` — and locate a h
 `git -C "$SP/pub.git" log --all --grep=<pattern>`. The throwaway receives exactly what the public
 remote would.
 
-Every view of the working repository has hidden something in a gate round: the current tree
-misses a file added and deleted before the push, `git grep` reads no messages, `log -p` skips a
-merge's own content without `-m` and any file under a `.gitattributes -diff` rule, and `cat-file`
-obeys a local `git replace` that the push ignores.
+Scan the throwaway, not the working repository; every view of the working repository can hide bytes
+the push sends: the current tree misses a file added and deleted before the push, `git grep` reads
+no messages, `log -p` skips a merge's own content without `-m` and any file under a `.gitattributes
+-diff` rule, and `cat-file` obeys a local `git replace` that the push ignores.
 
 The list to scan for: private repo and product names, machine-local paths (`~/…`), internal URLs,
 and codenames that outlived the rename of the files carrying them. Derive the list from the

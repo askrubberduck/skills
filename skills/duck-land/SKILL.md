@@ -26,9 +26,9 @@ candidate branch and merges nothing.
   `NOTE`, a raw reviewer approval, and "probably fine" are not gate-passed states.
 - **The branch head equals the candidate SHA** — the exact commit the authorization covers — and
   the fix passes behind it are **squashed into one candidate commit** before that authorization
-  is given, its message carrying the evidence. Delegated builders commit on detached HEADs and
-  wrong branches; confirm the branch you are landing from — and the PR head where there is one —
-  points at the candidate. The remote default branch is what landing *moves*, so it is never
+  is given, its message carrying the evidence. Confirm the branch you are landing from — and the PR
+  head where there is one — points at the candidate, not a detached HEAD or another branch a
+  delegated builder committed on. The remote default branch is what landing *moves*, so it is never
   part of this equality check; step 2 is what verifies where it ended up.
 - Re-verify the base: `git fetch`, compare origin/<base> to what was branched from. **If it
   advanced, integrating it produces a new head nobody authorized** — conflict resolutions and
@@ -51,8 +51,7 @@ candidate branch and merges nothing.
   owner's call on a named precondition, never the doer's, and never a blanket exemption from the
   rest; a waiver a reviewer discovers afterward is a second violation, not a footnote.
 - **A registry entry is not an authorization unless it says who authorized it** — `duck-scan`'s
-  attribution rule. The doer writes to the same decision log the owner does, so reading an
-  unattributed entry as permission is how a run authorizes itself in writing.
+  attribution rule: never read an unattributed entry as permission.
 
 ## Land
 

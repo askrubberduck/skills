@@ -47,7 +47,7 @@ below it.
 
 ## Tests get the same pass, harder
 
-Generated tests are where narration collects. A test's name states its intent, so a docstring
+Apply this pass hardest to generated tests. A test's name states its intent, so a docstring
 restating the name and an `Arrange / Act / Assert` banner set are pure duplication, and a comment
 explaining what an assertion asserts is the assertion. What earns its place: why a fixture value
 is *that* value — the boundary it sits on — the defect id a regression test pins, and why tests

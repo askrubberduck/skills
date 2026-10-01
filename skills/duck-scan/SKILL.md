@@ -14,16 +14,15 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
 ## Locate registries (detect, don't configure)
 
 **The repo's own instruction files say where work lives** — read them first, including when what
-they name sits outside the checkout. **The registry need not be in the checkout** at all. Then take
+they name sits outside the checkout. Then take
 what the repo actually has: docs that list items with states, active work-item directories, open
 PRs and issues through the host's CLI (`gh pr list`). Match a candidate on what it contains, never
 on what it is called — `STATUS.md`, `BACKLOG.md`, `TODO.md` and a delivery README are shapes that
 recur, not a lookup table. Use whichever exist; if none do, say so and ask where the backlog
 lives — once, then remember the answer for the session.
 
-**An in-repo miss is not an empty backlog.** Reporting "nothing open" from a scan that only
-searched the working tree is the failure this step exists to prevent: the repo looks quiet because
-the registry was never in it.
+**An in-repo miss is not an empty backlog.** Before reporting "nothing open", confirm the scan
+covered every registry the instruction files name, not only the working tree.
 
 ## Scan
 
