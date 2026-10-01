@@ -37,7 +37,7 @@ OUTAGES = (("credits", r"out of credits|insufficient credits?|credit balance"),
            ("capacity", r"at capacity|over capacity|overloaded"),
            ("quota", r"quota|RESOURCE_EXHAUSTED|\b429\b|rate.?limit"),
            ("model rejected", r"not supported|unknown model|invalid model|model.not.found"),
-           ("permission denied", r"permission\b.*\b(?:auto-)?denied"))
+           ("permission denied", r"permission\b[\s\S]{0,200}?\bdenied"))  # a wrapped message too
 TOKENS = re.compile(r"tokens used\s*:?\s*([\d,]+)", re.IGNORECASE)
 CODEX_ANSWER = "codex"  # codex exec prints this line alone before its final answer
 # A stage with its own ceiling counts against it; review and disposition share the round bound.
@@ -181,6 +181,25 @@ def launch(argv: list[str], out: Path, limit: float, workdir: Path) -> tuple[boo
         stop(child)
 
 
+def capture(workdir: Path, base: str, dest: Path) -> str:
+    """`add -A`, then the diff against `base`, landed whole: a reader never sees half a diff.
+    "" when it landed, else the outage cause."""
+    spare = dest.with_name(f".{dest.name}.{os.getpid()}")
+    try:
+        subprocess.run(["git", "-C", str(workdir), "add", "-A"], capture_output=True, check=True)
+        with spare.open("wb") as sink:
+            subprocess.run(["git", "-C", str(workdir), "diff", "--binary", base], stdout=sink,
+                           stderr=subprocess.DEVNULL, check=True)
+        if not spare.stat().st_size:
+            return "empty diff"
+        os.replace(spare, dest)
+        return ""
+    except (OSError, subprocess.CalledProcessError):
+        return "diff capture failed"
+    finally:
+        spare.unlink(missing_ok=True)
+
+
 def refuse(reason: str) -> int:
     print(f"refused: {reason}", file=sys.stderr)
     return 2
@@ -195,10 +214,17 @@ def run_seat(args) -> int:
     via = args.via or VIA.get(family)
     if via is None or model == "-":
         return refuse(f"no transport for pin {args.pin!r}: pass family:model[:effort] and --via")
+    if args.workdir == "":  # an unset $WT expands to nothing; the seat would run in scratch
+        return refuse("--workdir is empty")
     if args.workdir and via == "agy":
         return refuse("agy cannot write headless (it auto-denies write_file): a --workdir seat, "
                       "a race or rally rival, needs codex")
-    row_id = args.id or f"{args.gate}-r{args.round}-{model}"
+    if (args.diff_base, args.diff_out) != (None, None):
+        if not (args.diff_base and args.diff_out):
+            return refuse("--diff-base and --diff-out each take a value, and go together")
+        if not args.workdir:
+            return refuse("--diff-out needs --workdir: the diff is of the seat's worktree")
+    row_id = args.id or f"{args.gate}-r{args.round}-{args.stage}-{model}"
 
     trust = args.trust == "1"
     key, default = STAGE_BOUNDS.get(args.stage, ("trust_rounds", 2) if trust else ("review_rounds", 3))
@@ -223,6 +249,14 @@ def run_seat(args) -> int:
     workdir = Path(args.workdir).resolve() if args.workdir else out.parent
     if not workdir.is_dir():
         return refuse(f"--workdir is not a directory: {workdir}")
+    if args.diff_out and Path(args.diff_out).is_dir():
+        return refuse(f"--diff-out names a directory: {args.diff_out}")
+    if args.diff_out and not Path(args.diff_out).resolve().parent.is_dir():
+        return refuse(f"--diff-out's directory does not exist: {args.diff_out}")
+    if args.diff_base and subprocess.run(
+            ["git", "-C", str(workdir), "rev-parse", "--verify", f"{args.diff_base}^{{commit}}"],
+            capture_output=True).returncode:
+        return refuse(f"--diff-base is not a commit in {workdir}: {args.diff_base}")
     argv = transport(via, family, model, effort, prompt, workdir, args.add_dir, timeout)
     if args.cmd:
         argv = [args.cmd, *argv]
@@ -245,14 +279,20 @@ def run_seat(args) -> int:
         cancelled.append(number)
         sys.exit(128 + number)  # an interrupted run still finalizes its row
 
-    for sig in (signal.SIGTERM, signal.SIGHUP):
+    for sig in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT):
         signal.signal(sig, cancel)
     started = time.monotonic()
     verdict, cause, moved = "-", "crashed", []
+    diff = Path(args.diff_out).resolve() if args.diff_out else None
     try:
+        if diff:
+            diff.unlink(missing_ok=True)  # a reader waiting for it must not take a stale one
         timed_out, code = launch(argv, out, timeout, workdir)
         text = out.read_text(encoding="utf-8", errors="replace")
-        verdict, cause = classify(text, via, timed_out, code)
+        found, cause = classify(text, via, timed_out, code)
+        if diff and found != "-" and (failed := capture(workdir, args.diff_base, diff)):
+            found, cause = "-", failed
+        verdict = found  # only now: a cancel during the capture records a cancel, not a verdict
         row["tokens"] = tokens_of(text)
         if before is not None:
             after = snapshot(args.candidate)
@@ -295,6 +335,9 @@ STUBS = {
     "hang": "echo APPROVE; sleep 30",
     "denied": "echo 'Error: a tool required the \"write_file\" permission that headless mode'"
               " 'cannot prompt for, so it was auto-denied'",
+    "wrapped": "printf 'Error: a tool required the permission that headless mode\\n"
+               "cannot prompt for, so it was auto-denied\\n'",
+    "race": "echo raced > raced.txt; printf '\\0\\1' > raced.bin; echo DIFF",
     "cancel": 'sleep 30 & echo $! > "$0.pid"; touch "$0.up"; wait',
 }
 
@@ -319,14 +362,15 @@ def self_check() -> int:
         outs = iter(range(100))  # parallel seats of one gate must not share an output file
 
         def seat(stub: str, gate: str, *extra: str, rnd: int = 1, repo: str = "r",
-                 stdin=subprocess.DEVNULL) -> subprocess.Popen:
+                 stdin=subprocess.DEVNULL, **more_env: str) -> subprocess.Popen:
             argv = [sys.executable, __file__, "--gate", gate, "--round", str(rnd), "--stage",
                     "review", "--setup", "independent", "--trust", "0", "--pin",
                     "openai:gpt-6-sol:high", "--prompt", str(prompt), "--out",
                     str(root / "scratch" / f"{gate}-{next(outs)}.out"), "--repo", repo,
                     "--cmd", str(root / stub), *extra]
             return subprocess.Popen(argv, stdin=stdin, stdout=subprocess.PIPE,
-                                    stderr=subprocess.STDOUT, text=True, cwd=root, env=env)
+                                    stderr=subprocess.STDOUT, text=True, cwd=root,
+                                    env={**env, **more_env})
 
         def run(*args, **kwargs) -> tuple[int, str]:
             child = seat(*args, **kwargs)
@@ -344,9 +388,9 @@ def self_check() -> int:
         # 1. a REJECT after codex's answer marker is the verdict, not the echoed APPROVE; round 2
         # of trust work sits on its bound of 2 and runs; the row was pending while the seat ran
         code, out = run("reject", "g1", "--trust", "1", rnd=2)
-        assert code == 0 and final("g1-r2-gpt-6-sol") == ("REJECT", "final", "0"), (code, out)
-        assert rows()["g1-r2-gpt-6-sol"]["tokens"] == "1234", rows()["g1-r2-gpt-6-sol"]
-        assert "g1-r2-gpt-6-sol\tpending" in (root / "reject.seen").read_text()
+        assert code == 0 and final("g1-r2-review-gpt-6-sol") == ("REJECT", "final", "0"), out
+        assert rows()["g1-r2-review-gpt-6-sol"]["tokens"] == "1234", rows()
+        assert "g1-r2-review-gpt-6-sol\tpending" in (root / "reject.seen").read_text()
         assert (root / "reject.argv").read_text().split("\0")[:-1] == [
             "codex", "exec", "-m", "gpt-6-sol", "-c", "model_reasoning_effort=high", "-s",
             "workspace-write", "-C", str(root / "scratch"), "--skip-git-repo-check",
@@ -354,13 +398,14 @@ def self_check() -> int:
         assert (root / "reject.cwd").read_text().strip() == str(root / "scratch")
         code, out = run("reject", "g1", "--pin", "google:gemini-3.1-pro-high", "--add-dir",
                         str(checkout))
-        assert code == 0 and final("g1-r1-gemini-3.1-pro-high") == ("REJECT", "final", "0"), out
+        assert code == 0, out
+        assert final("g1-r1-review-gemini-3.1-pro-high") == ("REJECT", "final", "0"), out
         assert (root / "reject.argv").read_text().split("\0")[:-1] == [
             "agy", "--model", "gemini-3.1-pro-high", "--add-dir", str(checkout),
             "--print-timeout", "20s", "-p", prompt.read_text()]
         # a second agy seat of the same gate and round takes its own default id
         code, out = run("reject", "g1", "--pin", "google:gemini-3.1-flash")
-        assert code == 0 and final("g1-r1-gemini-3.1-flash") == ("REJECT", "final", "0"), out
+        assert code == 0 and final("g1-r1-review-gemini-3.1-flash") == ("REJECT", "final", "0"), out
         # --workdir moves the seat into a rival's worktree: codex -C and the cwd
         rival = root / "rival"
         rival.mkdir()
@@ -370,22 +415,31 @@ def self_check() -> int:
         count = len(rows())  # agy auto-denies write_file headless: a rival needs codex
         code, out = run("reject", "g1w", "--workdir", str(rival), "--pin", "google:gemini-3.1-pro")
         assert code == 2 and "needs codex" in out and len(rows()) == count, out
+        code, out = run("reject", "g1w", "--workdir", "", "--id", "g1w-empty")
+        assert code == 2 and "--workdir is empty" in out and len(rows()) == count, out
         code, out = run("greeting", "g1b")  # the prompt's verdict is no answer
-        assert code == 1 and final("g1b-r1-gpt-6-sol") == ("-", "final", "1"), out
+        assert code == 1 and final("g1b-r1-review-gpt-6-sol") == ("-", "final", "1"), out
         assert "no verdict" in out, out
+        # a review and a disposition by one model in one round take their own default ids
+        code, out = run("reject", "g1d", "--stage", "disposition")
+        assert code == 0 and final("g1d-r1-disposition-gpt-6-sol")[1] == "final", out
+        code, out = run("reject", "g1d")
+        assert code == 0 and final("g1d-r1-review-gpt-6-sol")[1] == "final", out
 
         # 2. the credits error is an outage with its cause
         code, out = run("credits", "g2")
-        assert code == 1 and final("g2-r1-gpt-6-sol") == ("-", "final", "1"), out
+        assert code == 1 and final("g2-r1-review-gpt-6-sol") == ("-", "final", "1"), out
         assert "outage: credits" in out, out
         code, out = run("denied", "g2", "--id", "g2-denied")  # agy headless auto-deny
+        assert code == 1 and "outage: permission denied" in out, out
+        code, out = run("wrapped", "g2", "--id", "g2-wrapped")  # the message wraps
         assert code == 1 and "outage: permission denied" in out, out
 
         # 3. past the 1s limit the whole group is killed, its grandchild included
         started = time.monotonic()
         code, out = run("sleep", "g3", repo="t")
         assert code == 1 and "outage: timeout" in out and time.monotonic() - started < 10, out
-        assert final("g3-r1-gpt-6-sol") == ("-", "final", "1")
+        assert final("g3-r1-review-gpt-6-sol") == ("-", "final", "1")
         with contextlib.suppress(ProcessLookupError):
             os.kill(int((root / "sleep.pid").read_text()), 0)
             raise AssertionError("the seat's child outlived the timeout")
@@ -396,7 +450,7 @@ def self_check() -> int:
         assert code == 2 and "past the bound of 2" in out and len(rows()) == count, out
         code, out = run("reject", "g4", "--trust", "1", "--extended", "owner: one more", rnd=4)
         assert code == 0 and "owner: one more" in out, out
-        assert final("g4-r4-gpt-6-sol")[1] == "final"
+        assert final("g4-r4-review-gpt-6-sol")[1] == "final"
         code, out = run("reject", "g4", "--trust", "1", "--extended", "owner: one more", rnd=4)
         assert code == 2 and "already recorded" in out and len(rows()) == count + 1, out
         code, out = run("reject", "g1", rnd=3)  # g1 holds rounds 1 and 2: 3 is within 3
@@ -406,15 +460,15 @@ def self_check() -> int:
 
         # a rally counts against rally_turns (default 10), not trust_rounds, and returns DIFF
         code, out = run("diff", "g4r", "--trust", "1", "--stage", "rally", "--setup", "rally", rnd=4)
-        assert code == 0 and final("g4r-r4-gpt-6-sol") == ("DIFF", "final", "0"), out
+        assert code == 0 and final("g4r-r4-rally-gpt-6-sol") == ("DIFF", "final", "0"), out
         code, out = run("diff", "g4r", "--trust", "1", "--stage", "rally", "--setup", "rally", rnd=11)
         assert code == 2 and "past the bound of 10" in out, out
 
         # 5. a seat that writes into the candidate is reported, and its row still finalized
         code, out = run("touch", "g5", "--candidate", str(checkout))
         assert code == 3 and "candidate moved: + ?? new.txt" in out, out
-        assert final("g5-r1-gpt-6-sol") == ("APPROVE", "final", "0")
-        assert rows()["g5-r1-gpt-6-sol"]["candidate"] != "-"
+        assert final("g5-r1-review-gpt-6-sol") == ("APPROVE", "final", "0")
+        assert rows()["g5-r1-review-gpt-6-sol"]["candidate"] != "-"
         # the candidate is now dirty; a second edit to the same file changes no status line (rally r2)
         code, out = run("append", "g5", "--id", "g5-append", "--candidate", str(checkout))
         assert code == 3 and "candidate moved: - content" in out, out
@@ -431,31 +485,97 @@ def self_check() -> int:
         code = held.wait(timeout=60)
         held.stdin.close()
         out = held.communicate()[0]
-        assert code == 0 and final("g7-r1-gpt-6-sol") == ("APPROVE", "final", "0"), out
+        assert code == 0 and final("g7-r1-review-gpt-6-sol") == ("APPROVE", "final", "0"), out
 
         # a verdict printed before a crash or the timeout belongs to an unfinished review (rally r1)
         code, out = run("crash", "g9")
-        assert code == 1 and final("g9-r1-gpt-6-sol") == ("-", "final", "1"), out
+        assert code == 1 and final("g9-r1-review-gpt-6-sol") == ("-", "final", "1"), out
         assert "exit 7" in out, out
         code, out = run("hang", "g9", "--id", "g9-hang", repo="t")
         assert code == 1 and final("g9-hang") == ("-", "final", "1") and "timeout" in out, out
 
-        # a signal to the script is a cancel: the row is final with the outage flag unknown
-        child = seat("cancel", "g10")
+        # a signal to the script, Ctrl-C included, is a cancel: the row is final with the outage
+        # flag unknown
+        for sig, gate in ((signal.SIGTERM, "g10"), (signal.SIGINT, "g10i")):
+            (root / "cancel.up").unlink(missing_ok=True)
+            child = seat("cancel", gate)
+            for _ in range(400):
+                if (root / "cancel.up").exists():
+                    break
+                time.sleep(0.05)
+            child.send_signal(sig)
+            out = child.communicate(timeout=60)[0]
+            assert final(f"{gate}-r1-review-gpt-6-sol") == ("-", "final", "-"), out
+            assert "cancelled" in out, out
+            with contextlib.suppress(ProcessLookupError):  # a cancel takes the seat's children too
+                os.kill(int((root / "cancel.pid").read_text()), 0)
+                raise AssertionError("the cancelled seat's child outlived it")
+
+        # a race rival's diff against the base, new files included, lands before the row is final
+        racer = root / "racer"
+        subprocess.run(["git", "init", "-q", str(racer)], check=True)
+        subprocess.run([*git[:2], str(racer), *git[3:], "commit", "-q", "--allow-empty",
+                        "--no-verify", "-m", "c"], check=True)
+        base = subprocess.run(["git", "-C", str(racer), "rev-parse", "HEAD"], capture_output=True,
+                              text=True, check=True).stdout.strip()
+        race = ("--stage", "race", "--setup", "race", "--workdir", str(racer), "--diff-base")
+        rival_diff = root / "scratch" / "rival.diff"
+        fakes = root / "fakes"  # a git ahead on the seat's PATH sees the ledger at `add -A`
+        fakes.mkdir()
+        (fakes / "git").write_text('#!/bin/sh\n[ "$3" != add ] || { cut -f1,16 '
+                                   '"$ASKRUBBERDUCK_HOME/dispatches.tsv" > "$0.seen"\n'
+                                   '[ -z "$GIT_SLOW" ] || { echo $$ > "$0.pid"; exec sleep 30; }; }\n'
+                                   'PATH="${PATH#*:}" exec git "$@"\n')
+        (fakes / "git").chmod(0o755)
+        fake_path = f"{fakes}:{os.environ['PATH']}"
+        code, out = run("race", "g11", *race, base, "--diff-out", str(rival_diff), PATH=fake_path)
+        assert code == 0 and final("g11-r1-race-gpt-6-sol") == ("DIFF", "final", "0"), out
+        assert "+raced" in rival_diff.read_text(), rival_diff.read_text()
+        assert "GIT binary patch" in rival_diff.read_text(), rival_diff.read_text()
+        assert "g11-r1-race-gpt-6-sol\tpending" in (fakes / "git.seen").read_text()
+        # a cancel during the capture is a cancel, not a verdict, and leaves no diff
+        child = seat("race", "g11", *race, base, "--diff-out", str(rival_diff), "--id",
+                     "g11-cancel", PATH=fake_path, GIT_SLOW="1")
         for _ in range(400):
-            if (root / "cancel.up").exists():
+            if (fakes / "git.pid").exists():
                 break
             time.sleep(0.05)
+        else:
+            raise AssertionError("the capture never started; the cancel would test nothing")
         child.send_signal(signal.SIGTERM)
         out = child.communicate(timeout=60)[0]
-        assert final("g10-r1-gpt-6-sol") == ("-", "final", "-") and "cancelled" in out, out
-        with contextlib.suppress(ProcessLookupError):  # a cancel takes the seat's children too
-            os.kill(int((root / "cancel.pid").read_text()), 0)
-            raise AssertionError("the cancelled seat's child outlived it")
+        assert final("g11-cancel") == ("-", "final", "-") and not rival_diff.exists(), out
+        with contextlib.suppress(ProcessLookupError):  # the capture's git dies with the cancel
+            os.kill(int((fakes / "git.pid").read_text()), 0)
+            raise AssertionError("the cancelled capture's git outlived it")
+        # a rival that leaves no change is an outage
+        subprocess.run(["git", "-C", str(racer), "reset", "-q", "--hard", base], check=True)
+        subprocess.run(["git", "-C", str(racer), "clean", "-qfd"], check=True)
+        code, out = run("diff", "g11", *race, base, "--diff-out", str(rival_diff), "--id",
+                        "g11-empty")
+        assert code == 1 and "outage: empty diff" in out and not rival_diff.exists(), out
+        # an outage captures nothing, and a stale diff from an earlier run is gone
+        code, out = run("credits", "g11", *race, base, "--diff-out", str(rival_diff), "--id",
+                        "g11-out")
+        assert code == 1 and not rival_diff.exists(), out
+        count = len(rows())  # the caller's own errors are refused before the row, not outages
+        code, out = run("race", "g11", *race, "0" * 40, "--diff-out", str(rival_diff), "--id",
+                        "g11-bad")
+        assert code == 2 and "not a commit" in out and len(rows()) == count, out
+        code, out = run("race", "g11", *race, base, "--diff-out", str(root / "absent" / "r.diff"),
+                        "--id", "g11-nodir")
+        assert code == 2 and "does not exist" in out and len(rows()) == count, out
+        code, out = run("race", "g11", *race, base, "--diff-out", str(root), "--id", "g11-isdir")
+        assert code == 2 and "names a directory" in out and len(rows()) == count, out
+        code, out = run("race", "g11", "--diff-base", base, "--diff-out", str(rival_diff), "--id",
+                        "g11-nowd")
+        assert code == 2 and "needs --workdir" in out and len(rows()) == count, out
+        code, out = run("race", "g11", *race, base, "--id", "g11-half")
+        assert code == 2 and "go together" in out and len(rows()) == count, out
 
         # a launch that raises still finalizes its row
         code, out = run("absent", "g8")
-        assert code == 1 and final("g8-r1-gpt-6-sol") == ("-", "final", "1"), out
+        assert code == 1 and final("g8-r1-review-gpt-6-sol") == ("-", "final", "1"), out
     print("dispatch self-check passed")
     return 0
 
@@ -477,8 +597,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--via", choices=sorted(set(VIA.values())), help="default: by family")
     parser.add_argument("--workdir", help="the seat's working directory; default: --out's")
     parser.add_argument("--add-dir", action="append", default=[], help="material directory")
+    parser.add_argument("--diff-base", help="with --diff-out: the base SHA the worktree diffs from")
+    parser.add_argument("--diff-out", help="after a verdict, the --workdir diff lands here")
     parser.add_argument("--extended", help="the owner's words extending the round bound")
-    parser.add_argument("--id", help="row id; default: <gate>-r<round>-<model>")
+    parser.add_argument("--id", help="row id; default: <gate>-r<round>-<stage>-<model>")
     parser.add_argument("--cmd", help=argparse.SUPPRESS)  # self-check: a stub ahead of the argv
     args = parser.parse_args(argv)
     if args.self_check:

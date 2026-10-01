@@ -192,8 +192,9 @@ criteria reviewed. Finalize each participant's row in `~/.askrubberduck/dispatch
 one row per adjudicated finding to `findings.tsv`, with a stable `cause_id` shared across
 participants that found the same cause; with two eligible captures (shadows excluded), report
 `$LEDGER remaining <gate_id>` — the estimate of defects neither found. `$LEDGER` is `python3` with
-the absolute path of this skill's `scripts/ledger.py`, whatever the working directory. Keep raw CLI
-stdout in scratch; preserve the decisive evidence before scratch cleanup.
+the absolute path of this skill's `scripts/ledger.py`, whatever the working directory, typed out as
+`python3 "<path>" <subcommand>` rather than held in one variable. Keep raw CLI stdout in scratch;
+preserve the decisive evidence before scratch cleanup.
 
 **Write that report where the landing gate can read it** — the same durable records home as the
 receipts, never only into the caller's context or `$SP`, and never as a commit on the candidate

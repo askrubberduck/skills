@@ -36,7 +36,8 @@ After each round, one of these holds, in this order:
 
 1. A substantiated `BLOCKER` → one more round.
 2. Two eligible captures (Broad, or Independent escalated once) → `$LEDGER remaining <gate_id>`
-   (`python3` with the absolute path of `duck-review`'s `scripts/ledger.py`); another round while
+   (`python3` with the absolute path of `duck-review`'s `scripts/ledger.py`, typed out as
+   `python3 "<path>" <subcommand>` rather than held in one variable); another round while
    its estimate is at least one, stop below; "insufficient evidence" from it counts as at least one.
 3. One capture and no `BLOCKER` → stop, unless the round found nothing at all and the reviewer's
    family has no recorded precision at or above 0.8 for any class on this repository

@@ -14,7 +14,8 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
 ## Recipe
 
 1. **Gather evidence, don't reminisce.** `$LEDGER` below is `python3` with the absolute path of
-   `../duck-review/scripts/ledger.py`, resolved from this skill's directory.
+   `../duck-review/scripts/ledger.py`, resolved from this skill's directory, typed out as
+   `python3 "<path>" <subcommand>` rather than held in one variable.
    - **Numbers first.** `$LEDGER thresholds` reads
      `~/.askrubberduck/dispatches.tsv` and prints lesson candidates — a pin's outage rate, a pin
      whose reviews among its last twenty dispatches found no unique blocker, minutes that drifted —
