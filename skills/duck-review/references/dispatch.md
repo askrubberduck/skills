@@ -51,7 +51,7 @@ and `[models].plan`, each defaulting to `[families].reviewers` (default empty: t
 names them).
 
 ```bash
-python3 "$DISPATCH" --gate "$GATE" --round "$N" --stage review --setup independent --trust 0 --pin "$PIN" \
+python3 "$DISPATCH" --gate "$GATE" --round "$N" --stage review --setup independent --trust 0 --pin "$MODEL" \
   --prompt "$SP/codex/prompt.md" --out "$SP/codex/r$N.out" --add-dir "$SP/material" \
   --candidate "$CHECKOUT"
 ```
