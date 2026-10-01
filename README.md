@@ -74,9 +74,9 @@ claude plugin install askrubberduck@askrubberduck --yes
 Or link a clone into your personal skills directory, which loads them unnamespaced:
 
 ```bash
-git clone https://github.com/askrubberduck/skills askrubberduck-skills
+git clone https://github.com/askrubberduck/skills ~/askrubberduck-skills
 mkdir -p ~/.claude/skills
-ln -s "$PWD"/askrubberduck-skills/skills/* ~/.claude/skills/
+ln -s ~/askrubberduck-skills/skills/* ~/.claude/skills/
 ```
 
 **Cloud sessions.** Claude Code on the web, `claude --cloud`, and routines clone the repo into a
@@ -108,9 +108,9 @@ codex plugin add askrubberduck@askrubberduck
 Link the clone into the directory these hosts share:
 
 ```bash
-git clone https://github.com/askrubberduck/skills askrubberduck-skills
+git clone https://github.com/askrubberduck/skills ~/askrubberduck-skills
 mkdir -p ~/.agents/skills
-ln -s "$PWD"/askrubberduck-skills/skills/* ~/.agents/skills/
+ln -s ~/askrubberduck-skills/skills/* ~/.agents/skills/
 ```
 
 `npx skills add askrubberduck/skills` does the same through the `skills` CLI and picks the

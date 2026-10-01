@@ -1,4 +1,4 @@
-<!-- translation-source: README.md sha256=e9362fd94a7ce02619cddc51318b08c43abbf2f704145a7a82f76d872aa67fc9 -->
+<!-- translation-source: README.md sha256=68d61f081e6326b7943c0b2606b23b713da6418a7db8435f438825f9ba7c6306 -->
 
 <p align="center">
   <img src="assets/logo.svg" width="112" alt="askrubberduck">
@@ -78,9 +78,9 @@ claude plugin install askrubberduck@askrubberduck --yes
 Или сделай симлинки из клона в свою папку навыков — тогда навыки будут без префикса плагина:
 
 ```bash
-git clone https://github.com/askrubberduck/skills askrubberduck-skills
+git clone https://github.com/askrubberduck/skills ~/askrubberduck-skills
 mkdir -p ~/.claude/skills
-ln -s "$PWD"/askrubberduck-skills/skills/* ~/.claude/skills/
+ln -s ~/askrubberduck-skills/skills/* ~/.claude/skills/
 ```
 
 **Облачные сессии.** Claude Code в браузере, `claude --cloud` и routines клонируют репозиторий в
@@ -113,9 +113,9 @@ codex plugin add askrubberduck@askrubberduck
 Сделай симлинки из клона в общую папку, которую читают эти агенты:
 
 ```bash
-git clone https://github.com/askrubberduck/skills askrubberduck-skills
+git clone https://github.com/askrubberduck/skills ~/askrubberduck-skills
 mkdir -p ~/.agents/skills
-ln -s "$PWD"/askrubberduck-skills/skills/* ~/.agents/skills/
+ln -s ~/askrubberduck-skills/skills/* ~/.agents/skills/
 ```
 
 `npx skills add askrubberduck/skills` делает то же самое через CLI `skills` и сам выбирает папку
