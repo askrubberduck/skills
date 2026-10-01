@@ -83,7 +83,7 @@ def check_versions(manifests: dict[str, Any], errors: list[str]) -> None:
 # Every skill that shows a reviewer dispatch must also carry the rule that keeps the dispatch
 # honest: material goes by path, never pasted into the command. Measured at 28-of-41 flipped
 # verdicts when it was not followed, so a dispatch example without the rule beside it is a defect.
-DISPATCH = re.compile(r"^\s*(codex exec|agy )", re.M)
+DISPATCH = re.compile(r"^\s*(codex exec|agy |\$DISPATCH )", re.M)
 BY_PATH = "by absolute path"
 
 
@@ -328,11 +328,21 @@ def check_ledger(root: Path, errors: list[str]) -> None:
         errors.append(f"{ledger.relative_to(root)} --self-check failed: {result.stderr.strip()[-300:]}")
 
 
-def validate(root: Path) -> list[str]:
+def check_dispatch(root: Path, errors: list[str]) -> None:
+    dispatch = root / "skills" / "duck-review" / "scripts" / "dispatch.py"
+    result = subprocess.run([sys.executable, str(dispatch), "--self-check"],
+                            capture_output=True, text=True)
+    if result.returncode != 0:
+        errors.append(f"{dispatch.relative_to(root)} --self-check failed: {result.stderr.strip()[-300:]}")
+
+
+def validate(root: Path, run_scripts: bool = True) -> list[str]:
     errors: list[str] = []
     readme = (root / "README.md").read_text()
     check_config_keys(root, readme, errors)
-    check_ledger(root, errors)
+    if run_scripts:  # the corruption copies only change text; their scripts are the root's
+        check_ledger(root, errors)
+        check_dispatch(root, errors)
     check_ledger_citations(root, errors)
     manifests = {relative: load_json(root, relative, errors) for relative in MANIFESTS}
     check_codex(manifests[".codex-plugin/plugin.json"], errors)
@@ -474,7 +484,7 @@ def self_test(root: Path) -> list[str]:
             if fingerprint(copy) == before:
                 failures.append(f"self-test mutation changed nothing: {label}")
                 continue
-            errors = validate(copy)
+            errors = validate(copy, run_scripts=False)
             if not errors:
                 failures.append(f"self-test did not reject: {label}")
             elif not any(expected in error for error in errors):

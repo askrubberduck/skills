@@ -43,24 +43,27 @@ still counts.
 
 ## Run the reviewers
 
-Run from a neutral scratch directory, never the target checkout. Close stdin, use absolute paths,
-and run in the background because reviews can take 10–45 minutes. Where the turn is the whole
-session (`claude -p`), its end kills a background seat (`error: interrupted`) and strands its row
-`pending`: poll the seat's exit in bounded waits and end the turn only after it. Where the CLI has
-no timeout of its own, bound the wait yourself with `[bounds].dispatch_timeout` (default 45m) the way
-`duck-race`'s block does (macOS ships no `timeout`) — and past the deadline kill the process,
-confirm it exited, then read what it wrote: a wait that returns while the worker still writes hands
-the retry a shared file. The pinned ids come from `~/.askrubberduck/config.toml`, never from memory
+Run each seat with `$DISPATCH` (`python3` with the absolute path of `duck-review`'s
+`scripts/dispatch.py`, whatever the working directory), in the background, because reviews can take
+10–45 minutes. Where the turn is the whole session (`claude -p`), its end kills a background seat
+(`error: interrupted`) and strands its row `pending`: poll the seat's exit in bounded waits and end
+the turn only after it. The pinned ids come from `~/.askrubberduck/config.toml`, never from memory
 (a `[repo."<origin>"]` table there overrides any key for that origin):
 `[models].review` (a review or a disposition), `[models].race` and `[models].plan`, each defaulting
 to `[families].reviewers` (default empty: the owner's setup names them).
-Minimum shapes, with the pins and the timeout bound first:
 
 ```bash
-: "${CODEX_MODEL:?pinned id, proven below}" "${AGY_MODEL:?pinned id, proven below}" "${DISPATCH_TIMEOUT:?from [bounds], e.g. 45m}"
-codex exec -m "$CODEX_MODEL" --skip-git-repo-check "$(cat "$SP/codex/prompt.md")" </dev/null > "$SP/codex/rN.out" 2>&1
-agy --model "$AGY_MODEL" --add-dir "$SP/material" --print-timeout "$DISPATCH_TIMEOUT" -p "$(cat "$SP/agy/prompt.md")" </dev/null > "$SP/agy/rN.out" 2>&1
+$DISPATCH --gate "$GATE" --round "$N" --stage review --setup independent --trust 0 --pin "$PIN" \
+  --prompt "$SP/codex/prompt.md" --out "$SP/codex/r$N.out" --add-dir "$SP/material" \
+  --candidate "$CHECKOUT"
 ```
+
+The script picks `codex exec` or `agy` by the pin's family (`--via` overrides), runs from the
+`--out` file's directory — the seat's own scratch directory, never the target checkout — closes
+stdin, kills the whole process group past `[bounds].dispatch_timeout` (default 45m) and confirms it
+exited, and refuses a round past the caller's bound unless `--extended` carries the owner's
+words. It exits 0 with a verdict, 1 on an outage and its cause, 2 when it refused, 3 when the seat
+changed the `--candidate` checkout.
 
 **The prompt is an argument; the material under review is a path inside it.** Hand the reviewer
 your instructions on the command line, and have those instructions name the diff, corpus, or files
@@ -72,22 +75,23 @@ the permission-denied outage.
 Sanity-check a new invocation form with the prompt `Reply with exactly: OK`. These traps yield
 plausible reviews at exit 0:
 
-- An unpinned invocation can silently use the wrong model family. Always pin `--model`, and prove
-  the pin using the identity checks above.
-- The prompt must be an **argument**. agy's `--print "<text>"` can drop it, and a prompt it gets
-  on **stdin** is discarded entirely — the reviewer answers with a greeting at exit 0. `codex exec`
-  reads a stdin prompt, but appends piped stdin to an argument prompt: close stdin all the same.
+- An unpinned invocation can silently use the wrong model family. The script always pins; prove a
+  new pin using the identity checks above.
+- The prompt must be an **argument**, as the script passes it. agy's `--print "<text>"` can drop
+  it, and a prompt it gets on **stdin** is discarded entirely — the reviewer answers with a greeting
+  at exit 0. `codex exec` reads a stdin prompt, but appends piped stdin to an argument prompt.
 - After a repair, a reviewer can replay its previous round instead of reading the new candidate.
   Have it open its result with the candidate's revision and one current line quoted from a named
   changed artifact, and compare each round's output with the last: an identical body is an outage,
   not a verdict.
 
 A zero-byte, greeting-only, timed-out, or crashed dispatch is an outage: a dispatch attempted that
-produced no verdict. An output that holds only a quota or credit error, or a rejection of the
-pinned model id, is an outage no retry clears: skip the retry and report the missing participant,
-naming the config file that holds a dead pin. **A degraded dispatch is the harder case — full
-length, well formed, and wrong.** Nothing in the exit status distinguishes it, so before trusting
-any result, check that its quoted justifications actually support its verdict.
+produced no verdict; the script names its cause. An output that holds only a quota or credit
+error, or a rejection of the pinned model id, is an outage no retry clears: skip the retry and
+report the missing participant, naming the config file that holds a dead pin. **A degraded
+dispatch is the harder case — full length, well formed, and wrong.** Nothing in the exit status
+distinguishes it, so before trusting any result, check that its quoted justifications actually
+support its verdict.
 
 Two kinds of malformed result:
 *unranked* — a verdict with findings that carry no severity: the participant counts, its findings
@@ -105,7 +109,7 @@ short, and its findings are adjudicated like any other. Its row carries `setup =
 gates count in whichever repository they ran, since a model's record is not a repository's; its
 comparison pairs it with its family's reviewer on the same gate of the same repository.
 
-Every dispatch attempt gets a row in `~/.askrubberduck/dispatches.tsv`: `pending` written before the
-seat launches, finalized once at synthesis with minutes, verdict and outage. A row left `pending` is
-an interrupted run. `$LEDGER schema` prints the columns and
-their domains; a plan critic's `PLAN: CONCUR | OBJECT` is recorded as verdict `CONCUR | OBJECT`.
+Every dispatch attempt gets a row in `~/.askrubberduck/dispatches.tsv`, and `$DISPATCH` writes it:
+`pending` before the seat launches, finalized when the seat exits with minutes, verdict and outage.
+A row left `pending` is an interrupted run. `$LEDGER schema` prints the columns and their domains;
+a plan critic's `PLAN: CONCUR | OBJECT` is recorded as verdict `CONCUR | OBJECT`.
