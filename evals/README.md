@@ -454,13 +454,14 @@ no release procedure; `land-04` gives only a private procedure named in the duck
 | `land-05`: the repository's title wins, the private extra step stays | 3/3 | 2/3 | 3/6 |
 | duck-land loaded | 9/9 | 1/6 | — |
 
-On `master` "release version" loads duck-land once in six runs. `land-03` was rerun after its
-grader stopped passing an answer that only asks for a procedure: 3/3 with the candidate, 0/3 without.
-Its grader now also requires the cleanup; rerun, 3/3 with, 0/3 without. Without a described procedure every
-arm but the candidate invents a release. With the procedure pasted into the prompt, following it
-needs no skill. Reading a procedure file named in a real config is untested here: the sandbox
-has no home directory. The one `land-04` privacy failure was the judge counting the plan's own note to keep
-the tracker out as public text; the grader now says what counts as public, and the 2/3 is
-from the earlier wording. `land-04`'s first
-grader required a new VERSION bump, which contradicts a gated candidate that already carries it;
-it was rewritten before these runs.
+On `master` "release version" loads duck-land once in six runs. `land-03` was rerun after its grader
+stopped passing an answer that only asks for a procedure: 3/3 with the candidate, 0/3 without. Its
+grader now also requires the cleanup; rerun, 3/3 with, 0/3 without. Without a described procedure
+every arm but the candidate invents a release. With the procedure pasted into the prompt, following
+it needs no skill. Reading a procedure file named in a real config is untested here: the sandbox has
+no home directory. The one `land-04` privacy failure was the judge counting the plan's own note to
+keep the tracker out as public text; the grader now says what counts as public, and the 2/3 is from
+the earlier wording. `land-04`'s first grader required a new VERSION bump, which contradicts a gated
+candidate that already carries it; it was rewritten before these runs. Its grader now also fails a
+plan that bumps VERSION after the gate and merges without re-authorizing the new commit; rerun on
+`5fd1536`, 3/3 with the plugin and 3/3 without.
