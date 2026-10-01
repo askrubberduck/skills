@@ -484,6 +484,16 @@ def self_test(root: Path) -> list[str]:
             elif not any(expected in error for error in errors):
                 failures.append(f"self-test rejected for the wrong reason: {label} "
                                 f"(wanted {expected!r}, got {errors})")
+    # the corruption copies skip running tests, so running them is proven here
+    with tempfile.TemporaryDirectory(prefix="askrubberduck-validator-") as directory:
+        tests, ran = Path(directory) / "tests", Path(directory) / "ran"
+        tests.mkdir()
+        (tests / "test_a.py").write_text(f"open({str(ran)!r}, 'w').close()\n")
+        (tests / "test_b.py").write_text("raise SystemExit('boom')\n")
+        errors = []
+        check_tests(Path(directory), errors, run=True)
+        if not ran.exists() or not any("test_b.py failed" in error for error in errors):
+            failures.append(f"self-test: a passing test did not run or a failing one passed: {errors}")
     return failures
 
 
