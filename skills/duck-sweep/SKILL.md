@@ -38,7 +38,7 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
      decision, then `-D`.
 3. Delete — **but check the worktree for untracked and ignored files first**: `git status --short
    --untracked-files=all --ignored`. Plain `git status` hides ignored files, so `git worktree
-   remove` exits 0 and takes the `.env`, local config, or credentials living there with it. Drop
+   remove` exits 0 and takes the environment files and local config living there with it. Drop
    entries reproducible from tracked content — build output, caches, installed dependencies —
    which the repo's own ignore rules already name as artifacts. Every other `??` or `!!` entry
    gets an explicit keep-or-delete decision before removal: it may exist nowhere else, so
