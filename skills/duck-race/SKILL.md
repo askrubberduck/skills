@@ -27,49 +27,40 @@ assumptions; rally turns them into tests. Pick by which of those the work needs.
    visible to both.
 2. Name the participants and their model families before starting. The doer (this session's family)
    is one; the rival is a **proven different family** from `[models].race` in
-   `~/.askrubberduck/config.toml` or the owner's setup, and
-   `$LEDGER pick race` chooses within it (`$LEDGER` is `python3` with the absolute path of
-   `../duck-review/scripts/ledger.py`, resolved from this skill's directory). Prove the rival's
+   `~/.askrubberduck/config.toml` or the owner's setup, and `$LEDGER pick race` chooses
+   `$RIVAL_PIN` within it (`$LEDGER` is `python3` with the absolute path of
+   `../duck-review/scripts/ledger.py`, resolved from this skill's directory; `$DISPATCH`, which
+   bounds the rival's seat and records its row, is the same with `dispatch.py`). Prove the rival's
    family and pin by dispatch mechanics' identity checks — roster line and pinned id recorded —
    before spending a round. Executable names are not identities, and a harness may host several
-   families; unknown identity never counts as a different family. The blocks below show the `codex`
-   transport; another CLI takes its shape from dispatch mechanics.
+   families; unknown identity never counts as a different family. The rival must come through a
+   transport that can write its worktree headless — codex; `$DISPATCH` refuses agy for `--workdir`.
 3. Confirm the owner has authorized sending this repository to the rival's vendor, as [dispatch
-   mechanics](../duck-review/references/dispatch.md) requires — a rival dispatch ships the same
-   material a review does. Sanity-check a new invocation form and classify a failed one by dispatch
-   mechanics; what it calls an outage is an outage here, not a forfeit: record it, and re-dispatch
-   unless dispatch mechanics rules out a retry. The problem statement travels as the command's
-   argument, but **a diff or a corpus it refers to is named by absolute path, and the files to
-   change by path relative to the participant's worktree; nothing is pasted in.** Pasted material
-   degrades a dispatch into confident nonsense at exit 0.
+   mechanics](../duck-review/references/dispatch.md) requires. What dispatch mechanics calls an
+   outage is an outage here, not a forfeit: re-dispatch under the next `--round` unless dispatch
+   mechanics rules out a retry. The brief travels as `--prompt`; **a diff or a corpus it refers to
+   is named by absolute path, and the files to change by path relative to the participant's
+   worktree; nothing is pasted in**, per dispatch mechanics. `problem.md` and every `turn.md` end
+   with `End your answer with the line: DIFF`; the script records an answer without it as an outage.
 
 ## Race mode
 
 One worktree per racer from the same base SHA, at the repo root. Racers never share a checkout.
-Dispatch the rival into the background first, then work the doer's attempt inline; capture the
-rival's diff only **after its dispatch has finished**:
+Dispatch the rival into the background first, then work the doer's attempt inline in its own
+worktree. `$GATE` names the run; `$N` counts from 1:
 
 ```bash
-set -um   # -u: an unbound name fails here, not as a 0-byte diff; -m: the rival gets its own process group
-: "${RIVAL_MODEL:?pinned id, proven per dispatch.md}" "${WT_RIVAL:?rival worktree}" "${BASE_SHA:?from problem.md}"
-DEADLINE=$((SECONDS + ${DISPATCH_SECONDS:?[bounds].dispatch_timeout in seconds}))   # past it the rival is an outage, not a forfeit
-codex exec -C "$WT_RIVAL" -s workspace-write -m "$RIVAL_MODEL" "$(cat "$SP/problem.md")" </dev/null > "$SP/rival.out" 2>&1 &
+$DISPATCH --gate "$GATE" --round "$N" --stage race --setup race --trust 0 --pin "$RIVAL_PIN" \
+  --prompt "$SP/problem.md" --out "$SP/rival-r$N.out" --workdir "$WT_RIVAL" &
 RIVAL=$!
-# run this block as one backgrounded shell call; the doer works its own attempt meanwhile, in its own worktree
-while kill -0 -- "-$RIVAL" 2>/dev/null && [ "$SECONDS" -lt "$DEADLINE" ]; do sleep 30; done   # the group, not the leader
-if kill -0 -- "-$RIVAL" 2>/dev/null; then kill -KILL -- "-$RIVAL"; wait "$RIVAL"; STATUS=deadline   # KILL: TERM can be ignored
-else wait "$RIVAL"; STATUS=$?; fi
-kill -KILL -- "-$RIVAL" 2>/dev/null; while kill -0 -- "-$RIVAL" 2>/dev/null; do sleep 1; done   # stragglers gone before capture
-if [ "$STATUS" = 0 ]; then git -C "$WT_RIVAL" add -A && git -C "$WT_RIVAL" diff "$BASE_SHA" > "$SP/rival.diff"
-else echo "rival outage: $STATUS" >> "$SP/rival.out"; fi   # an outage captures nothing: re-dispatch, never diff
+# the doer's own attempt, in its own worktree
+wait "$RIVAL" && git -C "$WT_RIVAL" add -A && git -C "$WT_RIVAL" diff "$BASE_SHA" > "$SP/rival.diff"
 ```
 
-- **Wait before you capture.** Backgrounding the dispatch and diffing immediately records an empty
-  attempt at exit 0 — a forfeit that never happened.
-- **The doer finishes its own attempt before reading `rival.out` or `rival.diff`.** Peeking
+A nonzero exit is an outage per dispatch mechanics: capture no diff.
+
+- **The doer finishes its own attempt before reading `rival-r$N.out` or `rival.diff`.** Peeking
   mid-attempt is the void condition. Dispatch-then-work makes the honest order also the fast one.
-- **Grant the rival write access** (`-s workspace-write`): the default sandbox is read-only, and a
-  rival that cannot write returns an empty attempt at exit 0.
 - **`add -A`, then diff against the recorded base SHA** — never bare `git diff`: a rival that
   commits leaves the bare form empty at exit 0, and a rival that creates new files leaves them
   invisible to any diff until they are added. Both read as a forfeit that never happened.
@@ -99,10 +90,11 @@ file paths) **by file**, never inlined. `$SP/turn.md` states the role for this t
 path, and the current state.
 
 ```bash
-codex exec -C "$WT" -s workspace-write -m "$RIVAL_MODEL" "$(cat "$SP/turn.md")" </dev/null > "$SP/rival-tN.out" 2>&1
+$DISPATCH --gate "$GATE" --round "$N" --stage rally --setup rally --trust 0 --pin "$RIVAL_PIN" \
+  --prompt "$SP/turn.md" --out "$SP/rival-t$N.out" --workdir "$WT"
 ```
 
-Bound each turn with the race block's deadline, kill and wait before reading its output.
+`$N` is the turn number; read the turn's output only after the script exits.
 
 A rally is one red-green pair, and the serve alternates each rally.
 
@@ -110,8 +102,7 @@ A rally is one red-green pair, and the serve alternates each rally.
    not merely the existing implementation. Handoff requires proven red — the test run's output saved
    under `$SP` and named by path, failing for the intended reason, not an import error. A test
    without a runnable red proof is rejected and re-served, and the rejected serve still counts
-   against the turn cap; vague untestable tests are how a side dodges the game. Same bar both
-   directions.
+   against the turn cap. Same bar both directions.
 2. **Return (implement):** the other side writes the minimum that turns the suite green. Handoff
    requires proven green — full suite output saved under `$SP` and named by path — and **no edits to
    any test in the same turn**. Editing the test you were served is the void condition; a test the
@@ -131,14 +122,14 @@ green is the candidate's evidence.
 
 **Rally at class level.** When the serves would be instances of one defect class, the serve is the
 table: one test that drives every position of the surface with the class's catalogue, on every
-implementation, and the return closes the class. One instance per serve is how a class outlives
-the turn cap — and how a review loop outlives its budget.
+implementation, and the return closes the class. Serve the whole class at once; one instance per
+serve exhausts the turn cap before the class closes.
 
 ## Contract (both modes)
 
 - An outage that survives one re-dispatch leaves one family playing: say so and stop calling the
-  work different-family. Each dispatch gets its row in `~/.askrubberduck/dispatches.tsv`:
-  verdict `DIFF`, or `-` with `outage = 1`.
+  work different-family. `$DISPATCH` writes each dispatch's row in
+  `~/.askrubberduck/dispatches.tsv`: verdict `DIFF`, or `-` with `outage = 1`.
 - Receipt to `race-rN.md` in the project's durable records home as `duck-proof` resolves it — never
   the scratchpad, never a commit on the candidate branch: problem hash, base SHA, participant
   identities with pinned model ids — a receipt without identities cannot prove the run was
