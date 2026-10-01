@@ -1,5 +1,6 @@
 {
   "name": "askrubberduck",
+  "displayName": "askrubberduck",
   "description": "Make the work prove itself. Challenge the goal, cut the clutter, and check what actually happened.",
   "version": "3.12.1",
   "author": {
@@ -8,6 +9,8 @@
   },
   "repository": "https://github.com/askrubberduck/skills",
   "homepage": "https://askrubberduck.github.io/skills/",
+  "documentationUrl": "https://askrubberduck.github.io/skills/",
+  "supportUrl": "https://github.com/askrubberduck/skills/issues",
   "keywords": [
     "code-review",
     "debugging",

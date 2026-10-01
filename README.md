@@ -80,10 +80,9 @@ ln -s ~/askrubberduck-skills/skills/* ~/.claude/skills/
 ```
 
 **Cloud sessions.** Claude Code on the web, `claude --cloud`, and routines clone the repo into a
-fresh container and never read `~/.claude/`. A cloud session on this repository needs no setup: its
-`.claude/skills/` links every skill, so `/duck-cut` resolves from the checked-out branch. For any
-other repository, declare the plugin in that repository's `.claude/settings.json`; repo-declared
-plugins install at session start, plugins enabled only in your user settings do not travel:
+fresh container and never read `~/.claude/`. Declare the plugin in the repository's
+`.claude/settings.json`; repo-declared plugins install at session start, plugins enabled only in
+your user settings do not travel:
 
 ```json
 {

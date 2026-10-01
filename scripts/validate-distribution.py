@@ -145,15 +145,14 @@ def check_required_references(root: Path, found: set[str], errors: list[str]) ->
 
 
 def visible(directory: Path) -> set[str]:
-    """Dotted entries are host state — agent frameworks write into `skills/` and `.claude/`
-    alike — never a skill or a link to one."""
+    """Dotted entries are host state that agent frameworks write into `skills/`, never a skill."""
     if not directory.is_dir():
         return set()
     return {path.name for path in directory.iterdir() if not path.name.startswith(".")}
 
 
 def check_skill_tree(root: Path, errors: list[str]) -> set[str]:
-    """The skill set is whatever is on disk. The invariant is that every one of them is linked."""
+    """The skill set is whatever is on disk."""
     found = {path.parent.name for path in (root / "skills").glob("*/SKILL.md")}
     if not found:
         errors.append("skills/: no skills found")
@@ -164,23 +163,6 @@ def check_skill_tree(root: Path, errors: list[str]) -> set[str]:
     for name in sorted(visible(root / "skills") - found):
         if (root / "skills" / name).is_dir():
             errors.append(f"skills/{name}: directory without a SKILL.md")
-
-    # Cloud sessions clone the repo and read `.claude/skills/`; they never see `~/.claude/skills/`.
-    # A skill added to `skills/` without its link is invisible to every cloud session on this repo,
-    # and nothing but this check would say so.
-    link_root = root / ".claude" / "skills"
-    linked = visible(link_root)
-    for name in sorted(found - linked):
-        errors.append(f".claude/skills/{name}: missing link — the skill is invisible to cloud sessions")
-    for name in sorted(linked - found):
-        errors.append(f".claude/skills/{name}: link to a skill that does not exist")
-    for name in sorted(linked & found):
-        link, target = link_root / name, f"../../skills/{name}"
-        if not link.is_symlink():
-            errors.append(f".claude/skills/{name}: must be a symlink into skills/, not a copy")
-        elif str(link.readlink()) != target:
-            errors.append(f".claude/skills/{name}: links to {str(link.readlink())!r}, "
-                          f"expected {target!r}")
     return found
 
 
@@ -391,15 +373,6 @@ CASES: list[tuple[str, str, Callable[[Path], None]]] = [
     ("codex default prompts", "defaultPrompt must contain 1-3",
      lambda c: rewrite_json(c / ".codex-plugin/plugin.json",
                             lambda m: m["interface"].__setitem__("defaultPrompt", []))),
-    ("skill removed", "link to a skill that does not exist",
-     lambda c: shutil.rmtree(c / "skills/duck-cut")),
-    ("project link missing", "missing link",
-     lambda c: (c / ".claude/skills/duck-cut").unlink()),
-    ("project link is a copy", "must be a symlink",
-     lambda c: ((c / ".claude/skills/duck-cut").unlink(), (c / ".claude/skills/duck-cut").mkdir())),
-    ("project link repointed", "links to",
-     lambda c: ((c / ".claude/skills/duck-cut").unlink(),
-                (c / ".claude/skills/duck-cut").symlink_to("../../skills/duck-run"))),
     ("missing frontmatter", "missing frontmatter", lambda c: (c / SCAN).write_text("# none\n")),
     ("duplicate description key", "frontmatter must be exactly",
      lambda c: edit(c, SCAN, "description:", "description: dupe\ndescription:")),
@@ -432,8 +405,7 @@ CASES: list[tuple[str, str, Callable[[Path], None]]] = [
     ("dispatch without the by-path rule", "never states the by-path rule",
      lambda c: edit(c, "skills/duck-race/SKILL.md", "by absolute path", "somehow")),
     ("required reference names a retired skill", "REQUIRED_REFERENCES names duck-shape",
-     lambda c: (shutil.rmtree(c / "skills/duck-shape"),
-                (c / ".claude/skills/duck-shape").unlink())),
+     lambda c: shutil.rmtree(c / "skills/duck-shape")),
     ("required reference deleted", "must reference `duck-shape`",
      lambda c: (c / "skills/duck-review/SKILL.md").write_text(
          (c / "skills/duck-review/SKILL.md").read_text().replace("`duck-shape`", "shape"))),
@@ -450,19 +422,12 @@ CASES: list[tuple[str, str, Callable[[Path], None]]] = [
 
 
 def fingerprint(root: Path) -> dict[str, str]:
-    # Symlinks are recorded by target, not followed: rglob does not descend into them, so a
-    # deleted or repointed link would otherwise look like a mutation that changed nothing.
     # Directories are recorded too, or a mutation that only creates one — a half-added skill, the
     # exact shape one check below exists for — is invisible here and reads as changing nothing.
-    def entry(path: Path) -> str:
-        if path.is_symlink():
-            return f"symlink:{path.readlink()}"
-        return "dir:" if path.is_dir() else path.read_text(errors="replace")
-
     return {
-        str(path.relative_to(root)): entry(path)
+        str(path.relative_to(root)): "dir:" if path.is_dir() else path.read_text(errors="replace")
         for path in sorted(root.rglob("*"))
-        if path.is_symlink() or path.is_file() or path.is_dir()
+        if path.is_file() or path.is_dir()
     }
 
 
@@ -471,7 +436,7 @@ def self_test(root: Path) -> list[str]:
     for label, expected, mutate in CASES:
         with tempfile.TemporaryDirectory(prefix="askrubberduck-validator-") as directory:
             copy = Path(directory) / "repo"
-            shutil.copytree(root, copy, symlinks=True,
+            shutil.copytree(root, copy,
                             ignore=shutil.ignore_patterns(".git", "graphify-out", "__pycache__"))
             before = fingerprint(copy)
             mutate(copy)

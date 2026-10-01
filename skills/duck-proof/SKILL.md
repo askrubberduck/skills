@@ -43,7 +43,7 @@ because none exists; state the gap when it limits coverage.
 - **Mechanism:** trace cause to effect. Hold a plausible competing explanation and choose an
   observation that separates them. Use `duck-why` when the cause needs investigation.
 - **Plan:** name the assumption that would invalidate dependent steps. Could the planned tests
-  pass while the outcome fails? Run the cheapest feasibility probe before endorsing that path.
+  succeed while the outcome fails? Run the cheapest feasibility probe before endorsing that path.
 - **Implementation:** identify a contract violation that ordinary tests might miss: duplicate,
   reordered, interrupted, stale, malformed, or concurrent input as relevant to the real system.
 - **Shape:** identify a mechanism that could disappear or an ownership boundary that makes the
