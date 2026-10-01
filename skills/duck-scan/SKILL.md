@@ -47,5 +47,4 @@ One table, then the recommendation:
   not a new doer.
 - If the user asked about specific IDs, answer those first, in the order asked.
 - Name the handoff when the scan reveals one: backlog full of stale/blocked rot → `duck-cut`;
-  pickables ready and the user wants them executed → `duck-campaign`. Naming it is the scan's whole
-  write privilege — the skills do the acting.
+  pickables ready and the user wants them executed → `duck-campaign`.

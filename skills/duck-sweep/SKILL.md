@@ -24,9 +24,8 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
      (`git branch --merged origin/<default>` is the proof). These outlive their ref. Delete with
      `-D`: `-d` re-checks against HEAD or the upstream and refuses when either is behind.
    - **Preserved by record** — squash-merged, rebased, or cherry-picked, *and* the project's
-     outcome record names the landed SHA and the candidate SHA for this branch (`duck-land` writes
-     them there for exactly this reason). The record is evidence the objects cannot supply. Confirm
-     the landed SHA is on `origin/<default>` **and the branch tip is still that candidate**, then
+     outcome record (`duck-land`'s) names this branch's landed and candidate SHAs. Confirm the
+     landed SHA is on `origin/<default>` **and the branch tip is still that candidate**, then
      delete. A branch that gained commits after it landed is Unproven, whatever the record says.
    - **Not preserved** — squash-merged, rebased, or cherry-picked with **no such record**: the
      default branch holds an equivalent *new* commit, never these objects, and no merge metadata
@@ -43,12 +42,10 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
    entries reproducible from tracked content — build output, caches, installed dependencies —
    which the repo's own ignore rules already name as artifacts. Every other `??` or `!!` entry
    gets an explicit keep-or-delete decision before removal: it may exist nowhere else, so
-   **unknown means keep, and only the owner may decide to delete one**. Uncommitted work is the
-   case with no second copy to recover from, which is why this decision is never the doer's
-   however obvious it looks; queue it via `duck-decide` and keep the file meanwhile. Then — only
-   once nothing in the worktree remains marked keep — `git worktree remove <path>`,
-   `git branch -D <branch>` against the classification above, and `git worktree prune` for
-   leftovers.
+   **unknown means keep, and only the owner may decide to delete one**, however obvious it looks;
+   queue it via `duck-decide` and keep the file meanwhile. Then — only once nothing in the
+   worktree remains marked keep — `git worktree remove <path>`, `git branch -D <branch>` against
+   the classification above, and `git worktree prune` for leftovers.
 4. Scratch dirs: hunt ad-hoc temp dirs outside the sanctioned scratchpad (e.g. `~/<repo>-tmp*`,
    `/tmp/<repo>*`, stray review-tmp dirs; the sanctioned scratchpad itself is disposable by design
    and never swept per-file). A non-git dir has no merge evidence, so inventory every entry

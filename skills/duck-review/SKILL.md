@@ -75,16 +75,15 @@ threads already fixed; the rest stay open and are listed.
 3. Select the required participants and effort bound using
    [challenge selection](references/challenge.md). Ordinary gates default to one verified
    cross-family reviewer; trust-touching gates default to two as that reference specifies.
-   Record the selected set before dispatch. A gate-semantics change uses the PRE-change rules,
-   including prerequisites and participant count; the new text cannot authorize itself.
+   Record the selected set before dispatch.
 4. Check the caller's evidence using `duck-proof`'s durable-home rules. A release gate requires a
    proof receipt tied to the final candidate; packet-sized or trust-touching work also needs the
    settled `duck-plan` record, including its actual challenge and any required independent input.
    Trust-touching work needs `duck-break` evidence appropriate to the changed surface; executable
    code arriving from `duck-run` carries its rally receipt or the reason the rally did not run.
-   Instruction changes need agent behavior trials, not invented service crash tests. A shared work
-   record with explicit proof/plan/break sections is equivalent to separate named receipts when all
-   consumers can resolve it. Existing `proof-rN.md` and `break-rN.md` conventions remain valid.
+   A shared work record with explicit proof/plan/break sections is equivalent to separate named
+   receipts when all consumers can resolve it. Existing `proof-rN.md` and `break-rN.md` conventions
+   remain valid.
 5. Spot-check cited commands or artifacts; file presence alone is not evidence. A repair invalidates
    relevant earlier checks. For re-review, identify the previous reviewed revision or snapshot and
    the current target. Inspect the new delta and affected contracts or paths, reopen impacted
@@ -121,10 +120,8 @@ Treat every verdict and finding as a claim, not a fact. For each finding, inspec
 and classify it as a substantiated `BLOCKER`, retained `SHOULD`, retained `NOTE`, or dismissed with
 a recorded reason.
 
-**When the actor adjudicating is the actor that built the candidate, adjudication is the weak
-point** — the reviewers are different families but the synthesis is not, and dismissing a true
-finding looks identical to dismissing a false one. Say so in the report, dismiss only on evidence a
-third party can re-check from the artifacts, and let a finding you cannot settle stand rather
+**When the actor adjudicating built the candidate, say so in the report**, dismiss only on evidence
+a third party can re-check from the artifacts, and let a finding you cannot settle stand rather
 than fall. Under the Broad setup, each family's findings are dispositioned by the other family
 first — one findings-list dispatch each, smaller than a review, recorded with `stage =
 disposition` so `remaining` never mistakes it for a capture — and the doer synthesizes where
@@ -159,9 +156,8 @@ if missing evidence prevents a gate decision, return `NOTE` and name the uncerta
   exist rather than proposing another patch. When two consecutive rounds'
   substantiated blockers target code introduced by remediation rather than the original candidate,
   **or fall in one ledger class whatever code they land on**, say so in the report — naming the
-  class, not only the instance — and recommend the caller's circuit breaker — rebuild the
-  contested unit under `duck-race`'s race mode, or lock the class in under its rally mode —
-  instead of implicitly inviting the next round.
+  class, not only the instance — and recommend the caller's circuit breaker (`duck-run`'s loop
+  diagnosis) instead of implicitly inviting the next round.
 - Count concepts, not lines: identify any new branch, exception, or second home for the same fact,
   any abstraction without a required contract or credible change-path justification, and any unit
   that took on a second job.
@@ -201,7 +197,6 @@ stdout in scratch; preserve the decisive evidence before scratch cleanup.
 
 **Write that report where the landing gate can read it** — the same durable records home as the
 receipts, never only into the caller's context or `$SP`, and never as a commit on the candidate
-branch. A verdict that exists only in a session transcript cannot be checked later, and
-`duck-land` needs the authorization itself, not a recollection that one was granted.
+branch.
 
 Then stop.

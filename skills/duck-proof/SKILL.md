@@ -69,8 +69,7 @@ contract, including ordering and tolerance, never by vote.
 `duck-break` owns destructive attack isolation and recovery mechanics. Use those mechanics for
 selected attacks here; invoke a full break when requested or required by the risk/policy. Drive
 relevant input classes and positions, state bounds and omissions, and do not claim exhaustive
-coverage of an unbounded surface. For instruction changes, execute realistic agent tasks and
-inspect their actions and outcomes; a structural Markdown validator is not behavioral proof.
+coverage of an unbounded surface. Instruction changes take the agent trials `duck-break` requires.
 
 Prefer the check that reports a break soonest after the edit; a slow gate that finds the same
 failure is a second check, not the first. Cannot execute a needed check? Record what is missing
@@ -128,8 +127,7 @@ Resolve the home from instructions — including a location outside the tree —
 convention, then an owner-provided task directory; ask only if a durable handoff is required and
 none is available. Do not invent a records branch. The home holds `proof-rN.md`, `break-rN.md`,
 `race-rN.md`, review reports, landing outcomes, `defect-classes.md` and `merge-pin-<host>.md`;
-the dispatch measurements live apart, in `~/.askrubberduck/`, because they pool across
-repositories and never need a reader in the tree.
+the dispatch measurements live apart, in `~/.askrubberduck/`.
 
 Use `proof-rN.md` when the consumer expects it, or give the consumer the exact section in a shared
 work record. Evidence and referenced artifacts must survive that handoff; scratch paths that will
