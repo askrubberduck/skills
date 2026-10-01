@@ -70,7 +70,8 @@ an empty diff is an outage, since a race rival's answer is a change.
 your instructions on the command line, and have those instructions name the diff, corpus, or files
 by absolute path for the reviewer to open — never paste that material into the command.
 
-Sanity-check a new invocation form with the prompt `Reply with exactly: OK`. These traps yield
+Sanity-check a new invocation form with the prompt `Reply with exactly: OK`, run as the bare CLI
+command outside `$DISPATCH`, which would record that answer as an outage. These traps yield
 plausible reviews at exit 0:
 
 - An unpinned invocation can silently use the wrong model family. The script always pins; prove a

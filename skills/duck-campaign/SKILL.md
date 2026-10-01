@@ -71,6 +71,6 @@ do not invent consent, rescope away a required outcome or retry an unchanged fai
 Contrary execution evidence reopens the affected shared design before dependent work continues.
 Stop when the authorized work is complete or all remaining work is blocked, and state which.
 
-At a context boundary, preserve the roster, candidate identities and valid evidence, and schedule
-any continuation, as `duck-diet`'s first runtime rule requires. Use `duck-sweep` for
+At a context boundary, preserve the roster, candidate identities and valid evidence; a continuation
+you schedule is booked as `duck-diet`'s first runtime rule requires. Use `duck-sweep` for
 already-authorized cleanup when needed; do not delete work just to make the roster appear empty.
