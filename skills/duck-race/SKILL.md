@@ -29,42 +29,48 @@ assumptions; rally turns them into tests. Pick by which of those the work needs.
    is one; the rival is a **proven different family** from `[models].race` in
    `~/.askrubberduck/config.toml` or the owner's setup, and `$LEDGER pick race` chooses
    `$RIVAL_PIN` within it (`$LEDGER` is `python3` with the absolute path of
-   `../duck-review/scripts/ledger.py`, resolved from this skill's directory; `$DISPATCH`, which
-   bounds the rival's seat and records its row, is the same with `dispatch.py`). Prove the rival's
+   `../duck-review/scripts/ledger.py`, resolved from this skill's directory, typed out as
+   `python3 "<path>" <subcommand>` rather than held in one variable; `$DISPATCH`, which
+   bounds the rival's seat and records its row, is the absolute path of `dispatch.py` beside it,
+   run as `python3 "$DISPATCH"`). Prove the rival's
    family and pin by dispatch mechanics' identity checks — roster line and pinned id recorded —
    before spending a round. Executable names are not identities, and a harness may host several
-   families; unknown identity never counts as a different family. The rival must come through a
-   transport that can write its worktree headless — codex; `$DISPATCH` refuses agy for `--workdir`.
+   families; unknown identity never counts as a different family. `$DISPATCH` refuses agy for
+   `--workdir`, so list only codex-transport pins in `[models].race`; a pick that returns another is
+   a missing participant, not a different family to try.
 3. Confirm the owner has authorized sending this repository to the rival's vendor, as [dispatch
    mechanics](../duck-review/references/dispatch.md) requires. What dispatch mechanics calls an
-   outage is an outage here, not a forfeit: re-dispatch under the next `--round` unless dispatch
-   mechanics rules out a retry. The brief travels as `--prompt`; **a diff or a corpus it refers to
-   is named by absolute path, and the files to change by path relative to the participant's
-   worktree; nothing is pasted in**, per dispatch mechanics. `problem.md` and every `turn.md` end
-   with `End your answer with the line: DIFF`; the script records an answer without it as an outage.
+   outage is an outage here, not a forfeit: unless dispatch mechanics rules out a retry, reset the
+   rival's worktree and index — `git -C "$WT_RIVAL" reset --hard "$BASE_SHA" && git -C "$WT_RIVAL"
+   clean -fd` in a race, the same on `"$WT"` to its last commit in a rally — and re-dispatch once
+   in the same `--round` with `--id "$GATE-r$N-race-retry"` (`"$GATE-r$N-rally-retry"` in a
+   rally). The brief travels as `--prompt`; **a diff or a corpus it refers to is named
+   by absolute path, and the files to change by path relative to the participant's worktree;
+   nothing is pasted in**, per dispatch mechanics. `problem.md` and every `turn.md` end with
+   `End your answer with the line: DIFF`; the script records an answer without it as an outage.
 
 ## Race mode
 
 One worktree per racer from the same base SHA, at the repo root. Racers never share a checkout.
-Dispatch the rival into the background first, then work the doer's attempt inline in its own
-worktree. `$GATE` names the run; `$N` counts from 1:
+Launch the block below as one backgrounded call, with every name set inside it — each call is a
+fresh shell — and work the doer's attempt in its own worktree meanwhile. `$GATE` names the run;
+`$N` counts from 1:
 
 ```bash
-$DISPATCH --gate "$GATE" --round "$N" --stage race --setup race --trust 0 --pin "$RIVAL_PIN" \
-  --prompt "$SP/problem.md" --out "$SP/rival-r$N.out" --workdir "$WT_RIVAL" &
-RIVAL=$!
-# the doer's own attempt, in its own worktree
-wait "$RIVAL" && git -C "$WT_RIVAL" add -A && git -C "$WT_RIVAL" diff "$BASE_SHA" > "$SP/rival.diff"
+: "${DISPATCH:?}" "${GATE:?}" "${N:?}" "${RIVAL_PIN:?}" "${SP:?}" "${WT_RIVAL:?}" "${BASE_SHA:?}"
+python3 "$DISPATCH" --gate "$GATE" --round "$N" --stage race --setup race --trust 0 --pin "$RIVAL_PIN" \
+  --prompt "$SP/problem.md" --out "$SP/rival-r$N.out" --workdir "$WT_RIVAL" \
+  --diff-base "$BASE_SHA" --diff-out "$SP/rival-r$N.diff"
 ```
 
-A nonzero exit is an outage per dispatch mechanics: capture no diff.
+The script stages the rival's worktree and writes its diff against the recorded base; an outage
+captures nothing. `rival-r$N.diff` is the rival's change only after the call returned 0; read the
+other exit codes in dispatch mechanics. An outage takes the retry above; a refusal is not retried
+unchanged — fix the cause its message names.
 
-- **The doer finishes its own attempt before reading `rival-r$N.out` or `rival.diff`.** Peeking
+- **The doer finishes its own attempt before reading `rival-r$N.out` or `rival-r$N.diff`.** Peeking
   mid-attempt is the void condition. Dispatch-then-work makes the honest order also the fast one.
-- **`add -A`, then diff against the recorded base SHA** — never bare `git diff`: a rival that
-  commits leaves the bare form empty at exit 0, and a rival that creates new files leaves them
-  invisible to any diff until they are added. Both read as a forfeit that never happened.
-- Never trust the rival's prose summary of what it changed; capture the diff from the worktree.
+- Never trust the rival's prose summary of what it changed; `rival-r$N.diff` is the change.
 
 ### Adjudicate
 
@@ -90,7 +96,8 @@ file paths) **by file**, never inlined. `$SP/turn.md` states the role for this t
 path, and the current state.
 
 ```bash
-$DISPATCH --gate "$GATE" --round "$N" --stage rally --setup rally --trust 0 --pin "$RIVAL_PIN" \
+: "${DISPATCH:?}" "${GATE:?}" "${N:?}" "${RIVAL_PIN:?}" "${SP:?}" "${WT:?}"
+python3 "$DISPATCH" --gate "$GATE" --round "$N" --stage rally --setup rally --trust 0 --pin "$RIVAL_PIN" \
   --prompt "$SP/turn.md" --out "$SP/rival-t$N.out" --workdir "$WT"
 ```
 
@@ -107,6 +114,8 @@ A rally is one red-green pair, and the serve alternates each rally.
    requires proven green — full suite output saved under `$SP` and named by path — and **no edits to
    any test in the same turn**. Editing the test you were served is the void condition; a test the
    returner believes is wrong goes back to the server with the objection in writing instead.
+   Commit each red serve and each green return in `$WT`, so a retry resets to a commit and keeps
+   the served test.
 3. Hash the suite's test files at handoff and again at green — unequal hashes are the returner's
    void condition caught after the fact. Red proof, green proof and objections go straight into
    the receipt below; nothing else reads a per-rally log.
@@ -128,8 +137,7 @@ serve exhausts the turn cap before the class closes.
 ## Contract (both modes)
 
 - An outage that survives one re-dispatch leaves one family playing: say so and stop calling the
-  work different-family. `$DISPATCH` writes each dispatch's row in
-  `~/.askrubberduck/dispatches.tsv`: verdict `DIFF`, or `-` with `outage = 1`.
+  work different-family.
 - Receipt to `race-rN.md` in the project's durable records home as `duck-proof` resolves it — never
   the scratchpad, never a commit on the candidate branch: problem hash, base SHA, participant
   identities with pinned model ids — a receipt without identities cannot prove the run was

@@ -14,7 +14,7 @@ doer = "anthropic"
 reviewers = ["openai:gpt-6-sol:high"]
 
 [models]
-race = ["google:gemini-3.8-flash-high"]
+race = ["openai:gpt-6-astra:high"]
 
 [bounds]
 dispatch_timeout = "7m"

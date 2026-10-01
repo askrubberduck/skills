@@ -41,7 +41,7 @@ still counts.
 
 ## Run the reviewers
 
-Run each seat with `$DISPATCH` (`python3` with the absolute path of `duck-review`'s
+Run each seat with `python3 "$DISPATCH"` (`$DISPATCH` is the absolute path of `duck-review`'s
 `scripts/dispatch.py`, whatever the working directory), in the background. Where the turn is the
 whole session (`claude -p`), its end kills a background seat (`error: interrupted`) and strands its
 row `pending`: poll the seat's exit in bounded waits and end the turn only after it. The pinned ids
@@ -51,7 +51,7 @@ and `[models].plan`, each defaulting to `[families].reviewers` (default empty: t
 names them).
 
 ```bash
-$DISPATCH --gate "$GATE" --round "$N" --stage review --setup independent --trust 0 --pin "$PIN" \
+python3 "$DISPATCH" --gate "$GATE" --round "$N" --stage review --setup independent --trust 0 --pin "$PIN" \
   --prompt "$SP/codex/prompt.md" --out "$SP/codex/r$N.out" --add-dir "$SP/material" \
   --candidate "$CHECKOUT"
 ```
@@ -62,7 +62,9 @@ The script picks `codex exec` or `agy` by the pin's family (`--via` overrides), 
 stdin, kills the whole process group past `[bounds].dispatch_timeout` (default 45m) and confirms it
 exited, and refuses a round past the caller's bound unless `--extended` carries the owner's
 words. It exits 0 with a verdict, 1 on an outage and its cause, 2 when it refused, 3 when the seat
-changed the `--candidate` checkout.
+changed the `--candidate` checkout. A race rival adds `--diff-base <sha> --diff-out <path>`: after
+a verdict the script writes the `--workdir` diff against that base whole; an outage writes none, and
+an empty diff is an outage, since a race rival's answer is a change.
 
 **The prompt is an argument; the material under review is a path inside it.** Hand the reviewer
 your instructions on the command line, and have those instructions name the diff, corpus, or files
@@ -97,12 +99,13 @@ findings are still claims. **A REJECT is never an outage.**
 **A pin on trial rides along.** A pin in `[learn].trial` (default empty) rides along for its first
 `[learn].shadow` (default 3) gates, and up to twice that while its comparison stays undecided;
 `$LEDGER pick review` names it on a `shadow` line while it does (`$LEDGER` is `python3` with the
-absolute path of `duck-review`'s `scripts/ledger.py`, whatever the working directory). Dispatch it
-beside the required set with the same brief and the same export authorization for its vendor, or
-skip it and say so. Its verdict never counts toward the gate, its outage never leaves the gate
-short, and its findings are adjudicated like any other. Its row carries `setup = shadow`. A trial's
-gates count in whichever repository they ran; its comparison pairs it with its family's reviewer
-on the same gate of the same repository.
+absolute path of `duck-review`'s `scripts/ledger.py`, whatever the working directory, typed out as
+`python3 "<path>" <subcommand>` rather than held in one variable). Dispatch it beside the required
+set with the same brief and the same export authorization for its vendor, or skip it and say so.
+Its verdict never counts toward the gate, its outage never leaves the gate short, and its findings
+are adjudicated like any other. Its row carries `setup = shadow`. A trial's gates count in
+whichever repository they ran; its comparison pairs it with its family's reviewer on the same gate
+of the same repository.
 
 Every dispatch attempt gets a row in `~/.askrubberduck/dispatches.tsv`, and `$DISPATCH` writes it:
 `pending` before the seat launches, finalized when the seat exits with minutes, verdict and outage.

@@ -83,7 +83,7 @@ def check_versions(manifests: dict[str, Any], errors: list[str]) -> None:
 # Every skill that shows a reviewer dispatch must also carry the rule that keeps the dispatch
 # honest: material goes by path, never pasted into the command. Measured at 28-of-41 flipped
 # verdicts when it was not followed, so a dispatch example without the rule beside it is a defect.
-DISPATCH = re.compile(r"^\s*(codex exec|agy |\$DISPATCH )", re.M)
+DISPATCH = re.compile(r"^\s*(codex exec|agy |python3 \"\$DISPATCH\" )", re.M)
 BY_PATH = "by absolute path"
 
 
