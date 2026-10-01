@@ -56,27 +56,25 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
 3. **Evidence bar**: 2+ independent occurrences or an explicit owner directive → build it.
    One occurrence → park it as a note in the nearest existing home, not a new artifact.
 4. **Apply the updates** — write the edit now, not a recommendation to write it.
-   While in each home, delete what the new lesson supersedes; stale guidance is worse than none.
+   While in each home, delete what the new lesson supersedes.
    Policy files are the limit, and the limit is authority rather than effort: an edit to a skill, a
    gate, or an instruction file is trust-touching, so it travels the same plan and review path as
    any other change to them — derive it, write it up, hand it on, never land it unreviewed.
 5. **Close the loop**: procedural guidance (a skill, a workflow rule) gets one rep before it's
    trusted. Reserve one occurrence as a holdout BEFORE deriving — at exactly two, derive from the
    other — state the expected outcome, then run the guidance against that holdout and attack the
-   result with `duck-proof` discipline; a failed rep sends the guidance back to draft, and the
-   redraft waits for a fresh occurrence to serve as its holdout — the used one cannot validate
-   twice, so at exactly two a failed rep parks the lesson until a third arrives. Check
+   result with `duck-proof` discipline. A failed rep sends the guidance back to draft, and the
+   redraft waits for a fresh occurrence as its holdout; a used holdout never validates twice.
+   Directive-derived guidance stays draft until its first real occurrence, its holdout. Check
    observable behavior, not whether the agent repeats the new rule: execute a counterexample,
    verify final artifacts, and record the candidate guidance, prompt, oracle and result. Pair
    opposite user preferences when testing agreement bias. Use an old-guidance baseline before
-   claiming improvement; one successful rep proves only that case.
-   Directive-derived guidance has no occurrence to reserve — it stays draft until its first real
-   occurrence, which serves as its holdout rep. Memory entries instead record their source
-   occurrence. Guidance that has never fired is a draft, not a lesson.
+   claiming improvement; one successful rep proves only that case. Memory entries instead record
+   their source occurrence.
 
 ## Common mistakes
 
 - Saving what the repo already records (git history, code structure) — memory duplicating the repo
   rots; link, don't copy.
 - Mining only failures — validated approaches that WORKED are equally worth encoding (with their
-  evidence), or they'll be re-derived at full cost next time.
+  evidence).

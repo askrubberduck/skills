@@ -39,7 +39,7 @@ candidate branch and merges nothing.
 - CI green on the exact head being merged.
 - **Commit messages and the PR description meet `duck-dry`'s prose bar**, checked before
   merge: a squash merge promotes the description into the commit body, so slop in either ships
-  into history. A claim without its receipt is the overclaim the gate exists to stop.
+  into history.
 - **Where this landing is a repository's first push to a public remote — or the one that flips it
   public — scan the bytes the push will transfer, where they land, never the working
   repository's view of them**, as [the public-push scan](references/public-push.md) lays out. A
@@ -67,38 +67,22 @@ candidate branch and merges nothing.
      packet; a stray merge in an otherwise flat log is not a license, match the dominant shape.
      No config enforces this; the history is the only guard.
    - **Pin the base.** Squash-merge the PR, or direct push where that is the standard, **pinning
-     the base at merge time**: a base that advances between the precondition check and the merge
-     lands a combination nobody reviewed, and no later check can un-land it. The merge must FAIL
-     when the base moved — so **verify your mechanism blocks, never infer it from its name.** Prove
-     it once per host, mechanism and CLI version on a throwaway copy of the remote: run the exact
-     invocation with its expected-base argument against a stationary base and record the success,
-     advance the base and record the refusal, quoted. That record — `merge-pin-<host>.md` at the
-     durable records home, with the invocation string, CLI version and date — is reused while the
-     invocation and version match, and re-proven when either changes; a refusal alone also fits
-     bad credentials, which is why both observations are kept. Where no throwaway remote is
-     possible, use only a mechanism whose vendor documentation names the base-SHA comparison for
-     that exact operation, record that as tier `documentary`, and rely on step 2's read-back.
-     Pin an explicitly recorded base SHA, never a ref — a ref a background fetch refreshes pins
-     nothing, and the cost of a false pin is the other branch's commit.
+     the base at merge time** with a mechanism proven to refuse a moved base, as [pinning the
+     base](references/pin-the-base.md) lays out.
 2. **Confirm the merge landed**: the new SHA is on the default branch and **its tree matches the
    candidate tree** — read it back, don't assume. Read the push's full output too, not its exit
    status: the remote prints policy objections ("Changes must be made through a pull request")
-   even when the ref moves, and an objection inside a green push is a finding, never noise. This
-   is the backstop for whatever step 1's pinning could not prevent: on a mismatch the landed
-   commit goes through the gate before it is recorded. It runs **after** the branch has moved, so
-   it cannot hold a deployment that a push triggers.
+   even when the ref moves, and an objection inside a green push is a finding, never noise. On a
+   mismatch the landed commit goes through the gate before it is recorded. It runs **after** the
+   branch has moved, so it cannot hold a deployment that a push triggers.
 3. Record the outcome where the repo keeps truth: shipped log / status doc / delivery board — with
    PR number, candidate SHA, landed SHA, and what changed. One recorded outcome per landing. Where
    that record lives in the repo, landing it by the same route is part of this landing's
    authorization.
 4. Close or queue obligations the change touched — the doer never closes an item that needs the
    owner's sign-off; queue those (`duck-decide` presents them).
-5. Clean up: delete the merged branch and its worktree under `duck-sweep`'s step 3, which settles
-   untracked and ignored files before a worktree goes; a matching tree says nothing about a
-   `.env` beside it. Step 2's read-back is what makes the branch safe to delete and what
-   `duck-sweep` cannot derive on its own — a squash leaves no metadata linking the branch
-   to the commit that replaced it, so **record the candidate and landed SHAs in step 3's outcome
-   entry** and delete against that, not against a classifier's guess. A cleanup held on a queued
+5. Clean up: delete the merged branch and its worktree under `duck-sweep`'s step 3, against the
+   candidate and landed SHAs step 3 recorded, never a classifier's guess. A cleanup held on a queued
    `duck-sweep` keep decision leaves the landing complete and recorded, with the pending worktree
    named in step 3's entry. Record a resumable boundary; continue other authorized work if the
    host and task allow it.

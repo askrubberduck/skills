@@ -59,10 +59,10 @@ For a failure, lead with the cause or the unresolved question, then provide:
 - The shared repair location and the check that would show the failure is gone.
 - Material uncertainty and the next discriminator, if the cause remains unresolved.
 
-A cause in code landed from a reviewed candidate is the ground truth every gate lacks: append a row
-to `~/.askrubberduck/findings.tsv` with `dispatch_id = -`, `tier = production`, `substantiated = 1`,
-a new `cause_id`, and in `candidate` the SHA the gate reviewed — `duck-land`'s outcome record maps
-the landed commit back to it, since a squash gives the same tree a new identity; `$LEDGER missed`
+For a cause in code landed from a reviewed candidate, append a row to
+`~/.askrubberduck/findings.tsv` with `dispatch_id = -`, `tier = production`, `substantiated = 1`, a
+new `cause_id`, and in `candidate` the SHA the gate reviewed — `duck-land`'s outcome record maps the
+landed commit back to it, since a squash gives the same tree a new identity; `$LEDGER missed`
 (`python3` with the absolute path of `../duck-review/scripts/ledger.py`, resolved from this skill's
 directory) joins that SHA to every dispatch that returned `APPROVE` on it.
 

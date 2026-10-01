@@ -27,8 +27,7 @@ verdicts, rankings, paths and quoted errors stay verbatim whatever the prose lan
 says the participant is one perspective and dispatches no reviewers of its own.
 
 Each criterion the brief takes from a repository rule is a verbatim quote of that rule, with its
-path and line; the task's own requirements travel with their own source. A paraphrase is a second
-rule nobody reviewed, and a stricter one yields findings the gate's own text dismisses.
+path and line; the task's own requirements travel with their own source.
 
 Capture a code candidate from its fork point: `git diff $(git merge-base <base> <candidate>)
 <candidate>`, and record both SHAs in the brief; a base that moved otherwise shows up reversed in
@@ -101,8 +100,8 @@ absolute path of `duck-review`'s `scripts/ledger.py`, whatever the working direc
 beside the required set with the same brief and the same export authorization for its vendor, or
 skip it and say so. Its verdict never counts toward the gate, its outage never leaves the gate
 short, and its findings are adjudicated like any other. Its row carries `setup = shadow`. A trial's
-gates count in whichever repository they ran, since a model's record is not a repository's; its
-comparison pairs it with its family's reviewer on the same gate of the same repository.
+gates count in whichever repository they ran; its comparison pairs it with its family's reviewer
+on the same gate of the same repository.
 
 Every dispatch attempt gets a row in `~/.askrubberduck/dispatches.tsv`, and `$DISPATCH` writes it:
 `pending` before the seat launches, finalized when the seat exits with minutes, verdict and outage.

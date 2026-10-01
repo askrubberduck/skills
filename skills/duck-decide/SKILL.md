@@ -5,8 +5,8 @@ description: Walk the owner through the decisions they have been ducking, one at
 
 # Duck Decide
 
-Blocking decisions are presented **one at a time, in full, in plain language**. Batching decisions
-produces rushed answers on exactly the items that were queued because they need judgment.
+Blocking decisions are presented **one at a time, in full, in plain language**, unless the owner
+chooses a batch once more than five are queued (see Order).
 
 Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
@@ -36,7 +36,7 @@ Past five queued decisions, ask first how to take them: one at a time; every rec
 every recommendation except the policy items; later. Name the policy items — money, risk, anything
 that changes what an operator or user can do — and keep them out of any batch. Walk only the ones
 the owner keeps, and record each batched decision as the owner's answer with the words that took
-it. Batch only when the owner chooses to.
+it.
 
 ## Common mistakes
 

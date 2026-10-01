@@ -25,9 +25,8 @@ necessary code repair unless it is already authorized; identify it separately wh
 
 ## Delete, consolidate or preserve
 
-Delete narration, redundant headings, signature restatements and obsolete history. A true statement
-about how development happened does not automatically deserve another home. Do not create a bug
-record, design document or backlog item merely to archive deleted prose.
+Delete what [the bar](references/bar.md) marks for deletion. Do not create a bug record, design
+document or backlog item merely to archive deleted prose.
 
 When a fact still affects a contract, decision or future action, keep it where its reader needs it:
 
@@ -35,8 +34,8 @@ When a fact still affects a contract, decision or future action, keep it where i
 - Caller-facing usage belongs in existing public documentation when it cannot live in the API.
 - A still-relevant design decision or authorized deferral belongs in the existing project record;
   link to an adequate record rather than copying it. Preserve unresolved owner decisions.
-- A test's intent belongs in its name, but a rename or changed assertion message is a code change,
-  not comment-only cleanup. Do not perform it outside authorized scope.
+- A test rename or changed assertion message is a code change, not comment-only cleanup. Do not
+  perform it outside authorized scope.
 
 Remove repeated explanations of the same rule while keeping the authoritative explanation useful.
 An internal ID is not the fact it refers to: stripping the ID must not leave a meaningless sentence.

@@ -106,7 +106,7 @@ satisfies no gate.
 
 Prepare the candidate and evidence before invoking `duck-review`. If committing is authorized,
 record the exact commit; otherwise review an explicit worktree snapshot and do not treat that as a
-landable SHA. A gate-policy change is reviewed under PRE-change rules, never its own relaxed rules.
+landable SHA.
 
 Act on the single adjudicated result:
 
@@ -120,10 +120,11 @@ Act on the single adjudicated result:
 
 Before a third or later review round, record a loop diagnosis. Contradicted premises go to
 `duck-frame`; wrong decomposition to `duck-plan`; repeated missed cases to an executable
-class-level check or a `duck-race` rally; rival implementations to a `duck-race` race; real owner
-tradeoffs to `duck-decide`. Continue review
-only when a named unresolved cause is shrinking and new evidence will be available. Repeated
-blockers from one class require repairing the method, not buying another round on the same basis.
+class-level check or a `duck-race` rally; rival implementations, or blockers that land on the
+fixes rather than the original change, to a `duck-race` race of the contested unit; real owner
+tradeoffs to `duck-decide`. Continue review only when a named unresolved cause is shrinking and
+new evidence will be available. Repeated blockers from one class require repairing the method, not
+buying another round on the same basis.
 
 ### Review-loop ownership and stable criteria
 
@@ -166,7 +167,7 @@ New owner input steers the current task; narrowing or withdrawal of authority ta
 immediately. Reuse settled decisions. A tool outage gets a bounded retry or another authorized
 mechanism; a permission rejection does not. Keep working until the authorized endpoint, a genuine
 owner decision on dependent work, an external block, an instruction to stop, or a real scheduled
-handoff. Never claim a handoff was booked without a host result confirming it.
+handoff.
 
-At a context boundary, preserve what `duck-diet`'s first runtime rule requires. Close with what
-changed, what was tested, and what remains unproven or unauthorized.
+At a context boundary, preserve state and book any handoff as `duck-diet`'s first runtime rule
+requires. Close with what changed, what was tested, and what remains unproven or unauthorized.

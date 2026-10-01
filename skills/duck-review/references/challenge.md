@@ -17,10 +17,10 @@ Trust-touching means security-, privacy-, or data-sensitive work, gate-semantics
 edit to a skill, a gate or an instruction file.
 Repository requirements bind release gates. An explicit smaller analysis can return useful evidence
 without satisfying a stronger release gate. A change to gate policy is judged under PRE-change
-rules; it never grants its own approval. Never shrink the required set after an outage or an adverse
-finding to manufacture a pass. A roster that cannot supply a row's required families is a missing
-participant, never a quietly smaller gate. Report incomplete participation and its effect on the
-claim.
+rules, including prerequisites and participant count; it never grants its own approval. Never
+shrink the required set after an outage or an adverse finding to manufacture a pass. A roster that
+cannot supply a row's required families is a missing participant, never a quietly smaller gate.
+Report incomplete participation and its effect on the claim.
 
 ## Start level, then escalate on evidence
 
@@ -34,14 +34,14 @@ the first round of a *release* review; an analysis pass is not a round of it.
 
 After each round, one of these holds, in this order:
 
-1. A substantiated `BLOCKER` → one more round, because defects cluster.
+1. A substantiated `BLOCKER` → one more round.
 2. Two eligible captures (Broad, or Independent escalated once) → `$LEDGER remaining <gate_id>`
    (`python3` with the absolute path of `duck-review`'s `scripts/ledger.py`); another round while
    its estimate is at least one, stop below; "insufficient evidence" from it counts as at least one.
 3. One capture and no `BLOCKER` → stop, unless the round found nothing at all and the reviewer's
    family has no recorded precision at or above 0.8 for any class on this repository
    (`$LEDGER precision`, which filters by origin) — then escalate
-   once to Broad, because a silent review with no history is the case with the least evidence.
+   once to Broad.
    Precision measures substantiation of what was claimed, not what was missed; it earns a stop
    only together with a clean round.
 
@@ -61,8 +61,7 @@ required set from the stage's list by recorded catches per minute, or in list or
 (default the pin's own) for trust-touching work and `[effort].ordinary` (default the pin's own)
 otherwise. Use the strongest available tier for trust-touching or unfamiliar high-risk judgments
 unless the owner specifies otherwise. Ordinary work may use a cheaper tier; record the choice
-without making a universal cost or quality claim. The participant counts and tiers above are
-conventions, not measured calibration; the dispatch ledger is where that measurement accumulates.
+without making a universal cost or quality claim.
 
 A new round needs a named unresolved claim and new evidence or a different approach. Keep explicit
 owner effort limits. Uncertainty at the limit stays uncertainty, not approval or an invented defect.
