@@ -23,9 +23,8 @@ is an absolute directory under the host's sanctioned scratch root. Preserve esse
 in the work record before disposing of scratch output.
 
 The brief states the language to answer in — the user's, unless they asked otherwise — and that
-verdicts, rankings, paths and quoted errors stay verbatim whatever the prose language. A reviewer
-told nothing answers in its own default and returns findings nobody asked for in that language.
-It also says the participant is one perspective and dispatches no reviewers of its own.
+verdicts, rankings, paths and quoted errors stay verbatim whatever the prose language. It also
+says the participant is one perspective and dispatches no reviewers of its own.
 
 Each criterion the brief takes from a repository rule is a verbatim quote of that rule, with its
 path and line; the task's own requirements travel with their own source. A paraphrase is a second
@@ -44,8 +43,7 @@ still counts.
 ## Run the reviewers
 
 Run each seat with `$DISPATCH` (`python3` with the absolute path of `duck-review`'s
-`scripts/dispatch.py`, whatever the working directory), in the background, because reviews can take
-10–45 minutes. Where the turn is the whole session (`claude -p`), its end kills a background seat
+`scripts/dispatch.py`, whatever the working directory), in the background. Where the turn is the whole session (`claude -p`), its end kills a background seat
 (`error: interrupted`) and strands its row `pending`: poll the seat's exit in bounded waits and end
 the turn only after it. The pinned ids come from `~/.askrubberduck/config.toml`, never from memory
 (a `[repo."<origin>"]` table there overrides any key for that origin):
@@ -67,10 +65,9 @@ changed the `--candidate` checkout.
 
 **The prompt is an argument; the material under review is a path inside it.** Hand the reviewer
 your instructions on the command line, and have those instructions name the diff, corpus, or files
-by absolute path for the reviewer to open — never paste that material into the command. Pasted
-material degrades the verdict — the reviewer quotes the corpus fluently and wrong, and flips
-toward letting findings stand — and forces a no-tools constraint, the prompt shape that provokes
-the permission-denied outage.
+by absolute path for the reviewer to open — never paste that material into the command: pasted material
+forces a no-tools prompt, which draws permission-denied outages and yields a verdict nobody can
+check against the source.
 
 Sanity-check a new invocation form with the prompt `Reply with exactly: OK`. These traps yield
 plausible reviews at exit 0:
@@ -80,8 +77,7 @@ plausible reviews at exit 0:
 - The prompt must be an **argument**, as the script passes it. agy's `--print "<text>"` can drop
   it, and a prompt it gets on **stdin** is discarded entirely — the reviewer answers with a greeting
   at exit 0. `codex exec` reads a stdin prompt, but appends piped stdin to an argument prompt.
-- After a repair, a reviewer can replay its previous round instead of reading the new candidate.
-  Have it open its result with the candidate's revision and one current line quoted from a named
+- After a repair, require the reviewer to show it read the new candidate: have it open its result with the candidate's revision and one current line quoted from a named
   changed artifact, and compare each round's output with the last: an identical body is an outage,
   not a verdict.
 

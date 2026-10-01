@@ -16,7 +16,7 @@ the Claude path names one. Counts may span projects; say which workspaces each c
 prompt is a row whose `payload` has `type == "message"` and `role == "user"`, its words in
 `content[].text`. The first row, `session_meta`, says whose session it is: `originator`
 `codex_exec` is a non-interactive dispatch, and a spawned agent carries `parent_thread_id`. Count
-neither; a store full of reviewer briefs otherwise reads as an owner who types briefs. An SDK
+neither. An SDK
 originator can be an app the owner types into or an automated dispatch: count it only with
 positive evidence of interactive input, otherwise report it as unknown; name the originators you
 counted. A fork names its parent in `forked_from_id` and

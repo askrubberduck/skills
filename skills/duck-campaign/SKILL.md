@@ -34,7 +34,7 @@ settled, authorized work when available, even if the roster has not yet been div
 ## Group by execution needs
 
 Keep related changes together when they share a rule, verification path or small delivery surface.
-Repeated findings at one boundary usually need one repair with several cases, not one packet per
+Give repeated findings at one boundary one repair with several cases, not one packet per
 finding. Conversely, separate work with different owners, release timing, material risks or
 genuinely independent execution. Avoid overlapping ownership of files that will be edited
 concurrently.

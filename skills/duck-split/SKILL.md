@@ -5,7 +5,7 @@ description: Hold a branch, PR or document to the one thing it was opened for; n
 
 # Duck Split
 
-A unit of work collects what belongs elsewhere. Sort it against the unit's intent, part by part,
+Expect a unit of work to carry parts that belong elsewhere. Sort it against the unit's intent, part by part,
 and show that the pieces sum to the original before anything leaves it.
 
 Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,

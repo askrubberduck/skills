@@ -78,8 +78,8 @@ remediation. Per-lane green does not prove the merged result.
 ## 4. Verify and try to break it
 
 When the change is executable code headed for independent review, run `duck-race` in rally mode
-against its contract first, with a family other than the doer's; a gate round finds one or two
-defects at a time, a rally turns their class into tests. Without export authority for that vendor,
+against its contract first, with a family other than the doer's, so a defect class becomes tests
+before the gate. Without export authority for that vendor,
 record that the rally did not run and why. Its receipt joins the handoff evidence.
 
 Run relevant project gates and `duck-proof` on the actual candidate. Proof owns claim-specific

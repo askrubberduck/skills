@@ -138,8 +138,8 @@ if missing evidence prevents a gate decision, return `NOTE` and name the uncerta
 
 - Judge a code change where it will run: a system that upgrades from an older state and can roll
   back, not a fresh one or an invented deployment. A new way to fail is a change to that system.
-- A guard added to cover a race that appeared when another guard was removed says the removed
-  one was load-bearing.
+- When a change adds a guard for a race that appeared after another guard was removed, flag the
+  removal: the removed guard was load-bearing.
 - A changed contract is incomplete until every other party to it moves in the same change or
   compatibility keeps the old contract working until a named follow-up.
 - A delta nobody asked for is a finding until someone explains it.
