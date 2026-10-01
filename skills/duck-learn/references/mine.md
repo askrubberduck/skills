@@ -14,14 +14,13 @@ one-level glob already reports roots only.
 **Codex**, `$CODEX_HOME/sessions/**` and `archived_sessions/**`: every project on the host, where
 the Claude path names one. Counts may span projects; say which workspaces each came from. An owner
 prompt is a row whose `payload` has `type == "message"` and `role == "user"`, its words in
-`content[].text`. The first row, `session_meta`, says whose session it is: `originator`
-`codex_exec` is a non-interactive dispatch, and a spawned agent carries `parent_thread_id`. Count
-neither. An SDK
-originator can be an app the owner types into or an automated dispatch: count it only with
-positive evidence of interactive input, otherwise report it as unknown; name the originators you
-counted. A fork names its parent in `forked_from_id` and
-replays the parent's prompts under new timestamps: drop that replayed prefix. Never fold by text
-alone, which also folds every honest repeat of a short directive.
+`content[].text`. The first row, `session_meta`, says whose session it is: `originator` `codex_exec`
+is a non-interactive dispatch, and a spawned agent carries `parent_thread_id`. Count neither. An SDK
+originator can be an app the owner types into or an automated dispatch: count it only with positive
+evidence of interactive input, otherwise report it as unknown; name the originators you counted. A
+fork names its parent in `forked_from_id` and replays the parent's prompts under new timestamps:
+drop that replayed prefix. Never fold by text alone, which also folds every honest repeat of a short
+directive.
 
 Strip only wrappers the host is known to inject. A pattern that removes any paired tag also
 removes the markup an owner pasted.

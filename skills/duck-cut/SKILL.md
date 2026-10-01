@@ -33,9 +33,9 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
    review whose work is on the default branch — its branch merged, or its candidate's tree matching a
    landed commit — and a closed item filed under an open heading.
 3. Act autonomously on everything that doesn't need the owner: make CLOSE/CUT/MERGE/UNBLOCK edits in
-   the registries with evidence. Local edits do not authorize a commit or publication. CUT deletes
-   the item from the registry, not just from the report. A versioned registry keeps the cut text in its history; for one outside version
-   control, keep it in the report until the owner has read it.
+   the registries with evidence. Local edits do not authorize a commit or publication. A versioned
+   registry keeps the cut text in its history; for one outside version control, keep it in the
+   report until the owner has read it.
 4. Items needing the owner (sign-offs, policy calls, anything the doer may not close): queue them
    and run `duck-decide` — never close an owner-gated item yourself, never drop it silently. Queuing
    one is not a reason to stop; the sweep continues past it.

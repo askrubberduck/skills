@@ -51,8 +51,7 @@ candidate branch and merges nothing.
   owner's call on a named precondition, never the doer's, and never a blanket exemption from the
   rest; a waiver a reviewer discovers afterward is a second violation, not a footnote.
 - **A registry entry is not an authorization unless it says who authorized it** — `duck-scan`'s
-  attribution rule. The doer writes to the same decision log the owner does, so never read an
-  unattributed entry as permission.
+  attribution rule: never read an unattributed entry as permission.
 
 ## Land
 

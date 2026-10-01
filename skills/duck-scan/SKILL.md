@@ -14,7 +14,7 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
 ## Locate registries (detect, don't configure)
 
 **The repo's own instruction files say where work lives** — read them first, including when what
-they name sits outside the checkout. **The registry need not be in the checkout** at all. Then take
+they name sits outside the checkout. Then take
 what the repo actually has: docs that list items with states, active work-item directories, open
 PRs and issues through the host's CLI (`gh pr list`). Match a candidate on what it contains, never
 on what it is called — `STATUS.md`, `BACKLOG.md`, `TODO.md` and a delivery README are shapes that

@@ -43,12 +43,13 @@ still counts.
 ## Run the reviewers
 
 Run each seat with `$DISPATCH` (`python3` with the absolute path of `duck-review`'s
-`scripts/dispatch.py`, whatever the working directory), in the background. Where the turn is the whole session (`claude -p`), its end kills a background seat
-(`error: interrupted`) and strands its row `pending`: poll the seat's exit in bounded waits and end
-the turn only after it. The pinned ids come from `~/.askrubberduck/config.toml`, never from memory
-(a `[repo."<origin>"]` table there overrides any key for that origin):
-`[models].review` (a review or a disposition), `[models].race` and `[models].plan`, each defaulting
-to `[families].reviewers` (default empty: the owner's setup names them).
+`scripts/dispatch.py`, whatever the working directory), in the background. Where the turn is the
+whole session (`claude -p`), its end kills a background seat (`error: interrupted`) and strands its
+row `pending`: poll the seat's exit in bounded waits and end the turn only after it. The pinned ids
+come from `~/.askrubberduck/config.toml`, never from memory (a `[repo."<origin>"]` table there
+overrides any key for that origin): `[models].review` (a review or a disposition), `[models].race`
+and `[models].plan`, each defaulting to `[families].reviewers` (default empty: the owner's setup
+names them).
 
 ```bash
 $DISPATCH --gate "$GATE" --round "$N" --stage review --setup independent --trust 0 --pin "$PIN" \
@@ -65,9 +66,7 @@ changed the `--candidate` checkout.
 
 **The prompt is an argument; the material under review is a path inside it.** Hand the reviewer
 your instructions on the command line, and have those instructions name the diff, corpus, or files
-by absolute path for the reviewer to open — never paste that material into the command: pasted material
-forces a no-tools prompt, which draws permission-denied outages and yields a verdict nobody can
-check against the source.
+by absolute path for the reviewer to open — never paste that material into the command.
 
 Sanity-check a new invocation form with the prompt `Reply with exactly: OK`. These traps yield
 plausible reviews at exit 0:
@@ -77,9 +76,9 @@ plausible reviews at exit 0:
 - The prompt must be an **argument**, as the script passes it. agy's `--print "<text>"` can drop
   it, and a prompt it gets on **stdin** is discarded entirely — the reviewer answers with a greeting
   at exit 0. `codex exec` reads a stdin prompt, but appends piped stdin to an argument prompt.
-- After a repair, require the reviewer to show it read the new candidate: have it open its result with the candidate's revision and one current line quoted from a named
-  changed artifact, and compare each round's output with the last: an identical body is an outage,
-  not a verdict.
+- After a repair, require the reviewer to show it read the new candidate: have it open its result
+  with the candidate's revision and one current line quoted from a named changed artifact, and
+  compare each round's output with the last: an identical body is an outage, not a verdict.
 
 A zero-byte, greeting-only, timed-out, or crashed dispatch is an outage: a dispatch attempted that
 produced no verdict; the script names its cause. An output that holds only a quota or credit
