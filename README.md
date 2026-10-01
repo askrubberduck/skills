@@ -362,7 +362,9 @@ occurrences. What will this gate cost? `cost <setup>` reads past gates. Is there
 its shadow gates, `promote` says whether it replaces its family's reviewer, joins the list, or goes.
 Standard library only. A `-` means unknown; unknown never counts as zero.
 
-What leaves your machine? Only what a dispatch hands another model. A reviewer or rival from
+### What leaves your machine
+
+Your work reaches another model only through a dispatch. A reviewer or rival from
 another family runs through that vendor's CLI on your machine: `codex` for OpenAI, `agy` for
 Google, signed in with your account and run with your environment. Its prompt, and the files and
 diffs it is pointed at, go to that vendor under that vendor's terms; a `codex` seat may also edit
