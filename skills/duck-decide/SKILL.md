@@ -32,6 +32,12 @@ next decision, so a dropped session loses nothing.
 Owner-specified order first; otherwise most-blocking first (the decision gating the most downstream
 work). Say how many are in the queue up front ("4 decisions queued; here is 1 of 4").
 
+Past five queued decisions, ask first how to take them: one at a time; every recommendation;
+every recommendation except the policy items; later. Name the policy items — money, risk, anything
+that changes what an operator or user can do — and keep them out of any batch. Walk only the ones
+the owner keeps, and record each batched decision as the owner's answer with the words that took
+it. Batch only when the owner chooses to.
+
 ## Common mistakes
 
 - Hiding material cost or schedule tradeoffs. Include them when relevant to the owner's decision,
