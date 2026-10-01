@@ -364,13 +364,15 @@ Standard library only. A `-` means unknown; unknown never counts as zero.
 
 ### What leaves your machine
 
-Your work reaches another model only through a dispatch. A reviewer or rival from
-another family runs through that vendor's CLI on your machine: `codex` for OpenAI, `agy` for
-Google, signed in with your account and run with your environment. Its prompt, and the files and
-diffs it is pointed at, go to that vendor under that vendor's terms; a `codex` seat may also edit
-the worktree it was given. The duck has no server and sends no telemetry. `duck-learn` reads your
-Claude Code and Codex session transcripts on disk to count what you asked for. Everything else the
-agent reads goes only where your host already sends it.
+Your work reaches another model only through a dispatch. A reviewer or rival from another family
+runs through that vendor's CLI on your machine: `codex` for OpenAI, `agy` for Google, signed in with
+your account and run with your environment. Its prompt, and the files and diffs it is pointed at, go
+to that vendor under that vendor's terms. A seat can run commands and change files: `codex` inside
+its sandbox (its working directory, the directories it was handed, the system temp directories),
+`agy` wherever its own permissions allow. The duck has no server and sends no telemetry.
+`duck-learn` reads your Claude Code and Codex session transcripts on disk to count what you asked
+for. Anything else the agent reads enters your host model's context and goes only where your host
+already sends it.
 
 ### How the duck keeps review rounds bounded
 
