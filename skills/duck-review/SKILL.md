@@ -13,6 +13,8 @@ a reviewer is not a substitute for the doer's own breaking attempts.
 
 Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Load a linked skill when the current step requires its procedure, then follow the named section
+within existing authority. A routing mention alone does not require loading every skill.
 
 **One invocation, one pass.** Never edit the candidate, create its prerequisite evidence, loop
 until reviewers approve, or land it. The caller owns repairs, owner decisions and the next
@@ -21,10 +23,10 @@ authorized action.
 ## Findings or independent judgment
 
 An explicit independent, cross-model or release-gate review uses the workflow below. Otherwise a
-findings-only, analysis-only or "multiple angles" request, or an answer to a received review,
-uses this in-session path. With no scope specified, `[review].default` in
-`~/.askrubberduck/config.toml` decides (default `findings`); `duck-run` and `duck-land` name the
-release-gate path when they call it. A findings pass never satisfies a required gate.
+findings-only, analysis-only or "multiple angles" request, or an answer to a received review, uses this
+in-session path. With no scope specified, `[review].default` in `~/.askrubberduck/config.toml` decides
+(default `findings`); [`duck-run`](../duck-run/SKILL.md) and [`duck-land`](../duck-land/SKILL.md) name
+the release-gate path when they call it. A findings pass never satisfies a required gate.
 
 Resolve the target, applicable base, constraints and prior dispositions as in preparation steps 1–2;
 for re-review also apply step 5. Inspect relevant risk surfaces such as behavior, failure recovery
@@ -32,30 +34,31 @@ and maintainability. Use distinct lenses rather than a fixed reviewer count; del
 useful and authorized; what counts as a different family is in
 [challenge selection](references/challenge.md).
 
-Substantiate and adjudicate findings against the current target using the criteria below. Why a
-value, guard or construction already in the history exists is answered by `duck-why`'s decision
-trace, not a guess. Return one consolidated list with stable IDs, severity, evidence and proposed
-fixes, plus coverage limits. No gate verdict is issued; a receipt is needed only when policy or a
-downstream handoff requires one. Report in-session. Posting comments, submitting a GitHub review and
-resolving threads each need their own existing authorization. Then return to the caller: a later
+Substantiate and adjudicate findings against the current target using the criteria below. Why a value,
+guard or construction already in the history exists is answered by [`duck-why`](../duck-why/SKILL.md)'s
+decision trace, not a guess. Return one consolidated list with stable IDs, severity, evidence and
+proposed fixes, plus coverage limits. No gate verdict is issued; a receipt is needed only when policy
+or a downstream handoff requires one. Report in-session. Posting comments, submitting a GitHub review
+and resolving threads each need their own existing authorization. Then return to the caller: a later
 selection authorizes that caller's scoped local fixes, not another review or a new approval round.
 Commit and publication remain separate actions.
 
 ## Answer a received review
 
-When the user is the author and a review has landed, judge each thread against the current
-candidate, not the revision the reviewer saw, and give it one disposition with its evidence:
-still valid, already fixed, disagree, out of scope, or a challenge to the approach. A thread that
-questions the mechanism rather than a line gets no patch: `duck-shape` over the problem, and a
-proposed shape, come before any edit. Draft one reply per thread: at most three words when
-agreeing or reporting a fix, fifteen otherwise. "Resolve all" covers resolving only, and only
-threads already fixed; the rest stay open and are listed.
+When the user is the author and a review has landed, judge each thread against the current candidate,
+not the revision the reviewer saw, and give it one disposition with its evidence: still valid, already
+fixed, disagree, out of scope, or a challenge to the approach. A thread that questions the mechanism
+rather than a line gets no patch: [`duck-shape`](../duck-shape/SKILL.md) over the problem, and a
+proposed shape, come before any edit. Draft one reply per thread: at most three words when agreeing or
+reporting a fix, fifteen otherwise. "Resolve all" covers resolving only, and only threads already
+fixed; the rest stay open and are listed.
 
 ## Prepare the review
 
 1. Resolve the exact target, its version and the requested judgment. For a code release use the last
    released tag through the candidate, not adjacent commits; for a PR use its own base. An
-   intentionally captured dirty worktree (captured as `duck-split` describes: a ref, not a stash)
+   intentionally captured dirty worktree (captured as [`duck-split`](../duck-split/SKILL.md) describes:
+   a ref, not a stash)
    can be reviewed, but landing later needs an authorized exact commit. For a design, plan or
    document, identify the supplied revision or snapshot; no PR, commit or invented Git base is
    needed.
@@ -67,7 +70,7 @@ threads already fixed; the rest stay open and are listed.
    setup's budget in [challenge selection](references/challenge.md) — so steps 5–6 have a bound
    to read.
    Name the coordinating caller who owns convergence, prior findings and the remaining round
-   bound; `duck-run` defines the default loop
+   bound; [`duck-run`](../duck-run/SKILL.md) defines the default loop
    contract for an executing caller, including stable cause IDs, reopening and what counts as a
    blocker versus a proposal. Treat the mechanism and its benefit as claims to challenge. If new
    evidence refutes the goal or criteria, return that contradiction; do not silently rewrite
@@ -76,11 +79,15 @@ threads already fixed; the rest stay open and are listed.
    [challenge selection](references/challenge.md). Ordinary gates default to one verified
    cross-family reviewer; trust-touching gates default to two as that reference specifies.
    Record the selected set before dispatch.
-4. Check the caller's evidence using `duck-proof`'s durable-home rules. A release gate requires a
+4. Check the caller's evidence using [`duck-proof`](../duck-proof/SKILL.md)'s durable-home rules. A
+   release gate requires a
    proof receipt tied to the final candidate; packet-sized or trust-touching work also needs the
-   settled `duck-plan` record, including its actual challenge and any required independent input.
-   Trust-touching work needs `duck-break` evidence appropriate to the changed surface; executable
-   code arriving from `duck-run` carries its rally receipt or the reason the rally did not run.
+   settled [`duck-plan`](../duck-plan/SKILL.md) record, including its actual challenge and any required
+   independent input.
+   Trust-touching work needs [`duck-break`](../duck-break/SKILL.md) evidence appropriate to the changed
+   surface. Include a
+   rally receipt when one ran; if the task or project policy requires a rally that did not run,
+   record the reason and its effect on readiness. Ordinary work needs no rally exemption.
    A shared work record with explicit proof/plan/break sections is equivalent to separate named
    receipts when all consumers can resolve it. Existing `proof-rN.md` and `break-rN.md` conventions
    remain valid.
@@ -116,22 +123,27 @@ short a reviewer, and both leave findings that are still claims to adjudicate.
 
 ## Adjudicate the claims
 
+Read relevant project constraints and `defect-classes.md` before adjudication. Resolve its home using
+[`duck-proof`](../duck-proof/SKILL.md), section "Evidence and handoff". Check applicable classes
+against the candidate; the ledger supplies counterexamples, not a finding quota. An absent ledger does
+not block a narrow review; state any coverage limit.
+
 Treat every verdict and finding as a claim, not a fact. For each finding, inspect the current target
 and classify it as a substantiated `BLOCKER`, retained `SHOULD`, retained `NOTE`, or dismissed with
 a recorded reason.
 
-**When the actor adjudicating built the candidate, say so in the report**, dismiss only on evidence
-a third party can re-check from the artifacts, and let a finding you cannot settle stand rather
-than fall. Under the Broad setup, each family's findings are dispositioned by the other family
-first — one findings-list dispatch each, smaller than a review, recorded with `stage =
-disposition` so `remaining` never mistakes it for a capture — and the doer synthesizes where
-the dispositions agree; where they disagree, the doer dismisses only on executed evidence.
-A finding that stands unsubstantiated after that is a `NOTE` with the disagreement named, not a
-`BLOCKER`; a disagreement about design intent goes to `duck-decide` at every risk level.
-Record `adjudicated_by` per finding in `~/.askrubberduck/findings.tsv`; `$LEDGER precision` turns
-that history into the prior a `read`-tier finding starts from.
-A substantiated blocker stands until resolved. An unsubstantiated suspicion is not a blocker;
-if missing evidence prevents a gate decision, return `NOTE` and name the uncertainty.
+**When the actor adjudicating built the candidate, say so in the report**, dismiss only on evidence a
+third party can re-check from the artifacts, and let a finding you cannot settle stand rather than
+fall. Under the Broad setup, each family's findings are dispositioned by the other family first — one
+findings-list dispatch each, smaller than a review, recorded with `stage = disposition` so `remaining`
+never mistakes it for a capture — and the doer synthesizes where the dispositions agree; where they
+disagree, the doer dismisses only on executed evidence. A finding that stands unsubstantiated after
+that is a `NOTE` with the disagreement named, not a `BLOCKER`; a disagreement about design intent goes
+to [`duck-decide`](../duck-decide/SKILL.md) at every risk level. Record `adjudicated_by` per finding in
+`~/.askrubberduck/findings.tsv`. `$LEDGER precision` is optional measurement of past substantiation,
+not evidence that a current finding is correct. A substantiated blocker stands until resolved. An
+unsubstantiated suspicion is not a blocker; if missing evidence prevents a gate decision, return `NOTE`
+and name the uncertainty.
 
 - Judge a code change where it will run: a system that upgrades from an older state and can roll
   back, not a fresh one or an invented deployment. A new way to fail is a change to that system.
@@ -150,21 +162,24 @@ if missing evidence prevents a gate decision, return `NOTE` and name the uncerta
   that a fact disappeared; context lines and moved facts create false blockers.
 - Resolve disagreement about framework behavior by reading the dependency source, not by vote.
 - Disagreement about what *should* be — a design intent, a public boundary, a policy, a cost or
-  schedule tradeoff — has no source to read: route it to the owner via `duck-decide` instead of
+  schedule tradeoff — has no source to read: route it to the owner via
+  [`duck-decide`](../duck-decide/SKILL.md) instead of
   settling it as the doer.
 - If supplied history shows the same rule drawing repeated findings, ask whether that rule should
   exist rather than proposing another patch. When two consecutive rounds'
   substantiated blockers target code introduced by remediation rather than the original candidate,
   **or fall in one ledger class whatever code they land on**, say so in the report — naming the
-  class, not only the instance — and recommend the caller's circuit breaker (`duck-run`'s loop
+  class, not only the instance — and recommend the caller's circuit breaker
+  ([`duck-run`](../duck-run/SKILL.md)'s loop
   diagnosis) instead of implicitly inviting the next round.
 - Count concepts, not lines: identify any new branch, exception, or second home for the same fact,
   any abstraction without a required contract or credible change-path justification, and any unit
   that took on a second job.
-  `duck-shape` owns this lens at change time; this gate reports any miss to the caller.
+  [`duck-shape`](../duck-shape/SKILL.md) owns this lens at change time; this gate reports any miss to
+  the caller.
 - A comment that states something false about the code is a defect, ranked on what it misleads
   about. A demand for explanatory comments is not: where the code is unclear the fix is the code,
-  and `duck-dry` sets what the surviving comments carry.
+  and [`duck-dry`](../duck-dry/SKILL.md) sets what the surviving comments carry.
 - Judge the change, not paperwork. A receipt or commit-message defect is a `NOTE` unless it makes
   the underlying artifact claim unverifiable.
 
@@ -190,8 +205,9 @@ Report the authoritative result, each reviewer's pinned model id and family, eac
 finding's adjudicated classification and evidence, any outage or downgrade, and the exact target and
 criteria reviewed. The dispatch script finalizes each participant's row in `dispatches.tsv`; append
 one row per adjudicated finding to `findings.tsv`, with a stable `cause_id` shared across
-participants that found the same cause; with two eligible captures (shadows excluded), report
-`$LEDGER remaining <gate_id>` — the estimate of defects neither found. `$LEDGER` is `python3` with
+participants that found the same cause. When measurement is requested, report
+`$LEDGER remaining <gate_id>` as an advisory estimate, never a gate or continuation criterion.
+`$LEDGER` is `python3` with
 the absolute path of this skill's `scripts/ledger.py`, whatever the working directory, typed out as
 `python3 "<path>" <subcommand>` rather than held in one variable. Keep raw CLI stdout in scratch;
 preserve the decisive evidence before scratch cleanup.

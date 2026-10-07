@@ -10,6 +10,8 @@ accounts for the evidence; a typo need not become an architectural or organizati
 
 Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Load a linked skill when the current step requires its procedure, then follow the named section
+within existing authority. A routing mention alone does not require loading every skill.
 This skill diagnoses without editing the candidate. Return the cause and repair location to the
 caller, which continues any already-authorized fix and verification. Do not request the same local
 repair permission again or imply that diagnosis satisfies a release gate.
@@ -42,13 +44,13 @@ errors that could affect the causal chain; record why a consequential competing 
 
 ## Trace an existing decision
 
-A question about when or why something was introduced has no failure to reproduce. Trace it
-through the artifact's own history: for code, `git log -S` or `-G` on the symbol and blame at the
-current line; for a document or plan, its revisions. Then find where the reason was stated:
-description, linked ticket, review thread. Keep the recorded reason apart from your inference.
-Check it against today's callers and later changes. Return the introducing change, its record,
-the reason, and whether it holds, lapsed (name the change that removed the reason) or is
-unknown. A lapsed reason is a finding, not a deletion; removal belongs to `duck-shape`.
+A question about when or why something was introduced has no failure to reproduce. Trace it through the
+artifact's own history: for code, `git log -S` or `-G` on the symbol and blame at the current line; for
+a document or plan, its revisions. Then find where the reason was stated: description, linked ticket,
+review thread. Keep the recorded reason apart from your inference. Check it against today's callers and
+later changes. Return the introducing change, its record, the reason, and whether it holds, lapsed
+(name the change that removed the reason) or is unknown. A lapsed reason is a finding, not a deletion;
+removal belongs to [`duck-shape`](../duck-shape/SKILL.md).
 
 ## Return an actionable diagnosis
 
@@ -59,15 +61,16 @@ For a failure, lead with the cause or the unresolved question, then provide:
 - The shared repair location and the check that would show the failure is gone.
 - Material uncertainty and the next discriminator, if the cause remains unresolved.
 
-For a cause in code landed from a reviewed candidate, append a row to
-`~/.askrubberduck/findings.tsv` with `dispatch_id = -`, `tier = production`, `substantiated = 1`, a
-new `cause_id`, and in `candidate` the SHA the gate reviewed — `duck-land`'s outcome record maps the
-landed commit back to it, since a squash gives the same tree a new identity; `$LEDGER missed`
-(`python3` with the absolute path of `../duck-review/scripts/ledger.py`, resolved from this skill's
-directory, typed out as `python3 "<path>" <subcommand>` rather than held in one variable) joins
-that SHA to every dispatch that returned `APPROVE` on it.
+For a cause in code landed from a reviewed candidate, append a row to `~/.askrubberduck/findings.tsv`
+with `dispatch_id = -`, `tier = production`, `substantiated = 1`, a new `cause_id`, and in `candidate`
+the SHA the gate reviewed — [`duck-land`](../duck-land/SKILL.md)'s outcome record maps the landed
+commit back to it, since a squash gives the same tree a new identity; `$LEDGER missed` (`python3` with
+the absolute path of `../duck-review/scripts/ledger.py`, resolved from this skill's directory, typed
+out as `python3 "<path>" <subcommand>` rather than held in one variable) joins that SHA to every
+dispatch that returned `APPROVE` on it.
 
-Keep ruled-out hypotheses only when their evidence prevents repeating a consequential dead end.
-Do not create a design or work item merely to explain a local defect. An unsettled architectural
-contract belongs to `duck-frame`; an actual owner policy choice belongs to `duck-decide`.
-`duck-proof` verifies the eventual repair.
+Keep ruled-out hypotheses only when their evidence prevents repeating a consequential dead end. Do not
+create a design or work item merely to explain a local defect. An unsettled architectural contract
+belongs to [`duck-frame`](../duck-frame/SKILL.md); an actual owner policy choice belongs to
+[`duck-decide`](../duck-decide/SKILL.md). [`duck-proof`](../duck-proof/SKILL.md) verifies the eventual
+repair.

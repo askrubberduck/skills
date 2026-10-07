@@ -12,6 +12,8 @@ impressive design is not evidence of improvement.
 
 Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Load a linked skill when the current step requires its procedure, then follow the named section
+within existing authority. A routing mention alone does not require loading every skill.
 Apply scoped local edits unless the request is report-only or analysis-only. Selected findings
 limit repairs, and the report gives each one applied, skipped with its reason, or parked.
 Continue through verification; commits and publication need separate authorization.
@@ -44,11 +46,11 @@ Use these as inspection prompts (the necessity checks), not automatic deletion r
 - Tests that mirror implementation: preserve outcome checks; question mocks or assertions that
   can pass while the required behavior fails.
 
-For each material candidate, choose **remove**, **simplify using an existing facility**, or
-**keep**. Ground the choice in a caller, contract, failure case or demonstrated change cost.
-"Separation of concerns" or a possible future use is not sufficient evidence. A single
-implementation may still protect a public API, security boundary or real platform difference. When
-nothing states why a mechanism already in the history exists, trace it with `duck-why` before
+For each material candidate, choose **remove**, **simplify using an existing facility**, or **keep**.
+Ground the choice in a caller, contract, failure case or demonstrated change cost. "Separation of
+concerns" or a possible future use is not sufficient evidence. A single implementation may still
+protect a public API, security boundary or real platform difference. When nothing states why a
+mechanism already in the history exists, trace it with [`duck-why`](../duck-why/SKILL.md) before
 choosing remove.
 
 ## Make the smallest justified cleanup
@@ -59,13 +61,13 @@ Keep validation, security, accessibility, recovery and necessary calibration int
 
 Keep edits focused on a cause; rerun affected checks before building on a risky change. Preserve
 required behavior unless a behavior change is explicitly in scope. Comments and docstrings use
-`duck-dry`'s [prose bar](../duck-dry/references/bar.md); deleting commentary does not repair the
-structure or justify extracting another helper.
+[`duck-dry`](../duck-dry/SKILL.md)'s [prose bar](../duck-dry/references/bar.md); deleting commentary
+does not repair the structure or justify extracting another helper.
 
-For an explicitly requested deep simplification or a demonstrated wrong boundary that local
-cleanup cannot fix, use [reconstruction](references/reconstruction.md). If the required outcome or
-boundary contract is unsettled, resolve that decision with `duck-frame` before dependent edits.
-Analysis mode applies the necessity checks to proposed mechanisms without editing.
+For an explicitly requested deep simplification or a demonstrated wrong boundary that local cleanup
+cannot fix, use [reconstruction](references/reconstruction.md). If the required outcome or boundary
+contract is unsettled, resolve that decision with [`duck-frame`](../duck-frame/SKILL.md) before
+dependent edits. Analysis mode applies the necessity checks to proposed mechanisms without editing.
 
 ## Verify and finish
 
@@ -79,5 +81,5 @@ concrete reason, and the checks actually run with their limits. Unchanged code i
 when no candidate survives inspection. Stop when the scoped findings are resolved and affected
 checks pass; another pass needs an unresolved defect, not a cleanup quota.
 
-`duck-proof` can challenge a remaining contract claim. This cleanup does not provide the independent
-release approval owned by `duck-review`.
+[`duck-proof`](../duck-proof/SKILL.md) can challenge a remaining contract claim. This cleanup does not
+provide the independent release approval owned by [`duck-review`](../duck-review/SKILL.md).

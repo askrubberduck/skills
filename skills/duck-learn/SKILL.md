@@ -10,6 +10,8 @@ or gets consciously discarded. Lessons that live only in a chat transcript are l
 
 Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Load a linked skill when the current step requires its procedure, then follow the named section
+within existing authority. A routing mention alone does not require loading every skill.
 
 ## Recipe
 
@@ -25,7 +27,8 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
      new pins) and prints ids nobody has configured, trialled or dispatched; `promote` prints each
      trial pin's verdict: still `shadow`, or `replace`, `add` or `drop` once decided.
      `[learn].discover` (default `auto`) decides what follows: `off` ignores both; `propose` queues
-     each through `duck-decide`; `auto` puts at most one new pin per family into `[learn].trial` and
+     each through [`duck-decide`](../duck-decide/SKILL.md); `auto` puts at most one new pin per family
+     into `[learn].trial` and
      applies each `replace`, `add` or `drop` verdict to `~/.askrubberduck/config.toml`, taking the
      pin out of `[learn].trial` in the same edit, and reports it. This is the owner's config, not a
      policy file: step 4's review path does not apply to it.
@@ -50,7 +53,8 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
      pending, a stale base — → the checked-in instructions doc. **A skill description matches words;
      it cannot see state.**
    - Fact, preference, or project state → **memory**.
-   - A **defect class** the doer repeated → `defect-classes.md`, which `duck-proof` reads
+   - A **defect class** the doer repeated → `defect-classes.md`, which
+     [`duck-proof`](../duck-proof/SKILL.md) reads
      before every pass. Classes compound; instances do not.
    - Rule that must bind every turn → the checked-in instructions doc (CLAUDE.md/AGENTS.md).
    - One-off, derivable, or already recorded → **discard, say so**.
@@ -64,7 +68,8 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
 5. **Close the loop**: procedural guidance (a skill, a workflow rule) gets one rep before it's
    trusted. Reserve one occurrence as a holdout BEFORE deriving — at exactly two, derive from the
    other — state the expected outcome, then run the guidance against that holdout and attack the
-   result with `duck-proof` discipline. A failed rep sends the guidance back to draft, and the
+   result with [`duck-proof`](../duck-proof/SKILL.md) discipline. A failed rep sends the guidance back
+   to draft, and the
    redraft waits for a fresh occurrence as its holdout; a used holdout never validates twice.
    Directive-derived guidance stays draft until its first real occurrence, its holdout. Check
    observable behavior, not whether the agent repeats the new rule: execute a counterexample,

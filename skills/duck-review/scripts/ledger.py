@@ -209,16 +209,19 @@ def cmd_remaining(args) -> int:
     if len(eligible) < 2:
         print(f"insufficient evidence: {len(eligible)} eligible captures in round {latest}")
         return 0
-    # An empty capture is a capture: a clean review of size 0 is evidence about the overlap.
     first, second = ({f["cause_id"] for f in gate if f["dispatch_id"] == d["id"]} for d in eligible)
     n1, n2, m = len(first), len(second), len(first & second)
+    if not n1 or not n2:
+        print(f"insufficient evidence: empty capture (n1 = {n1}, n2 = {n2})")
+        return 0
     estimate = chapman(n1, n2, m)
     found = len(first | second)
     for label, value in (("round", latest), ("n1", n1), ("n2", n2), ("m", m),
                          ("chapman", f"{estimate:.3f}"), ("found", found),
                          ("remaining", f"{max(estimate - found, 0):.3f}")):
         print(f"{label} = {value}")
-    if estimate > 0 and n1 and n2:
+    print("advisory estimate: correlated reviewers can share blind spots")
+    if estimate > 0:
         print(f"independence ratio = {m / (n1 * n2 / estimate):.3f}")
     return 0
 
@@ -304,7 +307,8 @@ def with_effort(arm: tuple[str, str, str], config: dict, trust: bool) -> tuple[s
 
 def pick_arms(config: dict, dispatches: list[dict], findings: list[dict], stage: str,
               trust: bool) -> tuple[list[tuple], dict[tuple, tuple]]:
-    wins = unique_blocker_dispatches(dispatches, findings)
+    adaptive = config.get("select", "fixed") == "adaptive" and stage == "review"
+    wins = unique_blocker_dispatches(dispatches, findings) if stage == "review" else set()
     rows = [d for d in dispatches if d["stage"] == stage and d["status"] == "final"]
     # Arms are the role's configured list and nothing else: history says how an arm has done, never
     # that a one-off dispatch is a reviewer we may send again. An arm is the whole (family, model,
@@ -317,17 +321,16 @@ def pick_arms(config: dict, dispatches: list[dict], findings: list[dict], stage:
     overall = minutes_mean(rows)
 
     stats = {}
-    for arm in arms:
+    for arm in arms if stage == "review" else []:
         mine = [d for d in rows if (d["family"], d["model"], d["effort"]) == arm]
         successes = sum(1 for d in mine if d["id"] in wins)
         minutes = minutes_mean(mine)
-        theta = random.betavariate(1 + successes, 1 + len(mine) - successes)
+        theta = random.betavariate(1 + successes, 1 + len(mine) - successes) if adaptive else 0
         divisor = minutes if minutes else overall if overall else 1
         stats[arm] = (successes, len(mine) - successes, minutes, theta / divisor)
 
     doer = config.get("doer")
-    ranked = (arms if config.get("select") == "fixed"
-              else sorted(arms, key=lambda a: stats[a][3], reverse=True))
+    ranked = sorted(arms, key=lambda a: stats[a][3], reverse=True) if adaptive else arms
     if stage not in JUDGING_ROLES:  # worker and explore serve the doer; they judge nothing
         return ranked[:1], stats
     chosen = [a for a in ranked if a[0] != doer][:1]
@@ -345,6 +348,8 @@ def cmd_pick(args) -> int:
         return 1
     dispatches, findings = load_tables()
     chosen, stats = pick_arms(config, dispatches, findings, args.stage, args.trust)
+    adaptive = config.get("select", "fixed") == "adaptive" and args.stage == "review"
+    print(f"selection = {'adaptive' if adaptive else 'fixed'}")
     for arm, (successes, failures, minutes, score) in stats.items():
         shown = "-" if minutes is None else f"{minutes:.1f}"
         print(f"arm {pin_of(arm)} s={successes} f={failures} minutes={shown} score={score:.4f}")
@@ -600,7 +605,7 @@ def main(argv: list[str] | None = None) -> int:
     precision.set_defaults(run=cmd_precision)
     subparsers.add_parser("missed", help="production causes per arm that approved the candidate"
                           ).set_defaults(run=cmd_missed)
-    pick = subparsers.add_parser("pick", help="Thompson-sample the next arm for a stage")
+    pick = subparsers.add_parser("pick", help="pick in list order; opt-in adaptive review ranking")
     pick.add_argument("stage")
     pick.add_argument("--trust", action="store_true")
     pick.add_argument("--repo", help="default: this checkout's origin")

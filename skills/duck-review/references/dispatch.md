@@ -26,12 +26,23 @@ The brief states the language to answer in — the user's, unless they asked oth
 verdicts, rankings, paths and quoted errors stay verbatim whatever the prose language. It also
 says the participant is one perspective and dispatches no reviewers of its own.
 
-Each criterion the brief takes from a repository rule is a verbatim quote of that rule, with its
-path and line; the task's own requirements travel with their own source.
+Each criterion the brief takes from a repository rule is a verbatim quote of that rule, with its path
+and line; the task's own requirements travel with their own source. Include governing rules and
+deployment facts with their sources, distinguishing documented facts from assumptions. Do not withhold
+a governing fact as an owner preference. Keep the doer's hypotheses and unwritten owner preferences or
+precedents out of the initial brief; the adjudicator checks them separately. An explicit owner
+requirement travels with its recorded source, including applicable earlier instructions. Shared
+agreement on a premise supplied by the brief is not independent evidence for that premise.
+
+For a dirty candidate, load [`duck-split`](../../duck-split/SKILL.md) and follow its git capture rules
+before dispatch: include
+staged, unstaged and relevant untracked work; inventory ignored files and preserve the user's
+checkout while constructing the snapshot in isolation.
 
 Capture a code candidate from its fork point: `git diff $(git merge-base <base> <candidate>)
 <candidate>`, and record both SHAs in the brief; a base that moved otherwise shows up reversed in
-the diff. A dirty worktree is first captured as a ref the way `duck-split` does; that ref is the
+the diff. A dirty worktree is first captured as a ref the way [`duck-split`](../../duck-split/SKILL.md)
+does; that ref is the
 candidate.
 
 A brief for round two or later carries the prior adjudication and the settled causes by stable

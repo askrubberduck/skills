@@ -10,6 +10,8 @@ by part, and show that the pieces sum to the original before anything leaves it.
 
 Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Load a linked skill when the current step requires its procedure, then follow the named section
+within existing authority. A routing mention alone does not require loading every skill.
 A question ("what doesn't belong?") gets the classification and no edits. An instruction to
 extract authorizes creating the new units only. Taking the moved parts out of the original needs
 an explicit removal instruction, "cut it from here" or any paraphrase; "extract it" alone is not
@@ -19,10 +21,10 @@ their own.
 
 ## Name the intent
 
-Use the recorded intent: the `duck-frame` outcome, the work item, or the unit's own title and
-description. With none recorded, state the intent its first parts imply as an assumption and
-classify against that; never sort against an intent nobody can read. A doubt about the intent
-itself is not a scope finding; leave it open.
+Use the recorded intent: the [`duck-frame`](../duck-frame/SKILL.md) outcome, the work item, or the
+unit's own title and description. With none recorded, state the intent its first parts imply as an
+assumption and classify against that; never sort against an intent nobody can read. A doubt about the
+intent itself is not a scope finding; leave it open.
 
 ## Judge each part
 
@@ -75,6 +77,7 @@ unless extraction was asked for.
   or the reflog, never guessed from a parent that already moved. Where the layers are open PRs,
   repoint each base before any force-push: a forge that finds a child's commits reachable from
   its base marks the child merged and may delete its branch.
-- The backup's commits land under new SHAs, so `duck-sweep` will find it Unproven: name it in
+- The backup's commits land under new SHAs, so [`duck-sweep`](../duck-sweep/SKILL.md) will find it
+  Unproven: name it in
   the report as the work item its Unmerged path reads, with the comparison result as the
   decision that lets it be deleted.

@@ -182,11 +182,13 @@
       "skill": "duck-run",
       "prompts": {
         "en": [
-          "Take this task through goal validation, planning, implementation, and proof. Stop at a verified local change."
+          "Take this task through goal validation, planning, implementation, and proof. Stop at a verified local change.",
+          "Apply selected findings A2 and A4 locally, then rerun the affected checks."
         ],
         "ru": [
           "возьми задачу в работу целиком",
-          "прогони задачу через пайплайн"
+          "прогони задачу через пайплайн",
+          "Примени выбранные замечания A2 и A4 локально и повтори затронутые проверки."
         ]
       }
     },

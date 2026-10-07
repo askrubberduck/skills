@@ -11,6 +11,8 @@ claim may survive unchanged; do not manufacture defects to look skeptical.
 
 Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Load a linked skill when the current step requires its procedure, then follow the named section
+within existing authority. A routing mention alone does not require loading every skill.
 
 ## Scope and authority
 
@@ -25,12 +27,12 @@ and verification without asking again. Selected finding IDs limit the work; repo
 applied, skipped with its reason, or parked. Commit, PR, push, merge, external dispatch and
 messages need their own existing authority; this skill grants none.
 
-For code, record the base and candidate; read the full relevant diff, including staged and
-uncommitted changes. Include relevant untracked files when they are part of the candidate; a
-test copy carries them the way `duck-split` captures a dirty tree — a ref, not a stash.
-`git diff <base>...<candidate>`, `git diff`, and `git diff --staged` cover different states. Read
-callers and the complete affected path, not just changed lines. A goal or plan needs no invented
-candidate SHA or code diff.
+For code, record the base and candidate; read the full relevant diff, including staged and uncommitted
+changes. Include relevant untracked files when they are part of the candidate; a test copy carries them
+the way [`duck-split`](../duck-split/SKILL.md) captures a dirty tree — a ref, not a stash. `git diff
+<base>...<candidate>`, `git diff`, and `git diff --staged` cover different states. Read callers and the
+complete affected path, not just changed lines. A goal or plan needs no invented candidate SHA or code
+diff.
 
 ## 1. Find what would disprove it
 
@@ -41,7 +43,8 @@ because none exists; state the gap when it limits coverage.
 - **Goal:** establish the pain and success measure. Compare no change, removal, or reuse when
   they could meet the same outcome. An unsupported benefit stays unproven.
 - **Mechanism:** trace cause to effect. Hold a plausible competing explanation and choose an
-  observation that separates them. Use `duck-why` when the cause needs investigation.
+  observation that separates them. Use [`duck-why`](../duck-why/SKILL.md) when the cause needs
+  investigation.
 - **Plan:** name the assumption that would invalidate dependent steps. Could the planned tests
   succeed while the outcome fails? Run the cheapest feasibility probe before endorsing that path.
 - **Implementation:** identify a contract violation that ordinary tests might miss: duplicate,
@@ -49,13 +52,17 @@ because none exists; state the gap when it limits coverage.
 - **Shape:** identify a mechanism that could disappear or an ownership boundary that makes the
   next realistic change hard. Compare alternatives against the same required behavior.
 
-A broad design decision belongs in `duck-frame`; a narrow necessity claim does not require a
-whole planning pipeline. Select challenges by consequence and uncertainty, not a quota of findings.
+A broad design decision belongs in [`duck-frame`](../duck-frame/SKILL.md); a narrow necessity claim
+does not require a whole planning pipeline. Select challenges by consequence and uncertainty, not a
+quota of findings.
 
 ## 2. Execute the challenge
 
 For behavioral claims, run a credible attempt to violate the central contract against the actual
-candidate and inspect the final state, not just the command's exit status. Standalone proof owns
+candidate and inspect the final state, not just the command's exit status. A suite collecting zero
+tests or skipping every test establishes no behavioral coverage; report that limit even at exit 0.
+For textual claims, source comparison can establish a broken reference or contradictory statement;
+claims about instruction behavior still need agent trials. Standalone proof owns
 running the necessary checks; a caller's output is reusable evidence only for the same candidate,
 inputs and relevant environment. For proposals, test uncertain premises with a small experiment
 when possible; this does not establish the correctness of an unbuilt implementation.
@@ -66,10 +73,11 @@ contract, or expose unnecessary code: investigate before calling the tests weak.
 implementations may produce different permitted outputs; adjudicate differences against the
 contract, including ordering and tolerance, never by vote.
 
-`duck-break` owns destructive attack isolation and recovery mechanics. Use those mechanics for
-selected attacks here; invoke a full break when requested or required by the risk/policy. Drive
-relevant input classes and positions, state bounds and omissions, and do not claim exhaustive
-coverage of an unbounded surface. Instruction changes take the agent trials `duck-break` requires.
+[`duck-break`](../duck-break/SKILL.md) owns destructive attack isolation and recovery mechanics. Use
+those mechanics for selected attacks here; invoke a full break when requested or required by the
+risk/policy. Drive relevant input classes and positions, state bounds and omissions, and do not claim
+exhaustive coverage of an unbounded surface. Instruction changes take the agent trials
+[`duck-break`](../duck-break/SKILL.md) requires.
 
 Prefer the check that reports a break soonest after the edit; a slow gate that finds the same
 failure is a second check, not the first. Cannot execute a needed check? Record what is missing
@@ -88,19 +96,20 @@ project gates before declaring completion; broaden for affected seams or unresol
 ceremony. A repair that fails sends the claim back through the challenge, at most twice per
 claim; at that bound the claim stays UNPROVEN with the failed repairs named.
 
-If the same defect class recurs, extend an executable check over its reachable surface, using
-instances as cases. Two independent occurrences record the class in `defect-classes.md` at the
-durable records home, creating the file on the first class; `duck-review` names that class when it
-recommends the caller's circuit breaker. Repeated one-off patches and increasingly long checklists
-are not closure of the class.
+If the same defect class recurs, extend an executable check over its reachable surface, using instances
+as cases. Two independent occurrences record the class in `defect-classes.md` at the durable records
+home, creating the file on the first class; [`duck-review`](../duck-review/SKILL.md) names that class
+when it recommends the caller's circuit breaker. Repeated one-off patches and increasingly long
+checklists are not closure of the class.
 
 ## 4. Prove the completed shape
 
-Run `duck-shape`'s necessity checks and realistic change probe on the assembled result, after
-correctness and operational constraints hold. For each mechanism, name what removing it loses or
-the contract that requires it; "clean architecture" is not verification, and line or abstraction
-counts are not targets. Shape edits return to section 3's executable checks. Run `duck-dry` on
-authorized edits; a prose cleanup that changes behavior also invalidates evidence.
+Run [`duck-shape`](../duck-shape/SKILL.md)'s necessity checks and realistic change probe on the
+assembled result, after correctness and operational constraints hold. For each mechanism, name what
+removing it loses or the contract that requires it; "clean architecture" is not verification, and line
+or abstraction counts are not targets. Shape edits return to section 3's executable checks. Run
+[`duck-dry`](../duck-dry/SKILL.md) on authorized edits; a prose cleanup that changes behavior also
+invalidates evidence.
 
 ## 5. Conclude on evidence, not concurrence
 
@@ -114,9 +123,9 @@ claim is refuted, or when required evidence is unavailable. Another pass needs a
 question and a new discriminating observation. Agreement with the owner is not evidence;
 opposition without evidence is not a finding.
 
-This is self-verification, not independent release approval. `duck-review` owns that judgment.
-For an additional independent challenge, use its challenge-selection reference; identify any
-missing independence honestly rather than silently upgrading a self-check into a gate.
+This is self-verification, not independent release approval. [`duck-review`](../duck-review/SKILL.md)
+owns that judgment. For an additional independent challenge, use its challenge-selection reference;
+identify any missing independence honestly rather than silently upgrading a self-check into a gate.
 
 ## Evidence and handoff (durable-home rules)
 
@@ -129,9 +138,9 @@ none is available. Do not invent a records branch. The home holds `proof-rN.md`,
 `race-rN.md`, review reports, landing outcomes, `defect-classes.md` and `merge-pin-<host>.md`;
 the dispatch measurements live apart, in `~/.askrubberduck/`.
 
-Use `proof-rN.md` when the consumer expects it, or give the consumer the exact section in a shared
-work record. Evidence and referenced artifacts must survive that handoff; scratch paths that will
-vanish are not durable citations. Raw logs and CLI stdout stay in scratch, never in a commit. Do
-not advance a candidate or its base merely to save a receipt. Local work needs no commit just to
-record a pass; `duck-run` and `duck-land` handle authorized release transitions and exact target
-checks.
+Use `proof-rN.md` when the consumer expects it, or give the consumer the exact section in a shared work
+record. Evidence and referenced artifacts must survive that handoff; scratch paths that will vanish are
+not durable citations. Raw logs and CLI stdout stay in scratch, never in a commit. Do not advance a
+candidate or its base merely to save a receipt. Local work needs no commit just to record a pass;
+[`duck-run`](../duck-run/SKILL.md) and [`duck-land`](../duck-land/SKILL.md) handle authorized release
+transitions and exact target checks.

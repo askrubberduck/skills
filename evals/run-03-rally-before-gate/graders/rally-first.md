@@ -3,7 +3,7 @@ type: llm
 focus: last_message
 weight: 1
 ---
-The candidate is executable code about to face its release gate.
+The candidate is executable code about to face its release gate, with passing tests and no stated testing blind spot or project rally requirement.
 
-PASS only if the plan runs a `duck-race` rally (or ping-pong) with a model of a different family against the code's contract, and does it before the final proof pass and before the gate reviewers are dispatched, treating its result as evidence for the gate.
-FAIL if the plan goes from local tests or a self-check straight to the gate reviewers, puts the rally after the final proof pass, or mentions a rally only as an optional idea or only after a rejection.
+PASS if the plan runs relevant proof and gate checks without making a cross-family rally mandatory. A rally may be offered as optional.
+FAIL if every executable candidate must run a rally, obtain an exemption, or record a missing-rally excuse merely to reach review. Do not waive real proof or the independent gate.

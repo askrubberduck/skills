@@ -32,33 +32,29 @@ the first round of a *release* review; an analysis pass is not a round of it.
 | not trust-touching | Independent, after a self-check of the decisive experiment | Independent |
 | trust-touching | Broad | Broad |
 
-After each round, one of these holds, in this order:
+Continue only for a named unresolved claim and a new discriminating observation or changed
+candidate, within the caller's recorded bound. A substantiated blocker holds approval; repair and
+recheck it before another review. Missing required evidence or participation leaves the gate
+incomplete. A complete review with no substantiated blocker needs no automatic extra round.
 
-1. A substantiated `BLOCKER` → one more round.
-2. Two eligible captures (Broad, or Independent escalated once) → `$LEDGER remaining <gate_id>`
-   (`python3` with the absolute path of `duck-review`'s `scripts/ledger.py`, typed out as
-   `python3 "<path>" <subcommand>` rather than held in one variable); another round while
-   its estimate is at least one, stop below; "insufficient evidence" from it counts as at least one.
-3. One capture and no `BLOCKER` → stop, unless the round found nothing at all and the reviewer's
-   family has no recorded precision at or above 0.8 for any class on this repository
-   (`$LEDGER precision`, which filters by origin) — then escalate
-   once to Broad.
-   Precision measures substantiation of what was claimed, not what was missed; it earns a stop
-   only together with a clean round.
+`remaining` and `precision` are optional measurements, not stop, continuation, escalation or
+approval criteria. Empty captures cannot distinguish clean work from shared blindness; correlated
+reviewers can miss the same cause. Do not turn an estimate or its absence into a finding.
 
-Ceilings against a wrong estimate: `[bounds].review_rounds` and `[bounds].trust_rounds` in
-`~/.askrubberduck/config.toml`, whose defaults `duck-run` states. Broad's budget is its two
-reviews, their two cross-family dispositions, and one outage retry per participant. Never reduce
-the set mid-gate; a smaller start applies to the next gate. Before the first dispatch, say what
-it will cost: `$LEDGER cost <setup>` reads it from past dispatches.
+`[bounds].review_rounds` and `[bounds].trust_rounds` in `~/.askrubberduck/config.toml` cap the run;
+`duck-run` states their defaults. Broad's budget is its two reviews, their two cross-family
+dispositions, and one outage retry per participant. Never reduce the required set mid-gate.
+Before dispatch, `$LEDGER cost <setup>` reports past cost when useful; `$LEDGER` is `python3` with
+the absolute path of `duck-review`'s `scripts/ledger.py`. Keep the recorded owner effort limit.
 
 Choose the method that separates plausible explanations: rival causes, a deletion alternative,
 an independent plan, an outcome oracle, or a reconstruction. Share requirements and source access;
 keep initial conclusions independent. Different role names or contexts are not different families,
 and different families may share a faulty premise. Test the premise too. Select an available,
-pinned model capable of the challenge — `$LEDGER pick <stage>` chooses within the
-required set from the stage's list by recorded catches per minute, or in list order when
-`[learn].select` is `fixed` (default `adaptive`). The chosen pin's effort is `[effort].trust`
+pinned model capable of the challenge — `$LEDGER pick <stage>` chooses within the required set
+in configured list order by default (`[learn].select = "fixed"`). Explicit `adaptive` selection
+uses recorded catches per minute for `review` only; stages without that outcome measure retain
+list order. The chosen pin's effort is `[effort].trust`
 (default the pin's own) for trust-touching work and `[effort].ordinary` (default the pin's own)
 otherwise. Use the strongest available tier for trust-touching or unfamiliar high-risk judgments
 unless the owner specifies otherwise. Ordinary work may use a cheaper tier; record the choice
