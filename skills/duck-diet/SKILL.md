@@ -11,6 +11,8 @@ establish lower cost or better results.
 
 Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Load a linked skill when the current step requires its procedure, then follow the named section
+within existing authority. A routing mention alone does not require loading every skill.
 Respect existing edit authority. An audit alone reports proposed changes; a request to trim applies
 justified local edits and verifies them without another approval request. Preserve owner decisions,
 security boundaries and required workflow evidence.
@@ -35,7 +37,8 @@ security boundaries and required workflow evidence.
    experiment. `[models].worker` for delegated builders (default the host's choice) and
    `[models].explore` for read-only search (default the host's choice) name the model to ask the
    host for; the identity and the check above still apply, and a same-family worker is never an
-   independent reviewer. Use `duck-review`'s challenge-selection policy for independent or high-risk
+   independent reviewer. Use [`duck-review`](../duck-review/SKILL.md)'s challenge-selection policy for
+   independent or high-risk
    judgments; honor the owner's model choices and repository requirements.
 4. **Batch useful communication.** Dispatch bounded independent tasks with the necessary context.
    Request findings and decisive evidence, not transcripts or repeated idle updates. More workers
@@ -46,11 +49,11 @@ security boundaries and required workflow evidence.
 
 ## Session cost audit
 
-Use actual host usage records. `duck-learn` owns the known transcript-store locations and how owner
-tasks are told from derived logs. Usage is counted here;
-include subagents and retries without double-counting derived logs. Report available input, cached
-input and output usage, measured elapsed time, repeated reads/dispatches and retry outcomes.
-A missing field or inaccessible store is unknown, never zero.
+Use actual host usage records. [`duck-learn`](../duck-learn/SKILL.md) owns the known transcript-store
+locations and how owner tasks are told from derived logs. Usage is counted here; include subagents and
+retries without double-counting derived logs. Report available input, cached input and output usage,
+measured elapsed time, repeated reads/dispatches and retry outcomes. A missing field or inaccessible
+store is unknown, never zero.
 
 Separate measured tokens, context size and billed cost. Bytes or word counts are size proxies, not
 measured tokens. Cached-input volume alone does not establish the dominant billed cost: conversion

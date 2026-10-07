@@ -12,6 +12,8 @@ durable home and is verified there before its container is removed.
 
 Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Load a linked skill when the current step requires its procedure, then follow the named section
+within existing authority. A routing mention alone does not require loading every skill.
 
 ## Sweep per repo
 
@@ -24,7 +26,8 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
      (`git branch --merged origin/<default>` is the proof). These outlive their ref. Delete with
      `-D`: `-d` re-checks against HEAD or the upstream and refuses when either is behind.
    - **Preserved by record** — squash-merged, rebased, or cherry-picked, *and* the project's
-     outcome record (`duck-land`'s) names this branch's landed and candidate SHAs. Confirm the
+     outcome record ([`duck-land`](../duck-land/SKILL.md)'s) names this branch's landed and candidate
+     SHAs. Confirm the
      landed SHA is on `origin/<default>` **and the branch tip is still that candidate**, then
      delete. A branch that gained commits after it landed is Unproven, whatever the record says.
    - **Not preserved** — squash-merged, rebased, or cherry-picked with **no such record**: the
@@ -43,7 +46,8 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
    which the repo's own ignore rules already name as artifacts. Every other `??` or `!!` entry
    gets an explicit keep-or-delete decision before removal: it may exist nowhere else, so
    **unknown means keep, and only the owner may decide to delete one**, however obvious it looks;
-   queue it via `duck-decide` and keep the file meanwhile. Then — only once nothing in the
+   queue it via [`duck-decide`](../duck-decide/SKILL.md) and keep the file meanwhile. Then — only once
+   nothing in the
    worktree remains marked keep — `git worktree remove <path>`, `git branch -D <branch>` against
    the classification above, and `git worktree prune` for leftovers.
 4. Scratch dirs: hunt ad-hoc temp dirs outside the sanctioned scratchpad (e.g. `<repo>-tmp*` in

@@ -10,6 +10,8 @@ without acting on anything. Writes (close/approve/park) route to the repo's disp
 
 Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Load a linked skill when the current step requires its procedure, then follow the named section
+within existing authority. A routing mention alone does not require loading every skill.
 
 ## Locate registries (detect, don't configure)
 
@@ -46,5 +48,6 @@ One table, then the recommendation:
   actions, not pickable work. A change waiting at its gate is neither: it belongs to the reviewer,
   not a new doer.
 - If the user asked about specific IDs, answer those first, in the order asked.
-- Name the handoff when the scan reveals one: backlog full of stale/blocked rot → `duck-cut`;
-  pickables ready and the user wants them executed → `duck-campaign`.
+- Name the handoff when the scan reveals one: backlog full of stale/blocked rot →
+  [`duck-cut`](../duck-cut/SKILL.md);
+  pickables ready and the user wants them executed → [`duck-campaign`](../duck-campaign/SKILL.md).

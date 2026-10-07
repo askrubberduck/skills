@@ -11,9 +11,12 @@ a required outcome. No finding is a valid result when the claims survive inspect
 
 Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Load a linked skill when the current step requires its procedure, then follow the named section
+within existing authority. A routing mention alone does not require loading every skill.
 Roast reports findings and proposed dispositions; it does not edit the candidate. One change
-belongs to `duck-review`, a backlog sweep to `duck-cut`, and verification of your own candidate to
-`duck-proof`.
+belongs to [`duck-review`](../duck-review/SKILL.md), a backlog sweep to
+[`duck-cut`](../duck-cut/SKILL.md), and verification of your own candidate to
+[`duck-proof`](../duck-proof/SKILL.md).
 
 ## Ground the critique
 
@@ -25,7 +28,7 @@ Choose relevant questions rather than filling every category:
 
 - Does the mechanism deliver the required outcome? Can existing behavior or deletion satisfy it?
 - Where do duplicate rules/state, unused paths, speculative options or leaking wrappers create a
-  real maintenance burden? Apply `duck-shape`'s necessity checks.
+  real maintenance burden? Apply [`duck-shape`](../duck-shape/SKILL.md)'s necessity checks.
 - Do affected trust boundaries enforce their contract? What can malformed input or a compromised
   component reach in the actual deployment?
 - Which required operation can fail, how is it noticed, and what recovery is available?
@@ -37,12 +40,11 @@ instances may have one shared fix; repetition alone does not make that fix an ow
 
 ## Substantiate and bound the pass
 
-Choose method, participants and effort bound with `duck-review`'s [challenge
-selection](../duck-review/references/challenge.md). A focused self-critique stays labeled as such.
-Use its [dispatch mechanics](../duck-review/references/dispatch.md) for external participants;
-required authorization and identity checks still apply, and their ledger rows carry
-`stage = roast`. Give independent critics the same
-constraints and complementary questions, not each other's conclusions.
+Choose method, participants and effort bound with [`duck-review`](../duck-review/SKILL.md)'s [challenge
+selection](../duck-review/references/challenge.md). A focused self-critique stays labeled as such. Use
+its [dispatch mechanics](../duck-review/references/dispatch.md) for external participants; required
+authorization and identity checks still apply, and their ledger rows carry `stage = roast`. Give
+independent critics the same constraints and complementary questions, not each other's conclusions.
 
 For each proposed finding, identify the violated contract or concrete cost, cite its source and
 execute a relevant counterexample when feasible. Distinguish demonstrated defects, supported
@@ -59,12 +61,13 @@ finding list is empty or every critic agrees.
 
 Report findings with location, consequence, evidence and proposed action, then material coverage
 limits. Separate required repairs from optional improvements and genuine owner decisions. Use
-`duck-decide` only for a tradeoff the owner actually needs to settle.
+[`duck-decide`](../duck-decide/SKILL.md) only for a tradeoff the owner actually needs to settle.
 
 A standalone critique stays in the response. Update an existing review/work record when requested,
-required by policy or needed for a downstream handoff, using `duck-proof`'s durable-home rules.
-Do not create a packet or backlog entry merely because a finding exists.
+required by policy or needed for a downstream handoff, using [`duck-proof`](../duck-proof/SKILL.md)'s
+durable-home rules. Do not create a packet or backlog entry merely because a finding exists.
 
 Return to the caller for already-authorized repairs. Small local fixes need their relevant checks;
-substantial work may need `duck-plan`, and release follows the required `duck-review` gate. The
-roast itself grants neither repair authority nor release approval.
+substantial work may need [`duck-plan`](../duck-plan/SKILL.md), and release follows the required
+[`duck-review`](../duck-review/SKILL.md) gate. The roast itself grants neither repair authority nor
+release approval.

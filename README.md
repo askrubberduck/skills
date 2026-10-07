@@ -195,10 +195,10 @@ you what it changed. Set it to `propose` to be asked first.
    checks that could kill them. Run the cheap experiment before building on the expensive guess.
 3. **Execute.** Make the meaningful check fail, make it pass, then apply `duck-shape` and
    `duck-dry` inside that unit. “We'll simplify it later” has had enough chances.
-4. **Prove**, `duck-proof`. Executable code headed for independent review first goes through a
-   `duck-race` rally with another model family. Attack the goal, the behavior and the finished
-   shape. `duck-break` runs hostile experiments where needed. Fix something? Run the affected checks
-   again. Yesterday's green does not cover today's edit.
+4. **Prove**, `duck-proof`. Attack the goal, the behavior and the finished shape. Use a cross-family
+   `duck-race` rally when requested, required by project policy, or a demonstrated testing blind
+   spot needs it. `duck-break` runs hostile experiments where needed. Fix something? Run the affected
+   checks again. Yesterday's green does not cover today's edit.
 5. **Review**, `duck-review`. Where the task or release policy requires it, independent reviewers
    challenge the exact candidate. A missing reviewer leaves a missing review, never a quiet pass.
 6. **Land**, `duck-land`. When you authorized a merge: merge, read back what landed, record it,
@@ -328,7 +328,7 @@ ordinary = "medium"
 trust = "high"
 
 [learn]
-select = "adaptive"         # adaptive: by track record; fixed: list order
+select = "fixed"            # list order; adaptive opts into review-only ranking
 discover = "auto"           # new models: off | propose | auto
 shadow = 3                  # gates a trial model rides along without counting
 trial = []                  # models on trial; duck-learn fills and empties it
@@ -351,10 +351,12 @@ procedure = "~/notes/releasing.md"   # your release process, kept outside the re
 review_rounds = 2
 ```
 
-The rows answer questions the duck used to guess at. How many defects did both reviewers miss?
-`skills/duck-review/scripts/ledger.py remaining <gate_id>` estimates it from what they found in
-common. Which family catches which class? `precision`. Who reviews next? `pick <stage>` samples from
-recorded catches per minute, inside the set the gate requires. Did the change help? `paired`
+The rows support optional measurement. `skills/duck-review/scripts/ledger.py remaining <gate_id>`
+estimates missed findings from overlap; empty captures are insufficient evidence, and shared blind
+spots limit the estimate. It never decides whether a review stops or passes. `precision` measures
+past substantiation, not missed defects. `pick <stage>` follows configured order inside the required
+set; explicit adaptive mode ranks reviews by recorded catches per minute. Other stages keep list
+order. Did the change help? `paired`
 compares two arms on the same cases. What is drifting? `thresholds` hands `duck-learn` its
 occurrences. What will this gate cost? `cost <setup>` reads past gates. Is there a new model?
 `roster <models|->` lists host models that are in no role list, no trial and no ledger row; after

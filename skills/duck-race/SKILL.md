@@ -11,6 +11,8 @@ write both sides of the proof.
 
 Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Load a linked skill when the current step requires its procedure, then follow the named section
+within existing authority. A routing mention alone does not require loading every skill.
 
 Two modes. **Race** when the question is *which implementation*: both attempt independently, in
 parallel, and the diffs are compared. **Rally** when the question is *which edge cases*: the
@@ -141,7 +143,8 @@ serve exhausts the turn cap before the class closes.
 
 - An outage that survives one re-dispatch leaves one family playing: say so and stop calling the
   work different-family.
-- Receipt to `race-rN.md` in the project's durable records home as `duck-proof` resolves it — never
+- Receipt to `race-rN.md` in the project's durable records home as
+  [`duck-proof`](../duck-proof/SKILL.md) resolves it — never
   the scratchpad, never a commit on the candidate branch: problem hash, base SHA, participant
   identities with pinned model ids — a receipt without identities cannot prove the run was
   cross-family at all — the mode, the diffs themselves, test output per candidate **and for the
@@ -154,7 +157,8 @@ serve exhausts the turn cap before the class closes.
 - Never commit raw CLI stdout; keep it in `$SP` — it is megabytes of tool chatter around a
   verdict the receipt already quotes.
 - **Adjudication is synthesis, not approval.** The output is a tested candidate, not an approved
-  one: it enters the normal pipeline (`duck-proof`, then `duck-review`) like any other work. This
+  one: it enters the normal pipeline ([`duck-proof`](../duck-proof/SKILL.md), then
+  [`duck-review`](../duck-review/SKILL.md)) like any other work. This
   skill replaces nothing downstream.
 
 ## Common mistakes

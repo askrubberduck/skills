@@ -11,10 +11,13 @@ Differs from a disposition flow (which acts on IDs the owner names) — this one
 
 Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Load a linked skill when the current step requires its procedure, then follow the named section
+within existing authority. A routing mention alone does not require loading every skill.
 
 ## Sweep
 
-1. Enumerate all items from the repo's registries by running `duck-scan` — it owns the locator, and
+1. Enumerate all items from the repo's registries by running [`duck-scan`](../duck-scan/SKILL.md) — it
+   owns the locator, and
    this skill does not carry a second copy of where registries live. Not installed? Say so and ask
    where the backlog is, once; never guess it.
 2. Per item, argue **against its existence** before anything else (the existence check). Verdict,
@@ -25,7 +28,8 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
      same evidence bar as CLOSE NOW. Delete, don't park — a parked item is still backlog.
    - **MERGE** — duplicate or subset of another item; fold and close.
    - **UNBLOCK** — the stated blocker no longer holds (verify, don't assume); make it pickable.
-     `duck-scan`'s attribution rule decides whether an entry lifting it counts: unattributed stays
+     [`duck-scan`](../duck-scan/SKILL.md)'s attribution rule decides whether an entry lifting it
+     counts: unattributed stays
      blocked.
    - **KEEP** — survives the critique; record the one-sentence justification that saved it.
 
@@ -37,7 +41,8 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
    registry keeps the cut text in its history; for one outside version control, keep it in the
    report until the owner has read it.
 4. Items needing the owner (sign-offs, policy calls, anything the doer may not close): queue them
-   and run `duck-decide` — never close an owner-gated item yourself, never drop it silently. Queuing
+   and run [`duck-decide`](../duck-decide/SKILL.md) — never close an owner-gated item yourself, never
+   drop it silently. Queuing
    one is not a reason to stop; the sweep continues past it.
 
 ## Report shape

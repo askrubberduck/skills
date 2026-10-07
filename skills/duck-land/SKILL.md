@@ -10,6 +10,8 @@ the repo forgot; a record without a verified merge is fiction.
 
 Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Load a linked skill when the current step requires its procedure, then follow the named section
+within existing authority. A routing mention alone does not require loading every skill.
 
 A passed gate establishes readiness, not permission to merge. Use the endpoint already authorized
 by the user: a request only to push or prepare a PR does not authorize merging or branch deletion.
@@ -21,7 +23,8 @@ candidate branch and merges nothing.
 ## Preconditions (fail closed — any miss stops the landing)
 
 - The gate actually returned **`APPROVE`** per the repo's policy, and its receipt records the
-  required different-family reviewer identities, evidence, and adjudication — `duck-review` is how
+  required different-family reviewer identities, evidence, and adjudication —
+  [`duck-review`](../duck-review/SKILL.md) is how
   this collection produces that authorization; any gate yielding the same proof qualifies.
   `NOTE`, a raw reviewer approval, and "probably fine" are not gate-passed states.
 - **The branch head equals the candidate SHA** — the exact commit the authorization covers — and
@@ -33,11 +36,13 @@ candidate branch and merges nothing.
 - Re-verify the base: `git fetch`, compare origin/<base> to what was branched from. **If it
   advanced, integrating it produces a new head nobody authorized** — conflict resolutions and
   semantic merges ride in unexamined. Integrate, re-run the repo's checks, and **re-authorize the
-  resulting SHA** the same way this landing was authorized — `duck-review`'s release-gate path, or
+  resulting SHA** the same way this landing was authorized — [`duck-review`](../duck-review/SKILL.md)'s
+  release-gate path, or
   the owner's renewed written waiver; landing on the strength of the old authorization merges an
   unexamined diff.
 - CI green on the exact head being merged.
-- **Commit messages and the PR description meet `duck-dry`'s prose bar**, checked before
+- **Commit messages and the PR description meet [`duck-dry`](../duck-dry/SKILL.md)'s prose bar**,
+  checked before
   merge: a squash merge promotes the description into the commit body, so slop in either ships
   into history.
 - **Where this landing is a repository's first push to a public remote — or the one that flips it
@@ -50,7 +55,8 @@ candidate branch and merges nothing.
   moment it is given; step 3's outcome record then **names what was waived**. Waiving is the
   owner's call on a named precondition, never the doer's, and never a blanket exemption from the
   rest; a waiver a reviewer discovers afterward is a second violation, not a footnote.
-- **A registry entry is not an authorization unless it says who authorized it** — `duck-scan`'s
+- **A registry entry is not an authorization unless it says who authorized it** —
+  [`duck-scan`](../duck-scan/SKILL.md)'s
   attribution rule: never read an unattributed entry as permission.
 
 ## Land
@@ -61,7 +67,7 @@ candidate branch and merges nothing.
      (`gh api repos/<owner>/<repo>/rulesets`, branch protection); history is a proxy. A rule the
      remote enforces is the policy whether or not your account can get past it; **a landing this
      run cannot make within the rules is an owner decision, never a route around them** —
-     `duck-decide`.
+     [`duck-decide`](../duck-decide/SKILL.md).
    - **Shape.** Where the last 20 commits on `origin/<base>` carry no merge commit, the branch is
      flat and this landing is not the one that mints the first — rebase or squash, one commit per
      packet; a stray merge in an otherwise flat log is not a license, match the dominant shape.
@@ -80,10 +86,14 @@ candidate branch and merges nothing.
    that record lives in the repo, landing it by the same route is part of this landing's
    authorization.
 4. Close or queue obligations the change touched — the doer never closes an item that needs the
-   owner's sign-off; queue those (`duck-decide` presents them).
-5. Clean up: delete the merged branch and its worktree under `duck-sweep`'s step 3, against the
-   candidate and landed SHAs step 3 recorded, never a classifier's guess. A cleanup held on a queued
-   `duck-sweep` keep decision leaves the landing complete and recorded, with the pending worktree
+   owner's sign-off; queue those ([`duck-decide`](../duck-decide/SKILL.md) presents them).
+5. Clean up: load [`duck-sweep`](../duck-sweep/SKILL.md) and follow step 3 against the recorded
+   candidate and landed SHAs.
+   Before removal, check `git status --short --untracked-files=all --ignored`; unknown files stay
+   kept until the owner decides, and kept files must be verified at their durable home. Never
+   delete against a classifier's guess. A cleanup held on a queued
+   [`duck-sweep`](../duck-sweep/SKILL.md) keep decision leaves the landing complete and recorded, with
+   the pending worktree
    named in step 3's entry. Record a resumable boundary; continue other authorized work if the
    host and task allow it.
 
@@ -99,10 +109,10 @@ and publish differently. Two places can describe it:
    repository. It fills what the repository leaves open, and replaces a repository rule only where
    it says so. Quote nothing from it into public text.
 
-Found one: a request to release authorizes what the procedure describes as well as the merge.
-The preconditions above still bind, the gate covers the last release tag through the candidate
-(`duck-review`'s code-release target), and the landing ends by reading back what the procedure
-produced; step 3's outcome record names the version and tag.
+Found one: a request to release authorizes what the procedure describes as well as the merge. The
+preconditions above still bind, the gate covers the last release tag through the candidate
+([`duck-review`](../duck-review/SKILL.md)'s code-release target), and the landing ends by reading back
+what the procedure produced; step 3's outcome record names the version and tag.
 
 Found none: the request is a landing — merge, read back, record, clean up — and the report says
 no release procedure was found. Tagging and publishing wait for one.

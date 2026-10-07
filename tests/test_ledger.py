@@ -245,7 +245,7 @@ def roles_check(root: Path) -> None:
             (["pick", "review", "--trust", "--repo", "r"], 0,
              ["chosen openai:gpt-6-astra:xhigh", "shadow openai:gpt-6-nova:xhigh 0/1"],
              ["shadow openai:gpt-6-sol"]),  # past its shadow gates, it no longer rides along
-            (["remaining", "g7", "--repo", "r"], 0, ["n1 = 1", "n2 = 0"], []),  # shadows are not captures
+            (["remaining", "g7", "--repo", "r"], 0, ["insufficient evidence", "n1 = 1", "n2 = 0"], ["remaining ="]),  # shadows are not captures
             (["promote", "--repo", "r"], 0,
              ["replace openai:gpt-6-astra:high with openai:gpt-6-sol:high in review",
               "add anthropic:claude-x:high to review", "drop google:gemini-9-pro:high",
@@ -489,6 +489,45 @@ def home_check(parent: Path) -> None:
     assert done.returncode == 0 and "gpt-é".encode() in done.stdout, done
 
 
+def selection_check(root: Path) -> None:
+    config = {"doer": "anthropic", "reviewers": ["openai:first:high", "google:second:high"]}
+    for stage in ("review", "plan", "race", "rally", "disposition", "worker", "explore"):
+        cfg = dict(config, **{stage: config["reviewers"]})
+        rows = [{"id": "caught", "stage": stage, "status": "final", "repo": "r",
+                 "gate_id": "g", "round": "1", "candidate": "c", "setup": "independent",
+                 "family": "openai", "model": "first", "effort": "high", "minutes": "100"}]
+        findings = [{"dispatch_id": "caught", "cause_id": "bug", "severity": "BLOCKER",
+                     "substantiated": "1"}]
+        for mode in (None, "fixed", "adaptive"):
+            choice = dict(cfg, select=mode) if mode else cfg
+            for seed in range(5):
+                random.seed(seed)
+                before = random.getstate()
+                chosen, stats = pick_arms(choice, rows, findings, stage, trust=False)
+                if stage == "review" and mode == "adaptive":
+                    assert random.getstate() != before
+                    assert stats[("openai", "first", "high")][:2] == (1, 0), stats
+                else:
+                    assert chosen == [("openai", "first", "high")], (stage, mode, chosen)
+                    assert random.getstate() == before, (stage, mode, "unexpected sampling")
+                    if stage != "review":
+                        assert not stats, (stage, "invented outcome statistics", stats)
+    for n1, n2 in ((0, 0), (1, 0), (0, 1)):
+        rows = [{c: "-" for c in DISPATCH_COLUMNS} for _ in range(2)]
+        for row, ident, family in zip(rows, ("one", "two"), ("openai", "google")):
+            row.update(id=ident, gate_id="g", round="1", repo="r", stage="review", setup="broad",
+                       trust="1", candidate="c", family=family, model="m", status="final", outage="0")
+        findings = [{c: "-" for c in FINDING_COLUMNS} for _ in range(n1+n2)]
+        for row, ident in zip(findings, ["one"]*n1 + ["two"]*n2):
+            row.update(dispatch_id=ident, gate_id="g", candidate="c", cause_id="bug", substantiated="1")
+        for name, columns, data in (("dispatches.tsv", DISPATCH_COLUMNS, rows),
+                                    ("findings.tsv", FINDING_COLUMNS, findings)):
+            (root/name).write_text("\t".join(columns)+"\n"+"".join(
+                "\t".join(row[c] for c in columns)+"\n" for row in data))
+        code, out = run(["remaining", "g", "--repo", "r"])
+        assert code == 0 and "insufficient evidence" in out and "remaining =" not in out, out
+
+
 def self_check() -> int:
     with tempfile.TemporaryDirectory(prefix="askrubberduck-ledger-") as directory:
         root = Path(directory)
@@ -556,7 +595,7 @@ def self_check() -> int:
         assert code == 1 and "no origin resolved" in err.getvalue(), (code, out)
         for argv, expected, wanted in (
                 (["remaining", "g1", "--repo", "r"], 0, ["remaining = 0.500"]),
-                (["remaining", "g4", "--repo", "r"], 0, ["n2 = 0", "remaining = 0.000"]),
+                (["remaining", "g4", "--repo", "r"], 0, ["n2 = 0", "insufficient evidence"]),
                 (["remaining", "g3", "--repo", "r"], 0, ["insufficient evidence: 1 eligible captures"]),
                 (["precision", "--repo", "r"], 0, ["anthropic correctness executed claimed=4"]),
                 (["missed"], 0, ["anthropic claude-opus-5 missed=1"]),  # the c4 production row is unsubstantiated: openai is not charged
@@ -575,6 +614,7 @@ def self_check() -> int:
             assert code == expected, (argv, code, out)
             assert all(want in out for want in wanted), (argv, out)
         roles_check(root)
+        selection_check(root)
         eligibility_check()
         rally_check(root)
     for gone in (["--self-check"], ["pick", "review", "--seed", "1"]):  # test hooks stay in tests/
