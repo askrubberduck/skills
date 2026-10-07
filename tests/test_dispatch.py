@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""dispatch.py end to end: fake `codex` and `agy` on PATH, a fixture home, every exit path.
+"""dispatch.py end to end: fake `codex`, `agy` and `claude` on PATH, a fixture home, every exit path.
 Run: python3 tests/test_dispatch.py"""
 
 from __future__ import annotations
@@ -33,6 +33,11 @@ STUBS = {
     "reject": 'printf \'%s\\0\' "$@" > "$0.argv"; pwd -P > "$0.cwd"; cut -f1,16 "$ASKRUBBERDUCK_HOME/dispatches.tsv"'
               ' > "$0.seen"\nprintf \'user\\nAPPROVE\\ncodex\\n**VERDICT: REJECT**\\n'
               'tokens used\\n1,234\\n\'',
+    "severity": "printf 'VERDICT: APPROVE\\n\\nNOTE\\nCoverage limit\\n'",
+    "bare-severity": "printf 'APPROVE\\n\\nNOTE\\nCoverage limit\\n'",
+    "plan-severity": "printf 'PLAN: OBJECT\\n\\nNOTE\\nCoverage limit\\n'",
+    "terminal-diff": "printf '## NOTE\\nNonblocking observation\\nDIFF\\n'",
+    "earlier-severity": "printf 'NOTE\\nCoverage limit\\n**VERDICT: REJECT**\\n'",
     "greeting": "printf 'user\\nVERDICT: REJECT\\ncodex\\nHello! How can I help?\\n'",
     "credits": "echo \"ERROR: You're out of credits. Add credits to continue.\"; exit 1",
     "sleep": 'sleep 30 & echo $! > "$0.pid"; wait',
@@ -68,9 +73,9 @@ def self_check() -> int:
             stub = root / name
             stub.write_text(f"#!/bin/sh\n{body}\n")
             stub.chmod(0o755)
-            # codex and agy on the seat's PATH run the stub, their own name its first argument
+            # Each CLI on the seat's PATH runs the stub with its own name as the first argument
             (root / "bin" / name).mkdir(parents=True)
-            for cli in ("codex", "agy"):
+            for cli in ("codex", "agy", "claude"):
                 fake = root / "bin" / name / cli
                 fake.write_text(f'#!/bin/sh\nexec {shlex.quote(str(stub))} "${{0##*/}}" "$@"\n')
                 fake.chmod(0o755)
@@ -120,6 +125,16 @@ def self_check() -> int:
         assert (root / "reject.argv").read_text().split("\0")[:-1] == [
             "agy", "--model", "gemini-3.1-pro-high", "--add-dir", str(checkout),
             "--print-timeout", "20s", "-p", prompt.read_text()]
+        code, out = run("reject", "g1c", "--pin", "anthropic:claude-test:high", "--add-dir",
+                        str(checkout))
+        assert code == 0 and final("g1c-r1-review-claude-test") == ("REJECT", "final", "0"), out
+        assert (root / "reject.argv").read_text().split("\0")[:-1] == [
+            "claude", "-p", "--model", "claude-test", "--effort", "high", "--permission-mode",
+            "plan", "--permission-prompts", "none", "--tools", "Read,Glob,Grep",
+            "--strict-mcp-config", "--mcp-config", '{"mcpServers":{}}', "--add-dir", str(checkout),
+            "--", prompt.read_text()]
+        code, out = run("reject", "g1c", "--pin", "anthropic:claude-other")
+        assert code == 0 and "--effort" not in (root / "reject.argv").read_text(), out
         # a second agy seat of the same gate and round takes its own default id
         code, out = run("reject", "g1", "--pin", "google:gemini-3.1-flash")
         assert code == 0 and final("g1-r1-review-gemini-3.1-flash") == ("REJECT", "final", "0"), out
@@ -132,6 +147,8 @@ def self_check() -> int:
         count = len(rows())  # agy auto-denies write_file headless: a rival needs codex
         code, out = run("reject", "g1w", "--workdir", str(rival), "--pin", "google:gemini-3.1-pro")
         assert code == 2 and "needs codex" in out and len(rows()) == count, out
+        code, out = run("reject", "g1w", "--workdir", str(rival), "--pin", "anthropic:claude-test")
+        assert code == 2 and "read-only" in out and len(rows()) == count, out
         code, out = run("reject", "g1w", "--workdir", "", "--id", "g1w-empty")
         assert code == 2 and "--workdir is empty" in out and len(rows()) == count, out
         code, out = run("greeting", "g1b")  # the prompt's verdict is no answer
@@ -142,6 +159,13 @@ def self_check() -> int:
         assert code == 0 and final("g1d-r1-disposition-gpt-6-sol")[1] == "final", out
         code, out = run("reject", "g1d")
         assert code == 0 and final("g1d-r1-review-gpt-6-sol")[1] == "final", out
+
+        for stub, verdict in (("severity", "APPROVE"), ("bare-severity", "APPROVE"),
+                              ("earlier-severity", "REJECT"), ("plan-severity", "OBJECT"),
+                              ("terminal-diff", "DIFF")):
+            code, out = run(stub, "verdict-"+stub)
+            assert code == 0 and final("verdict-"+stub+"-r1-review-gpt-6-sol") == (
+                verdict, "final", "0"), out
 
         # 2. the credits error is an outage with its cause
         code, out = run("credits", "g2")
@@ -289,8 +313,10 @@ def self_check() -> int:
         assert code == 2 and "needs --workdir" in out and len(rows()) == count, out
         code, out = run("race", "g11", *race, base, "--id", "g11-half")
         assert code == 2 and "go together" in out and len(rows()) == count, out
-        code, out = run("reject", "g12", "--pin", "anthropic:claude:high")  # transport by family only
+        code, out = run("reject", "g12", "--pin", "unknown:claude:high")  # transport by family only
         assert code == 2 and "no transport" in out and "--via" not in out, out
+        code, out = run("reject", "g12", "--prompt", str(root / "missing-brief.md"))
+        assert code == 2 and "unreadable input" in out and len(rows()) == count, out
         code, out = run("reject", "g12", rnd=0)
         assert code == 2 and "--round counts from 1" in out, out
         for gone in (["--self-check"], ["--cmd", "true"], ["--sha", "abc"], ["--via", "codex"]):

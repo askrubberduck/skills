@@ -1,6 +1,6 @@
 ---
 name: duck-decide
-description: Walk the owner through the decisions they have been ducking, one at a time. Use when open decisions, blocked obligations, or approvals need the owner's answer, the user asks to walk through decisions or options, or several owner decisions are pending.
+description: Use when asked to walk through owner decisions, options, blocked obligations or pending approvals.
 ---
 
 # Duck Decide
@@ -8,8 +8,8 @@ description: Walk the owner through the decisions they have been ducking, one at
 Blocking decisions are presented **one at a time, in full, in plain language**, unless the owner
 chooses a batch once more than five are queued (see Order).
 
-Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
-quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Use the user's requested language; preserve commands, paths, identifiers, quoted errors and
+machine-readable verdicts.
 
 ## Per decision, present
 

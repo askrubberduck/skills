@@ -1,6 +1,6 @@
 ---
 name: duck-scan
-description: Find ready, blocked, and remaining work without changing anything; looking is free. Use when the user asks what is next, open, ready, left, or available to pick up, requests status, or asks whether a named work item is ready.
+description: Use when asked what work is ready, blocked, open or remaining, or for repository status without changes.
 ---
 
 # Duck Scan
@@ -8,8 +8,8 @@ description: Find ready, blocked, and remaining work without changing anything; 
 Read-only. Answers "what's next" from the repo's own registries without a full-doc re-read and
 without acting on anything. Writes (close/approve/park) route to the repo's disposition workflow.
 
-Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
-quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Use the user's requested language; preserve commands, paths, identifiers, quoted errors and
+machine-readable verdicts.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.
 

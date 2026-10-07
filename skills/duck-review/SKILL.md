@@ -1,6 +1,6 @@
 ---
 name: duck-review
-description: Review work from multiple angles or deliver an independent judgment. Use for designs, plans, documents, code, local changes, completed work or PRs; findings-only reviews; an independent second opinion; a release gate; or to answer a review you received, saying which comments still apply to what you pushed since and drafting the replies. Findings-only review stays in-session; independent and release reviews use cross-model scrutiny and return APPROVE, REJECT, or NOTE. It does not fix, repeat, or land.
+description: Use when asked to review code, local changes, PRs, plans or documents, give an independent verdict or release gate, or assess and draft replies to received review comments.
 ---
 
 # Duck Review
@@ -11,8 +11,8 @@ implementation; judge completed work against observable results.
 Independent scrutiny precedes release approval. The builder must validate the candidate first;
 a reviewer is not a substitute for the doer's own breaking attempts.
 
-Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
-quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Use the user's requested language; preserve commands, paths, identifiers, quoted errors and
+machine-readable verdicts.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.
 
@@ -49,9 +49,9 @@ When the user is the author and a review has landed, judge each thread against t
 not the revision the reviewer saw, and give it one disposition with its evidence: still valid, already
 fixed, disagree, out of scope, or a challenge to the approach. A thread that questions the mechanism
 rather than a line gets no patch: [`duck-shape`](../duck-shape/SKILL.md) over the problem, and a
-proposed shape, come before any edit. Draft one reply per thread: at most three words when agreeing or
-reporting a fix, fifteen otherwise. "Resolve all" covers resolving only, and only threads already
-fixed; the rest stay open and are listed.
+proposed shape, come before any edit. Draft one concise reply per thread, with enough evidence or
+reasoning to support its disposition; follow any reply format the user requests. "Resolve all"
+covers resolving only, and only threads already fixed; the rest stay open and are listed.
 
 ## Prepare the review
 

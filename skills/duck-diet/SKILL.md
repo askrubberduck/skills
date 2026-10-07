@@ -1,6 +1,6 @@
 ---
 name: duck-diet
-description: Put agent context, memory, and token costs on a diet without starving the essential guidance. Use when the user asks for minimum tokens, a session-cost analysis, an agent setup health check, or trimming of CLAUDE.md, AGENTS.md, or memory, when picking which model tier or agent type a stage runs on, or before a long campaign or multi-agent run.
+description: Use when asked to audit agent setup, reduce context or token costs, trim instructions or memory, or choose model tiers.
 ---
 
 # Duck Diet
@@ -9,8 +9,8 @@ Reduce measured waste in agent context and work. Find repeated reads, duplicated
 unnecessary dispatches or retries before recommending a new setup. Smaller output alone does not
 establish lower cost or better results.
 
-Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
-quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Use the user's requested language; preserve commands, paths, identifiers, quoted errors and
+machine-readable verdicts.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.
 Respect existing edit authority. An audit alone reports proposed changes; a request to trim applies

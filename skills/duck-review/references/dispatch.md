@@ -67,9 +67,9 @@ python3 "$DISPATCH" --gate "$GATE" --round "$N" --stage review --setup independe
   --candidate "$CHECKOUT"
 ```
 
-The script picks `codex exec` or `agy` by the pin's family, runs from the
+The script picks `codex exec`, `agy` or `claude -p` by the pin's family, runs from the
 `--out` file's directory — the seat's own scratch directory, never the target checkout, unless
-`--workdir` names a worktree the seat is meant to change (codex `-C`; refused for agy) — closes
+`--workdir` names a worktree the seat is meant to change (codex `-C`; refused for agy and Claude) — closes
 stdin, kills the whole process group past `[bounds].dispatch_timeout` (default 45m) and confirms it
 exited, and refuses a round past the caller's bound unless `--extended` carries the owner's
 words. It exits 0 with a verdict, 1 on an outage and its cause, 2 when it refused, 3 when the seat
@@ -77,9 +77,17 @@ changed the `--candidate` checkout. A race rival adds `--diff-base <sha> --diff-
 a verdict the script writes the `--workdir` diff against that base whole; an outage writes none, and
 an empty diff is an outage, since a race rival's answer is a change.
 
-**The prompt is an argument; the material under review is a path inside it.** Hand the reviewer
+**`--prompt` takes a UTF-8 brief file path; the script passes its contents as a CLI argument.**
+The material under review is a path inside that brief. Hand the reviewer
 your instructions on the command line, and have those instructions name the diff, corpus, or files
 by absolute path for the reviewer to open — never paste that material into the command.
+
+The Anthropic route uses `claude -p` with an exact model pin and optional effort, plan permissions,
+read-only file tools and no MCP servers. It does not approve writes or shell execution. Claude and agy
+seats cannot take `--workdir` or serve as writable race/rally rivals; use a supported writable transport
+instead. agy headless writes are denied, not a sandbox guarantee. Treat source-only findings as
+`tier = read`; claim executed evidence only when the seat supplies observed command output. The outer
+runner bounds all transports and finalizes their ledger rows on timeout or failure.
 
 Sanity-check a new invocation form with the prompt `Reply with exactly: OK`, run as the bare CLI
 command outside `$DISPATCH`, which would record that answer as an outage. These traps yield
@@ -101,6 +109,12 @@ report the missing participant, naming the config file that holds a dead pin. **
 dispatch is the harder case — full length, well formed, and wrong.** Nothing in the exit status
 distinguishes it, so before trusting any result, check that its quoted justifications actually
 support its verdict.
+
+Ask participants to label the overall result `VERDICT: APPROVE | REJECT | NOTE` (or
+`PLAN: CONCUR | OBJECT`). The parser prioritizes explicit result lines; otherwise it uses the opening
+standalone verdict, preserving terminal bare `DIFF` for race/rally output. A later bare severity
+heading cannot overwrite the opening review verdict. Ambiguous output still
+requires inspection rather than treating its parsed label as independent judgment.
 
 Two kinds of malformed result:
 *unranked* — a verdict with findings that carry no severity: the participant counts, its findings

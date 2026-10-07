@@ -265,6 +265,8 @@ arms on reply length alone; dispositions and nothing-resolved passed eighteen of
 first run let replies be "one sentence" and got sentences of 22 to 55 words; with the rule changed
 to fifteen words the plugin arm wrote 14 to 17 and passed one run of three, the no-plugin arm none.
 The rubric was rewritten once in between, to grade the rule as written rather than a stricter one.
+These historical scores include the former reply caps. The current rubric grades concise, supported
+replies without universal word limits; those old scores do not establish its behavior.
 
 ### `shape` with the six harder cases, 2026-09-21
 

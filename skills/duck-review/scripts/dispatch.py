@@ -27,9 +27,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from ledger import (DEFAULT_RALLY_TURNS, DISPATCH_COLUMNS, DISPATCH_ENUMS, arm_of,  # noqa: E402
                     default_origin, home, load_config, read_table, validate_row)
 
-VIA = {"openai": "codex", "google": "agy"}  # by the pin's family
+VIA = {"openai": "codex", "google": "agy", "anthropic": "claude"}  # by the pin's family
 VERDICT_LINE = re.compile(
-    r"^[\s>#*_`]*(?:(?:VERDICT|PLAN)\s*:[\s*_`]*)?(APPROVE|REJECT|NOTE|CONCUR|OBJECT|DIFF)[\s*_`.]*$")
+    r"^[\s>#*_`]*(?:(?P<label>VERDICT|PLAN)\s*:[\s*_`]*)?"
+    r"(?P<verdict>APPROVE|REJECT|NOTE|CONCUR|OBJECT|DIFF)[\s*_`.]*$")
 # Checked only when no verdict was found, first match wins: while credits are out, codex reports
 # that before anything else, so a later pin rejection proves nothing.
 OUTAGES = (("credits", r"out of credits|insufficient credits?|credit balance"),
@@ -58,6 +59,11 @@ def transport(via: str, family: str, model: str, effort: str, prompt: str, workd
         reasoning = ["-c", f"model_reasoning_effort={effort}"] if effort != "-" else []
         return ["codex", "exec", "-m", model, *reasoning, "-s", "workspace-write", "-C",
                 str(workdir), "--skip-git-repo-check", *dirs, prompt]
+    if via == "claude":
+        reasoning = ["--effort", effort] if effort != "-" else []
+        return ["claude", "-p", "--model", model, *reasoning, "--permission-mode", "plan",
+                "--permission-prompts", "none", "--tools", "Read,Glob,Grep", "--strict-mcp-config",
+                "--mcp-config", '{"mcpServers":{}}', *dirs, "--", prompt]
     # agy takes the effort as part of the model id: `gemini-3.1-pro-high`
     pinned = model if effort == "-" else f"{model}-{effort}"
     return ["agy", "--model", pinned, *dirs, "--print-timeout", f"{math.ceil(limit)}s", "-p", prompt]
@@ -70,11 +76,16 @@ def classify(text: str, via: str, timed_out: bool, code: int) -> tuple[str, str]
     lines = text.splitlines()
     if via == "codex" and CODEX_ANSWER in lines:  # before it, codex echoes the prompt
         lines = lines[len(lines) - lines[::-1].index(CODEX_ANSWER):]
-    verdicts = [match[1] for match in map(VERDICT_LINE.match, lines) if match]
+    matches = [match for match in map(VERDICT_LINE.match, lines) if match]
+    explicit = [match["verdict"] for match in matches if match["label"]]
+    # Severity headings can also be bare NOTE; they must not replace the opening verdict.
+    bare = [match["verdict"] for match in matches]
+    verdict = (explicit[-1] if explicit else "DIFF" if bare and bare[-1] == "DIFF"
+               else bare[0] if bare else None)
     if timed_out:
         return "-", "timeout"
-    if verdicts and code == 0:
-        return verdicts[-1], ""
+    if verdict and code == 0:
+        return verdict, ""
     answer = "\n".join(lines)
     for cause, pattern in OUTAGES:
         if re.search(pattern, answer, re.IGNORECASE):
@@ -220,6 +231,8 @@ def run_seat(args) -> int:
     if args.workdir and via == "agy":
         return refuse("agy cannot write headless (it auto-denies write_file): a --workdir seat, "
                       "a race or rally rival, needs codex")
+    if args.workdir and via == "claude":
+        return refuse("claude review seats are read-only: a --workdir seat needs codex")
     if (args.diff_base, args.diff_out) != (None, None):
         if not (args.diff_base and args.diff_out):
             return refuse("--diff-base and --diff-out each take a value, and go together")
@@ -318,7 +331,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--trust", required=True, choices=sorted(DISPATCH_ENUMS["trust"]))
     parser.add_argument("--pin", required=True,
                         help="family:model[:effort], as config.toml spells it")
-    parser.add_argument("--prompt", required=True, help="the brief; it travels as an argument")
+    parser.add_argument("--prompt", required=True,
+                        help="UTF-8 brief file path; its contents become the CLI prompt argument")
     parser.add_argument("--out", required=True,
                         help="the seat's output file; its directory is the scratch dir")
     parser.add_argument("--repo", help="default: this checkout's origin")

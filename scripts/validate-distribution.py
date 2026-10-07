@@ -101,9 +101,8 @@ MAX_DESCRIPTION = 600
 # EXISTS, so a load-bearing link can be deleted and every check stays green. Measured: removing
 # duck-review's duck-shape clause passed the whole gate, catalog regenerated.
 # One wording of the per-skill language rule; a second wording drifts (11/9 split, measured).
-LANGUAGE_RULE = ("Follow the user's language unless they ask otherwise. Keep commands, paths, "
-                 "identifiers,\nquoted errors and machine-readable verdicts unchanged; the duck asks "
-                 "for evidence in any language.")
+LANGUAGE_RULE = ("Use the user's requested language; preserve commands, paths, identifiers, quoted "
+                 "errors and\nmachine-readable verdicts.")
 
 
 def check_language_rule(root: Path, name: str, errors: list[str]) -> None:
@@ -410,9 +409,9 @@ CASES: list[tuple[str, str, Callable[[Path], None]]] = [
      lambda c: (c / "skills/duck-review/SKILL.md").write_text(
          (c / "skills/duck-review/SKILL.md").read_text().replace("`duck-shape`", "shape"))),
     ("description ends a plain YAML scalar", "no host can load the skill",
-     lambda c: edit(c, SCAN, "Find ready, blocked", "Note: find ready, blocked")),
+     lambda c: edit(c, SCAN, "description: Use when asked", "description: Note: use when asked")),
     ("description over budget", "over the 600 budget",
-     lambda c: edit(c, SCAN, "Find ready, blocked", "x" * 600 + " Find ready, blocked")),
+     lambda c: edit(c, SCAN, "description: Use when asked", "description: " + "x" * 600 + " Use when asked")),
     ("skill without a routing probe", "no selection probe for duck-scan",
      lambda c: edit(c, "evals/routing.json", '"skill": "duck-scan"', '"skill": "duck-scam"')),
     ("skill directory without a SKILL.md", "directory without a SKILL.md",

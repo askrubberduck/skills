@@ -1,6 +1,6 @@
 ---
 name: duck-land
-description: Merge approved work, run a described release process when asked, update project records, and clean up the branch and worktree; landed means nothing left behind. Use when a change has passed its review gate, the user authorizes landing, merging or a release, an authorized gate-passed PR or version bump is ready, or merged work was never recorded in status or outcome documentation.
+description: Use when asked to merge approved work, run a release process, or record and clean up work already merged.
 ---
 
 # Duck Land
@@ -8,8 +8,8 @@ description: Merge approved work, run a described release process when asked, up
 The ship step: gate passed → merge → record → clean. A merge without a recorded outcome is work
 the repo forgot; a record without a verified merge is fiction.
 
-Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
-quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Use the user's requested language; preserve commands, paths, identifiers, quoted errors and
+machine-readable verdicts.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.
 
@@ -27,12 +27,10 @@ candidate branch and merges nothing.
   [`duck-review`](../duck-review/SKILL.md) is how
   this collection produces that authorization; any gate yielding the same proof qualifies.
   `NOTE`, a raw reviewer approval, and "probably fine" are not gate-passed states.
-- **The branch head equals the candidate SHA** — the exact commit the authorization covers — and
-  the fix passes behind it are **squashed into one candidate commit** before that authorization
-  is given, its message carrying the evidence. Confirm the branch you are landing from — and the PR
-  head where there is one — points at the candidate, not a detached HEAD or another branch a
-  delegated builder committed on. The remote default branch is what landing *moves*, so it is never
-  part of this equality check; step 2 is what verifies where it ended up.
+- **The branch head and PR head, where present, equal the candidate SHA** — the exact commit the
+  authorization covers. Follow repository commit conventions; no pre-squash is required by this skill.
+  Rewriting commits changes that SHA and requires renewed verification and authorization. The remote default branch
+  is what landing moves, not part of this equality check; step 2 verifies where it ended up.
 - Re-verify the base: `git fetch`, compare origin/<base> to what was branched from. **If it
   advanced, integrating it produces a new head nobody authorized** — conflict resolutions and
   semantic merges ride in unexamined. Integrate, re-run the repo's checks, and **re-authorize the
@@ -61,18 +59,16 @@ candidate branch and merges nothing.
 
 ## Land
 
-1. Merge per the repo's policy — **ask the remote for its enforced policy first, the base's history
-   only for its shape, never habit**.
+1. Merge per the repository's written conventions and enforced policy. Ask the remote for its
+   rules; commit history alone does not impose a merge method or commit count.
    - **Policy.** Server-side rules are the actual policy where the host exposes them
-     (`gh api repos/<owner>/<repo>/rulesets`, branch protection); history is a proxy. A rule the
+     (`gh api repos/<owner>/<repo>/rulesets`, branch protection). A rule the
      remote enforces is the policy whether or not your account can get past it; **a landing this
      run cannot make within the rules is an owner decision, never a route around them** —
      [`duck-decide`](../duck-decide/SKILL.md).
-   - **Shape.** Where the last 20 commits on `origin/<base>` carry no merge commit, the branch is
-     flat and this landing is not the one that mints the first — rebase or squash, one commit per
-     packet; a stray merge in an otherwise flat log is not a license, match the dominant shape.
-     No config enforces this; the history is the only guard.
-   - **Pin the base.** Squash-merge the PR, or direct push where that is the standard, **pinning
+   - **Shape.** Use the repository's permitted merge method and commit format. Do not rewrite a
+     reviewed candidate merely to match inferred history.
+   - **Pin the base.** Use that merge method, or direct push where repository policy permits, **pinning
      the base at merge time** with a mechanism proven to refuse a moved base, as [pinning the
      base](references/pin-the-base.md) lays out.
 2. **Confirm the merge landed**: the new SHA is on the default branch and **its tree matches the

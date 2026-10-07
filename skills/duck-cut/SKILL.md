@@ -1,6 +1,6 @@
 ---
 name: duck-cut
-description: Shrink a backlog the honest way — obsolete work out, duplicates merged, viable items unblocked. Use when the user asks to cut or clean a backlog, critique open or blocked backlog items, autonomously close, cut, merge, or unblock every item that does not need the owner, or when open, blocked, and deferred work keeps accumulating.
+description: Use when asked to clean a backlog, retire obsolete work, merge duplicates or unblock viable items.
 ---
 
 # Duck Cut
@@ -9,8 +9,8 @@ Adversarial sweep over **every** open, blocked, and deferred item with a cut bia
 smaller backlog, not a tidier one. "Cut this" findings are first-class, equal to "do this".
 Differs from a disposition flow (which acts on IDs the owner names) — this one hunts.
 
-Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
-quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Use the user's requested language; preserve commands, paths, identifiers, quoted errors and
+machine-readable verdicts.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.
 

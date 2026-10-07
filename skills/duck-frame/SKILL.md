@@ -1,6 +1,6 @@
 ---
 name: duck-frame
-description: Settle a system's target design before planning begins, because 'we'll figure out the architecture later' means never. Use for system analysis, architecture choices, or unsettled requirements and boundaries. Reuse a settled design when its assumptions still hold.
+description: Use when asked to analyze a system, settle requirements and boundaries, or choose architecture before planning.
 ---
 
 # Duck Frame
@@ -8,8 +8,8 @@ description: Settle a system's target design before planning begins, because 'we
 Resolve the design decisions needed for the requested outcome. Return a recommendation grounded in the
 actual system; implementation sequencing belongs to [`duck-plan`](../duck-plan/SKILL.md).
 
-Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
-quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Use the user's requested language; preserve commands, paths, identifiers, quoted errors and
+machine-readable verdicts.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.
 Framing authorizes analysis and its record, not implementation, commits or publication. Follow

@@ -1,6 +1,6 @@
 ---
 name: duck-roast
-description: Roast the whole solution until its weak claims show; a finding must earn its place, and a round must end. Use when the user asks for a roast or repeated full critique of the standing solution, wants a codebase audited for over-engineering, bloat, or what could be deleted repo-wide, or wants a milestone-level adversarial assessment rather than a change review or backlog sweep.
+description: Use when asked to roast a whole solution, repeat full critique or audit a codebase for over-engineering and deletions.
 ---
 
 # Duck Roast
@@ -9,8 +9,8 @@ Find consequential defects and unnecessary mechanisms in the requested solution.
 whole relevant flow; a convincing criticism names what fails or what can disappear without losing
 a required outcome. No finding is a valid result when the claims survive inspection.
 
-Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
-quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
+Use the user's requested language; preserve commands, paths, identifiers, quoted errors and
+machine-readable verdicts.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.
 Roast reports findings and proposed dispositions; it does not edit the candidate. One change
