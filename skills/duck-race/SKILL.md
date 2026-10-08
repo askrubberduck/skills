@@ -1,6 +1,6 @@
 ---
 name: duck-race
-description: Use when asked to race models, ping-pong a task, compare independent implementations or generate adversarial tests across model families.
+description: Use when the user says "race it", "duck race", or "ping-pong", wants two models tackling one problem, a task has several plausible implementations worth comparing, generated tests keep passing without catching real defects, single-attempt builds of similar work kept failing review, or a review-fix loop keeps faulting the fixes instead of the original change.
 ---
 
 # Duck Race
@@ -9,7 +9,7 @@ Different-family generation. Two model families work the same problem, and execu
 what survives — never prose taste, never a vote. Same-family work lets one set of blind spots
 write both sides of the proof.
 
-Use the user's requested language; preserve commands, paths, identifiers, quoted errors and
+Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and
 machine-readable verdicts.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.
@@ -49,7 +49,7 @@ assumptions; rally turns them into tests. Pick by which of those the work needs.
    rally). The brief travels as `--prompt`; **a diff or a corpus it refers to is named
    by absolute path, and the files to change by path relative to the participant's worktree;
    nothing is pasted in**, per dispatch mechanics. `problem.md` and every `turn.md` end with
-   `End your answer with the line: DIFF`; the script records an answer without it as an outage.
+   `End your answer with the line: VERDICT: DIFF`; the script records an answer without it as an outage.
 
 ## Race mode
 

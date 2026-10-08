@@ -1,6 +1,6 @@
 ---
 name: duck-sweep
-description: Use when asked to clean stale branches, worktrees, checkouts, scratch directories or ignore rules.
+description: Use when the user asks for repository cleanup across one or more repos, or when stale worktrees and temporary artifacts have accumulated after merged work.
 ---
 
 # Duck Sweep
@@ -10,7 +10,7 @@ case"** — unmerged work gets an explicit merge-or-delete decision, not a repri
 preservation invariant covers every deletion path: an entry marked **keep** relocates to its
 durable home and is verified there before its container is removed.
 
-Use the user's requested language; preserve commands, paths, identifiers, quoted errors and
+Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and
 machine-readable verdicts.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.

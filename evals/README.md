@@ -77,8 +77,29 @@ A case file is a question to ask the duck, not a receipt saying it passed.
 | English | Selection probes for every skill; existing behavioral cases; runner suites for why, dry, shape and scan | Two bounded selection probes on 2026-09-17; with/without runs for four skills on 2026-09-18, see Runner suites |
 | Russian | Selection probes for every skill; behavioral cases 9-17 | No recorded host/model routing runs |
 
-The rest of the routing corpus and cases 13-18 are unrun. Earlier runs, if any, do not verify changed
-descriptions. Package validation checks distribution structure; it cannot establish language support.
+The September runs below are historical. The owner-supplied October review covers the expanded
+corpus and cases 13-18; see the dated results below. Earlier runs do not verify changed descriptions. Package validation checks distribution structure; it cannot establish language support.
+
+### Owner-supplied PR #84 review, 2026-10-08
+
+Target `f2d0f8e`, base `3a1d385`; these are external review receipts, not runs performed by
+this change's author. Claude Code runner, three runs per case, Sonnet judge:
+
+| Check | PR head | Base | No plugin |
+|---|---|---|---|
+| 56 runner cases, mean score | 0.884 | 0.909 | 0.769 |
+| Controlled why/shape cases, mean with-plugin score | 0.916 | 0.952 | — |
+| Positive why cases, skill loaded | 1/21 | 19/21 | — |
+| Positive shape cases, skill loaded | 0/21 | 15/21 | — |
+| 83 forced-choice description probes, Opus 5.5 | 80/83 | 81/83 | — |
+| 18 behavioral cases, Opus 5.5 and Sonnet judge | 13/18 | 14/18 | 6/18 |
+
+The controlled runs used with/without mode and preserved traces showing only the intended
+plugin version. Forced-choice probes overstated implicit skill activation; record actual Skill
+tool calls separately. One Russian re-review prompt regressed from 5/5 to 1/5. The differing
+behavioral cases became equal on three additional runs; their initial difference was noise.
+These receipts reject the request-only descriptions. Restoring situational triggers needs new
+why/shape with/without runs; these results do not validate that repair.
 
 ### Local selection probes, 2026-09-17
 

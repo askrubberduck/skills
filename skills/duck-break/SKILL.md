@@ -1,6 +1,6 @@
 ---
 name: duck-break
-description: Use when asked to break or red-team a system, exercise hostile inputs, or test behavioral claims dynamically.
+description: Use when the user asks to break or red-team work, when a behavioral proof needs hostile inputs, or when high-risk work lacks dynamic evidence.
 ---
 
 # Duck Break
@@ -9,7 +9,7 @@ An attack names the claim it could refute, executes the attempt, and observes th
 and opining is not an executed attack. Surviving the selected attacks establishes only that scope.
 The breaker reports findings; the authorized caller repairs them and reruns the invalidated checks.
 
-Use the user's requested language; preserve commands, paths, identifiers, quoted errors and
+Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and
 machine-readable verdicts.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.

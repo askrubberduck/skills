@@ -1,6 +1,6 @@
 ---
 name: duck-plan
-description: Use when asked to plan implementation, challenge a plan, identify consequential assumptions or define acceptance checks.
+description: Use for implementation planning, consequential uncertainty, or work that previously needed repeated review fixes.
 ---
 
 # Duck Plan
@@ -8,7 +8,7 @@ description: Use when asked to plan implementation, challenge a plan, identify c
 Produce a plan someone can execute and verify. Each unit must change a required outcome or resolve
 an uncertainty that blocks it. Agreement among planners does not establish feasibility.
 
-Use the user's requested language; preserve commands, paths, identifiers, quoted errors and
+Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and
 machine-readable verdicts.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.

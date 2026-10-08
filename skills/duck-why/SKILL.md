@@ -1,6 +1,6 @@
 ---
 name: duck-why
-description: Use when asked to diagnose a failure or ineffective fix, or trace who introduced a value, guard or behavior and why. Not a plain explanation of how code works.
+description: Use when a test fails, a bug is reported, a build or CI goes red, a traceback or error is pasted, behavior differs across environments or from expectations, or a fix keeps failing. Also for tracing who added a value, flag, guard or behavior and why, including pasted code; not for a plain explanation of how code works.
 ---
 
 # Duck Why
@@ -8,7 +8,7 @@ description: Use when asked to diagnose a failure or ineffective fix, or trace w
 Find the demonstrated cause of the failure and the paths it affects. Stop when that explanation
 accounts for the evidence; a typo need not become an architectural or organizational diagnosis.
 
-Use the user's requested language; preserve commands, paths, identifiers, quoted errors and
+Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and
 machine-readable verdicts.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.

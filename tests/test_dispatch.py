@@ -18,6 +18,7 @@ sys.dont_write_bytecode = True  # no __pycache__ inside the shipped skill
 SCRIPTS = Path(__file__).resolve().parent.parent / "skills" / "duck-review" / "scripts"
 DISPATCH = SCRIPTS / "dispatch.py"
 sys.path.insert(0, str(SCRIPTS))
+from dispatch import classify
 from ledger import DISPATCH_COLUMNS, DISPATCH_ENUMS, read_table  # noqa: E402
 
 CONFIG_FIXTURE = """\
@@ -31,33 +32,44 @@ dispatch_timeout = "20s"
 STUBS = {
     # codex echoes the prompt after `user`; only the text after its answer marker is the answer
     "reject": 'printf \'%s\\0\' "$@" > "$0.argv"; pwd -P > "$0.cwd"; cut -f1,16 "$ASKRUBBERDUCK_HOME/dispatches.tsv"'
-              ' > "$0.seen"\nprintf \'user\\nAPPROVE\\ncodex\\n**VERDICT: REJECT**\\n'
+              ' > "$0.seen"\n[ "$1" != codex ] || printf \'user\\nAPPROVE\\ncodex\\n\'\nprintf \'**VERDICT: REJECT**\\n'
               'tokens used\\n1,234\\n\'',
     "severity": "printf 'VERDICT: APPROVE\\n\\nNOTE\\nCoverage limit\\n'",
-    "bare-severity": "printf 'APPROVE\\n\\nNOTE\\nCoverage limit\\n'",
+    "bare-severity": "printf 'VERDICT: APPROVE\\n\\nNOTE\\nCoverage limit\\n'",
     "plan-severity": "printf 'PLAN: OBJECT\\n\\nNOTE\\nCoverage limit\\n'",
-    "terminal-diff": "printf '## NOTE\\nNonblocking observation\\nDIFF\\n'",
+    "terminal-diff": "printf '## NOTE\\nNonblocking observation\\nVERDICT: DIFF\\n'",
     "earlier-severity": "printf 'NOTE\\nCoverage limit\\n**VERDICT: REJECT**\\n'",
     "greeting": "printf 'user\\nVERDICT: REJECT\\ncodex\\nHello! How can I help?\\n'",
     "credits": "echo \"ERROR: You're out of credits. Add credits to continue.\"; exit 1",
     "sleep": 'sleep 30 & echo $! > "$0.pid"; wait',
-    "touch": 'touch "$CANDIDATE/new.txt"; echo APPROVE',
-    "slow": "sleep 0.5; echo NOTE",
-    "stdin": "cat > /dev/null; echo APPROVE",
-    "diff": "echo DIFF",
-    "crash": "echo APPROVE; exit 7",
-    "append": 'echo more >> "$CANDIDATE/new.txt"; echo APPROVE',
-    "hang": "echo APPROVE; sleep 30",
+    "touch": 'touch "$CANDIDATE/new.txt"; echo "VERDICT: APPROVE"',
+    "slow": "sleep 0.5; echo 'VERDICT: NOTE'",
+    "stdin": "cat > /dev/null; echo 'VERDICT: APPROVE'",
+    "diff": "echo 'VERDICT: DIFF'",
+    "crash": "echo 'VERDICT: APPROVE'; exit 7",
+    "append": 'echo more >> "$CANDIDATE/new.txt"; echo "VERDICT: APPROVE"',
+    "hang": "echo 'VERDICT: APPROVE'; sleep 30",
     "denied": "echo 'Error: a tool required the \"write_file\" permission that headless mode'"
               " 'cannot prompt for, so it was auto-denied'",
     "wrapped": "printf 'Error: a tool required the permission that headless mode\\n"
                "cannot prompt for, so it was auto-denied\\n'",
-    "race": "echo raced > raced.txt; printf '\\0\\1' > raced.bin; echo DIFF",
+    "race": "echo raced > raced.txt; printf '\\0\\1' > raced.bin; echo 'VERDICT: DIFF'",
     "cancel": 'sleep 30 & echo $! > "$0.pid"; touch "$0.up"; wait',
 }
 
 
 def self_check() -> int:
+    for answer in ("> VERDICT: APPROVE\nREJECT", "NOTE\nREJECT",
+                   "VERDICT: APPROVE\nVERDICT: REJECT", "VERDICT: NOTE\nVERDICT: DIFF",
+                   "VERDICT: NOTE\nDIFF", "VERDICT: APPROVE\nREJECT",
+                   "```\nVERDICT: APPROVE\n```", "APPROVE\nNOTE",
+                   "````markdown\n```text\nVERDICT: APPROVE\n```\n````",
+                   "    VERDICT: APPROVE", "\tVERDICT: APPROVE",
+                   "> The reviewer returned:\nVERDICT: APPROVE",
+                   "```text\n``` example continues\nVERDICT: APPROVE\n```"):
+        assert classify(answer, "claude", False, 0)[0] == "-", answer
+    assert classify("> VERDICT: APPROVE\n\nVERDICT: REJECT", "claude", False, 0) == ("REJECT", "")
+    assert classify("```\nVERDICT: APPROVE\n```\nVERDICT: REJECT", "claude", False, 0) == ("REJECT", "")
     with tempfile.TemporaryDirectory(prefix="askrubberduck-dispatch-") as directory:
         root = Path(directory).resolve()  # macOS: /var is /private/var
         os.environ["ASKRUBBERDUCK_HOME"] = str(root)
@@ -130,7 +142,8 @@ def self_check() -> int:
         assert code == 0 and final("g1c-r1-review-claude-test") == ("REJECT", "final", "0"), out
         assert (root / "reject.argv").read_text().split("\0")[:-1] == [
             "claude", "-p", "--model", "claude-test", "--effort", "high", "--permission-mode",
-            "plan", "--permission-prompts", "none", "--tools", "Read,Glob,Grep",
+            "plan", "--permission-prompts", "none", "--setting-sources", "project", "--safe-mode",
+            "--no-session-persistence", "--tools", "Read,Glob,Grep",
             "--strict-mcp-config", "--mcp-config", '{"mcpServers":{}}', "--add-dir", str(checkout),
             "--", prompt.read_text()]
         code, out = run("reject", "g1c", "--pin", "anthropic:claude-other")
@@ -334,10 +347,100 @@ def self_check() -> int:
     import ledger
     ledger.DEFAULT_RALLY_TURNS = 7
     import dispatch
+    import importlib
+    importlib.reload(dispatch)
     assert dispatch.STAGE_BOUNDS["rally"] == ("rally_turns", 7), dispatch.STAGE_BOUNDS
     print("dispatch self-check passed")
     return 0
 
 
+def claude_canary() -> int:
+    """Opt-in real CLI probe; fake API key and loopback response server, no vendor requests."""
+    import http.server
+    import json
+    import shutil
+    import threading
+    from dispatch import transport
+
+    cli = shutil.which("claude")
+    assert cli, "claude must be installed for --claude-canary"
+    hits = []
+
+    class Handler(http.server.BaseHTTPRequestHandler):
+        def do_POST(self):
+            request = self.rfile.read(int(self.headers.get("Content-Length", 0)))
+            hits.append(request.decode())
+            message = {"id": "msg_canary", "type": "message", "role": "assistant",
+                       "model": "claude-sonnet-4-6", "content": [], "stop_reason": None,
+                       "stop_sequence": None, "usage": {"input_tokens": 1, "output_tokens": 1}}
+            events = [("message_start", {"message": message}),
+                      ("content_block_start", {"index": 0, "content_block": {"type": "text", "text": ""}}),
+                      ("content_block_delta", {"index": 0, "delta": {"type": "text_delta", "text": "OK"}}),
+                      ("content_block_stop", {"index": 0}),
+                      ("message_delta", {"delta": {"stop_reason": "end_turn", "stop_sequence": None},
+                                         "usage": {"output_tokens": 1}}),
+                      ("message_stop", {})]
+            body = "".join(f"event: {kind}\ndata: {json.dumps({'type': kind, **data})}\n\n"
+                           for kind, data in events).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/event-stream")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, *args):
+            pass
+
+    server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        with tempfile.TemporaryDirectory(prefix="duck-claude-canary-") as directory:
+            root = Path(directory)
+            config = root / "config"
+            config.mkdir()
+            scratch = root / "scratch"
+            scratch.mkdir()
+            marker = root / "hook-ran"
+            instruction = "DUCK_CANARY_PRIVATE_INSTRUCTION"
+            (config / "CLAUDE.md").write_text(instruction)
+            (scratch / "CLAUDE.md").write_text(instruction)
+            hook = {"hooks": {"SessionStart": [{"hooks": [{"type": "command",
+                    "command": "touch " + shlex.quote(str(marker))}]}]}}
+            (config / "settings.json").write_text(json.dumps(hook))
+            (config / ".claude.json").write_text(json.dumps({"hasCompletedOnboarding": True}))
+            (scratch / ".claude").mkdir()
+            (scratch / ".claude" / "settings.json").write_text(json.dumps(hook))
+            env = {key: os.environ[key] for key in ("PATH", "HOME", "USER", "TMPDIR")
+                   if key in os.environ}
+            env.update(CLAUDE_CONFIG_DIR=str(config), ANTHROPIC_API_KEY="local-canary-only",
+                       ANTHROPIC_BASE_URL=f"http://127.0.0.1:{server.server_port}",
+                       CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC="1")
+            argv = transport("claude", "anthropic", "claude-sonnet-4-6", "-", "OK",
+                             scratch, [], 20)
+            argv[0] = cli
+            argv[1:1] = ["--debug-file", str(root / "cli-debug.log")]
+            # Positive control proves startup reached the hooks, not just that nothing ran.
+            control = [part for part in argv if part not in
+                       ("--setting-sources", "project", "--safe-mode")]
+            subprocess.run(control, env=env, cwd=scratch, stdin=subprocess.DEVNULL,
+                           capture_output=True, timeout=25, check=True)
+            assert marker.exists() and hits, "positive control did not reach SessionStart/API"
+            assert instruction in "".join(hits), "control did not load canary CLAUDE.md"
+            marker.unlink()
+            hits.clear()
+            subprocess.run(argv, env=env, cwd=scratch, stdin=subprocess.DEVNULL,
+                           capture_output=True, timeout=25, check=True)
+            assert hits, "isolated seat did not initialize and reach the loopback API"
+            assert not marker.exists(), "review seat ran a user/project hook"
+            assert instruction not in "".join(hits), "review seat leaked canary instructions"
+            assert not list(config.rglob("*.jsonl")), "review seat persisted a transcript"
+    finally:
+        server.shutdown()
+        server.server_close()
+    print("real Claude hook canary passed (loopback API only)")
+    return 0
+
+
 if __name__ == "__main__":
-    raise SystemExit(self_check())
+    raise SystemExit(claude_canary() if "--claude-canary" in sys.argv else self_check())

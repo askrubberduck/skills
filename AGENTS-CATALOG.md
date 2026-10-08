@@ -10,26 +10,26 @@ but lacks native Agent Skills discovery. Regenerate with `python3 scripts/render
 The duck reads before it speaks. When a task matches a skill below, read its `SKILL.md` and
 follow it before proceeding. Challenge the claim, run the check, keep the evidence.
 English is the home language; match task intent across languages. Follow the user's
-requested language, keeping commands, paths, identifiers, quoted errors and verdicts unchanged.
+language unless they ask otherwise, keeping commands, paths, identifiers, quoted errors and verdicts unchanged.
 Installed location: `~/.agents/skills/<name>/SKILL.md` (or this repo's `skills/<name>/SKILL.md`).
 
-- **duck-break** — Use when asked to break or red-team a system, exercise hostile inputs, or test behavioral claims dynamically.
-- **duck-campaign** — Use when asked to turn a vision, backlog or broad directive into independent workstreams and execute them.
-- **duck-cut** — Use when asked to clean a backlog, retire obsolete work, merge duplicates or unblock viable items.
-- **duck-decide** — Use when asked to walk through owner decisions, options, blocked obligations or pending approvals.
-- **duck-diet** — Use when asked to audit agent setup, reduce context or token costs, trim instructions or memory, or choose model tiers.
-- **duck-dry** — Use when asked to trim redundant code comments, docstrings, commit messages or PR descriptions. Not ordinary prose editing.
-- **duck-frame** — Use when asked to analyze a system, settle requirements and boundaries, or choose architecture before planning.
-- **duck-land** — Use when asked to merge approved work, run a release process, or record and clean up work already merged.
-- **duck-learn** — Use when asked for a retrospective, to mine sessions and outcomes, or extract reusable lessons and skill improvements.
-- **duck-plan** — Use when asked to plan implementation, challenge a plan, identify consequential assumptions or define acceptance checks.
-- **duck-proof** — Use when asked to prove necessity, correctness or simplicity, verify a plan or implementation, or check work before review.
-- **duck-race** — Use when asked to race models, ping-pong a task, compare independent implementations or generate adversarial tests across model families.
-- **duck-review** — Use when asked to review code, local changes, PRs, plans or documents, give an independent verdict or release gate, or assess and draft replies to received review comments.
-- **duck-roast** — Use when asked to roast a whole solution, repeat full critique or audit a codebase for over-engineering and deletions.
-- **duck-run** — Use when asked to duck a task, apply selected findings or carry work through planning, implementation and verification.
-- **duck-scan** — Use when asked what work is ready, blocked, open or remaining, or for repository status without changes.
-- **duck-shape** — Use when asked to simplify code, remove abstractions or bloat, compare structures or check the shape of completed work.
-- **duck-split** — Use when asked to check task scope, extract unrelated work or split a branch, PR, document or plan.
-- **duck-sweep** — Use when asked to clean stale branches, worktrees, checkouts, scratch directories or ignore rules.
-- **duck-why** — Use when asked to diagnose a failure or ineffective fix, or trace who introduced a value, guard or behavior and why. Not a plain explanation of how code works.
+- **duck-break** — Use when the user asks to break or red-team work, when a behavioral proof needs hostile inputs, or when high-risk work lacks dynamic evidence.
+- **duck-campaign** — Use when the user asks to start a campaign, execute all plannable work, turn a vision, a backlog, or competitor gaps into parallel builds, or provides a broad directive spanning many work items without an existing campaign structure.
+- **duck-cut** — Use when the user asks to cut or clean a backlog, critique open or blocked backlog items, autonomously close, cut, merge, or unblock every item that does not need the owner, or when open, blocked, and deferred work keeps accumulating.
+- **duck-decide** — Use when open decisions, blocked obligations, or approvals need the owner's answer, the user asks to walk through decisions or options, or several owner decisions are pending.
+- **duck-diet** — Use when the user asks for minimum tokens, a session-cost analysis, an agent setup health check, or trimming of CLAUDE.md, AGENTS.md, or memory, when picking which model tier or agent type a stage runs on, or before a long campaign or multi-agent run.
+- **duck-dry** — Use for redundant comments, generated code narration, or commit and PR prose that repeats the diff; before committing or reviewing generated code. Preserve parsed directives. Not ordinary prose editing.
+- **duck-frame** — Use for system analysis, architecture choices, or unsettled requirements and boundaries.
+- **duck-land** — Use when a change has passed its review gate, the user authorizes landing, merging or a release, an authorized gate-passed PR or version bump is ready, or merged work was never recorded in status or outcome documentation.
+- **duck-learn** — Use when the user asks for a retrospective, wants to mine sessions or outcomes, asks what should become a skill or where tokens were wasted, or after a campaign, incident, or review gate needed many rounds.
+- **duck-plan** — Use for implementation planning, consequential uncertainty, or work that previously needed repeated review fixes.
+- **duck-proof** — Use when the user asks whether a solution is necessary, correct, or elegant, asks to prove a plan or finished shape, or wants work verified before review.
+- **duck-race** — Use when the user says "race it", "duck race", or "ping-pong", wants two models tackling one problem, a task has several plausible implementations worth comparing, generated tests keep passing without catching real defects, single-attempt builds of similar work kept failing review, or a review-fix loop keeps faulting the fixes instead of the original change.
+- **duck-review** — Use for designs, plans, documents, code, local changes, completed work or PRs; findings-only reviews; an independent second opinion; a release gate; or to answer a review you received, saying which comments still apply to what you pushed since and drafting the replies.
+- **duck-roast** — Use when the user asks for a roast or repeated full critique of the standing solution, wants a codebase audited for over-engineering, bloat, or what could be deleted repo-wide, or wants a milestone-level adversarial assessment rather than a change review or backlog sweep.
+- **duck-run** — Use when the user asks to duck a task, apply selected findings, or carry work through the delivery flow.
+- **duck-scan** — Use when the user asks what is next, open, ready, left, or available to pick up, requests status, or asks whether a named work item is ready.
+- **duck-shape** — Use when the user asks to simplify, shorten or clean up code, calls it over-engineered, bloated, too defensive or AI slop, asks which of two designs carries less, or wants the structure of completed work checked, whether a file, a diff or a pasted snippet.
+- **duck-split** — Use when the user asks what in a branch, PR, document or plan does not belong to the original task, asks to extract, split or move part of it into its own branch, PR or document, or whether it still carries only what it was meant to.
+- **duck-sweep** — Use when the user asks for repository cleanup across one or more repos, or when stale worktrees and temporary artifacts have accumulated after merged work.
+- **duck-why** — Use when a test fails, a bug is reported, a build or CI goes red, a traceback or error is pasted, behavior differs across environments or from expectations, or a fix keeps failing. Also for tracing who added a value, flag, guard or behavior and why, including pasted code; not for a plain explanation of how code works.

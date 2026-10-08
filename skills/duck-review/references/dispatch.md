@@ -83,7 +83,10 @@ your instructions on the command line, and have those instructions name the diff
 by absolute path for the reviewer to open — never paste that material into the command.
 
 The Anthropic route uses `claude -p` with an exact model pin and optional effort, plan permissions,
-read-only file tools and no MCP servers. It does not approve writes or shell execution. Claude and agy
+read-only file tools and no MCP servers. It excludes user settings, disables customizations with
+`--safe-mode`, and disables session persistence. Admin-managed settings still apply, including
+managed hooks; inspect those before claiming a shell-free seat. The tool route does not approve
+writes or shell execution. Claude and agy
 seats cannot take `--workdir` or serve as writable race/rally rivals; use a supported writable transport
 instead. agy headless writes are denied, not a sandbox guarantee. Treat source-only findings as
 `tier = read`; claim executed evidence only when the seat supplies observed command output. The outer
@@ -110,11 +113,15 @@ dispatch is the harder case — full length, well formed, and wrong.** Nothing i
 distinguishes it, so before trusting any result, check that its quoted justifications actually
 support its verdict.
 
-Ask participants to label the overall result `VERDICT: APPROVE | REJECT | NOTE` (or
-`PLAN: CONCUR | OBJECT`). The parser prioritizes explicit result lines; otherwise it uses the opening
-standalone verdict, preserving terminal bare `DIFF` for race/rally output. A later bare severity
-heading cannot overwrite the opening review verdict. Ambiguous output still
-requires inspection rather than treating its parsed label as independent judgment.
+Ask participants for exactly one unquoted result line: `VERDICT: APPROVE | REJECT | NOTE`,
+`PLAN: CONCUR | OBJECT`, or `VERDICT: DIFF` for race/rally output. Bare words, quoted examples and
+fenced snippets are not results; multiple labeled results are unsupported, even when identical.
+Severity headings cannot overwrite a labeled result. Inspect its justification before trusting it.
+
+Claude normally saves transcripts under `~/.claude/projects`; this route uses
+`--no-session-persistence`. Exclude older reviewer transcripts when mining owner sessions.
+Read-only seats provide source evidence for break/proof, not executed behavioral checks. Selection
+still excludes the doer's family; an Anthropic doer cannot use a Claude pin as its different-family seat.
 
 Two kinds of malformed result:
 *unranked* — a verdict with findings that carry no severity: the participant counts, its findings

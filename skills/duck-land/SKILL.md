@@ -1,6 +1,6 @@
 ---
 name: duck-land
-description: Use when asked to merge approved work, run a release process, or record and clean up work already merged.
+description: Use when a change has passed its review gate, the user authorizes landing, merging or a release, an authorized gate-passed PR or version bump is ready, or merged work was never recorded in status or outcome documentation.
 ---
 
 # Duck Land
@@ -8,7 +8,7 @@ description: Use when asked to merge approved work, run a release process, or re
 The ship step: gate passed → merge → record → clean. A merge without a recorded outcome is work
 the repo forgot; a record without a verified merge is fiction.
 
-Use the user's requested language; preserve commands, paths, identifiers, quoted errors and
+Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and
 machine-readable verdicts.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.
@@ -29,7 +29,7 @@ candidate branch and merges nothing.
   `NOTE`, a raw reviewer approval, and "probably fine" are not gate-passed states.
 - **The branch head and PR head, where present, equal the candidate SHA** — the exact commit the
   authorization covers. Follow repository commit conventions; no pre-squash is required by this skill.
-  Rewriting commits changes that SHA and requires renewed verification and authorization. The remote default branch
+  Rewriting commits before merge changes that SHA and requires renewed verification and authorization. The remote default branch
   is what landing moves, not part of this equality check; step 2 verifies where it ended up.
 - Re-verify the base: `git fetch`, compare origin/<base> to what was branched from. **If it
   advanced, integrating it produces a new head nobody authorized** — conflict resolutions and
@@ -61,6 +61,7 @@ candidate branch and merges nothing.
 
 1. Merge per the repository's written conventions and enforced policy. Ask the remote for its
    rules; commit history alone does not impose a merge method or commit count.
+   If neither specifies a method, use a normal merge that preserves the reviewed commits.
    - **Policy.** Server-side rules are the actual policy where the host exposes them
      (`gh api repos/<owner>/<repo>/rulesets`, branch protection). A rule the
      remote enforces is the policy whether or not your account can get past it; **a landing this

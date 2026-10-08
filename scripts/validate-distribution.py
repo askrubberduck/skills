@@ -94,14 +94,14 @@ def check_dispatch_rule(where: str, body: str, errors: list[str]) -> None:
 
 
 # Roughly 150 tokens per skill, loaded by every host in every session before anyone asks for
-# anything. The longest today is 502; the budget is the ceiling, not a fit to current contents.
+# anything. The budget is a ceiling, not a fit to current contents.
 MAX_DESCRIPTION = 600
 
 # The cross-reference check below proves that references RESOLVE. It cannot prove one still
 # EXISTS, so a load-bearing link can be deleted and every check stays green. Measured: removing
 # duck-review's duck-shape clause passed the whole gate, catalog regenerated.
 # One wording of the per-skill language rule; a second wording drifts (11/9 split, measured).
-LANGUAGE_RULE = ("Use the user's requested language; preserve commands, paths, identifiers, quoted "
+LANGUAGE_RULE = ("Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted "
                  "errors and\nmachine-readable verdicts.")
 
 
@@ -392,6 +392,8 @@ CASES: list[tuple[str, str, Callable[[Path], None]]] = [
     ("unbalanced code fence", "unbalanced",
      lambda c: (c / "skills/duck-review/SKILL.md").write_text(
          (c / "skills/duck-review/SKILL.md").read_text() + "\n```bash\nstray\n")),
+    ("README map missing a skill", "README skills map must list",
+     lambda c: edit(c, "README.md", "| `duck-scan` |", "| `duck-missing` |")),
     ("stale generated catalog", "stale", lambda c: (c / "AGENTS-CATALOG.md").write_text("# stale\n")),
     ("release version disagrees", "release version disagrees",
      lambda c: rewrite_json(c / ".claude-plugin/plugin.json",
@@ -409,9 +411,9 @@ CASES: list[tuple[str, str, Callable[[Path], None]]] = [
      lambda c: (c / "skills/duck-review/SKILL.md").write_text(
          (c / "skills/duck-review/SKILL.md").read_text().replace("`duck-shape`", "shape"))),
     ("description ends a plain YAML scalar", "no host can load the skill",
-     lambda c: edit(c, SCAN, "description: Use when asked", "description: Note: use when asked")),
+     lambda c: edit(c, SCAN, "description: Use when", "description: Note: use when")),
     ("description over budget", "over the 600 budget",
-     lambda c: edit(c, SCAN, "description: Use when asked", "description: " + "x" * 600 + " Use when asked")),
+     lambda c: edit(c, SCAN, "description: Use when", "description: " + "x" * 600 + " Use when asked")),
     ("skill without a routing probe", "no selection probe for duck-scan",
      lambda c: edit(c, "evals/routing.json", '"skill": "duck-scan"', '"skill": "duck-scam"')),
     ("skill directory without a SKILL.md", "directory without a SKILL.md",

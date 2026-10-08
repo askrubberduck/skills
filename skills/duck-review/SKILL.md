@@ -1,6 +1,6 @@
 ---
 name: duck-review
-description: Use when asked to review code, local changes, PRs, plans or documents, give an independent verdict or release gate, or assess and draft replies to received review comments.
+description: Use for designs, plans, documents, code, local changes, completed work or PRs; findings-only reviews; an independent second opinion; a release gate; or to answer a review you received, saying which comments still apply to what you pushed since and drafting the replies.
 ---
 
 # Duck Review
@@ -11,7 +11,7 @@ implementation; judge completed work against observable results.
 Independent scrutiny precedes release approval. The builder must validate the candidate first;
 a reviewer is not a substitute for the doer's own breaking attempts.
 
-Use the user's requested language; preserve commands, paths, identifiers, quoted errors and
+Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and
 machine-readable verdicts.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.
@@ -49,8 +49,7 @@ When the user is the author and a review has landed, judge each thread against t
 not the revision the reviewer saw, and give it one disposition with its evidence: still valid, already
 fixed, disagree, out of scope, or a challenge to the approach. A thread that questions the mechanism
 rather than a line gets no patch: [`duck-shape`](../duck-shape/SKILL.md) over the problem, and a
-proposed shape, come before any edit. Draft one concise reply per thread, with enough evidence or
-reasoning to support its disposition; follow any reply format the user requests. "Resolve all"
+proposed shape, come before any edit. Draft one reply per thread, as short as its disposition allows; follow any reply format the user requests. "Resolve all"
 covers resolving only, and only threads already fixed; the rest stay open and are listed.
 
 ## Prepare the review

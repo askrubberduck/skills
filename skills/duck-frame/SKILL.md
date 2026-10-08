@@ -1,6 +1,6 @@
 ---
 name: duck-frame
-description: Use when asked to analyze a system, settle requirements and boundaries, or choose architecture before planning.
+description: Use for system analysis, architecture choices, or unsettled requirements and boundaries.
 ---
 
 # Duck Frame
@@ -8,7 +8,7 @@ description: Use when asked to analyze a system, settle requirements and boundar
 Resolve the design decisions needed for the requested outcome. Return a recommendation grounded in the
 actual system; implementation sequencing belongs to [`duck-plan`](../duck-plan/SKILL.md).
 
-Use the user's requested language; preserve commands, paths, identifiers, quoted errors and
+Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and
 machine-readable verdicts.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.

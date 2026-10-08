@@ -29,8 +29,8 @@ from ledger import (DEFAULT_RALLY_TURNS, DISPATCH_COLUMNS, DISPATCH_ENUMS, arm_o
 
 VIA = {"openai": "codex", "google": "agy", "anthropic": "claude"}  # by the pin's family
 VERDICT_LINE = re.compile(
-    r"^[\s>#*_`]*(?:(?P<label>VERDICT|PLAN)\s*:[\s*_`]*)?"
-    r"(?P<verdict>APPROVE|REJECT|NOTE|CONCUR|OBJECT|DIFF)[\s*_`.]*$")
+    r"^ {0,3}[*_]*(?:VERDICT\s*:\s*[*_]*(?P<verdict>APPROVE|REJECT|NOTE|DIFF)"
+    r"|PLAN\s*:\s*[*_]*(?P<plan>CONCUR|OBJECT))[*_]*\.?\s*$")
 # Checked only when no verdict was found, first match wins: while credits are out, codex reports
 # that before anything else, so a later pin rejection proves nothing.
 OUTAGES = (("credits", r"out of credits|insufficient credits?|credit balance"),
@@ -62,7 +62,8 @@ def transport(via: str, family: str, model: str, effort: str, prompt: str, workd
     if via == "claude":
         reasoning = ["--effort", effort] if effort != "-" else []
         return ["claude", "-p", "--model", model, *reasoning, "--permission-mode", "plan",
-                "--permission-prompts", "none", "--tools", "Read,Glob,Grep", "--strict-mcp-config",
+                "--permission-prompts", "none", "--setting-sources", "project", "--safe-mode",
+                "--no-session-persistence", "--tools", "Read,Glob,Grep", "--strict-mcp-config",
                 "--mcp-config", '{"mcpServers":{}}', *dirs, "--", prompt]
     # agy takes the effort as part of the model id: `gemini-3.1-pro-high`
     pinned = model if effort == "-" else f"{model}-{effort}"
@@ -76,12 +77,29 @@ def classify(text: str, via: str, timed_out: bool, code: int) -> tuple[str, str]
     lines = text.splitlines()
     if via == "codex" and CODEX_ANSWER in lines:  # before it, codex echoes the prompt
         lines = lines[len(lines) - lines[::-1].index(CODEX_ANSWER):]
-    matches = [match for match in map(VERDICT_LINE.match, lines) if match]
-    explicit = [match["verdict"] for match in matches if match["label"]]
-    # Severity headings can also be bare NOTE; they must not replace the opening verdict.
-    bare = [match["verdict"] for match in matches]
-    verdict = (explicit[-1] if explicit else "DIFF" if bare and bare[-1] == "DIFF"
-               else bare[0] if bare else None)
+    results = []
+    fence = None
+    quoted = False
+    for line in lines:
+        if fence is None and line.lstrip().startswith(">"):
+            quoted = True
+        elif not line.strip():
+            quoted = False
+        if quoted:
+            continue
+        marker = re.match(r"^\s*(`{3,}|~{3,})", line)
+        if marker:
+            if fence is None:
+                fence = marker[1]
+            elif (marker[1][0] == fence[0] and len(marker[1]) >= len(fence)
+                  and not line[marker.end():].strip()):
+                fence = None
+        elif fence is None and (match := VERDICT_LINE.fullmatch(line)):
+            results.append(match["verdict"] or match["plan"])
+        elif fence is None and re.fullmatch(
+                r"\s*[*_]*(?:APPROVE|REJECT|CONCUR|OBJECT|DIFF)[*_]*\.?\s*", line):
+            results.append(None)  # an unlabeled result cannot coexist with a usable result
+    verdict = results[0] if len(results) == 1 else None
     if timed_out:
         return "-", "timeout"
     if verdict and code == 0:
@@ -92,7 +110,7 @@ def classify(text: str, via: str, timed_out: bool, code: int) -> tuple[str, str]
             return "-", cause
     if code != 0:
         return "-", f"exit {code}"
-    return "-", "no verdict" if answer.strip() else "empty output"
+    return "-", "ambiguous verdict" if len(results) > 1 else "no verdict" if answer.strip() else "empty output"
 
 
 def tokens_of(text: str) -> str:

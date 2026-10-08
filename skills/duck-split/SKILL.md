@@ -1,6 +1,6 @@
 ---
 name: duck-split
-description: Use when asked to check task scope, extract unrelated work or split a branch, PR, document or plan.
+description: Use when the user asks what in a branch, PR, document or plan does not belong to the original task, asks to extract, split or move part of it into its own branch, PR or document, or whether it still carries only what it was meant to.
 ---
 
 # Duck Split
@@ -8,7 +8,7 @@ description: Use when asked to check task scope, extract unrelated work or split
 Expect a unit of work to carry parts that belong elsewhere. Sort it against the unit's intent, part
 by part, and show that the pieces sum to the original before anything leaves it.
 
-Use the user's requested language; preserve commands, paths, identifiers, quoted errors and
+Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and
 machine-readable verdicts.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.

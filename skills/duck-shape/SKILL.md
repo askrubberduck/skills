@@ -1,6 +1,6 @@
 ---
 name: duck-shape
-description: Use when asked to simplify code, remove abstractions or bloat, compare structures or check the shape of completed work.
+description: Use when the user asks to simplify, shorten or clean up code, calls it over-engineered, bloated, too defensive or AI slop, asks which of two designs carries less, or wants the structure of completed work checked, whether a file, a diff or a pasted snippet.
 ---
 
 # Duck Shape
@@ -10,7 +10,7 @@ the code hard to change: a small edit that touches many places, facts a reader m
 editing safely, and behavior nobody can predict from the interface. A smaller diff or a more
 impressive design is not evidence of improvement.
 
-Use the user's requested language; preserve commands, paths, identifiers, quoted errors and
+Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and
 machine-readable verdicts.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.

@@ -1,6 +1,6 @@
 ---
 name: duck-campaign
-description: Use when asked to turn a vision, backlog or broad directive into independent workstreams and execute them.
+description: Use when the user asks to start a campaign, execute all plannable work, turn a vision, a backlog, or competitor gaps into parallel builds, or provides a broad directive spanning many work items without an existing campaign structure.
 ---
 
 # Duck Campaign
@@ -9,7 +9,7 @@ Turn the requested outcomes into a manageable set of workstreams and carry each 
 endpoint. Split work when separate execution, ownership or release helps; the ability to ship two
 small changes separately is not by itself a reason to create two packets.
 
-Use the user's requested language; preserve commands, paths, identifiers, quoted errors and
+Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and
 machine-readable verdicts.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.
