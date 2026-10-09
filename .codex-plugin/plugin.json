@@ -1,6 +1,6 @@
 {
   "name": "askrubberduck",
-  "version": "3.13.0",
+  "version": "3.13.1",
   "description": "Make the work prove itself. Challenge the goal, cut the clutter, and check what actually happened.",
   "author": {
     "name": "askrubberduck",
@@ -24,7 +24,7 @@
   ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "askrubberduck",
+    "displayName": "Ask Rubber Duck",
     "shortDescription": "Make the work prove itself. Confidence earns nothing.",
     "longDescription": "Your agent says it is done. The duck asks what could break it. Challenge the goal, shape the plan, build the smallest robust path, and run the checks after the last fix. Choose the challenge the task needs; keep release review independent. The agent owns the loop. Nobody moves the finish line. English is the home language. Ask in yours; the duck still owes you proof.",
     "developerName": "askrubberduck",
