@@ -200,6 +200,7 @@ def eligibility_check(cases: int = 3000) -> None:
                                "outage": outage})
             for k in range(rng.choice([0, 0, 1, 2])):
                 findings.append({"dispatch_id": ident, "cause_id": f"c{n}{k}",
+                                 "severity": rng.choice(["BLOCKER", "SHOULD", "NOTE"]),
                                  "substantiated": rng.choice(["1", "1", "0"])})
 
         for g in range(rng.randint(0, 2 * needed + 2)):
@@ -263,6 +264,10 @@ def roles_check(root: Path) -> None:
     code, out = run(["pick", "explore", "--repo", "r"])
     assert code == 1 and "holds no any arm" in out, out  # not "outside anthropic": explore may share it
     (root / "config.toml").write_text(ROLES_CONFIG)
+    # a replace names, with severity, each incumbent cause the trial missed on the shared gates
+    missed = findings + [dict(findings[0], cause_id="k5", severity="SHOULD")]
+    assert trial_verdict(config, dispatches, missed, "openai:gpt-6-sol:high") == (
+        "replace", "openai:gpt-6-astra:high; missed SHOULD k5")
     clean = dict(dispatches[6], id="s9", gate_id="g10", candidate="c10")
     assert trial_verdict(config, dispatches + [clean], findings,
                          "google:gemini-3.8-flash-high")[0] == "drop"

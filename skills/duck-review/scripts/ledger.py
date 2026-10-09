@@ -425,7 +425,15 @@ def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
         # too few gates beside the incumbent, or all clean: nothing says which model is better
         return undecided, f"{len(shared)} shared gates, {own} vs {found} causes"
     if own >= found:
-        return "replace", pin_of(incumbent)
+        # the sum ignores severity: whoever applies the replace sees what the trial missed
+        missed = sorted({(f["severity"], f["cause_id"]) for d in shared
+                         for f in findings if f["dispatch_id"] == theirs[gate(d)]["id"]
+                         and f["substantiated"] == "1"
+                         and f["cause_id"] not in {g["cause_id"] for g in findings
+                                                   if g["dispatch_id"] == d["id"]
+                                                   and g["substantiated"] == "1"}})
+        return "replace", pin_of(incumbent) + "".join(
+            f"; missed {severity} {cause}" for severity, cause in missed)
     return "drop", f"{own} vs {found} causes on shared gates"
 
 
@@ -470,7 +478,8 @@ def cmd_promote(args) -> int:
     for pin in config.get("trial", []):
         verdict, reason = trial_verdict(config, dispatches, findings, pin)
         if verdict == "replace":
-            print(f"replace {reason} with {pin} in review")
+            incumbent, *missed = reason.split("; ")
+            print(f"replace {incumbent} with {pin} in review" + "".join(f"\n  {m}" for m in missed))
         elif verdict == "add":
             print(f"add {pin} to review")
         else:
