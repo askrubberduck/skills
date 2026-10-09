@@ -53,7 +53,7 @@ still counts.
 ## Run the reviewers
 
 Run each seat with `python3 "$DISPATCH"` (`$DISPATCH` is the absolute path of `duck-review`'s
-`scripts/dispatch.py`, whatever the working directory), in the background. Where the turn is the
+`scripts/dispatch.py`, whatever the working directory), in the background; its `--help` lists the flags, so run that rather than reading the script. Where the turn is the
 whole session (`claude -p`), its end kills a background seat (`error: interrupted`) and strands its
 row `pending`: poll the seat's exit in bounded waits and end the turn only after it. The pinned ids
 come from `~/.askrubberduck/config.toml`, never from memory (a `[repo."<origin>"]` table there

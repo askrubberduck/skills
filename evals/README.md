@@ -114,7 +114,7 @@ graders and exclude the trigger indicators.
 | Supplied patch `57b3a83` | 0.918 | 146/171 | 148/162 | 17/18 |
 
 Outcome differences are within the report's estimated noise; the why activation difference is
-substantial. The repair through `05a7ab1` restored the exact base duck-why description used by that patch. The
+substantial. The repair in #84 first restored the base duck-why description; H, below, replaced it. The
 conservative variant restored every description and scored 0.904 with 144/162 Skill calls; no
 measured benefit justified that wider rollback.
 

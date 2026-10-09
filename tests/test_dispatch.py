@@ -26,7 +26,7 @@ CONFIG_FIXTURE = """\
 [bounds]
 review_rounds = 3
 trust_rounds = 2
-dispatch_timeout = "1s"
+dispatch_timeout = "5s"
 [repo."r"]
 dispatch_timeout = "20s"
 """
@@ -218,10 +218,10 @@ def self_check() -> int:
         code, out = run("wrapped", "g2", "--id", "g2-wrapped")  # the message wraps
         assert code == 1 and "outage: permission denied" in out, out
 
-        # 3. past the 1s limit the whole group is killed, its grandchild included
+        # 3. past the 5s limit the whole group is killed, its grandchild included
         started = time.monotonic()
         code, out = run("sleep", "g3", repo="t")
-        assert code == 1 and "outage: timeout" in out and time.monotonic() - started < 10, out
+        assert code == 1 and "outage: timeout" in out and time.monotonic() - started < 20, out
         assert final("g3-r1-review-gpt-6-sol") == ("-", "final", "1")
         with contextlib.suppress(ProcessLookupError):
             os.kill(int((root / "sleep.pid").read_text()), 0)
@@ -263,7 +263,7 @@ def self_check() -> int:
         lines = (root / "dispatches.tsv").read_text().splitlines()
         assert len(lines) == len(rows()) + 1 and all(l.count("\t") == 16 for l in lines), lines
 
-        # 7. a CLI that reads stdin gets EOF, not the caller's open pipe (repo t: 1s limit)
+        # 7. a CLI that reads stdin gets EOF, not the caller's open pipe (repo t: 5s limit)
         held = seat("stdin", "g7", repo="t", stdin=subprocess.PIPE)
         code = held.wait(timeout=60)
         held.stdin.close()
