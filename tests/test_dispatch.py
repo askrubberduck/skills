@@ -56,6 +56,9 @@ STUBS = {
                "cannot prompt for, so it was auto-denied\\n'",
     "race": "echo raced > raced.txt; printf '\\0\\1' > raced.bin; echo 'VERDICT: DIFF'",
     "cancel": 'sleep 30 & echo $! > "$0.pid"; touch "$0.up"; wait',
+    "env": 'ls -A "$CODEX_HOME" > "$0.ls"; printf %s "$CODEX_HOME" > "$0.codex"; '
+           'printf %s "$HOME" > "$0.HOME"; readlink "$CODEX_HOME/auth.json" > "$0.auth"; '
+           'echo "VERDICT: APPROVE"',
 }
 
 
@@ -193,6 +196,25 @@ def self_check() -> int:
         assert code == 2 and "read-only" in out and len(rows()) == count, out
         code, out = run("reject", "g1w", "--workdir", "", "--id", "g1w-empty")
         assert code == 2 and "--workdir is empty" in out and len(rows()) == count, out
+        # a codex seat gets its own CODEX_HOME with only the owner's login linked in, and as HOME
+        # too unless it is a rival; the home is gone after the run
+        owner = root / "owner-codex"
+        owner.mkdir()
+        (owner / "auth.json").write_text("{}")
+        (owner / "AGENTS.md").write_text("private")
+        code, out = run("env", "g1h", CODEX_HOME=str(owner))
+        seat_home = (root / "env.codex").read_text()
+        assert code == 0 and (root / "env.ls").read_text() == "auth.json\n", out
+        assert (root / "env.HOME").read_text() == seat_home != str(owner), seat_home
+        assert (root / "env.auth").read_text().strip() == str(owner / "auth.json")
+        assert not Path(seat_home).exists(), "the seat's home outlived the run"
+        code, out = run("env", "g1h", "--workdir", str(rival), "--id", "g1h-rival", CODEX_HOME=str(owner))
+        assert code == 0 and (root / "env.HOME").read_text() == os.environ["HOME"], out
+        (owner / "auth.json").unlink()  # an API-key login has no file to link
+        code, out = run("env", "g1h", "--id", "g1h-key", CODEX_HOME=str(owner))
+        assert code == 0 and (root / "env.ls").read_text() == "", out
+        code, out = run("env", "g1h", "--pin", "google:gemini-3.1-pro", CODEX_HOME=str(owner))
+        assert code == 0 and (root / "env.codex").read_text() == str(owner), out
         code, out = run("greeting", "g1b")  # the prompt's verdict is no answer
         assert code == 1 and final("g1b-r1-review-gpt-6-sol") == ("-", "final", "1"), out
         assert "no verdict" in out, out
@@ -471,13 +493,95 @@ def claude_canary() -> int:
     return 0
 
 
+def codex_canary() -> int:
+    """Opt-in real CLI probe: a fake owner home and a loopback Responses API, no vendor requests."""
+    import http.server
+    import json
+    import threading
+    from unittest import mock
+    from dispatch import codex_env, transport
+
+    cli = shutil.which("codex")
+    assert cli, "codex must be installed for --codex-canary"
+    hits = []
+
+    class Handler(http.server.BaseHTTPRequestHandler):
+        def do_POST(self):
+            hits.append(self.rfile.read(int(self.headers.get("Content-Length", 0))).decode())
+            item = {"type": "message", "role": "assistant", "id": "msg_canary",
+                    "content": [{"type": "output_text", "text": "OK", "annotations": []}]}
+            usage = {"input_tokens": 1, "output_tokens": 1, "total_tokens": 2}
+            events = [("response.created", {"response": {"id": "resp_canary"}}),
+                      ("response.output_item.done", {"output_index": 0, "item": item}),
+                      ("response.completed", {"response": {"id": "resp_canary", "usage": usage}})]
+            body = "".join(f"event: {kind}\ndata: {json.dumps({'type': kind, **data})}\n\n"
+                           for kind, data in events).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/event-stream")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, *args):
+            pass
+
+    server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        with tempfile.TemporaryDirectory(prefix="duck-codex-canary-") as directory:
+            root = Path(directory)
+            home = root / "home"
+            owner = home / ".codex"
+            skill = home / ".agents" / "skills" / "duck-canary"
+            skill.mkdir(parents=True)
+            owner.mkdir()
+            scratch = root / "scratch"
+            scratch.mkdir()
+            agents, skilled = "DUCK_CANARY_PRIVATE_INSTRUCTION", "DUCK_CANARY_PRIVATE_SKILL"
+            (owner / "AGENTS.md").write_text(agents)
+            (owner / "auth.json").write_text("{}")
+            (skill / "SKILL.md").write_text(f"---\nname: duck-canary\ndescription: {skilled}\n---\n")
+            env = {key: os.environ[key] for key in ("PATH", "USER", "TMPDIR") if key in os.environ}
+            env.update(HOME=str(home), CODEX_HOME=str(owner), DUCK_CANARY_KEY="local-canary-only")
+            argv = transport("codex", "openai", "duck-canary", "-", "OK", scratch, [], 20)
+            argv[0] = cli
+            argv[2:2] = ["-c", 'model_provider="duck_canary"', "-c",
+                         "model_providers.duck_canary={name=\"duck canary\", base_url=\"http://"
+                         f"127.0.0.1:{server.server_port}/v1\", env_key=\"DUCK_CANARY_KEY\", "
+                         "wire_api=\"responses\"}"]
+            # Positive control proves the owner's home reaches the request, not just that it is absent.
+            subprocess.run(argv, env=env, cwd=scratch, stdin=subprocess.DEVNULL,
+                           capture_output=True, timeout=60, check=True)
+            assert hits and agents in hits[-1] and skilled in hits[-1], "control missed the owner home"
+            hits.clear()
+            seat = root / "seat"
+            seat.mkdir()
+            with mock.patch.dict(os.environ, env, clear=True):
+                isolated = codex_env(seat, rival=False)
+            subprocess.run(argv, env=isolated, cwd=scratch, stdin=subprocess.DEVNULL,
+                           capture_output=True, timeout=60, check=True)
+            assert hits, "isolated seat did not reach the loopback API"
+            assert agents not in hits[-1], "review seat read the owner's AGENTS.md"
+            assert skilled not in hits[-1], "review seat loaded the owner's skills"
+    finally:
+        server.shutdown()
+        server.server_close()
+    print("real Codex home canary passed (loopback API only)")
+    return 0
+
+
 if __name__ == "__main__":
     if "--claude-canary" in sys.argv:
         raise SystemExit(claude_canary())
+    if "--codex-canary" in sys.argv:
+        raise SystemExit(codex_canary())
     code = self_check()
-    # the Claude seat's isolation is a security property: check it wherever the real CLI exists
-    if not code and shutil.which("claude"):
-        code = claude_canary()
-    elif not code:
-        print("real Claude hook canary skipped: claude is not installed")
+    # seat isolation is a security property: check it wherever the real CLI exists
+    for name, canary in (("Claude hook", claude_canary), ("Codex home", codex_canary)):
+        cli = name.split()[0].lower()
+        if not code and shutil.which(cli):
+            code = canary()
+        elif not code:
+            print(f"real {name} canary skipped: {cli} is not installed")
     raise SystemExit(code)

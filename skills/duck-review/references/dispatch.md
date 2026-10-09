@@ -77,6 +77,11 @@ changed the `--candidate` checkout. A race rival adds `--diff-base <sha> --diff-
 a verdict the script writes the `--workdir` diff against that base whole; an outage writes none, and
 an empty diff is an outage, since a race rival's answer is a change.
 
+A codex seat runs with a fresh `CODEX_HOME` holding only a link to the owner's `auth.json`: no
+AGENTS.md, config, plugins, memories or MCP servers, and the model and effort come from the pin.
+A review seat also gets that directory as `HOME`, which hides `~/.agents/skills`; a `--workdir`
+rival keeps `HOME`, and those skills with it, so the owner's toolchains still build.
+
 **`--prompt` takes a UTF-8 brief file path; the script passes its contents as a CLI argument.**
 The material under review is a path inside that brief. Hand the reviewer
 your instructions on the command line, and have those instructions name the diff, corpus, or files
