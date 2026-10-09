@@ -19,3 +19,13 @@ Read the rendered Markdown for layout and read the translation for meaning and v
 
 README translations do not establish skill routing in that language. Those claims need the
 [language evals](evals/README.md). The duck checks its own claims, too.
+
+# Change a contract with its check
+
+A change to how the duck talks to something else ships with a check run against the real thing.
+
+- A parser fixture is a recorded transcript from the real CLI, not output written to match the
+  parser.
+- A skill description change reports Skill-call counts with and without it.
+- A grader is never rewritten in the change whose rule it grades. Change the rule, rerun the old
+  grader, then change the grader on its own.
