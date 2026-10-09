@@ -381,6 +381,14 @@ def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
     """(verdict, reason) for a trial pin: `shadow` while it still rides along, then `replace`,
     `add` or `drop`. A trial that cannot decide keeps riding up to twice its shadow count, then
     drops, so no pin sits in `trial` forever and blocks its family's next model."""
+    verdict, reason, missed = trial_result(config, dispatches, findings, pin)
+    return verdict, reason + "".join(f"; missed {severity} {cause}" for severity, cause in missed)
+
+
+def trial_result(config: dict, dispatches: list[dict], findings: list[dict],
+                 pin: str) -> tuple[str, str, list[tuple[str, str]]]:
+    """`trial_verdict`, with a replace's missed causes as (severity, cause_id) pairs: a cause id
+    may hold any text, so a caller never splits them back out of the reason."""
     needed = int(config.get("shadow", DEFAULT_SHADOW))
     family = arm_of(pin)[0]
     on_trial = {arm_of(p)[:2] for p in config.get("trial", [])}
@@ -402,9 +410,9 @@ def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
     counted = {(d["repo"], d["gate_id"]) for d in rows}  # any round of a counted gate
     if any(d["outage"] == "1" for d in shadow_rows(dispatches, pin)
            if (d["repo"], d["gate_id"]) in counted):
-        return "drop", "outage on a shadow gate"
+        return "drop", "outage on a shadow gate", []
     if len(rows) < needed:
-        return "shadow", f"{len(rows)}/{needed}"
+        return "shadow", f"{len(rows)}/{needed}", []
     distinct: dict[str, set[str]] = {}  # a cause recorded twice is still one cause
     for f in findings:
         if f["substantiated"] == "1":
@@ -413,8 +421,8 @@ def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
     undecided = "drop" if len(rows) >= 2 * needed else "shadow"
     if incumbent is None:
         if sum(caught.get(d["id"], 0) for d in rows):
-            return "add", "no reviewer of its family; it substantiated a cause"
-        return undecided, "no substantiated cause yet"
+            return "add", "no reviewer of its family; it substantiated a cause", []
+        return undecided, "no substantiated cause yet", []
     # ponytail: "not worse on the shared gates" by summed substantiated causes; three gates cannot
     # reach significance, so this only keeps out a clearly worse model. `paired` over more gates is
     # the upgrade.
@@ -423,7 +431,7 @@ def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
     found = sum(caught.get(theirs[gate(d)]["id"], 0) for d in shared)
     if len(shared) < needed or not (own or found):
         # too few gates beside the incumbent, or all clean: nothing says which model is better
-        return undecided, f"{len(shared)} shared gates, {own} vs {found} causes"
+        return undecided, f"{len(shared)} shared gates, {own} vs {found} causes", []
     if own >= found:
         # the sum ignores severity: whoever applies the replace sees what the trial missed
         rank = {"BLOCKER": 0, "SHOULD": 1, "NOTE": 2}
@@ -433,9 +441,8 @@ def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
                          and f["cause_id"] not in {g["cause_id"] for g in findings
                                                    if g["dispatch_id"] == d["id"]
                                                    and g["substantiated"] == "1"}})
-        return "replace", pin_of(incumbent) + "".join(
-            f"; missed {severity} {cause}" for _, severity, cause in missed)
-    return "drop", f"{own} vs {found} causes on shared gates"
+        return "replace", pin_of(incumbent), [(severity, cause) for _, severity, cause in missed]
+    return "drop", f"{own} vs {found} causes on shared gates", []
 
 
 def shadow_status(config: dict, dispatches: list[dict],
@@ -477,10 +484,11 @@ def cmd_promote(args) -> int:
     config = load_config(args.repo or default_origin())
     dispatches, findings = load_tables()
     for pin in config.get("trial", []):
-        verdict, reason = trial_verdict(config, dispatches, findings, pin)
+        verdict, reason, missed = trial_result(config, dispatches, findings, pin)
         if verdict == "replace":
-            incumbent, *missed = reason.split("; ")
-            print(f"replace {incumbent} with {pin} in review" + "".join(f"\n  {m}" for m in missed))
+            print(f"replace {reason} with {pin} in review")
+            for severity, cause in missed:
+                print(f"  missed {severity} {cause}")
         elif verdict == "add":
             print(f"add {pin} to review")
         else:
