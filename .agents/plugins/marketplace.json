@@ -1,7 +1,7 @@
 {
   "name": "askrubberduck",
   "interface": {
-    "displayName": "askrubberduck"
+    "displayName": "Ask Rubber Duck"
   },
   "plugins": [
     {

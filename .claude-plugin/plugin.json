@@ -1,8 +1,8 @@
 {
   "name": "askrubberduck",
-  "displayName": "askrubberduck",
+  "displayName": "Ask Rubber Duck",
   "description": "Make the work prove itself. Challenge the goal, cut the clutter, and check what actually happened.",
-  "version": "3.13.0",
+  "version": "3.13.1",
   "author": {
     "name": "askrubberduck",
     "url": "https://github.com/askrubberduck"
