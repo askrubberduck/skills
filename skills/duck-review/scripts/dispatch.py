@@ -222,6 +222,19 @@ def codex_env(home: Path, rival: bool) -> dict[str, str]:
     return {**os.environ, "CODEX_HOME": str(home), **({} if rival else {"HOME": str(home)})}
 
 
+def agy_env(home: Path) -> dict[str, str]:
+    """An agy seat's environment: `home` as HOME, holding only the owner's login, so the owner's
+    ~/.gemini/config rules and skills stay out. The login is two files under ~/.gemini plus the
+    keychain, which macOS finds under HOME."""
+    owner = Path.home()
+    (home / ".gemini").mkdir()
+    (home / "Library").mkdir()
+    for part in (".gemini/oauth_creds.json", ".gemini/google_accounts.json", "Library/Keychains"):
+        if (owner / part).exists():  # links, not copies: a refreshed token stays the owner's
+            (home / part).symlink_to((owner / part).resolve())
+    return {**os.environ, "HOME": str(home)}
+
+
 def launch(argv: list[str], out: Path, limit: float, workdir: Path,
            env: dict[str, str] | None = None) -> tuple[bool, int]:
     """Run to completion or the limit: (whether the limit ended it, the exit code)."""
@@ -345,12 +358,13 @@ def run_seat(args) -> int:
     started = time.monotonic()
     verdict, cause, moved = "-", "crashed", []
     diff = Path(args.diff_out).resolve() if args.diff_out else None
-    isolated = Path(tempfile.mkdtemp(prefix="askrubberduck-codex-")) if via == "codex" else None
+    isolated = Path(tempfile.mkdtemp(prefix=f"askrubberduck-{via}-")) if via != "claude" else None
     try:
         if diff:
             diff.unlink(missing_ok=True)  # a reader waiting for it must not take a stale one
         answer.unlink(missing_ok=True)  # a stale answer from an earlier run is no answer
-        env = codex_env(isolated, rival=bool(args.workdir)) if isolated else None
+        env = (codex_env(isolated, rival=bool(args.workdir)) if via == "codex"
+               else agy_env(isolated) if isolated else None)
         timed_out, code = launch(argv, out, timeout, workdir, env)
         text = out.read_text(encoding="utf-8", errors="replace")
         reply = answer.read_text(encoding="utf-8", errors="replace") if answer.exists() else ""

@@ -58,7 +58,7 @@ STUBS = {
     "cancel": 'sleep 30 & echo $! > "$0.pid"; touch "$0.up"; wait',
     "env": 'ls -A "$CODEX_HOME" > "$0.ls"; printf %s "$CODEX_HOME" > "$0.codex"; '
            'printf %s "$HOME" > "$0.HOME"; readlink "$CODEX_HOME/auth.json" > "$0.auth"; '
-           'echo "VERDICT: APPROVE"',
+           'ls -A "$HOME/.gemini" "$HOME/Library" > "$0.gemini" 2>&1; echo "VERDICT: APPROVE"',
 }
 
 
@@ -215,6 +215,19 @@ def self_check() -> int:
         assert code == 0 and (root / "env.ls").read_text() == "", out
         code, out = run("env", "g1h", "--pin", "google:gemini-3.1-pro", CODEX_HOME=str(owner))
         assert code == 0 and (root / "env.codex").read_text() == str(owner), out
+        # an agy seat gets its own HOME with only the Google login and the keychain linked in
+        person = root / "person"
+        (person / ".gemini" / "config").mkdir(parents=True)
+        (person / "Library" / "Keychains").mkdir(parents=True)
+        for name in ("oauth_creds.json", "google_accounts.json", "config/AGENTS.md"):
+            (person / ".gemini" / name).write_text("{}")
+        code, out = run("env", "g1g", "--pin", "google:gemini-3.1-pro", HOME=str(person))
+        seat_home = (root / "env.HOME").read_text()
+        assert code == 0 and seat_home != str(person), out
+        assert (root / "env.gemini").read_text().split() == [
+            f"{seat_home}/.gemini:", "google_accounts.json", "oauth_creds.json",
+            f"{seat_home}/Library:", "Keychains"], (root / "env.gemini").read_text()
+        assert not Path(seat_home).exists(), "the seat's home outlived the run"
         code, out = run("greeting", "g1b")  # the prompt's verdict is no answer
         assert code == 1 and final("g1b-r1-review-gpt-6-sol") == ("-", "final", "1"), out
         assert "no verdict" in out, out

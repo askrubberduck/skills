@@ -82,6 +82,10 @@ AGENTS.md, config, plugins, memories or MCP servers, and the model and effort co
 A review seat also gets that directory as `HOME`, which hides `~/.agents/skills`; a `--workdir`
 rival keeps `HOME`, and those skills with it, so the owner's toolchains still build.
 
+An agy seat runs with a fresh `HOME` holding only links to the owner's Google login
+(`~/.gemini/oauth_creds.json`, `~/.gemini/google_accounts.json`) and `~/Library/Keychains`,
+so the rules and skills in `~/.gemini/config` stay out.
+
 **`--prompt` takes a UTF-8 brief file path; the script passes its contents as a CLI argument.**
 The material under review is a path inside that brief. Hand the reviewer
 your instructions on the command line, and have those instructions name the diff, corpus, or files
