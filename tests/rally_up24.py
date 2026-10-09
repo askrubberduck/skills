@@ -98,5 +98,24 @@ class PromoteTest(unittest.TestCase):
                     trial_verdict(config, loaded_dispatches, loaded_findings, pin)[0],
                     "replace")
 
+    def test_missing_severity_preserves_existing_replace_verdict(self):
+        incumbent = "openai:gpt-6-inc:high"
+        pin = "openai:gpt-6-trial:high"
+        config = {"reviewers": [incumbent], "trial": [pin], "shadow": 1}
+        dispatches = []
+        for ident, model, setup in (("inc", "gpt-6-inc", "independent"),
+                                    ("trial", "gpt-6-trial", "shadow")):
+            row = dict.fromkeys(DISPATCH_COLUMNS, "-")
+            row.update(id=ident, gate_id="g1", round="1", repo="r", candidate="c1",
+                       stage="review", setup=setup, status="final", outage="0",
+                       family="openai", model=model, effort="high")
+            dispatches.append(row)
+        # The pre-UP24 comparison accepts these same minimal finding dictionaries.
+        findings = [{"dispatch_id": "inc", "cause_id": "incumbent-cause",
+                     "substantiated": "1"},
+                    {"dispatch_id": "trial", "cause_id": "trial-cause",
+                     "substantiated": "1"}]
+        self.assertEqual(trial_verdict(config, dispatches, findings, pin)[0], "replace")
+
 if __name__ == "__main__":
     unittest.main()
