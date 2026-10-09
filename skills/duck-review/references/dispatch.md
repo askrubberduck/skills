@@ -115,8 +115,9 @@ support its verdict.
 
 Ask participants to open with a labeled result line, `VERDICT: APPROVE | REJECT | NOTE` or
 `PLAN: CONCUR | OBJECT`; race and rally answers end with `VERDICT: DIFF`. The script reads only the
-answer's first and last non-empty lines; body markup only excludes quoted or fenced boundary
-examples. Body result labels and severity headings cannot become results. Two different boundary
+answer's first and last non-empty lines. A labeled boundary result inside a quote or fence counts
+as an unsupported conflict, so it cannot silently hide a final rejection. Body result labels and
+severity headings cannot become results. Two different boundary
 results are unsupported. Bare NOTE remains a severity heading, not an overall result; other bare
 result words conflict with a labeled boundary result. Inspect
 the justification before trusting the label.

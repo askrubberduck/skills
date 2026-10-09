@@ -83,7 +83,12 @@ def self_check() -> int:
         assert classify(label, "claude", False, 0) == ("APPROVE", ""), label
     assert classify("**PLAN:** CONCUR", "claude", False, 0) == ("CONCUR", "")
     assert classify("VERDICT: APPROVE\n\nNOTE", "claude", False, 0) == ("APPROVE", "")
-    # a real codex exec run: prompt echo, answer, token count, then the answer again
+    # a final result hidden by quote or fence state is a conflict, never silently dropped
+    for tail in ("> Prior rationale.\n- Final judgment\nVERDICT: REJECT",
+                 "> Prior rationale.\nVERDICT: REJECT", "```\nVERDICT: REJECT",
+                 "> q\n---\nVERDICT: REJECT", "> q\n| a | b |\nVERDICT: REJECT"):
+        assert classify("VERDICT: APPROVE\n\n" + tail, "claude", False, 0) == (
+            "-", "ambiguous verdict"), tail
     # a real codex exec log echoes the prompt and repeats the answer: never parsed for a result
     real = "user\nReply with VERDICT: NOTE\ncodex\nVERDICT: NOTE\ndone\ntokens used\n8,187\nVERDICT: NOTE\ndone\n"
     assert classify("VERDICT: NOTE\ndone\n", "codex", False, 0, real) == ("NOTE", "")

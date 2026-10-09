@@ -92,12 +92,16 @@ def classify(text: str, via: str, timed_out: bool, code: int, log: str = "") -> 
                 fence = None
             continue
         if fence is not None:
-            continue
-        if line.lstrip().startswith(">"):
+            pass
+        elif line.lstrip().startswith(">"):
             quoted = True
         elif not line.strip() or re.match(r"^ {0,3}#{1,6} ", line):
             quoted = False  # a heading starts a new block, not a quote continuation
-        if quoted or i not in boundaries:
+        if i not in boundaries:
+            continue
+        if fence is not None or quoted:
+            if VERDICT_LINE.fullmatch(line):
+                results.append(None)  # a result that may be an example cannot be dropped silently
             continue
         if match := VERDICT_LINE.fullmatch(line):
             results.append(match["verdict"] or match["plan"])
