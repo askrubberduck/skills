@@ -7,6 +7,7 @@ from __future__ import annotations
 import contextlib
 import os
 import shlex
+import shutil
 import signal
 import subprocess
 import sys
@@ -32,8 +33,8 @@ dispatch_timeout = "20s"
 STUBS = {
     # codex echoes the prompt after `user`; only the text after its answer marker is the answer
     "reject": 'printf \'%s\\0\' "$@" > "$0.argv"; pwd -P > "$0.cwd"; cut -f1,16 "$ASKRUBBERDUCK_HOME/dispatches.tsv"'
-              ' > "$0.seen"\n[ "$1" != codex ] || printf \'user\\nAPPROVE\\ncodex\\n\'\nprintf \'**VERDICT: REJECT**\\n'
-              'tokens used\\n1,234\\n\'',
+              ' > "$0.seen"\n[ "$1" != codex ] || printf \'user\\nAPPROVE\\ncodex\\n\' >&2\n'
+              'printf \'**VERDICT: REJECT**\\n\'\n[ "$1" != codex ] || printf \'tokens used\\n1,234\\n\' >&2',
     "severity": "printf 'VERDICT: APPROVE\\n\\nNOTE\\nCoverage limit\\n'",
     "bare-severity": "printf 'VERDICT: APPROVE\\n\\nNOTE\\nCoverage limit\\n'",
     "plan-severity": "printf 'PLAN: OBJECT\\n\\nNOTE\\nCoverage limit\\n'",
@@ -70,6 +71,19 @@ def self_check() -> int:
         assert classify(answer, "claude", False, 0)[0] == "-", answer
     assert classify("> VERDICT: APPROVE\n\nVERDICT: REJECT", "claude", False, 0) == ("REJECT", "")
     assert classify("```\nVERDICT: APPROVE\n```\nVERDICT: REJECT", "claude", False, 0) == ("REJECT", "")
+    for answer in ("```text\nexample\nVERDICT: APPROVE",
+                   "> example\ncontinued quotation\nVERDICT: APPROVE"):
+        assert classify(answer, "claude", False, 0)[0] == "-", answer
+    # the body is never parsed: a quote ended by a heading, then a second result, is ambiguous
+    assert classify("VERDICT: APPROVE\n\n> Prior rationale was incomplete.\n## Final judgment\n"
+                    "VERDICT: REJECT", "claude", False, 0) == ("-", "ambiguous verdict")
+    assert classify("## VERDICT: REJECT\n\n## BLOCKER\nNOTE\n> VERDICT: APPROVE\nfindings",
+                    "agy", False, 0) == ("REJECT", "")
+    # a real codex exec run: prompt echo, answer, token count, then the answer again
+    # a real codex exec log echoes the prompt and repeats the answer: never parsed for a result
+    real = "user\nReply with VERDICT: NOTE\ncodex\nVERDICT: NOTE\ndone\ntokens used\n8,187\nVERDICT: NOTE\ndone\n"
+    assert classify("VERDICT: NOTE\ndone\n", "codex", False, 0, real) == ("NOTE", "")
+    assert classify("", "codex", False, 0, real)[0] == "-"
     with tempfile.TemporaryDirectory(prefix="askrubberduck-dispatch-") as directory:
         root = Path(directory).resolve()  # macOS: /var is /private/var
         os.environ["ASKRUBBERDUCK_HOME"] = str(root)
@@ -89,7 +103,11 @@ def self_check() -> int:
             (root / "bin" / name).mkdir(parents=True)
             for cli in ("codex", "agy", "claude"):
                 fake = root / "bin" / name / cli
-                fake.write_text(f'#!/bin/sh\nexec {shlex.quote(str(stub))} "${{0##*/}}" "$@"\n')
+                if cli == "codex":  # like codex exec, the last message also lands in its file
+                    fake.write_text(f'#!/bin/sh\n[ "$2" = --output-last-message ] || exit 91\n'
+                                    f'{shlex.quote(str(stub))} codex "$@" > "$3"; s=$?; cat "$3"; exit $s\n')
+                else:
+                    fake.write_text(f'#!/bin/sh\nexec {shlex.quote(str(stub))} "${{0##*/}}" "$@"\n')
                 fake.chmod(0o755)
         env = {**os.environ, "CANDIDATE": str(checkout)}
         outs = iter(range(100))  # parallel seats of one gate must not share an output file
@@ -119,13 +137,15 @@ def self_check() -> int:
             row = rows()[row_id]
             return row["verdict"], row["status"], row["outage"]
 
-        # 1. a REJECT after codex's answer marker is the verdict, not the echoed APPROVE; round 2
+        # 1. the verdict comes from codex's last-message file, not the log's echoed APPROVE; round 2
         # of trust work sits on its bound of 2 and runs; the row was pending while the seat ran
         code, out = run("reject", "g1", "--trust", "1", rnd=2)
         assert code == 0 and final("g1-r2-review-gpt-6-sol") == ("REJECT", "final", "0"), out
         assert rows()["g1-r2-review-gpt-6-sol"]["tokens"] == "1234", rows()
         assert "g1-r2-review-gpt-6-sol\tpending" in (root / "reject.seen").read_text()
-        assert (root / "reject.argv").read_text().split("\0")[:-1] == [
+        argv = (root / "reject.argv").read_text().split("\0")[:-1]
+        assert argv[2] == "--output-last-message" and argv[3].endswith(".answer"), argv
+        assert argv[:2] + argv[4:] == [
             "codex", "exec", "-m", "gpt-6-sol", "-c", "model_reasoning_effort=high", "-s",
             "workspace-write", "-C", str(root / "scratch"), "--skip-git-repo-check",
             prompt.read_text()]
@@ -443,4 +463,12 @@ def claude_canary() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(claude_canary() if "--claude-canary" in sys.argv else self_check())
+    if "--claude-canary" in sys.argv:
+        raise SystemExit(claude_canary())
+    code = self_check()
+    # the Claude seat's isolation is a security property: check it wherever the real CLI exists
+    if not code and shutil.which("claude"):
+        code = claude_canary()
+    elif not code:
+        print("real Claude hook canary skipped: claude is not installed")
+    raise SystemExit(code)

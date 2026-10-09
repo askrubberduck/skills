@@ -28,9 +28,12 @@ from ledger import (DEFAULT_RALLY_TURNS, DISPATCH_COLUMNS, DISPATCH_ENUMS, arm_o
                     default_origin, home, load_config, read_table, validate_row)
 
 VIA = {"openai": "codex", "google": "agy", "anthropic": "claude"}  # by the pin's family
+# Only boundary lines carry results; body markup only guards against quoted boundary examples.
+# A heading or bold marker around the label is allowed.
 VERDICT_LINE = re.compile(
-    r"^ {0,3}[*_]*(?:VERDICT\s*:\s*[*_]*(?P<verdict>APPROVE|REJECT|NOTE|DIFF)"
-    r"|PLAN\s*:\s*[*_]*(?P<plan>CONCUR|OBJECT))[*_]*\.?\s*$")
+    r" {0,3}(?:#{1,6} +)?[*_]*(?:VERDICT\s*:\s*[*_]*(?P<verdict>APPROVE|REJECT|NOTE|DIFF)"
+    r"|PLAN\s*:\s*[*_]*(?P<plan>CONCUR|OBJECT))[*_]*\.?\s*")
+BARE_RESULT = re.compile(r"\s*[*_]*(?:APPROVE|REJECT|CONCUR|OBJECT|DIFF)[*_]*\.?\s*")
 # Checked only when no verdict was found, first match wins: while credits are out, codex reports
 # that before anything else, so a later pin rejection proves nothing.
 OUTAGES = (("credits", r"out of credits|insufficient credits?|credit balance"),
@@ -39,7 +42,6 @@ OUTAGES = (("credits", r"out of credits|insufficient credits?|credit balance"),
            ("model rejected", r"not supported|unknown model|invalid model|model.not.found"),
            ("permission denied", r"permission\b[\s\S]{0,200}?\bdenied"))  # a wrapped message too
 TOKENS = re.compile(r"tokens used\s*:?\s*([\d,]+)", re.IGNORECASE)
-CODEX_ANSWER = "codex"  # codex exec prints this line alone before its final answer
 # A stage with its own ceiling counts against it; review and disposition share the round bound.
 STAGE_BOUNDS = {"plan": ("plan_rounds", 2), "rally": ("rally_turns", DEFAULT_RALLY_TURNS),
                 "roast": ("roast_passes", 2)}
@@ -70,35 +72,38 @@ def transport(via: str, family: str, model: str, effort: str, prompt: str, workd
     return ["agy", "--model", pinned, *dirs, "--print-timeout", f"{math.ceil(limit)}s", "-p", prompt]
 
 
-def classify(text: str, via: str, timed_out: bool, code: int) -> tuple[str, str]:
+def classify(text: str, via: str, timed_out: bool, code: int, log: str = "") -> tuple[str, str]:
     """(verdict, outage cause). A seat that timed out or exited nonzero is an outage whatever it
     printed — a verdict before the crash belongs to a review that never finished; otherwise a found
     verdict is never an outage, whatever else the output says."""
     lines = text.splitlines()
-    if via == "codex" and CODEX_ANSWER in lines:  # before it, codex echoes the prompt
-        lines = lines[len(lines) - lines[::-1].index(CODEX_ANSWER):]
+    body = [i for i, line in enumerate(lines) if line.strip()]
     results = []
+    boundaries = set(body[:1] + body[-1:])
     fence = None
     quoted = False
-    for line in lines:
-        if fence is None and line.lstrip().startswith(">"):
-            quoted = True
-        elif not line.strip():
-            quoted = False
-        if quoted:
-            continue
-        marker = re.match(r"^\s*(`{3,}|~{3,})", line)
+    for i, line in enumerate(lines):
+        marker = re.match(r"^ {0,3}(`{3,}|~{3,})", line)
         if marker:
             if fence is None:
                 fence = marker[1]
             elif (marker[1][0] == fence[0] and len(marker[1]) >= len(fence)
                   and not line[marker.end():].strip()):
                 fence = None
-        elif fence is None and (match := VERDICT_LINE.fullmatch(line)):
+            continue
+        if fence is not None:
+            continue
+        if line.lstrip().startswith(">"):
+            quoted = True
+        elif not line.strip() or re.match(r"^ {0,3}#{1,6} ", line):
+            quoted = False  # a heading starts a new block, not a quote continuation
+        if quoted or i not in boundaries:
+            continue
+        if match := VERDICT_LINE.fullmatch(line):
             results.append(match["verdict"] or match["plan"])
-        elif fence is None and re.fullmatch(
-                r"\s*[*_]*(?:APPROVE|REJECT|CONCUR|OBJECT|DIFF)[*_]*\.?\s*", line):
-            results.append(None)  # an unlabeled result cannot coexist with a usable result
+        elif BARE_RESULT.fullmatch(line):
+            results.append(None)  # an unlabeled result conflicts with a labeled one
+    results = list(dict.fromkeys(results))
     verdict = results[0] if len(results) == 1 else None
     if timed_out:
         return "-", "timeout"
@@ -106,7 +111,7 @@ def classify(text: str, via: str, timed_out: bool, code: int) -> tuple[str, str]
         return verdict, ""
     answer = "\n".join(lines)
     for cause, pattern in OUTAGES:
-        if re.search(pattern, answer, re.IGNORECASE):
+        if re.search(pattern, answer + "\n" + log, re.IGNORECASE):
             return "-", cause
     if code != 0:
         return "-", f"exit {code}"
@@ -290,6 +295,10 @@ def run_seat(args) -> int:
             capture_output=True).returncode:
         return refuse(f"--diff-base is not a commit in {workdir}: {args.diff_base}")
     argv = transport(via, family, model, effort, prompt, workdir, args.add_dir, timeout)
+    # codex's log echoes the prompt and repeats the answer; its last message is the answer alone
+    answer = out.with_name(out.name + ".answer") if via == "codex" else out
+    if via == "codex":
+        argv[2:2] = ["--output-last-message", str(answer)]
     candidate = (before[0].removeprefix("HEAD ")[:7] if before else "") or "-"
     row = dict(id=row_id, gate_id=args.gate, round=str(args.round),
                date=datetime.date.today().isoformat(), repo=repo, stage=args.stage,
@@ -317,9 +326,11 @@ def run_seat(args) -> int:
     try:
         if diff:
             diff.unlink(missing_ok=True)  # a reader waiting for it must not take a stale one
+        answer.unlink(missing_ok=True)  # a stale answer from an earlier run is no answer
         timed_out, code = launch(argv, out, timeout, workdir)
         text = out.read_text(encoding="utf-8", errors="replace")
-        found, cause = classify(text, via, timed_out, code)
+        reply = answer.read_text(encoding="utf-8", errors="replace") if answer.exists() else ""
+        found, cause = classify(reply, via, timed_out, code, text)
         if diff and found != "-" and (failed := capture(workdir, args.diff_base, diff)):
             found, cause = "-", failed
         verdict = found  # only now: a cancel during the capture records a cancel, not a verdict

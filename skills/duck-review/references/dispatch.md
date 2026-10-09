@@ -113,10 +113,12 @@ dispatch is the harder case — full length, well formed, and wrong.** Nothing i
 distinguishes it, so before trusting any result, check that its quoted justifications actually
 support its verdict.
 
-Ask participants for exactly one unquoted result line: `VERDICT: APPROVE | REJECT | NOTE`,
-`PLAN: CONCUR | OBJECT`, or `VERDICT: DIFF` for race/rally output. Bare words, quoted examples and
-fenced snippets are not results; multiple labeled results are unsupported, even when identical.
-Severity headings cannot overwrite a labeled result. Inspect its justification before trusting it.
+Ask participants to open with a labeled result line, `VERDICT: APPROVE | REJECT | NOTE` or
+`PLAN: CONCUR | OBJECT`; race and rally answers end with `VERDICT: DIFF`. The script reads only the
+answer's first and last non-empty lines; body markup only excludes quoted or fenced boundary
+examples. Body result labels and severity headings cannot become results. Two different boundary
+results are unsupported, and a bare word is none. Inspect
+the justification before trusting the label.
 
 Claude normally saves transcripts under `~/.claude/projects`; this route uses
 `--no-session-persistence`. Exclude older reviewer transcripts when mining owner sessions.

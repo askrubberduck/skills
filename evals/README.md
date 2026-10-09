@@ -101,6 +101,29 @@ behavioral cases became equal on three additional runs; their initial difference
 These receipts reject the request-only descriptions. Restoring situational triggers needs new
 why/shape with/without runs; these results do not validate that repair.
 
+### Owner-supplied fix comparison, 2026-10-09
+
+The supplied patch's scratch commit `57b3a83` was evaluated in Claude Code 2.1.294, 56 runner
+cases with three runs each and a Sonnet judge. These are external receipts; scores use identical
+graders and exclude the trigger indicators.
+
+| Target | Mean score | Fully passing runs | Skill calls | Positive why calls |
+|---|---|---|---|---|
+| Base `3a1d385` | 0.917 | 151/171 | 143/162 | 18/18 |
+| PR repair `91e2212` | 0.904 | 143/171 | 129/162 | 3/18 |
+| Supplied patch `57b3a83` | 0.918 | 146/171 | 148/162 | 17/18 |
+
+Outcome differences are within the report's estimated noise; the why activation difference is
+substantial. This change restores the exact base duck-why description used by that patch. The
+conservative variant restored every description and scored 0.904 with 144/162 Skill calls; no
+measured benefit justified that wider rollback.
+
+The supplied patch also scored 80/83 forced-choice routing probes and 13/18 behavioral cases.
+Repeated language checks returned Russian on 8/10 runs of case 11, versus 12/14 on base. Cases 2,
+7 and 9 still fail on base and the patch; no repair is claimed for those pre-existing failures.
+The full metrics belong to the supplied scratch commit. Local hardening of quoted parser
+boundaries is separately verified by dispatch regressions and the real loopback Claude canary.
+
 ### Local selection probes, 2026-09-17
 
 Two fresh Codex subagents each received the current English names/descriptions and one prompt, with

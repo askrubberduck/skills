@@ -61,7 +61,8 @@ candidate branch and merges nothing.
 
 1. Merge per the repository's written conventions and enforced policy. Ask the remote for its
    rules; commit history alone does not impose a merge method or commit count.
-   If neither specifies a method, use a normal merge that preserves the reviewed commits.
+   If neither specifies a method, use the sole method allowed by the remote. If several
+   remain, follow the owner's stated preference; without one, the owner chooses the method.
    - **Policy.** Server-side rules are the actual policy where the host exposes them
      (`gh api repos/<owner>/<repo>/rulesets`, branch protection). A rule the
      remote enforces is the policy whether or not your account can get past it; **a landing this

@@ -237,20 +237,18 @@ def check_skill(root: Path, name: str, found: set[str], errors: list[str]) -> No
                 errors.append(f"{location}: missing linked resource {target!r}")
 
 
-def check_generated(root: Path, readme: str, errors: list[str]) -> None:
+def check_generated(root: Path, errors: list[str]) -> None:
     script = root / "scripts" / "render-catalog.py"
     spec = importlib.util.spec_from_file_location("render_catalog", script)
     module = importlib.util.module_from_spec(spec)
     try:
         spec.loader.exec_module(module)
-        catalog_expected, readme_expected, _ = module.render(root)
+        catalog_expected, _ = module.render(root)
     except (OSError, AttributeError, TypeError, ValueError) as exc:
         errors.append(f"generated catalog validation failed: {exc}")
         return
     if (root / "AGENTS-CATALOG.md").read_text() != catalog_expected:
         errors.append("AGENTS-CATALOG.md: generated content is stale")
-    if readme != readme_expected:
-        errors.append("README.md: generated skills table is stale")
 
 
 def check_routing(root: Path, found: set[str], errors: list[str]) -> None:
@@ -327,7 +325,7 @@ def validate(root: Path, run_scripts: bool = True) -> list[str]:
         check_language_rule(root, name, errors)
     check_routing(root, found, errors)
     check_versions(manifests, errors)
-    check_generated(root, readme, errors)
+    check_generated(root, errors)
     return sorted(errors)
 
 

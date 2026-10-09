@@ -44,29 +44,28 @@ def skill_rows(root: Path) -> list[tuple[str, str]]:
     return rows
 
 
-def render(root: Path) -> tuple[str, str, int]:
+def render(root: Path) -> tuple[str, int]:
     rows = skill_rows(root)
     catalog = [CATALOG_HEADER]
     catalog.extend(f"- **{name}** — {description}" for name, description in rows)
     catalog_text = "\n".join(catalog) + "\n"
 
     # The README map is editorial prose; discovery metadata belongs in the catalog.
-    rendered_readme = (root / "README.md").read_text()
+    readme = (root / "README.md").read_text()
     table = re.search(r"<!-- skills-table:start -->.*?<!-- skills-table:end -->",
-                      rendered_readme, re.S)
+                      readme, re.S)
     if not table:
         raise ValueError("README skills-table markers not found")
     names = re.findall(r"^\| `([^`]+)` \|", table[0], re.M)
     if sorted(names) != [name for name, _ in rows]:
         raise ValueError("README skills map must list each installed skill once")
-    return catalog_text, rendered_readme, len(rows)
+    return catalog_text, len(rows)
 
 
 def main() -> int:
     root = Path(__file__).resolve().parent.parent
-    catalog_text, readme_text, count = render(root)
+    catalog_text, count = render(root)
     (root / "AGENTS-CATALOG.md").write_text(catalog_text)
-    (root / "README.md").write_text(readme_text)
     print(f"wrote AGENTS-CATALOG.md; checked README map ({count} skills)")
     return 0
 

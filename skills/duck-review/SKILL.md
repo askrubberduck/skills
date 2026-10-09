@@ -113,7 +113,7 @@ that survives. Neither owner preference nor a mandate to be negative is evidence
 
 ## Reviewer result contract
 
-Require each reviewer to return `APPROVE | REJECT | NOTE` and findings ranked
+Require each reviewer to open with the line `VERDICT: APPROVE | REJECT | NOTE` and rank findings
 `BLOCKER | SHOULD | NOTE`. A reviewer's `APPROVE` claims no release-blocking defect and its
 `REJECT` claims at least one; its `NOTE` is not `APPROVE-W-CONDITIONS` and not an outage. These
 are inputs to the superreview, not votes. A malformed result is *unranked* or *unsupported* as
