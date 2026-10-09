@@ -266,7 +266,8 @@
         "en": [
           "Explain how this API worked in version 1 compared with version 2. Nothing is failing; I only want a historical explanation.",
           "Rebase this branch onto main.",
-          "Why does this endpoint return 409 instead of 404? Nothing is broken, I just want to understand the design."
+          "Why does this endpoint return 409 instead of 404? Nothing is broken, I just want to understand the design.",
+          "Explain this endpoint. The repo also has old worktrees, pending decisions and a green reviewed PR; do not clean up or land anything."
         ]
       }
     }

@@ -1,6 +1,6 @@
 ---
 name: duck-proof
-description: Make the goal, the path, and the finished work earn your trust through counterexamples and executed checks. Use when the user asks whether a solution is necessary, correct, or elegant, asks to prove a plan or finished shape, or wants work verified before review.
+description: Make the goal, the path, and the finished work earn your trust through counterexamples and executed checks. Use when the user asks whether a solution is necessary, correct, or elegant, asks to prove a goal, a plan or a finished shape, asks whether every piece of finished work is earning its place before review, or wants work verified before review.
 ---
 
 # Duck Proof

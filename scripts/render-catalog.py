@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render the skill catalog and README table; `validate-distribution.py` checks they are current."""
+"""Render the skill catalog and validate the editorial README map; `validate-distribution.py` checks they are current."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ but lacks native Agent Skills discovery. Regenerate with `python3 scripts/render
 The duck reads before it speaks. When a task matches a skill below, read its `SKILL.md` and
 follow it before proceeding. Challenge the claim, run the check, keep the evidence.
 English is the home language; match task intent across languages. Follow the user's
-requested language, keeping commands, paths, identifiers, quoted errors and verdicts unchanged.
+language unless they ask otherwise, keeping commands, paths, identifiers, quoted errors and verdicts unchanged.
 Installed location: `~/.agents/skills/<name>/SKILL.md` (or this repo's `skills/<name>/SKILL.md`).
 """
 
@@ -44,37 +44,29 @@ def skill_rows(root: Path) -> list[tuple[str, str]]:
     return rows
 
 
-def render(root: Path) -> tuple[str, str, int]:
+def render(root: Path) -> tuple[str, int]:
     rows = skill_rows(root)
     catalog = [CATALOG_HEADER]
     catalog.extend(f"- **{name}** — {description}" for name, description in rows)
     catalog_text = "\n".join(catalog) + "\n"
 
-    table = ["| Skill | What it does |", "|---|---|"]
-    for name, description in rows:
-        human_summary = description.split(". ", 1)[0].rstrip(".")
-        table.append(f"| `{name}` | {human_summary} |")
-    block = "<!-- skills-table:start -->\n" + "\n".join(table) + "\n<!-- skills-table:end -->"
-
-    readme_path = root / "README.md"
-    readme = readme_path.read_text()
-    if "<!-- skills-table:start -->" not in readme or "<!-- skills-table:end -->" not in readme:
-        raise ValueError("README markers not found — add skills-table markers first")
-    rendered_readme = re.sub(
-        r"<!-- skills-table:start -->.*?<!-- skills-table:end -->",
-        block,
-        readme,
-        flags=re.S,
-    )
-    return catalog_text, rendered_readme, len(rows)
+    # The README map is editorial prose; discovery metadata belongs in the catalog.
+    readme = (root / "README.md").read_text()
+    table = re.search(r"<!-- skills-table:start -->.*?<!-- skills-table:end -->",
+                      readme, re.S)
+    if not table:
+        raise ValueError("README skills-table markers not found")
+    names = re.findall(r"^\| `([^`]+)` \|", table[0], re.M)
+    if sorted(names) != [name for name, _ in rows]:
+        raise ValueError("README skills map must list each installed skill once")
+    return catalog_text, len(rows)
 
 
 def main() -> int:
     root = Path(__file__).resolve().parent.parent
-    catalog_text, readme_text, count = render(root)
+    catalog_text, count = render(root)
     (root / "AGENTS-CATALOG.md").write_text(catalog_text)
-    (root / "README.md").write_text(readme_text)
-    print(f"wrote AGENTS-CATALOG.md + README table ({count} skills)")
+    print(f"wrote AGENTS-CATALOG.md; checked README map ({count} skills)")
     return 0
 
 

@@ -6,7 +6,7 @@ tags such as `ru`, `es`, or `pt-BR`. Link each available language by its own nam
 Keep the source's section order, capabilities, limits, and review rules. Translate the duck's
 voice naturally: short, direct, curious, and unwilling to accept confidence as proof. Commands,
 paths, skill names, and verdicts stay unchanged. Translated skill summaries belong in the README;
-the catalog generator owns only the English table.
+the generator owns `AGENTS-CATALOG.md` and checks skill coverage in the editorial English map.
 
 When the English source changes, check each translation in the same change. Record the SHA-256
 of the exact reviewed `README.md` bytes in a hidden `translation-source` comment in each translation.

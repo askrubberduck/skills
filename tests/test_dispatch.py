@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""dispatch.py end to end: fake `codex` and `agy` on PATH, a fixture home, every exit path.
+"""dispatch.py end to end: fake `codex`, `agy` and `claude` on PATH, a fixture home, every exit path.
 Run: python3 tests/test_dispatch.py"""
 
 from __future__ import annotations
@@ -7,6 +7,7 @@ from __future__ import annotations
 import contextlib
 import os
 import shlex
+import shutil
 import signal
 import subprocess
 import sys
@@ -18,6 +19,7 @@ sys.dont_write_bytecode = True  # no __pycache__ inside the shipped skill
 SCRIPTS = Path(__file__).resolve().parent.parent / "skills" / "duck-review" / "scripts"
 DISPATCH = SCRIPTS / "dispatch.py"
 sys.path.insert(0, str(SCRIPTS))
+from dispatch import classify
 from ledger import DISPATCH_COLUMNS, DISPATCH_ENUMS, read_table  # noqa: E402
 
 CONFIG_FIXTURE = """\
@@ -31,28 +33,66 @@ dispatch_timeout = "20s"
 STUBS = {
     # codex echoes the prompt after `user`; only the text after its answer marker is the answer
     "reject": 'printf \'%s\\0\' "$@" > "$0.argv"; pwd -P > "$0.cwd"; cut -f1,16 "$ASKRUBBERDUCK_HOME/dispatches.tsv"'
-              ' > "$0.seen"\nprintf \'user\\nAPPROVE\\ncodex\\n**VERDICT: REJECT**\\n'
-              'tokens used\\n1,234\\n\'',
+              ' > "$0.seen"\n[ "$1" != codex ] || printf \'user\\nAPPROVE\\ncodex\\n\' >&2\n'
+              'printf \'**VERDICT: REJECT**\\n\'\n[ "$1" != codex ] || printf \'tokens used\\n1,234\\n\' >&2',
+    "severity": "printf 'VERDICT: APPROVE\\n\\nNOTE\\nCoverage limit\\n'",
+    "bare-severity": "printf 'VERDICT: APPROVE\\n\\nNOTE\\nCoverage limit\\n'",
+    "plan-severity": "printf 'PLAN: OBJECT\\n\\nNOTE\\nCoverage limit\\n'",
+    "terminal-diff": "printf '## NOTE\\nNonblocking observation\\nVERDICT: DIFF\\n'",
+    "earlier-severity": "printf 'NOTE\\nCoverage limit\\n**VERDICT: REJECT**\\n'",
     "greeting": "printf 'user\\nVERDICT: REJECT\\ncodex\\nHello! How can I help?\\n'",
     "credits": "echo \"ERROR: You're out of credits. Add credits to continue.\"; exit 1",
     "sleep": 'sleep 30 & echo $! > "$0.pid"; wait',
-    "touch": 'touch "$CANDIDATE/new.txt"; echo APPROVE',
-    "slow": "sleep 0.5; echo NOTE",
-    "stdin": "cat > /dev/null; echo APPROVE",
-    "diff": "echo DIFF",
-    "crash": "echo APPROVE; exit 7",
-    "append": 'echo more >> "$CANDIDATE/new.txt"; echo APPROVE',
-    "hang": "echo APPROVE; sleep 30",
+    "touch": 'touch "$CANDIDATE/new.txt"; echo "VERDICT: APPROVE"',
+    "slow": "sleep 0.5; echo 'VERDICT: NOTE'",
+    "stdin": "cat > /dev/null; echo 'VERDICT: APPROVE'",
+    "diff": "echo 'VERDICT: DIFF'",
+    "crash": "echo 'VERDICT: APPROVE'; exit 7",
+    "append": 'echo more >> "$CANDIDATE/new.txt"; echo "VERDICT: APPROVE"',
+    "hang": "echo 'VERDICT: APPROVE'; sleep 30",
     "denied": "echo 'Error: a tool required the \"write_file\" permission that headless mode'"
               " 'cannot prompt for, so it was auto-denied'",
     "wrapped": "printf 'Error: a tool required the permission that headless mode\\n"
                "cannot prompt for, so it was auto-denied\\n'",
-    "race": "echo raced > raced.txt; printf '\\0\\1' > raced.bin; echo DIFF",
+    "race": "echo raced > raced.txt; printf '\\0\\1' > raced.bin; echo 'VERDICT: DIFF'",
     "cancel": 'sleep 30 & echo $! > "$0.pid"; touch "$0.up"; wait',
 }
 
 
 def self_check() -> int:
+    for answer in ("> VERDICT: APPROVE\nREJECT", "NOTE\nREJECT",
+                   "VERDICT: APPROVE\nVERDICT: REJECT", "VERDICT: NOTE\nVERDICT: DIFF",
+                   "VERDICT: NOTE\nDIFF", "VERDICT: APPROVE\nREJECT",
+                   "```\nVERDICT: APPROVE\n```", "APPROVE\nNOTE",
+                   "````markdown\n```text\nVERDICT: APPROVE\n```\n````",
+                   "    VERDICT: APPROVE", "\tVERDICT: APPROVE",
+                   "> The reviewer returned:\nVERDICT: APPROVE",
+                   "```text\n``` example continues\nVERDICT: APPROVE\n```"):
+        assert classify(answer, "claude", False, 0)[0] == "-", answer
+    assert classify("> VERDICT: APPROVE\n\nVERDICT: REJECT", "claude", False, 0) == ("REJECT", "")
+    assert classify("```\nVERDICT: APPROVE\n```\nVERDICT: REJECT", "claude", False, 0) == ("REJECT", "")
+    for answer in ("```text\nexample\nVERDICT: APPROVE",
+                   "> example\ncontinued quotation\nVERDICT: APPROVE"):
+        assert classify(answer, "claude", False, 0)[0] == "-", answer
+    # the body is never parsed: a quote ended by a heading, then a second result, is ambiguous
+    assert classify("VERDICT: APPROVE\n\n> Prior rationale was incomplete.\n## Final judgment\n"
+                    "VERDICT: REJECT", "claude", False, 0) == ("-", "ambiguous verdict")
+    assert classify("## VERDICT: REJECT\n\n## BLOCKER\nNOTE\n> VERDICT: APPROVE\nfindings",
+                    "agy", False, 0) == ("REJECT", "")
+    for label in ("**VERDICT:** APPROVE", "**VERDICT**: APPROVE", "VERDICT: ** APPROVE **"):
+        assert classify(label, "claude", False, 0) == ("APPROVE", ""), label
+    assert classify("**PLAN:** CONCUR", "claude", False, 0) == ("CONCUR", "")
+    assert classify("VERDICT: APPROVE\n\nNOTE", "claude", False, 0) == ("APPROVE", "")
+    # a final result hidden by quote or fence state is a conflict, never silently dropped
+    for tail in ("> Prior rationale.\n- Final judgment\nVERDICT: REJECT",
+                 "> Prior rationale.\nVERDICT: REJECT", "```\nVERDICT: REJECT",
+                 "> q\n---\nVERDICT: REJECT", "> q\n| a | b |\nVERDICT: REJECT"):
+        assert classify("VERDICT: APPROVE\n\n" + tail, "claude", False, 0) == (
+            "-", "ambiguous verdict"), tail
+    # a real codex exec log echoes the prompt and repeats the answer: never parsed for a result
+    real = "user\nReply with VERDICT: NOTE\ncodex\nVERDICT: NOTE\ndone\ntokens used\n8,187\nVERDICT: NOTE\ndone\n"
+    assert classify("VERDICT: NOTE\ndone\n", "codex", False, 0, real) == ("NOTE", "")
+    assert classify("", "codex", False, 0, real)[0] == "-"
     with tempfile.TemporaryDirectory(prefix="askrubberduck-dispatch-") as directory:
         root = Path(directory).resolve()  # macOS: /var is /private/var
         os.environ["ASKRUBBERDUCK_HOME"] = str(root)
@@ -68,11 +108,15 @@ def self_check() -> int:
             stub = root / name
             stub.write_text(f"#!/bin/sh\n{body}\n")
             stub.chmod(0o755)
-            # codex and agy on the seat's PATH run the stub, their own name its first argument
+            # Each CLI on the seat's PATH runs the stub with its own name as the first argument
             (root / "bin" / name).mkdir(parents=True)
-            for cli in ("codex", "agy"):
+            for cli in ("codex", "agy", "claude"):
                 fake = root / "bin" / name / cli
-                fake.write_text(f'#!/bin/sh\nexec {shlex.quote(str(stub))} "${{0##*/}}" "$@"\n')
+                if cli == "codex":  # like codex exec, the last message also lands in its file
+                    fake.write_text(f'#!/bin/sh\n[ "$2" = --output-last-message ] || exit 91\n'
+                                    f'{shlex.quote(str(stub))} codex "$@" > "$3"; s=$?; cat "$3"; exit $s\n')
+                else:
+                    fake.write_text(f'#!/bin/sh\nexec {shlex.quote(str(stub))} "${{0##*/}}" "$@"\n')
                 fake.chmod(0o755)
         env = {**os.environ, "CANDIDATE": str(checkout)}
         outs = iter(range(100))  # parallel seats of one gate must not share an output file
@@ -102,13 +146,15 @@ def self_check() -> int:
             row = rows()[row_id]
             return row["verdict"], row["status"], row["outage"]
 
-        # 1. a REJECT after codex's answer marker is the verdict, not the echoed APPROVE; round 2
+        # 1. the verdict comes from codex's last-message file, not the log's echoed APPROVE; round 2
         # of trust work sits on its bound of 2 and runs; the row was pending while the seat ran
         code, out = run("reject", "g1", "--trust", "1", rnd=2)
         assert code == 0 and final("g1-r2-review-gpt-6-sol") == ("REJECT", "final", "0"), out
         assert rows()["g1-r2-review-gpt-6-sol"]["tokens"] == "1234", rows()
         assert "g1-r2-review-gpt-6-sol\tpending" in (root / "reject.seen").read_text()
-        assert (root / "reject.argv").read_text().split("\0")[:-1] == [
+        argv = (root / "reject.argv").read_text().split("\0")[:-1]
+        assert argv[2] == "--output-last-message" and argv[3].endswith(".answer"), argv
+        assert argv[:2] + argv[4:] == [
             "codex", "exec", "-m", "gpt-6-sol", "-c", "model_reasoning_effort=high", "-s",
             "workspace-write", "-C", str(root / "scratch"), "--skip-git-repo-check",
             prompt.read_text()]
@@ -120,6 +166,17 @@ def self_check() -> int:
         assert (root / "reject.argv").read_text().split("\0")[:-1] == [
             "agy", "--model", "gemini-3.1-pro-high", "--add-dir", str(checkout),
             "--print-timeout", "20s", "-p", prompt.read_text()]
+        code, out = run("reject", "g1c", "--pin", "anthropic:claude-test:high", "--add-dir",
+                        str(checkout))
+        assert code == 0 and final("g1c-r1-review-claude-test") == ("REJECT", "final", "0"), out
+        assert (root / "reject.argv").read_text().split("\0")[:-1] == [
+            "claude", "-p", "--model", "claude-test", "--effort", "high", "--permission-mode",
+            "plan", "--permission-prompts", "none", "--setting-sources", "project", "--safe-mode",
+            "--no-session-persistence", "--tools", "Read,Glob,Grep",
+            "--strict-mcp-config", "--mcp-config", '{"mcpServers":{}}', "--add-dir", str(checkout),
+            "--", prompt.read_text()]
+        code, out = run("reject", "g1c", "--pin", "anthropic:claude-other")
+        assert code == 0 and "--effort" not in (root / "reject.argv").read_text(), out
         # a second agy seat of the same gate and round takes its own default id
         code, out = run("reject", "g1", "--pin", "google:gemini-3.1-flash")
         assert code == 0 and final("g1-r1-review-gemini-3.1-flash") == ("REJECT", "final", "0"), out
@@ -132,6 +189,8 @@ def self_check() -> int:
         count = len(rows())  # agy auto-denies write_file headless: a rival needs codex
         code, out = run("reject", "g1w", "--workdir", str(rival), "--pin", "google:gemini-3.1-pro")
         assert code == 2 and "needs codex" in out and len(rows()) == count, out
+        code, out = run("reject", "g1w", "--workdir", str(rival), "--pin", "anthropic:claude-test")
+        assert code == 2 and "read-only" in out and len(rows()) == count, out
         code, out = run("reject", "g1w", "--workdir", "", "--id", "g1w-empty")
         assert code == 2 and "--workdir is empty" in out and len(rows()) == count, out
         code, out = run("greeting", "g1b")  # the prompt's verdict is no answer
@@ -142,6 +201,13 @@ def self_check() -> int:
         assert code == 0 and final("g1d-r1-disposition-gpt-6-sol")[1] == "final", out
         code, out = run("reject", "g1d")
         assert code == 0 and final("g1d-r1-review-gpt-6-sol")[1] == "final", out
+
+        for stub, verdict in (("severity", "APPROVE"), ("bare-severity", "APPROVE"),
+                              ("earlier-severity", "REJECT"), ("plan-severity", "OBJECT"),
+                              ("terminal-diff", "DIFF")):
+            code, out = run(stub, "verdict-"+stub)
+            assert code == 0 and final("verdict-"+stub+"-r1-review-gpt-6-sol") == (
+                verdict, "final", "0"), out
 
         # 2. the credits error is an outage with its cause
         code, out = run("credits", "g2")
@@ -289,8 +355,10 @@ def self_check() -> int:
         assert code == 2 and "needs --workdir" in out and len(rows()) == count, out
         code, out = run("race", "g11", *race, base, "--id", "g11-half")
         assert code == 2 and "go together" in out and len(rows()) == count, out
-        code, out = run("reject", "g12", "--pin", "anthropic:claude:high")  # transport by family only
+        code, out = run("reject", "g12", "--pin", "unknown:claude:high")  # transport by family only
         assert code == 2 and "no transport" in out and "--via" not in out, out
+        code, out = run("reject", "g12", "--prompt", str(root / "missing-brief.md"))
+        assert code == 2 and "unreadable input" in out and len(rows()) == count, out
         code, out = run("reject", "g12", rnd=0)
         assert code == 2 and "--round counts from 1" in out, out
         for gone in (["--self-check"], ["--cmd", "true"], ["--sha", "abc"], ["--via", "codex"]):
@@ -308,10 +376,108 @@ def self_check() -> int:
     import ledger
     ledger.DEFAULT_RALLY_TURNS = 7
     import dispatch
+    import importlib
+    importlib.reload(dispatch)
     assert dispatch.STAGE_BOUNDS["rally"] == ("rally_turns", 7), dispatch.STAGE_BOUNDS
     print("dispatch self-check passed")
     return 0
 
 
+def claude_canary() -> int:
+    """Opt-in real CLI probe; fake API key and loopback response server, no vendor requests."""
+    import http.server
+    import json
+    import shutil
+    import threading
+    from dispatch import transport
+
+    cli = shutil.which("claude")
+    assert cli, "claude must be installed for --claude-canary"
+    hits = []
+
+    class Handler(http.server.BaseHTTPRequestHandler):
+        def do_POST(self):
+            request = self.rfile.read(int(self.headers.get("Content-Length", 0)))
+            hits.append(request.decode())
+            message = {"id": "msg_canary", "type": "message", "role": "assistant",
+                       "model": "claude-sonnet-4-6", "content": [], "stop_reason": None,
+                       "stop_sequence": None, "usage": {"input_tokens": 1, "output_tokens": 1}}
+            events = [("message_start", {"message": message}),
+                      ("content_block_start", {"index": 0, "content_block": {"type": "text", "text": ""}}),
+                      ("content_block_delta", {"index": 0, "delta": {"type": "text_delta", "text": "OK"}}),
+                      ("content_block_stop", {"index": 0}),
+                      ("message_delta", {"delta": {"stop_reason": "end_turn", "stop_sequence": None},
+                                         "usage": {"output_tokens": 1}}),
+                      ("message_stop", {})]
+            body = "".join(f"event: {kind}\ndata: {json.dumps({'type': kind, **data})}\n\n"
+                           for kind, data in events).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/event-stream")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, *args):
+            pass
+
+    server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        with tempfile.TemporaryDirectory(prefix="duck-claude-canary-") as directory:
+            root = Path(directory)
+            config = root / "config"
+            config.mkdir()
+            scratch = root / "scratch"
+            scratch.mkdir()
+            marker = root / "hook-ran"
+            instruction = "DUCK_CANARY_PRIVATE_INSTRUCTION"
+            (config / "CLAUDE.md").write_text(instruction)
+            (scratch / "CLAUDE.md").write_text(instruction)
+            hook = {"hooks": {"SessionStart": [{"hooks": [{"type": "command",
+                    "command": "touch " + shlex.quote(str(marker))}]}]}}
+            (config / "settings.json").write_text(json.dumps(hook))
+            (config / ".claude.json").write_text(json.dumps({"hasCompletedOnboarding": True}))
+            (scratch / ".claude").mkdir()
+            (scratch / ".claude" / "settings.json").write_text(json.dumps(hook))
+            env = {key: os.environ[key] for key in ("PATH", "HOME", "USER", "TMPDIR")
+                   if key in os.environ}
+            env.update(CLAUDE_CONFIG_DIR=str(config), ANTHROPIC_API_KEY="local-canary-only",
+                       ANTHROPIC_BASE_URL=f"http://127.0.0.1:{server.server_port}",
+                       CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC="1")
+            argv = transport("claude", "anthropic", "claude-sonnet-4-6", "-", "OK",
+                             scratch, [], 20)
+            argv[0] = cli
+            argv[1:1] = ["--debug-file", str(root / "cli-debug.log")]
+            # Positive control proves startup reached the hooks, not just that nothing ran.
+            control = [part for part in argv if part not in
+                       ("--setting-sources", "project", "--safe-mode")]
+            subprocess.run(control, env=env, cwd=scratch, stdin=subprocess.DEVNULL,
+                           capture_output=True, timeout=25, check=True)
+            assert marker.exists() and hits, "positive control did not reach SessionStart/API"
+            assert instruction in "".join(hits), "control did not load canary CLAUDE.md"
+            marker.unlink()
+            hits.clear()
+            subprocess.run(argv, env=env, cwd=scratch, stdin=subprocess.DEVNULL,
+                           capture_output=True, timeout=25, check=True)
+            assert hits, "isolated seat did not initialize and reach the loopback API"
+            assert not marker.exists(), "review seat ran a user/project hook"
+            assert instruction not in "".join(hits), "review seat leaked canary instructions"
+            assert not list(config.rglob("*.jsonl")), "review seat persisted a transcript"
+    finally:
+        server.shutdown()
+        server.server_close()
+    print("real Claude hook canary passed (loopback API only)")
+    return 0
+
+
 if __name__ == "__main__":
-    raise SystemExit(self_check())
+    if "--claude-canary" in sys.argv:
+        raise SystemExit(claude_canary())
+    code = self_check()
+    # the Claude seat's isolation is a security property: check it wherever the real CLI exists
+    if not code and shutil.which("claude"):
+        code = claude_canary()
+    elif not code:
+        print("real Claude hook canary skipped: claude is not installed")
+    raise SystemExit(code)

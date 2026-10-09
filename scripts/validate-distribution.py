@@ -13,6 +13,8 @@ a dependency the gate has to grow a pip step for.
 from __future__ import annotations
 
 import argparse
+import contextlib
+import io
 import importlib.util
 import json
 import re
@@ -94,7 +96,7 @@ def check_dispatch_rule(where: str, body: str, errors: list[str]) -> None:
 
 
 # Roughly 150 tokens per skill, loaded by every host in every session before anyone asks for
-# anything. The longest today is 502; the budget is the ceiling, not a fit to current contents.
+# anything. The budget is a ceiling, not a fit to current contents.
 MAX_DESCRIPTION = 600
 
 # The cross-reference check below proves that references RESOLVE. It cannot prove one still
@@ -238,20 +240,18 @@ def check_skill(root: Path, name: str, found: set[str], errors: list[str]) -> No
                 errors.append(f"{location}: missing linked resource {target!r}")
 
 
-def check_generated(root: Path, readme: str, errors: list[str]) -> None:
+def check_generated(root: Path, errors: list[str]) -> None:
     script = root / "scripts" / "render-catalog.py"
     spec = importlib.util.spec_from_file_location("render_catalog", script)
     module = importlib.util.module_from_spec(spec)
     try:
         spec.loader.exec_module(module)
-        catalog_expected, readme_expected, _ = module.render(root)
+        catalog_expected, _ = module.render(root)
     except (OSError, AttributeError, TypeError, ValueError) as exc:
         errors.append(f"generated catalog validation failed: {exc}")
         return
     if (root / "AGENTS-CATALOG.md").read_text() != catalog_expected:
         errors.append("AGENTS-CATALOG.md: generated content is stale")
-    if readme != readme_expected:
-        errors.append("README.md: generated skills table is stale")
 
 
 def check_routing(root: Path, found: set[str], errors: list[str]) -> None:
@@ -310,6 +310,8 @@ def check_tests(root: Path, errors: list[str], run: bool) -> None:
         result = subprocess.run([sys.executable, str(test)], capture_output=True, text=True)
         if result.returncode != 0:
             errors.append(f"{test.relative_to(root)} failed: {result.stderr.strip()[-300:]}")
+        elif result.stdout.strip():
+            print(result.stdout.rstrip())
 
 
 def validate(root: Path, run_scripts: bool = True) -> list[str]:
@@ -328,7 +330,7 @@ def validate(root: Path, run_scripts: bool = True) -> list[str]:
         check_language_rule(root, name, errors)
     check_routing(root, found, errors)
     check_versions(manifests, errors)
-    check_generated(root, readme, errors)
+    check_generated(root, errors)
     return sorted(errors)
 
 
@@ -393,6 +395,8 @@ CASES: list[tuple[str, str, Callable[[Path], None]]] = [
     ("unbalanced code fence", "unbalanced",
      lambda c: (c / "skills/duck-review/SKILL.md").write_text(
          (c / "skills/duck-review/SKILL.md").read_text() + "\n```bash\nstray\n")),
+    ("README map missing a skill", "README skills map must list",
+     lambda c: edit(c, "README.md", "| `duck-scan` |", "| `duck-missing` |")),
     ("stale generated catalog", "stale", lambda c: (c / "AGENTS-CATALOG.md").write_text("# stale\n")),
     ("release version disagrees", "release version disagrees",
      lambda c: rewrite_json(c / ".claude-plugin/plugin.json",
@@ -410,9 +414,9 @@ CASES: list[tuple[str, str, Callable[[Path], None]]] = [
      lambda c: (c / "skills/duck-review/SKILL.md").write_text(
          (c / "skills/duck-review/SKILL.md").read_text().replace("`duck-shape`", "shape"))),
     ("description ends a plain YAML scalar", "no host can load the skill",
-     lambda c: edit(c, SCAN, "Find ready, blocked", "Note: find ready, blocked")),
+     lambda c: edit(c, SCAN, "description: ", "description: Note: ")),
     ("description over budget", "over the 600 budget",
-     lambda c: edit(c, SCAN, "Find ready, blocked", "x" * 600 + " Find ready, blocked")),
+     lambda c: edit(c, SCAN, "description: ", "description: " + "x" * 600 + " ")),
     ("skill without a routing probe", "no selection probe for duck-scan",
      lambda c: edit(c, "evals/routing.json", '"skill": "duck-scan"', '"skill": "duck-scam"')),
     ("skill directory without a SKILL.md", "directory without a SKILL.md",
@@ -453,10 +457,15 @@ def self_test(root: Path) -> list[str]:
     with tempfile.TemporaryDirectory(prefix="askrubberduck-validator-") as directory:
         tests, ran = Path(directory) / "tests", Path(directory) / "ran"
         tests.mkdir()
-        (tests / "test_a.py").write_text(f"open({str(ran)!r}, 'w').close()\n")
+        (tests / "test_a.py").write_text(
+            f"open({str(ran)!r}, 'w').close()\nprint('canary skipped: no CLI')\n")
         (tests / "test_b.py").write_text("raise SystemExit('boom')\n")
         errors = []
-        check_tests(Path(directory), errors, run=True)
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            check_tests(Path(directory), errors, run=True)
+        if "canary skipped: no CLI" not in output.getvalue():
+            failures.append("self-test: successful test skip notice was hidden")
         if not ran.exists() or not any("test_b.py failed" in error for error in errors):
             failures.append(f"self-test: a passing test did not run or a failing one passed: {errors}")
     return failures

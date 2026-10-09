@@ -27,9 +27,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from ledger import (DEFAULT_RALLY_TURNS, DISPATCH_COLUMNS, DISPATCH_ENUMS, arm_of,  # noqa: E402
                     default_origin, home, load_config, read_table, validate_row)
 
-VIA = {"openai": "codex", "google": "agy"}  # by the pin's family
+VIA = {"openai": "codex", "google": "agy", "anthropic": "claude"}  # by the pin's family
+# Only boundary lines carry results; body markup only guards against quoted boundary examples.
+# A heading or bold marker around the label is allowed.
 VERDICT_LINE = re.compile(
-    r"^[\s>#*_`]*(?:(?:VERDICT|PLAN)\s*:[\s*_`]*)?(APPROVE|REJECT|NOTE|CONCUR|OBJECT|DIFF)[\s*_`.]*$")
+    r" {0,3}(?:#{1,6} +)?[*_]*(?:VERDICT[\s*_]*:[\s*_]*(?P<verdict>APPROVE|REJECT|NOTE|DIFF)"
+    r"|PLAN[\s*_]*:[\s*_]*(?P<plan>CONCUR|OBJECT))[\s*_]*\.?\s*")
+BARE_RESULT = re.compile(r"\s*[*_]*(?:APPROVE|REJECT|CONCUR|OBJECT|DIFF)[*_]*\.?\s*")
 # Checked only when no verdict was found, first match wins: while credits are out, codex reports
 # that before anything else, so a later pin rejection proves nothing.
 OUTAGES = (("credits", r"out of credits|insufficient credits?|credit balance"),
@@ -38,7 +42,6 @@ OUTAGES = (("credits", r"out of credits|insufficient credits?|credit balance"),
            ("model rejected", r"not supported|unknown model|invalid model|model.not.found"),
            ("permission denied", r"permission\b[\s\S]{0,200}?\bdenied"))  # a wrapped message too
 TOKENS = re.compile(r"tokens used\s*:?\s*([\d,]+)", re.IGNORECASE)
-CODEX_ANSWER = "codex"  # codex exec prints this line alone before its final answer
 # A stage with its own ceiling counts against it; review and disposition share the round bound.
 STAGE_BOUNDS = {"plan": ("plan_rounds", 2), "rally": ("rally_turns", DEFAULT_RALLY_TURNS),
                 "roast": ("roast_passes", 2)}
@@ -58,30 +61,65 @@ def transport(via: str, family: str, model: str, effort: str, prompt: str, workd
         reasoning = ["-c", f"model_reasoning_effort={effort}"] if effort != "-" else []
         return ["codex", "exec", "-m", model, *reasoning, "-s", "workspace-write", "-C",
                 str(workdir), "--skip-git-repo-check", *dirs, prompt]
+    if via == "claude":
+        reasoning = ["--effort", effort] if effort != "-" else []
+        return ["claude", "-p", "--model", model, *reasoning, "--permission-mode", "plan",
+                "--permission-prompts", "none", "--setting-sources", "project", "--safe-mode",
+                "--no-session-persistence", "--tools", "Read,Glob,Grep", "--strict-mcp-config",
+                "--mcp-config", '{"mcpServers":{}}', *dirs, "--", prompt]
     # agy takes the effort as part of the model id: `gemini-3.1-pro-high`
     pinned = model if effort == "-" else f"{model}-{effort}"
     return ["agy", "--model", pinned, *dirs, "--print-timeout", f"{math.ceil(limit)}s", "-p", prompt]
 
 
-def classify(text: str, via: str, timed_out: bool, code: int) -> tuple[str, str]:
+def classify(text: str, via: str, timed_out: bool, code: int, log: str = "") -> tuple[str, str]:
     """(verdict, outage cause). A seat that timed out or exited nonzero is an outage whatever it
     printed — a verdict before the crash belongs to a review that never finished; otherwise a found
     verdict is never an outage, whatever else the output says."""
     lines = text.splitlines()
-    if via == "codex" and CODEX_ANSWER in lines:  # before it, codex echoes the prompt
-        lines = lines[len(lines) - lines[::-1].index(CODEX_ANSWER):]
-    verdicts = [match[1] for match in map(VERDICT_LINE.match, lines) if match]
+    body = [i for i, line in enumerate(lines) if line.strip()]
+    results = []
+    boundaries = set(body[:1] + body[-1:])
+    fence = None
+    quoted = False
+    for i, line in enumerate(lines):
+        marker = re.match(r"^ {0,3}(`{3,}|~{3,})", line)
+        if marker:
+            if fence is None:
+                fence = marker[1]
+            elif (marker[1][0] == fence[0] and len(marker[1]) >= len(fence)
+                  and not line[marker.end():].strip()):
+                fence = None
+            continue
+        if fence is not None:
+            pass
+        elif line.lstrip().startswith(">"):
+            quoted = True
+        elif not line.strip() or re.match(r"^ {0,3}#{1,6} ", line):
+            quoted = False  # a heading starts a new block, not a quote continuation
+        if i not in boundaries:
+            continue
+        if fence is not None or quoted:
+            if VERDICT_LINE.fullmatch(line):
+                results.append(None)  # a result that may be an example cannot be dropped silently
+            continue
+        if match := VERDICT_LINE.fullmatch(line):
+            results.append(match["verdict"] or match["plan"])
+        elif BARE_RESULT.fullmatch(line):
+            results.append(None)  # an unlabeled result conflicts with a labeled one
+    results = list(dict.fromkeys(results))
+    verdict = results[0] if len(results) == 1 else None
     if timed_out:
         return "-", "timeout"
-    if verdicts and code == 0:
-        return verdicts[-1], ""
+    if verdict and code == 0:
+        return verdict, ""
     answer = "\n".join(lines)
     for cause, pattern in OUTAGES:
-        if re.search(pattern, answer, re.IGNORECASE):
+        if re.search(pattern, answer + "\n" + log, re.IGNORECASE):
             return "-", cause
     if code != 0:
         return "-", f"exit {code}"
-    return "-", "no verdict" if answer.strip() else "empty output"
+    return "-", "ambiguous verdict" if len(results) > 1 else "no verdict" if answer.strip() else "empty output"
 
 
 def tokens_of(text: str) -> str:
@@ -220,6 +258,8 @@ def run_seat(args) -> int:
     if args.workdir and via == "agy":
         return refuse("agy cannot write headless (it auto-denies write_file): a --workdir seat, "
                       "a race or rally rival, needs codex")
+    if args.workdir and via == "claude":
+        return refuse("claude review seats are read-only: a --workdir seat needs codex")
     if (args.diff_base, args.diff_out) != (None, None):
         if not (args.diff_base and args.diff_out):
             return refuse("--diff-base and --diff-out each take a value, and go together")
@@ -259,6 +299,10 @@ def run_seat(args) -> int:
             capture_output=True).returncode:
         return refuse(f"--diff-base is not a commit in {workdir}: {args.diff_base}")
     argv = transport(via, family, model, effort, prompt, workdir, args.add_dir, timeout)
+    # codex's log echoes the prompt and repeats the answer; its last message is the answer alone
+    answer = out.with_name(out.name + ".answer") if via == "codex" else out
+    if via == "codex":
+        argv[2:2] = ["--output-last-message", str(answer)]
     candidate = (before[0].removeprefix("HEAD ")[:7] if before else "") or "-"
     row = dict(id=row_id, gate_id=args.gate, round=str(args.round),
                date=datetime.date.today().isoformat(), repo=repo, stage=args.stage,
@@ -286,9 +330,11 @@ def run_seat(args) -> int:
     try:
         if diff:
             diff.unlink(missing_ok=True)  # a reader waiting for it must not take a stale one
+        answer.unlink(missing_ok=True)  # a stale answer from an earlier run is no answer
         timed_out, code = launch(argv, out, timeout, workdir)
         text = out.read_text(encoding="utf-8", errors="replace")
-        found, cause = classify(text, via, timed_out, code)
+        reply = answer.read_text(encoding="utf-8", errors="replace") if answer.exists() else ""
+        found, cause = classify(reply, via, timed_out, code, text)
         if diff and found != "-" and (failed := capture(workdir, args.diff_base, diff)):
             found, cause = "-", failed
         verdict = found  # only now: a cancel during the capture records a cancel, not a verdict
@@ -318,7 +364,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--trust", required=True, choices=sorted(DISPATCH_ENUMS["trust"]))
     parser.add_argument("--pin", required=True,
                         help="family:model[:effort], as config.toml spells it")
-    parser.add_argument("--prompt", required=True, help="the brief; it travels as an argument")
+    parser.add_argument("--prompt", required=True,
+                        help="UTF-8 brief file path; its contents become the CLI prompt argument")
     parser.add_argument("--out", required=True,
                         help="the seat's output file; its directory is the scratch dir")
     parser.add_argument("--repo", help="default: this checkout's origin")

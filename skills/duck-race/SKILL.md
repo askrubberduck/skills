@@ -49,7 +49,7 @@ assumptions; rally turns them into tests. Pick by which of those the work needs.
    rally). The brief travels as `--prompt`; **a diff or a corpus it refers to is named
    by absolute path, and the files to change by path relative to the participant's worktree;
    nothing is pasted in**, per dispatch mechanics. `problem.md` and every `turn.md` end with
-   `End your answer with the line: DIFF`; the script records an answer without it as an outage.
+   `End your answer with the line: VERDICT: DIFF`; the script records an answer without it as an outage.
 
 ## Race mode
 

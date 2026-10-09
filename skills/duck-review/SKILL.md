@@ -49,9 +49,8 @@ When the user is the author and a review has landed, judge each thread against t
 not the revision the reviewer saw, and give it one disposition with its evidence: still valid, already
 fixed, disagree, out of scope, or a challenge to the approach. A thread that questions the mechanism
 rather than a line gets no patch: [`duck-shape`](../duck-shape/SKILL.md) over the problem, and a
-proposed shape, come before any edit. Draft one reply per thread: at most three words when agreeing or
-reporting a fix, fifteen otherwise. "Resolve all" covers resolving only, and only threads already
-fixed; the rest stay open and are listed.
+proposed shape, come before any edit. Draft one reply per thread, as short as its disposition allows; follow any reply format the user requests. "Resolve all"
+covers resolving only, and only threads already fixed; the rest stay open and are listed.
 
 ## Prepare the review
 
@@ -114,7 +113,7 @@ that survives. Neither owner preference nor a mandate to be negative is evidence
 
 ## Reviewer result contract
 
-Require each reviewer to return `APPROVE | REJECT | NOTE` and findings ranked
+Require each reviewer to open with the line `VERDICT: APPROVE | REJECT | NOTE` and rank findings
 `BLOCKER | SHOULD | NOTE`. A reviewer's `APPROVE` claims no release-blocking defect and its
 `REJECT` claims at least one; its `NOTE` is not `APPROVE-W-CONDITIONS` and not an outage. These
 are inputs to the superreview, not votes. A malformed result is *unranked* or *unsupported* as

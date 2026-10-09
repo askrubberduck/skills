@@ -77,8 +77,74 @@ A case file is a question to ask the duck, not a receipt saying it passed.
 | English | Selection probes for every skill; existing behavioral cases; runner suites for why, dry, shape and scan | Two bounded selection probes on 2026-09-17; with/without runs for four skills on 2026-09-18, see Runner suites |
 | Russian | Selection probes for every skill; behavioral cases 9-17 | No recorded host/model routing runs |
 
-The rest of the routing corpus and cases 13-18 are unrun. Earlier runs, if any, do not verify changed
-descriptions. Package validation checks distribution structure; it cannot establish language support.
+The September runs below are historical. The owner-supplied October review covers the expanded
+corpus and cases 13-18; see the dated results below. Earlier runs do not verify changed descriptions. Package validation checks distribution structure; it cannot establish language support.
+
+### Owner-supplied PR #84 review, 2026-10-08
+
+Target `f2d0f8e`, base `3a1d385`; these are external review receipts, not runs performed by
+this change's author. Claude Code runner, three runs per case, Sonnet judge:
+
+| Check | PR head | Base | No plugin |
+|---|---|---|---|
+| 56 runner cases, mean score | 0.884 | 0.909 | 0.769 |
+| Controlled why/shape cases, mean with-plugin score | 0.916 | 0.952 | — |
+| Positive why cases, skill loaded | 1/21 | 19/21 | — |
+| Positive shape cases, skill loaded | 0/21 | 15/21 | — |
+| 83 forced-choice description probes, Opus 5.5 | 80/83 | 81/83 | — |
+| 18 behavioral cases, Opus 5.5 and Sonnet judge | 13/18 | 14/18 | 6/18 |
+
+The controlled runs used with/without mode and preserved traces showing only the intended
+plugin version. Forced-choice probes overstated implicit skill activation; record actual Skill
+tool calls separately. One Russian re-review prompt regressed from 5/5 to 1/5. The differing
+behavioral cases became equal on three additional runs; their initial difference was noise.
+These receipts reject the request-only descriptions. Restoring situational triggers needs new
+why/shape with/without runs; these results do not validate that repair.
+
+### Owner-supplied fix comparison, 2026-10-09
+
+The supplied patch's scratch commit `57b3a83` was evaluated in Claude Code 2.1.294, 56 runner
+cases with three runs each and a Sonnet judge. These are external receipts; scores use identical
+graders and exclude the trigger indicators.
+
+| Target | Mean score | Fully passing runs | Skill calls | Positive why calls |
+|---|---|---|---|---|
+| Base `3a1d385` | 0.917 | 151/171 | 143/162 | 18/18 |
+| PR repair `91e2212` | 0.904 | 143/171 | 129/162 | 3/18 |
+| Supplied patch `57b3a83` | 0.918 | 146/171 | 148/162 | 17/18 |
+
+Outcome differences are within the report's estimated noise; the why activation difference is
+substantial. The repair through `05a7ab1` restored the exact base duck-why description used by that patch. The
+conservative variant restored every description and scored 0.904 with 144/162 Skill calls; no
+measured benefit justified that wider rollback.
+
+The supplied patch also scored 80/83 forced-choice routing probes and 13/18 behavioral cases.
+Repeated language checks returned Russian on 8/10 runs of case 11, versus 12/14 on base. Cases 2,
+7 and 9 still fail on base and the patch; no repair is claimed for those pre-existing failures.
+The full metrics belong to the supplied scratch commit. Local hardening of quoted parser
+boundaries is separately verified by dispatch regressions and the real loopback Claude canary.
+
+### Owner-supplied voice and trigger comparison, 2026-10-09
+
+The updated review compared three description candidates with the same 56 runner cases,
+three runs each and identical graders. Its recommended hybrid keeps the duck voice and
+`Use when` form, with added shape, land, proof and why triggers. These are external receipts:
+
+| Target | Mean score | Fully passing runs | Trigger checks | Negative checks |
+|---|---|---|---|---|
+| Base `3a1d385` | 0.917 | 151/171 | 143/162 | 30/30 |
+| Short descriptions `57b3a83` | 0.918 | 146/171 | 148/162 | 30/30 |
+| Recommended hybrid H | 0.924 | 148/171 | 162/162 | 30/30 |
+
+H scored 81/83 forced-choice routing probes and 14/18 behavioral cases, equal to base.
+Behavioral cases 2 and 9 loaded duck-why for the first time in the compared versions but
+still failed on content; activation does not establish a correct outcome. Case 7 still failed.
+Negative trigger checks pass when nothing loads; the 162/162 total is not 162 positive Skill calls.
+
+This change applies the supplied H descriptions and language rule. After the eval, duck-shape's
+`whether` was shortened to `if` to fit the 600-character limit. The supplied report says package,
+dispatch and Claude canary checks passed after that trim; the reported behavioral scores cover
+H before it. No new benchmark run or whole-candidate release approval is claimed here.
 
 ### Local selection probes, 2026-09-17
 
@@ -265,6 +331,8 @@ arms on reply length alone; dispositions and nothing-resolved passed eighteen of
 first run let replies be "one sentence" and got sentences of 22 to 55 words; with the rule changed
 to fifteen words the plugin arm wrote 14 to 17 and passed one run of three, the no-plugin arm none.
 The rubric was rewritten once in between, to grade the rule as written rather than a stricter one.
+These historical scores include the former reply caps. The current rubric grades concise, supported
+replies without universal word limits; those old scores do not establish its behavior.
 
 ### `shape` with the six harder cases, 2026-09-21
 

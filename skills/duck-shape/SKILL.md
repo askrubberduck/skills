@@ -1,6 +1,6 @@
 ---
 name: duck-shape
-description: Make every layer earn its place; cut the machinery the problem never asked for. Use when the user asks to simplify, shorten or clean up code, calls it over-engineered, bloated, too defensive or AI slop, asks which of two designs carries less, or wants the structure of completed work checked, whether a file, a diff or a pasted snippet. Deep reconstruction is available when local cleanup cannot fix the boundary.
+description: Make every layer earn its place; cut the machinery the problem never asked for. Use when the user asks to simplify, shorten or clean up code or tests, calls it over-engineered, bloated, too defensive, duplicated or AI slop, asks to cut a repeated check, inline a supposedly pointless wrapper or drop an unused mode or flag, asks which of two designs carries less, or asks if finished work has its simplest structure, even in a small file or pasted snippet that already looks plain. A request to cut is enough to check what the cut would lose. Not for explaining code, renaming, or comments alone.
 ---
 
 # Duck Shape
