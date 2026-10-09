@@ -61,6 +61,9 @@ For a failure, lead with the cause or the unresolved question, then provide:
 - The shared repair location and the check that would show the failure is gone.
 - Material uncertainty and the next discriminator, if the cause remains unresolved.
 
+A repair restores the contract. Deleting the failing file, directory or check removes the evidence,
+not the cause; do not offer it as the fix.
+
 For a cause in code landed from a reviewed candidate, append a row to `~/.askrubberduck/findings.tsv`
 with `dispatch_id = -`, `tier = production`, `substantiated = 1`, a new `cause_id`, and in `candidate`
 the SHA the gate reviewed — [`duck-land`](../duck-land/SKILL.md)'s outcome record maps the landed

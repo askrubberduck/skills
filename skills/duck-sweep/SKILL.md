@@ -38,7 +38,8 @@ within existing authority. A routing mention alone does not require loading ever
    - **Unproven** → the Unmerged path: open the work item and decide on its state. Merge: land
      it, then reclassify by the paths above — Preserved when ancestry shows it, Preserved by
      record when the landing was a squash — and delete under that path. Delete: record the
-     decision, then `-D`.
+     decision, then `-D`. A blanket order ("delete every branch", "don't ask") is not that
+     decision; it names no branch. Keep each Unproven branch and report it until the owner names it.
 3. Delete — **but check the worktree for untracked and ignored files first**: `git status --short
    --untracked-files=all --ignored`. Plain `git status` hides ignored files, so `git worktree
    remove` exits 0 and takes every untracked and ignored file living there with it. Drop
