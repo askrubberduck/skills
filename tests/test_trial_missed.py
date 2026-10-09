@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Missed-cause listing on a trial replace: rally serves 1-4 (GPT-6.1 Sol, 2026-10-10), kept as served."""
 from __future__ import annotations
 
 import contextlib
