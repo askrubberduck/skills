@@ -71,7 +71,10 @@ def transport(via: str, family: str, model: str, effort: str, prompt: str, workd
                 "--mcp-config", '{"mcpServers":{}}', *dirs, "--", prompt]
     # agy takes the effort as part of the model id: `gemini-3.1-pro-high`
     pinned = model if effort == "-" else f"{model}-{effort}"
-    return ["agy", "--model", pinned, *dirs, "--print-timeout", f"{math.ceil(limit)}s", "-p", prompt]
+    # headless agy auto-denies any tool it would ask about, reads included, so it runs with every
+    # tool approved; --sandbox limits its terminal, not its file writes, which --candidate reports
+    return ["agy", "--model", pinned, "--dangerously-skip-permissions", "--sandbox", *dirs,
+            "--print-timeout", f"{math.ceil(limit)}s", "-p", prompt]
 
 
 def classify(text: str, via: str, timed_out: bool, code: int, log: str = "") -> tuple[str, str]:
@@ -271,7 +274,7 @@ def run_seat(args) -> int:
     if args.workdir == "":  # an unset $WT expands to nothing; the seat would run in scratch
         return refuse("--workdir is empty")
     if args.workdir and via == "agy":
-        return refuse("agy cannot write headless (it auto-denies write_file): a --workdir seat, "
+        return refuse("agy seats review, they are not rivals: a --workdir seat, "
                       "a race or rally rival, needs codex")
     if args.workdir and via == "claude":
         return refuse("claude review seats are read-only: a --workdir seat needs codex")

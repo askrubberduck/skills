@@ -167,7 +167,8 @@ def self_check() -> int:
         assert code == 0, out
         assert final("g1-r1-review-gemini-3.1-pro-high") == ("REJECT", "final", "0"), out
         assert (root / "reject.argv").read_text().split("\0")[:-1] == [
-            "agy", "--model", "gemini-3.1-pro-high", "--add-dir", str(checkout),
+            "agy", "--model", "gemini-3.1-pro-high", "--dangerously-skip-permissions", "--sandbox",
+            "--add-dir", str(checkout),
             "--print-timeout", "20s", "-p", prompt.read_text()]
         code, out = run("reject", "g1c", "--pin", "anthropic:claude-test:high", "--add-dir",
                         str(checkout))

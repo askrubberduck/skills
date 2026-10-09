@@ -93,7 +93,9 @@ read-only file tools and no MCP servers. It excludes user settings, disables cus
 managed hooks; inspect those before claiming a shell-free seat. The tool route does not approve
 writes or shell execution. Claude and agy
 seats cannot take `--workdir` or serve as writable race/rally rivals; use a supported writable transport
-instead. agy headless writes are denied, not a sandbox guarantee. Treat source-only findings as
+instead. agy runs with every tool approved, since headless it denies whatever it would ask about,
+reads included; `--sandbox` limits its terminal, not its file writes. Pass the reviewed checkout as
+`--candidate` so a write is reported; material given only by `--add-dir` is not watched. Treat source-only findings as
 `tier = read`; claim executed evidence only when the seat supplies observed command output. The outer
 runner bounds all transports and finalizes their ledger rows on timeout or failure.
 
