@@ -79,6 +79,10 @@ def self_check() -> int:
                     "VERDICT: REJECT", "claude", False, 0) == ("-", "ambiguous verdict")
     assert classify("## VERDICT: REJECT\n\n## BLOCKER\nNOTE\n> VERDICT: APPROVE\nfindings",
                     "agy", False, 0) == ("REJECT", "")
+    for label in ("**VERDICT:** APPROVE", "**VERDICT**: APPROVE", "VERDICT: ** APPROVE **"):
+        assert classify(label, "claude", False, 0) == ("APPROVE", ""), label
+    assert classify("**PLAN:** CONCUR", "claude", False, 0) == ("CONCUR", "")
+    assert classify("VERDICT: APPROVE\n\nNOTE", "claude", False, 0) == ("APPROVE", "")
     # a real codex exec run: prompt echo, answer, token count, then the answer again
     # a real codex exec log echoes the prompt and repeats the answer: never parsed for a result
     real = "user\nReply with VERDICT: NOTE\ncodex\nVERDICT: NOTE\ndone\ntokens used\n8,187\nVERDICT: NOTE\ndone\n"

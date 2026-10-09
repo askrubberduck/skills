@@ -31,8 +31,8 @@ VIA = {"openai": "codex", "google": "agy", "anthropic": "claude"}  # by the pin'
 # Only boundary lines carry results; body markup only guards against quoted boundary examples.
 # A heading or bold marker around the label is allowed.
 VERDICT_LINE = re.compile(
-    r" {0,3}(?:#{1,6} +)?[*_]*(?:VERDICT\s*:\s*[*_]*(?P<verdict>APPROVE|REJECT|NOTE|DIFF)"
-    r"|PLAN\s*:\s*[*_]*(?P<plan>CONCUR|OBJECT))[*_]*\.?\s*")
+    r" {0,3}(?:#{1,6} +)?[*_]*(?:VERDICT[\s*_]*:[\s*_]*(?P<verdict>APPROVE|REJECT|NOTE|DIFF)"
+    r"|PLAN[\s*_]*:[\s*_]*(?P<plan>CONCUR|OBJECT))[\s*_]*\.?\s*")
 BARE_RESULT = re.compile(r"\s*[*_]*(?:APPROVE|REJECT|CONCUR|OBJECT|DIFF)[*_]*\.?\s*")
 # Checked only when no verdict was found, first match wins: while credits are out, codex reports
 # that before anything else, so a later pin rejection proves nothing.

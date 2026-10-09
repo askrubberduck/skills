@@ -117,7 +117,8 @@ Ask participants to open with a labeled result line, `VERDICT: APPROVE | REJECT 
 `PLAN: CONCUR | OBJECT`; race and rally answers end with `VERDICT: DIFF`. The script reads only the
 answer's first and last non-empty lines; body markup only excludes quoted or fenced boundary
 examples. Body result labels and severity headings cannot become results. Two different boundary
-results are unsupported, and a bare word is none. Inspect
+results are unsupported. Bare NOTE remains a severity heading, not an overall result; other bare
+result words conflict with a labeled boundary result. Inspect
 the justification before trusting the label.
 
 Claude normally saves transcripts under `~/.claude/projects`; this route uses

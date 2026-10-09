@@ -13,6 +13,8 @@ a dependency the gate has to grow a pip step for.
 from __future__ import annotations
 
 import argparse
+import contextlib
+import io
 import importlib.util
 import json
 import re
@@ -307,6 +309,8 @@ def check_tests(root: Path, errors: list[str], run: bool) -> None:
         result = subprocess.run([sys.executable, str(test)], capture_output=True, text=True)
         if result.returncode != 0:
             errors.append(f"{test.relative_to(root)} failed: {result.stderr.strip()[-300:]}")
+        elif result.stdout.strip():
+            print(result.stdout.rstrip())
 
 
 def validate(root: Path, run_scripts: bool = True) -> list[str]:
@@ -452,10 +456,15 @@ def self_test(root: Path) -> list[str]:
     with tempfile.TemporaryDirectory(prefix="askrubberduck-validator-") as directory:
         tests, ran = Path(directory) / "tests", Path(directory) / "ran"
         tests.mkdir()
-        (tests / "test_a.py").write_text(f"open({str(ran)!r}, 'w').close()\n")
+        (tests / "test_a.py").write_text(
+            f"open({str(ran)!r}, 'w').close()\nprint('canary skipped: no CLI')\n")
         (tests / "test_b.py").write_text("raise SystemExit('boom')\n")
         errors = []
-        check_tests(Path(directory), errors, run=True)
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            check_tests(Path(directory), errors, run=True)
+        if "canary skipped: no CLI" not in output.getvalue():
+            failures.append("self-test: successful test skip notice was hidden")
         if not ran.exists() or not any("test_b.py failed" in error for error in errors):
             failures.append(f"self-test: a passing test did not run or a failing one passed: {errors}")
     return failures
