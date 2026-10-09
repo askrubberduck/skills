@@ -1,6 +1,6 @@
 ---
 name: duck-why
-description: Name the cause of a failure before anyone writes a fix, because the symptom is not the defect. Use when a test fails, a bug is reported, a build or CI goes red, a traceback or error is pasted, something passes in one environment and fails in another, behavior differs from what was expected, a fix keeps not sticking, or the user asks why something is broken, including when the code is pasted inline and the cause looks obvious. Also when the user asks who added a value, flag, guard or behavior and why, or whether that reason still holds; not for a plain explanation of how something works.
+description: Name the cause of a failure before anyone writes a fix, because the symptom is not the defect. Use when a test fails, a bug is reported, a build or CI goes red, a traceback or error is pasted, something passes in one place and fails in another, a fix keeps not sticking, or the user asks why something fails, even when the code is pasted inline and the cause looks obvious. Also when the user asks who added a constant, timeout, flag or guard and why, or whether that reason still holds, even though nothing is failing. Not for explaining how something works.
 ---
 
 # Duck Why
@@ -8,8 +8,8 @@ description: Name the cause of a failure before anyone writes a fix, because the
 Find the demonstrated cause of the failure and the paths it affects. Stop when that explanation
 accounts for the evidence; a typo need not become an architectural or organizational diagnosis.
 
-Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and
-machine-readable verdicts.
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.
 This skill diagnoses without editing the candidate. Return the cause and repair location to the

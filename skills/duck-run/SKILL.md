@@ -1,6 +1,6 @@
 ---
 name: duck-run
-description: Use when the user asks to duck a task, apply selected findings, or carry work through the delivery flow.
+description: Challenge the goal, shape the plan, build it, and make it prove itself; local means local. Use when the user asks to duck a task, apply selected findings, or carry work through the delivery flow. Continue to independent review and landing only within the authorized endpoint.
 ---
 
 # Duck Run
@@ -9,8 +9,8 @@ Own the whole authorized task. Carry the outcome, constraints, candidate, valid 
 action across stages. A skill returning a finding is a handoff to this caller, not an automatic
 reason to ask for another go-ahead.
 
-Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and
-machine-readable verdicts.
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.
 When the host forbids edits, as a plan-only mode does, say so once, finish the analysis it

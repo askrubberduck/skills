@@ -1,6 +1,6 @@
 ---
 name: duck-proof
-description: Use when the user asks whether a solution is necessary, correct, or elegant, asks to prove a plan or finished shape, or wants work verified before review.
+description: Make the goal, the path, and the finished work earn your trust through counterexamples and executed checks. Use when the user asks whether a solution is necessary, correct, or elegant, asks to prove a goal, a plan or a finished shape, asks whether every piece of finished work is earning its place before review, or wants work verified before review.
 ---
 
 # Duck Proof
@@ -9,8 +9,8 @@ Try to falsify the claim, including the owner's preferred goal or mechanism. Agr
 aggressive review, and a green suite are not substitutes for a discriminating test. A supported
 claim may survive unchanged; do not manufacture defects to look skeptical.
 
-Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and
-machine-readable verdicts.
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.
 

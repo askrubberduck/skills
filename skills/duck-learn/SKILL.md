@@ -1,6 +1,6 @@
 ---
 name: duck-learn
-description: Use when the user asks for a retrospective, wants to mine sessions or outcomes, asks what should become a skill or where tokens were wasted, or after a campaign, incident, or review gate needed many rounds.
+description: Turn session and delivery evidence into reusable lessons, so each mistake is only paid for once. Use when the user asks for a retrospective, wants to mine sessions or outcomes, asks what should become a skill or where tokens were wasted, or after a campaign, incident, or review gate needed many rounds.
 ---
 
 # Duck Learn
@@ -8,8 +8,8 @@ description: Use when the user asks for a retrospective, wants to mine sessions 
 The feedback loop: evidence from past work becomes durable updates — a skill, a memory, a rule —
 or gets consciously discarded. Lessons that live only in a chat transcript are lessons lost.
 
-Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and
-machine-readable verdicts.
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.
 

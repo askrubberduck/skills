@@ -114,7 +114,7 @@ graders and exclude the trigger indicators.
 | Supplied patch `57b3a83` | 0.918 | 146/171 | 148/162 | 17/18 |
 
 Outcome differences are within the report's estimated noise; the why activation difference is
-substantial. This change restores the exact base duck-why description used by that patch. The
+substantial. The repair through `05a7ab1` restored the exact base duck-why description used by that patch. The
 conservative variant restored every description and scored 0.904 with 144/162 Skill calls; no
 measured benefit justified that wider rollback.
 
@@ -123,6 +123,28 @@ Repeated language checks returned Russian on 8/10 runs of case 11, versus 12/14 
 7 and 9 still fail on base and the patch; no repair is claimed for those pre-existing failures.
 The full metrics belong to the supplied scratch commit. Local hardening of quoted parser
 boundaries is separately verified by dispatch regressions and the real loopback Claude canary.
+
+### Owner-supplied voice and trigger comparison, 2026-10-09
+
+The updated review compared three description candidates with the same 56 runner cases,
+three runs each and identical graders. Its recommended hybrid keeps the duck voice and
+`Use when` form, with added shape, land, proof and why triggers. These are external receipts:
+
+| Target | Mean score | Fully passing runs | Trigger checks | Negative checks |
+|---|---|---|---|---|
+| Base `3a1d385` | 0.917 | 151/171 | 143/162 | 30/30 |
+| Short descriptions `57b3a83` | 0.918 | 146/171 | 148/162 | 30/30 |
+| Recommended hybrid H | 0.924 | 148/171 | 162/162 | 30/30 |
+
+H scored 81/83 forced-choice routing probes and 14/18 behavioral cases, equal to base.
+Behavioral cases 2 and 9 loaded duck-why for the first time in the compared versions but
+still failed on content; activation does not establish a correct outcome. Case 7 still failed.
+Negative trigger checks pass when nothing loads; the 162/162 total is not 162 positive Skill calls.
+
+This change applies the supplied H descriptions and language rule. After the eval, duck-shape's
+`whether` was shortened to `if` to fit the 600-character limit. The supplied report says package,
+dispatch and Claude canary checks passed after that trim; the reported behavioral scores cover
+H before it. No new benchmark run or whole-candidate release approval is claimed here.
 
 ### Local selection probes, 2026-09-17
 

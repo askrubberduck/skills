@@ -1,6 +1,6 @@
 ---
 name: duck-land
-description: Use when a change has passed its review gate, the user authorizes landing, merging or a release, an authorized gate-passed PR or version bump is ready, or merged work was never recorded in status or outcome documentation.
+description: Merge approved work, run a described release process when asked, record what landed, and clean up the branch and worktree; landed means nothing left behind. Use when a change has passed its review gate and the user authorizes landing, merging or a release, when a gate-passed PR or version bump is ready, when the user asks what the landing or the push itself will check first, including a push that makes a repository public, or when merged work was never recorded in status or outcome documentation.
 ---
 
 # Duck Land
@@ -8,8 +8,8 @@ description: Use when a change has passed its review gate, the user authorizes l
 The ship step: gate passed → merge → record → clean. A merge without a recorded outcome is work
 the repo forgot; a record without a verified merge is fiction.
 
-Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and
-machine-readable verdicts.
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.
 

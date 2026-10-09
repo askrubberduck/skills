@@ -1,6 +1,6 @@
 ---
 name: duck-shape
-description: Use when the user asks to simplify, shorten or clean up code, calls it over-engineered, bloated, too defensive or AI slop, asks which of two designs carries less, or wants the structure of completed work checked, whether a file, a diff or a pasted snippet.
+description: Make every layer earn its place; cut the machinery the problem never asked for. Use when the user asks to simplify, shorten or clean up code or tests, calls it over-engineered, bloated, too defensive, duplicated or AI slop, asks to cut a repeated check, inline a supposedly pointless wrapper or drop an unused mode or flag, asks which of two designs carries less, or asks if finished work has its simplest structure, even in a small file or pasted snippet that already looks plain. A request to cut is enough to check what the cut would lose. Not for explaining code, renaming, or comments alone.
 ---
 
 # Duck Shape
@@ -10,8 +10,8 @@ the code hard to change: a small edit that touches many places, facts a reader m
 editing safely, and behavior nobody can predict from the interface. A smaller diff or a more
 impressive design is not evidence of improvement.
 
-Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and
-machine-readable verdicts.
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 Load a linked skill when the current step requires its procedure, then follow the named section
 within existing authority. A routing mention alone does not require loading every skill.
 Apply scoped local edits unless the request is report-only or analysis-only. Selected findings

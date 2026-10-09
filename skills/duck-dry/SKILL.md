@@ -1,6 +1,6 @@
 ---
 name: duck-dry
-description: Use for redundant comments, generated code narration, or commit and PR prose that repeats the diff; before committing or reviewing generated code. Preserve parsed directives. Not ordinary prose editing.
+description: Strip comments, docstrings, commit messages, and PR descriptions until only unobvious decisions, contracts, and traps survive. Use for redundant comments, generated code narration, or commit and PR prose that repeats the diff; before committing or reviewing generated code. Preserve parsed directives. Not ordinary prose editing.
 ---
 
 # Duck Dry
@@ -8,8 +8,8 @@ description: Use for redundant comments, generated code narration, or commit and
 Remove commentary that repeats the code or records an obsolete story. Keep the facts a maintainer
 needs but cannot recover from the code: constraints, external contracts, traps and calibration.
 
-Follow the user's language unless they ask otherwise; preserve commands, paths, identifiers, quoted errors and
-machine-readable verdicts.
+Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
+quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
 Default to the current task's diff, including staged changes. Sweep committed files or a tree only
 when named. Report-only means no edits. Local cleanup does not authorize commits or publication.
 
