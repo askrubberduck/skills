@@ -426,14 +426,15 @@ def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
         return undecided, f"{len(shared)} shared gates, {own} vs {found} causes"
     if own >= found:
         # the sum ignores severity: whoever applies the replace sees what the trial missed
-        missed = sorted({(f["severity"], f["cause_id"]) for d in shared
+        rank = {"BLOCKER": 0, "SHOULD": 1, "NOTE": 2}
+        missed = sorted({(rank[f["severity"]], f["severity"], f["cause_id"]) for d in shared
                          for f in findings if f["dispatch_id"] == theirs[gate(d)]["id"]
                          and f["substantiated"] == "1"
                          and f["cause_id"] not in {g["cause_id"] for g in findings
                                                    if g["dispatch_id"] == d["id"]
                                                    and g["substantiated"] == "1"}})
         return "replace", pin_of(incumbent) + "".join(
-            f"; missed {severity} {cause}" for severity, cause in missed)
+            f"; missed {severity} {cause}" for _, severity, cause in missed)
     return "drop", f"{own} vs {found} causes on shared gates"
 
 

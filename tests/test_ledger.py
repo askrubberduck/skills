@@ -265,9 +265,11 @@ def roles_check(root: Path) -> None:
     assert code == 1 and "holds no any arm" in out, out  # not "outside anthropic": explore may share it
     (root / "config.toml").write_text(ROLES_CONFIG)
     # a replace names, with severity, each incumbent cause the trial missed on the shared gates
-    missed = findings + [dict(findings[0], cause_id="k5", severity="SHOULD")]
+    missed = findings + [dict(findings[0], cause_id="k5", severity="NOTE"),
+                         dict(findings[0], cause_id="k6", severity="SHOULD"),
+                         dict(findings[2], cause_id="k7")]  # the trial's own extra cause keeps it ahead
     assert trial_verdict(config, dispatches, missed, "openai:gpt-6-sol:high") == (
-        "replace", "openai:gpt-6-astra:high; missed SHOULD k5")
+        "replace", "openai:gpt-6-astra:high; missed SHOULD k6; missed NOTE k5")
     clean = dict(dispatches[6], id="s9", gate_id="g10", candidate="c10")
     assert trial_verdict(config, dispatches + [clean], findings,
                          "google:gemini-3.8-flash-high")[0] == "drop"
