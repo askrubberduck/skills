@@ -371,8 +371,8 @@ Anthropic, signed in with your account and run with your environment. Its prompt
 diffs it reads, go to that vendor under its terms. `codex` can run commands and change files inside
 its sandbox. The Claude review route uses plan permissions, read-only file tools and no MCP servers;
 user customizations and session persistence are disabled, while admin-managed settings still apply.
-It cannot serve as a writable rival. agy runs with every tool approved and its terminal sandboxed:
-it can write files, and the duck reports a write to the checkout under review. Adding a transport grants no vendor dispatch authority. The duck has no
+It cannot serve as a writable rival. agy runs in plan mode: it reads without asking, and a write is
+denied. Adding a transport grants no vendor dispatch authority. The duck has no
 server and sends no telemetry.
 `duck-learn` reads your Claude Code and Codex session transcripts on disk to count what you asked
 for. Anything else the agent reads enters your host model's context and goes only where your host
