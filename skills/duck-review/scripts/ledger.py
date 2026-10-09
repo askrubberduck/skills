@@ -435,8 +435,8 @@ def trial_result(config: dict, dispatches: list[dict], findings: list[dict],
     if own >= found:
         # the sum ignores severity: whoever applies the replace sees what the trial missed
         rank = {"BLOCKER": 0, "SHOULD": 1, "NOTE": 2}
-        missed = sorted({(rank.get(f.get("severity"), 3), f.get("severity", "-"), f["cause_id"])
-                         for d in shared
+        known = lambda f: f.get("severity") if f.get("severity") in rank else "-"  # unknown sorts last
+        missed = sorted({(rank.get(known(f), 3), known(f), f["cause_id"]) for d in shared
                          for f in findings if f["dispatch_id"] == theirs[gate(d)]["id"]
                          and f["substantiated"] == "1"
                          and f["cause_id"] not in {g["cause_id"] for g in findings
