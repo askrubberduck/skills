@@ -16,9 +16,11 @@ import hashlib
 import math
 import os
 import re
+import shutil
 import signal
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -206,11 +208,24 @@ def stop(child: subprocess.Popen) -> None:
     raise RuntimeError(f"process group {child.pid} survived SIGKILL")
 
 
-def launch(argv: list[str], out: Path, limit: float, workdir: Path) -> tuple[bool, int]:
+def codex_env(home: Path, rival: bool) -> dict[str, str]:
+    """A codex seat's environment: `home` as CODEX_HOME holding only the owner's login, so the
+    owner's AGENTS.md, config, plugins, memories and skills stay out. A review seat also gets it as
+    HOME, which hides ~/.agents/skills; a rival keeps HOME, and those skills, for the owner's
+    toolchains."""
+    login = Path(os.environ.get("CODEX_HOME") or Path.home() / ".codex") / "auth.json"
+    if login.exists():  # a link, not a copy: a token the seat refreshes stays the owner's login
+        (home / "auth.json").symlink_to(login.resolve())
+    return {**os.environ, "CODEX_HOME": str(home), **({} if rival else {"HOME": str(home)})}
+
+
+def launch(argv: list[str], out: Path, limit: float, workdir: Path,
+           env: dict[str, str] | None = None) -> tuple[bool, int]:
     """Run to completion or the limit: (whether the limit ended it, the exit code)."""
     with out.open("w") as sink:
         child = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=sink,
-                                 stderr=subprocess.STDOUT, cwd=workdir, start_new_session=True)
+                                 stderr=subprocess.STDOUT, cwd=workdir, env=env,
+                                 start_new_session=True)
     try:
         return False, child.wait(timeout=limit)
     except subprocess.TimeoutExpired:
@@ -327,11 +342,13 @@ def run_seat(args) -> int:
     started = time.monotonic()
     verdict, cause, moved = "-", "crashed", []
     diff = Path(args.diff_out).resolve() if args.diff_out else None
+    isolated = Path(tempfile.mkdtemp(prefix="askrubberduck-codex-")) if via == "codex" else None
     try:
         if diff:
             diff.unlink(missing_ok=True)  # a reader waiting for it must not take a stale one
         answer.unlink(missing_ok=True)  # a stale answer from an earlier run is no answer
-        timed_out, code = launch(argv, out, timeout, workdir)
+        env = codex_env(isolated, rival=bool(args.workdir)) if isolated else None
+        timed_out, code = launch(argv, out, timeout, workdir, env)
         text = out.read_text(encoding="utf-8", errors="replace")
         reply = answer.read_text(encoding="utf-8", errors="replace") if answer.exists() else ""
         found, cause = classify(reply, via, timed_out, code, text)
@@ -344,6 +361,8 @@ def run_seat(args) -> int:
             moved = [f"- {line}" for line in before if line not in after]
             moved += [f"+ {line}" for line in after if line not in before]
     finally:
+        if isolated:
+            shutil.rmtree(isolated, ignore_errors=True)
         row.update(minutes=str(math.ceil((time.monotonic() - started) / 60)), verdict=verdict,
                    status="final", outage="0" if verdict != "-" else "-" if cancelled else "1")
         record(row, new=False)
