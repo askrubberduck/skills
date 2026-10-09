@@ -63,6 +63,40 @@ class PromoteTest(unittest.TestCase):
                                  f"replace {incumbent} with {pin} in review\n"
                                  f"  missed BLOCKER {cause}\n")
 
+    def test_unknown_severity_does_not_change_replace_verdict(self):
+        incumbent = "openai:gpt-6-inc:high"
+        pin = "openai:gpt-6-trial:high"
+        config = {"reviewers": [incumbent], "trial": [pin], "shadow": 1}
+        dispatches = []
+        for ident, model, setup in (("inc", "gpt-6-inc", "independent"),
+                                    ("trial", "gpt-6-trial", "shadow")):
+            row = dict.fromkeys(DISPATCH_COLUMNS, "-")
+            row.update(id=ident, gate_id="g1", round="1", repo="r", candidate="c1",
+                       stage="review", setup=setup, status="final", outage="0",
+                       family="openai", model=model, effort="high")
+            dispatches.append(row)
+        findings = []
+        for ident, cause, severity in (("inc", "incumbent-cause", "-"),
+                                       ("trial", "trial-cause", "NOTE")):
+            row = dict.fromkeys(FINDING_COLUMNS, "-")
+            row.update(dispatch_id=ident, gate_id="g1", candidate="c1",
+                       cause_id=cause, severity=severity, substantiated="1")
+            findings.append(row)
+
+        with tempfile.TemporaryDirectory(prefix="rally-up24-") as directory:
+            root = Path(directory)
+            for name, columns, rows in (("dispatches.tsv", DISPATCH_COLUMNS, dispatches),
+                                        ("findings.tsv", FINDING_COLUMNS, findings)):
+                with (root / name).open("w", encoding="utf-8", newline="") as stream:
+                    writer = csv.DictWriter(stream, fieldnames=columns, delimiter="\t")
+                    writer.writeheader()
+                    writer.writerows(rows)
+            with patch.dict(os.environ, {"ASKRUBBERDUCK_HOME": directory}):
+                loaded_dispatches, loaded_findings = load_tables()
+                self.assertEqual(loaded_findings, findings)
+                self.assertEqual(
+                    trial_verdict(config, loaded_dispatches, loaded_findings, pin)[0],
+                    "replace")
 
 if __name__ == "__main__":
     unittest.main()
