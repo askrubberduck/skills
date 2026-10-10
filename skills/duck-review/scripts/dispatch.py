@@ -13,9 +13,11 @@ import contextlib
 import datetime
 import fcntl
 import hashlib
+import json
 import math
 import os
 import re
+import select
 import shutil
 import signal
 import subprocess
@@ -43,6 +45,7 @@ OUTAGES = (("credits", r"out of credits|insufficient credits?|credit balance"),
            ("quota", r"quota|RESOURCE_EXHAUSTED|\b429\b|rate.?limit"),
            ("model rejected", r"not supported|unknown model|invalid model|model.not.found"),
            ("permission denied", r"permission\b[\s\S]{0,200}?\bdenied"))  # a wrapped message too
+WATCHDOG = "--watchdog"  # internal: dispatch.py --watchdog <row json> runs a seat's watchdog
 TOKENS = re.compile(r"tokens used\s*:?\s*(\d[\d,]*)", re.IGNORECASE)  # a count starts with a digit
 # A stage with its own ceiling counts against it; review and disposition share the round bound.
 STAGE_BOUNDS = {"plan": ("plan_rounds", 2), "rally": ("rally_turns", DEFAULT_RALLY_TURNS),
@@ -170,8 +173,9 @@ def locked_ledger():
         os.close(fd)
 
 
-def record(row: dict, new: bool) -> bool:
-    """Append `row`, or replace the line carrying its id; False when a new row's id is taken."""
+def record(row: dict, new: bool, if_pending: bool = False) -> bool:
+    """Append `row`, or replace the line carrying its id; False when a new row's id is taken, or,
+    with `if_pending`, when its row is no longer pending."""
     if bad_values(row):
         raise ValueError(f"refusing to write {', '.join(bad_values(row))}: {row}")
     line = "\t".join(row[c] for c in DISPATCH_COLUMNS) + "\n"
@@ -185,6 +189,9 @@ def record(row: dict, new: bool) -> bool:
         lines[-1] = lines[-1] if lines[-1].endswith("\n") else lines[-1] + "\n"
         ids = [other.split("\t", 1)[0] for other in lines]
         if new and row["id"] in ids[1:]:
+            return False
+        if if_pending and (row["id"] not in ids[1:] or lines[ids.index(row["id"], 1)].rstrip(
+                "\n").split("\t")[DISPATCH_COLUMNS.index("status")] != "pending"):
             return False
         if not new and row["id"] in ids[1:]:
             lines[ids.index(row["id"], 1)] = line
@@ -200,6 +207,8 @@ def record(row: dict, new: bool) -> bool:
 def stop(child: subprocess.Popen) -> None:
     """Kill the seat's whole process group and wait until it is gone: a seat still writing after
     the wait returns hands the next reader a shared file."""
+    # ponytail: the leader is reaped while its group may live on; a new process taking the group's id
+    # inside one 50 ms poll would need the pid space to wrap around first.
     for sig in (signal.SIGTERM, signal.SIGKILL):
         try:
             os.killpg(child.pid, sig)
@@ -240,19 +249,96 @@ def agy_env(home: Path) -> dict[str, str]:
     return {**os.environ, "HOME": str(home)}
 
 
-def launch(argv: list[str], out: Path, limit: float, workdir: Path,
-           env: dict[str, str] | None = None) -> tuple[bool, int]:
-    """Run to completion or the limit: (whether the limit ended it, the exit code)."""
-    with out.open("w") as sink:
-        child = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=sink,
-                                 stderr=subprocess.STDOUT, cwd=workdir, env=env,
-                                 start_new_session=True)
+def guard(row: dict) -> subprocess.Popen | None:
+    """Start the seat's watchdog, which writes `row` pending; None when its id is taken. From here on,
+    however dispatch ends, even by SIGKILL, the watchdog sees EOF on its stdin, stops the seat and
+    finalizes a row left pending."""
+    watchdog = subprocess.Popen([sys.executable, str(Path(__file__).resolve()), WATCHDOG,
+                                 json.dumps(row)], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                text=True, start_new_session=True)
+    recorded = watchdog.stdout.readline()
+    if not recorded:
+        raise OSError("the seat's watchdog could not write its row")
+    if json.loads(recorded):
+        return watchdog
+    watchdog.stdin.close()
+    watchdog.wait()
+    return None
+
+
+def launch(watchdog: subprocess.Popen, argv: list[str], out: Path, limit: float, workdir: Path,
+           env: dict[str, str] | None) -> tuple[bool, int]:
+    """Run the seat under its watchdog: (whether the limit ended the seat, its exit code)."""
+    watchdog.stdin.write(json.dumps({"argv": argv, "out": str(out), "limit": limit,
+                                     "workdir": str(workdir),
+                                     "env": env if env is not None else dict(os.environ)}) + "\n")
+    watchdog.stdin.flush()
+    result = watchdog.stdout.readline()
+    if not result:
+        raise OSError("the seat's watchdog ended without a result")
+    result = json.loads(result)
+    if "error" in result:
+        raise OSError(result["error"])
+    return result["timed_out"], result["code"]
+
+
+def watch(row_json: str) -> int:
+    """The watchdog: write the pending row, start the seat in its own group, stop it at the limit,
+    report to dispatch, then wait for dispatch to finish; if dispatch went away first, stop the seat
+    and finalize the row as cancelled."""
+    row, started = json.loads(row_json), time.time()
+    # a cancel meant for dispatch (pkill, a tree kill) must leave the watchdog to clean up. A handler,
+    # not SIG_IGN: exec resets a handler to the default, so the seat still gets its SIGTERM
+    for sig in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT):
+        signal.signal(sig, lambda *_: None)
+    signal.signal(signal.SIGCHLD, signal.SIG_DFL)  # an inherited SIG_IGN would reap the seat for us
+    if not record(row, new=True):
+        print(json.dumps(False), flush=True)
+        return 0
     try:
-        return False, child.wait(timeout=limit)
-    except subprocess.TimeoutExpired:
-        return True, -1
-    finally:
-        stop(child)
+        print(json.dumps(True), flush=True)
+        spec = sys.stdin.readline()  # cut short, without its newline: dispatch died writing it
+        serve(json.loads(spec) if spec.endswith("\n") else None)
+        while os.read(sys.stdin.fileno(), 1):  # until dispatch is done with its row
+            pass
+    except OSError:  # BrokenPipeError included: dispatch is gone
+        os.dup2(os.open(os.devnull, os.O_WRONLY), sys.stdout.fileno())  # no flush error at exit
+    finally:  # dispatch ended without finalizing the row: a cancel
+        row.update(minutes=str(math.ceil((time.time() - started) / 60)), verdict="-",
+                   status="final", outage="-")
+        record(row, new=False, if_pending=True)
+    return 0
+
+
+def serve(spec: dict | None) -> None:
+    """Run the seat `spec` names in its own group until it exits, the limit passes or dispatch goes
+    away; stop the group, then report to dispatch. None: dispatch went away before the seat."""
+    if spec is None:
+        return
+    try:
+        sink = open(spec["out"], "w")
+        seat = subprocess.Popen(spec["argv"], stdin=subprocess.DEVNULL, stdout=sink,
+                                stderr=subprocess.STDOUT, cwd=spec["workdir"], env=spec["env"],
+                                start_new_session=True)
+    except OSError as error:  # the CLI is missing: dispatch reports it as the outage
+        print(json.dumps({"error": str(error)}), flush=True)
+        return
+    with sink:  # closed only once the seat is stopped: a failed close cannot skip the stop
+        deadline = time.monotonic() + spec["limit"]
+        timed_out = gone = False
+        try:
+            while seat.poll() is None:
+                if time.monotonic() > deadline:
+                    timed_out = True
+                    break
+                if select.select([sys.stdin], [], [], 0.05)[0] and not os.read(sys.stdin.fileno(), 1):
+                    gone = True  # EOF: dispatch is gone
+                    break
+        finally:
+            stop(seat)
+    if not gone:
+        print(json.dumps({"timed_out": timed_out, "code": -1 if timed_out else seat.returncode}),
+              flush=True)
 
 
 def capture(workdir: Path, base: str, dest: Path) -> str:
@@ -326,6 +412,8 @@ def run_seat(args) -> int:
     workdir = Path(args.workdir).resolve() if args.workdir else out.parent
     if not workdir.is_dir():
         return refuse(f"--workdir is not a directory: {workdir}")
+    if out.exists() and not out.is_file():
+        return refuse(f"--out is not a regular file: {out}")
     if args.diff_out and Path(args.diff_out).is_dir():
         return refuse(f"--diff-out names a directory: {args.diff_out}")
     if args.diff_out and not Path(args.diff_out).resolve().parent.is_dir():
@@ -347,30 +435,24 @@ def run_seat(args) -> int:
                status="pending", outage="-")
     if bad_values(row):
         return refuse(f"not a ledger value in {', '.join(bad_values(row))}")
-    if not record(row, new=True):
+    watchdog = guard(row)
+    if watchdog is None:
         return refuse(f"{row_id} is already recorded; a rerun takes a new --id")
     if reached > limit:
         print(f"extended past the bound of {limit} rounds by the owner: {args.extended}")
 
-    cancelled = []  # a signal to this script is the caller cancelling: no verdict, no outage
-
-    def cancel(number, _):
-        cancelled.append(number)
-        sys.exit(128 + number)  # an interrupted run still finalizes its row
-
-    for sig in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT):
-        signal.signal(sig, cancel)
     started = time.monotonic()
     verdict, cause, moved = "-", "crashed", []
     diff = Path(args.diff_out).resolve() if args.diff_out else None
-    isolated = Path(tempfile.mkdtemp(prefix=f"askrubberduck-{via}-")) if via != "claude" else None
+    isolated = None
     try:
+        isolated = Path(tempfile.mkdtemp(prefix=f"askrubberduck-{via}-")) if via != "claude" else None
         if diff:
             diff.unlink(missing_ok=True)  # a reader waiting for it must not take a stale one
         answer.unlink(missing_ok=True)  # a stale answer from an earlier run is no answer
         env = (codex_env(isolated, rival=bool(args.workdir)) if via == "codex"
                else agy_env(isolated) if isolated else None)
-        timed_out, code = launch(argv, out, timeout, workdir, env)
+        timed_out, code = launch(watchdog, argv, out, timeout, workdir, env)
         text = out.read_text(encoding="utf-8", errors="replace")
         reply = answer.read_text(encoding="utf-8", errors="replace") if answer.exists() else ""
         found, cause = classify(reply, via, timed_out, code, text)
@@ -386,10 +468,10 @@ def run_seat(args) -> int:
         if isolated:
             shutil.rmtree(isolated, ignore_errors=True)
         row.update(minutes=str(math.ceil((time.monotonic() - started) / 60)), verdict=verdict,
-                   status="final", outage="0" if verdict != "-" else "-" if cancelled else "1")
+                   status="final", outage="0" if verdict != "-" else "1")
         record(row, new=False)
-        if cancelled:
-            print(f"{row_id} cancelled {row['minutes']}m")
+        watchdog.stdin.close()  # done with the row: the watchdog may leave
+        watchdog.wait()
     for line in moved:
         print(f"candidate moved: {line}")
     print(f"{row_id} {verdict if verdict != '-' else f'outage: {cause}'} {row['minutes']}m")
@@ -397,6 +479,12 @@ def run_seat(args) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # A cancel ends dispatch where it stands; the seat's watchdog stops the seat and finalizes the
+    # row. SIGINT included (no KeyboardInterrupt), and whatever the caller had them set or blocked.
+    cancels = {signal.SIGTERM, signal.SIGHUP, signal.SIGINT}
+    for sig in cancels:
+        signal.signal(sig, signal.SIG_DFL)
+    signal.pthread_sigmask(signal.SIG_UNBLOCK, cancels)
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--gate", required=True, help="gate id")
     parser.add_argument("--round", required=True, type=int, help="this gate's round, from 1")
@@ -428,4 +516,6 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
+    if sys.argv[1:2] == [WATCHDOG]:
+        raise SystemExit(watch(sys.argv[2]))
     raise SystemExit(main())
