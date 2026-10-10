@@ -45,7 +45,9 @@ OUTAGES = (("credits", r"out of credits|insufficient credits?|credit balance"),
            ("permission denied", r"permission\b[\s\S]{0,200}?\bdenied"))  # a wrapped message too
 CANCELS = {signal.SIGTERM, signal.SIGHUP, signal.SIGINT}  # the caller cancelling a seat
 LOCK_WAIT = 30  # seconds another writer may hold the ledger before a write gives up
-FINISH: list = []  # the running seat's finalizer: idempotent, so main() may call it after a cancel
+# Idempotent cleanup steps of the running seat (stop it, finalize its row): main() runs them, last
+# first, for a cancel that lands at an instruction before a step's own guard
+CLEANUP: list = []
 TOKENS = re.compile(r"tokens used\s*:?\s*(\d[\d,]*)", re.IGNORECASE)  # a count starts with a digit
 # A stage with its own ceiling counts against it; review and disposition share the round bound.
 STAGE_BOUNDS = {"plan": ("plan_rounds", 2), "rally": ("rally_turns", DEFAULT_RALLY_TURNS),
@@ -226,9 +228,13 @@ def record(row: dict, new: bool) -> bool:
 
 def stop(child: subprocess.Popen) -> None:
     """Kill the seat's whole process group and wait until it is gone: a seat still writing after
-    the wait returns hands the next reader a shared file."""
+    the wait returns hands the next reader a shared file. Once per seat: a second killpg could hit
+    a group that reused the id."""
     with held():
+        if getattr(child, "stopped", False):
+            return
         _stop(child)
+        child.stopped = True
 
 
 def _stop(child: subprocess.Popen) -> None:
@@ -289,6 +295,7 @@ def launch(argv: list[str], out: Path, limit: float, workdir: Path,
             child = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=sink,
                                      stderr=subprocess.STDOUT, cwd=workdir, env=env,
                                      start_new_session=True, preexec_fn=seat_signals)
+            CLEANUP.append(lambda: stop(child))
         return False, child.wait(timeout=limit)
     except subprocess.TimeoutExpired:
         return True, -1
@@ -422,7 +429,7 @@ def run_seat(args) -> int:
                 record(row, new=False)
             finished = True
 
-    FINISH.append(finish)  # main() runs it again if a cancel lands before this function's own guard
+    CLEANUP.append(finish)
     try:
         with held():  # a cancel after the pending write lands here, and the row is ours to finalize
             ours = record(row, new=True)
@@ -495,8 +502,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         return run_seat(args)
     except SystemExit:  # a cancel can land at any instruction; the first one blocked the rest
-        for finish in FINISH:
-            finish()
+        for step in reversed(CLEANUP):
+            step()
         raise
     except OSError as error:  # the CLI is missing or the scratch dir unwritable; the row is final
         print(f"outage: {error}")

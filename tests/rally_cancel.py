@@ -333,5 +333,100 @@ while True:
                 os.close(reader)
 
 
+class CancelEnteringSeatStop(unittest.TestCase):
+    def test_first_cancel_entering_seat_cleanup_leaves_no_running_seat(self):
+        with tempfile.TemporaryDirectory(prefix="duck-rally-stop-entry-") as directory:
+            root = Path(directory).resolve()
+            fake = root / "codex"
+            fake.write_text(f"#!{sys.executable}\n" + """
+import os
+import time
+from pathlib import Path
+
+root = Path(__file__).parent
+(root / "seat.pid").write_text(str(os.getpid()))
+while not (root / "release").exists():
+    time.sleep(0.01)
+(root / "late-write").write_text("seat continued after dispatch exited")
+while True:
+    time.sleep(0.01)
+""")
+            fake.chmod(0o755)
+            brief = root / "brief"
+            brief.write_text("Review the fixture")
+            home = root / "ledger"
+            home.mkdir()
+            (home / "config.toml").write_text('[bounds]\ndispatch_timeout = "1s"\n')
+            driver = """
+import os
+import signal
+import sys
+
+sys.dont_write_bytecode = True
+sys.path.insert(0, sys.argv.pop(1))
+import dispatch
+
+def cancel_at_stop_entry(frame, event, arg):
+    if event == "call" and frame.f_code is dispatch.stop.__code__:
+        # The real wait timed out; classification has not decided the row's outcome.
+        # Deliver the first cancel before the cleanup function can hold signals.
+        sys.settrace(None)
+        os.kill(os.getpid(), signal.SIGTERM)
+    return cancel_at_stop_entry
+
+sys.settrace(cancel_at_stop_entry)
+raise SystemExit(dispatch.main(sys.argv[1:]))
+"""
+            env = {**os.environ, "PATH": str(root), "HOME": str(root),
+                   "CODEX_HOME": str(root / "owner"), "TMPDIR": str(root),
+                   "ASKRUBBERDUCK_HOME": str(home)}
+            child, seat_pid = None, None
+            try:
+                child = subprocess.Popen(
+                    [sys.executable, "-c", driver, str(SCRIPTS),
+                     "--gate", "stop-entry-cancel", "--round", "1", "--stage", "review",
+                     "--setup", "independent", "--trust", "0", "--pin", "openai:fixture",
+                     "--prompt", str(brief), "--out", str(root / "out"), "--repo", "r"],
+                    env=env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE, text=True)
+                stdout, stderr = child.communicate(timeout=10)
+                self.assertTrue((root / "seat.pid").exists(), stdout + stderr)
+                seat_pid = int((root / "seat.pid").read_text())
+                try:
+                    os.killpg(seat_pid, 0)
+                    seat_survived = True
+                except (ProcessLookupError, PermissionError):
+                    seat_survived = False
+                # Only release after dispatch exits, so the write proves continued execution.
+                (root / "release").touch()
+                deadline = time.monotonic() + 1
+                while not (root / "late-write").exists() and time.monotonic() < deadline:
+                    time.sleep(0.01)
+                with patch.dict(os.environ, env):
+                    rows = ledger.read_table("dispatches.tsv", ledger.DISPATCH_COLUMNS,
+                                             ledger.DISPATCH_ENUMS)
+                self.assertEqual(len(rows), 1, stdout + stderr)
+                observed = (child.returncode, rows[0]["status"], rows[0]["outage"],
+                            rows[0]["verdict"], seat_survived, (root / "late-write").exists())
+                self.assertEqual(
+                    observed, (128 + signal.SIGTERM, "final", "-", "-", False, False),
+                    "C1: a first cancel entering seat cleanup must stop the process group "
+                    "before dispatch exits; observed "
+                    f"(exit, status, outage, verdict, seat_survived, late_write)={observed!r}; "
+                    f"stdout={stdout!r}, stderr={stderr!r}")
+            finally:
+                if child is not None:
+                    if child.poll() is None:
+                        child.kill()
+                    child.communicate(timeout=10)
+                if seat_pid is None and (root / "seat.pid").exists():
+                    seat_pid = int((root / "seat.pid").read_text())
+                if seat_pid is not None:
+                    try:
+                        os.killpg(seat_pid, signal.SIGKILL)
+                    except (ProcessLookupError, PermissionError):
+                        pass
+
+
 if __name__ == "__main__":
     unittest.main()
