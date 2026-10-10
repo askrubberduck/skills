@@ -114,7 +114,8 @@ def read_table(name: str, columns: tuple[str, ...], enums: dict[str, set]) -> li
         raise SystemExit(f"{path}: {error.strerror}")  # an unread table is no answer, not an empty one
     except UnicodeDecodeError as error:
         raise SystemExit(f"{path}: not UTF-8 ({error.reason} at byte {error.start})")
-    reader = csv.reader(lines, delimiter="\t", quoting=csv.QUOTE_NONE)  # written unquoted: a " is text
+    # written as plain tab-joined fields: no quoting, no field limit, so no csv parser on the way back
+    reader = (line.split("\t") for line in lines)
     if next(reader, None) != list(columns):
         raise SystemExit(f"{path}:1: header does not match {', '.join(columns)}")
     rows = []
