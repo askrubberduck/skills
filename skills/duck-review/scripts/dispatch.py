@@ -393,6 +393,7 @@ def run_seat(args) -> int:
     cancelled = []  # a signal to this script is the caller cancelling: no verdict, no outage
 
     def cancel(number, _):
+        signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)  # the first cancel wins; cleanup runs whole
         cancelled.append(number)
         sys.exit(128 + number)  # an interrupted run still finalizes its row
 
@@ -429,16 +430,17 @@ def run_seat(args) -> int:
             moved = [f"- {line}" for line in before if line not in after]
             moved += [f"+ {line}" for line in after if line not in before]
     finally:
-        if isolated:
-            shutil.rmtree(isolated, ignore_errors=True)
-        if ours:
-            with held():  # a cancel landing now keeps the outcome already decided: exit code only
+        with held():  # a cancel landing now keeps the outcome already decided: exit code only
+            if isolated:
+                shutil.rmtree(isolated, ignore_errors=True)
+            if ours:
                 row.update(minutes=str(math.ceil((time.monotonic() - started) / 60)),
                            verdict=verdict, status="final",
                            outage="0" if verdict != "-" else "-" if cancelled else "1")
                 record(row, new=False)
-            if cancelled:
-                print(f"{row_id} cancelled {row['minutes']}m")
+        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)  # the row is final: prints stay cancellable
+        if cancelled and ours:
+            print(f"{row_id} cancelled {row['minutes']}m")
     for line in moved:
         print(f"candidate moved: {line}")
     print(f"{row_id} {verdict if verdict != '-' else f'outage: {cause}'} {row['minutes']}m")
