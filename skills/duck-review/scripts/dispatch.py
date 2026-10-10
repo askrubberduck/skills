@@ -13,7 +13,6 @@ import contextlib
 import datetime
 import fcntl
 import hashlib
-import json
 import math
 import os
 import re
@@ -72,10 +71,9 @@ def transport(via: str, family: str, model: str, effort: str, prompt: str, workd
                 "--mcp-config", '{"mcpServers":{}}', *dirs, "--", prompt]
     # agy takes the effort as part of the model id: `gemini-3.1-pro-high`
     pinned = model if effort == "-" else f"{model}-{effort}"
-    # headless agy ends the seat on any permission it would ask for. The seat's settings allow every
-    # command; --sandbox turns a command's write into a write_file request, which plan mode denies:
-    # live probes 2026-10-10 found a review's commands running and no write landing
-    return ["agy", "--model", pinned, "--mode", "plan", "--sandbox", *dirs, "--print-timeout",
+    # headless agy auto-denies any tool it would ask about, reads included; plan mode reads freely
+    # and still denies writes
+    return ["agy", "--model", pinned, "--mode", "plan", *dirs, "--print-timeout",
             f"{math.ceil(limit)}s", "-p", prompt]
 
 
@@ -178,8 +176,9 @@ def record(row: dict, new: bool) -> bool:
         raise ValueError(f"refusing to write {', '.join(bad_values(row))}: {row}")
     line = "\t".join(row[c] for c in DISPATCH_COLUMNS) + "\n"
     with locked_ledger() as path:
-        try:
-            lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
+        try:  # rows end only at a newline, as ledger.read_table reads them
+            text = path.read_text(encoding="utf-8")
+            lines = [f"{line}\n" for line in text.removesuffix("\n").split("\n")] if text else []
         except FileNotFoundError:
             lines = []
         lines = lines or ["\t".join(DISPATCH_COLUMNS) + "\n"]
@@ -238,12 +237,6 @@ def agy_env(home: Path) -> dict[str, str]:
     for part in (".gemini/oauth_creds.json", ".gemini/google_accounts.json", "Library/Keychains"):
         if (owner / part).exists():  # links, not copies: a refreshed token stays the owner's
             (home / part).symlink_to((owner / part).resolve())
-    settings = home / ".gemini" / "antigravity-cli" / "settings.json"
-    settings.parent.mkdir()
-    # agy's built-in skills unpack into the seat's home; reading them must not end the seat, while
-    # the rest of the home, the login links, stays unreadable
-    builtin = (settings.parent / "builtin").resolve()
-    settings.write_text(json.dumps({"permissions": {"allow": ["command(*)", f"read_file({builtin})"]}}))
     return {**os.environ, "HOME": str(home)}
 
 

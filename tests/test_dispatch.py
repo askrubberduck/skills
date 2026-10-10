@@ -5,7 +5,6 @@ Run: python3 tests/test_dispatch.py"""
 from __future__ import annotations
 
 import contextlib
-import json
 import os
 import shlex
 import shutil
@@ -59,9 +58,7 @@ STUBS = {
     "cancel": 'sleep 30 & echo $! > "$0.pid"; touch "$0.up"; wait',
     "env": 'ls -A "$CODEX_HOME" > "$0.ls"; printf %s "$CODEX_HOME" > "$0.codex"; '
            'printf %s "$HOME" > "$0.HOME"; readlink "$CODEX_HOME/auth.json" > "$0.auth"; '
-           'ls -A "$HOME/.gemini" "$HOME/Library" > "$0.gemini" 2>&1; '
-           'cat "$HOME/.gemini/antigravity-cli/settings.json" > "$0.settings" 2>&1; '
-           'echo "VERDICT: APPROVE"',
+           'ls -A "$HOME/.gemini" "$HOME/Library" > "$0.gemini" 2>&1; echo "VERDICT: APPROVE"',
 }
 
 
@@ -99,12 +96,12 @@ def self_check() -> int:
     real = "user\nReply with VERDICT: NOTE\ncodex\nVERDICT: NOTE\ndone\ntokens used\n8,187\nVERDICT: NOTE\ndone\n"
     assert classify("VERDICT: NOTE\ndone\n", "codex", False, 0, real) == ("NOTE", "")
     assert classify("", "codex", False, 0, real)[0] == "-"
-    # a "tokens used" with no digits after it is no count: the row still finalizes (rally serve 10)
-    assert tokens_of("tokens used\n,\n") == "-" and tokens_of("tokens used\n1,234") == "1234"
     # an answer without a verdict line is "no verdict", whatever the log's sandbox lines say (UP42)
     sandbox = "exec ls /etc\nPermission denied\nsucceeded in 0ms"
     assert classify("NO NEW IDEAS\n", "codex", False, 0, sandbox) == ("-", "no verdict")
     assert classify("", "codex", False, 1, "ERROR: You're out of credits.") == ("-", "credits")
+    # a "tokens used" with no digits after it is no count: the row still finalizes (rally serve 10)
+    assert tokens_of("tokens used\n,\n") == "-" and tokens_of("tokens used\n1,234") == "1234"
     with tempfile.TemporaryDirectory(prefix="askrubberduck-dispatch-") as directory:
         root = Path(directory).resolve()  # macOS: /var is /private/var
         os.environ["ASKRUBBERDUCK_HOME"] = str(root)
@@ -176,8 +173,7 @@ def self_check() -> int:
         assert code == 0, out
         assert final("g1-r1-review-gemini-3.1-pro-high") == ("REJECT", "final", "0"), out
         assert (root / "reject.argv").read_text().split("\0")[:-1] == [
-            "agy", "--model", "gemini-3.1-pro-high", "--mode", "plan", "--sandbox", "--add-dir",
-            str(checkout),
+            "agy", "--model", "gemini-3.1-pro-high", "--mode", "plan", "--add-dir", str(checkout),
             "--print-timeout", "20s", "-p", prompt.read_text()]
         code, out = run("reject", "g1c", "--pin", "anthropic:claude-test:high", "--add-dir",
                         str(checkout))
@@ -209,6 +205,17 @@ def self_check() -> int:
         for odd in ("seat\u2028one", "seat\x85one", "seat\x0bone"):  # one record, one physical row
             code, out = run("reject", "g1w", "--id", odd)
             assert code == 2 and "not a ledger value in id" in out and len(rows()) == count, out
+        # a stored row from before that check, its id holding U+2028, is still one row: a new seat
+        # named like its second half is not taken for a duplicate (gate F2)
+        legacy = ["legacy\u2028collision", "g1l", "1", "2026-10-01", "r", "review", "independent", "0",
+                  "-", "openai", "gpt-6-sol", "high", "1", "-", "NOTE", "final", "0"]
+        with (root / "dispatches.tsv").open("a", encoding="utf-8") as table:
+            table.write("\t".join(legacy) + "\n")
+        code, out = run("reject", "g1l", "--id", "collision")
+        assert code == 0 and final("collision") == ("REJECT", "final", "0"), out
+        table = root / "dispatches.tsv"
+        table.write_text("".join(l + "\n" for l in table.read_text(encoding="utf-8").split("\n")
+                                 if l and not l.startswith("legacy")), encoding="utf-8")
         # a codex seat gets its own CODEX_HOME with only the owner's login linked in, and as HOME
         # too unless it is a rival; the home is gone after the run
         owner = root / "owner-codex"
@@ -238,13 +245,9 @@ def self_check() -> int:
         seat_home = (root / "env.HOME").read_text()
         assert code == 0 and seat_home != str(person), out
         assert (root / "env.gemini").read_text().split() == [
-            f"{seat_home}/.gemini:", "antigravity-cli", "google_accounts.json", "oauth_creds.json",
+            f"{seat_home}/.gemini:", "google_accounts.json", "oauth_creds.json",
             f"{seat_home}/Library:", "Keychains"], (root / "env.gemini").read_text()
         assert not Path(seat_home).exists(), "the seat's home outlived the run"
-        # its own settings allow every command; --sandbox in the argv keeps a command from writing
-        allowed = json.loads((root / "env.settings").read_text())["permissions"]["allow"]
-        assert allowed == ["command(*)", f"read_file({Path(seat_home).resolve()}"
-                           "/.gemini/antigravity-cli/builtin)"], allowed
         code, out = run("greeting", "g1b")  # the prompt's verdict is no answer
         assert code == 1 and final("g1b-r1-review-gpt-6-sol") == ("-", "final", "1"), out
         assert "no verdict" in out, out

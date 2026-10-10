@@ -84,10 +84,7 @@ rival keeps `HOME`, and those skills with it, so the owner's toolchains still bu
 
 An agy seat runs with a fresh `HOME` holding only links to the owner's Google login
 (`~/.gemini/oauth_creds.json`, `~/.gemini/google_accounts.json`) and `~/Library/Keychains`,
-so the rules and skills in `~/.gemini/config` stay out. Headless agy ends a seat on any permission it
-would ask for: the seat's settings allow every command, and `--sandbox` turns a command's write into a
-file write that plan mode denies. A seat that tries to write, by tool or by command, ends with no
-answer, so a brief for an agy seat asks for reading, not changing.
+so the rules and skills in `~/.gemini/config` stay out.
 
 **`--prompt` takes a UTF-8 brief file path; the script passes its contents as a CLI argument.**
 The material under review is a path inside that brief. Hand the reviewer
