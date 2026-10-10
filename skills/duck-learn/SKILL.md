@@ -25,8 +25,9 @@ within existing authority. A routing mention alone does not require loading ever
    - **New models.** `$LEDGER roster -` reads host model ids on stdin (`agy models | $LEDGER
      roster -`; codex prints none, so the owner names its
      new pins) and prints ids nobody has configured, trialled or dispatched; `promote` prints each
-     trial pin's verdict: still `shadow`, or `replace`, `add` or `drop` once decided.
-     `[learn].discover` (default `auto`) decides what follows: `off` ignores both; `propose` queues
+     trial pin's verdict: still `shadow`, or `replace`, `add` or `drop` once decided; a `replace`
+     lists, with severity, each incumbent cause the trial missed, since the comparison sums causes.
+     `[learn].discover` (default `propose`) decides what follows: `off` ignores both; `propose` queues
      each through [`duck-decide`](../duck-decide/SKILL.md); `auto` puts at most one new pin per family
      into `[learn].trial` and
      applies each `replace`, `add` or `drop` verdict to `~/.askrubberduck/config.toml`, taking the

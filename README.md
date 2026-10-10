@@ -181,9 +181,9 @@ just because the code reached it.
 posted review comments and resolved threads each need your go-ahead; a passed review does not
 grant one. So does sending your code to another model vendor, deleting work that exists nowhere
 else, and waiving any rule a gate enforces. Local edits you asked for need no second permission.
-One exception is the duck's own config: with `[learn].discover` left at `auto`, `duck-learn` puts a
-new model on trial and applies trial verdicts to `~/.askrubberduck/config.toml` itself, then tells
-you what it changed. Set it to `propose` to be asked first.
+The duck's own config asks too: `duck-learn` proposes each new model trial and each trial verdict.
+Set `[learn].discover` to `auto` and it puts a new model on trial and applies trial verdicts to
+`~/.askrubberduck/config.toml` itself, then tells you what it changed.
 
 ## How the duck carries a task
 
@@ -329,7 +329,7 @@ trust = "high"
 
 [learn]
 select = "fixed"            # list order; adaptive opts into review-only ranking
-discover = "auto"           # new models: off | propose | auto
+discover = "propose"        # new models: off | propose | auto
 shadow = 3                  # gates a trial model rides along without counting
 trial = []                  # models on trial; duck-learn fills and empties it
 
