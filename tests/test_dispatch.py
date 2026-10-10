@@ -155,6 +155,14 @@ def self_check() -> int:
             row = rows()[row_id]
             return row["verdict"], row["status"], row["outage"]
 
+        def finalized(row_id: str) -> tuple[str, str, str]:
+            """A cancelled dispatch's row, once its watchdog has finalized it."""
+            for _ in range(200):
+                if rows()[row_id]["status"] == "final":
+                    break
+                time.sleep(0.05)
+            return final(row_id)
+
         # 1. the verdict comes from codex's last-message file, not the log's echoed APPROVE; round 2
         # of trust work sits on its bound of 2 and runs; the row was pending while the seat ran
         code, out = run("reject", "g1", "--trust", "1", rnd=2)
@@ -332,8 +340,8 @@ def self_check() -> int:
         code, out = run("hang", "g9", "--id", "g9-hang", repo="t")
         assert code == 1 and final("g9-hang") == ("-", "final", "1") and "timeout" in out, out
 
-        # a signal to the script, Ctrl-C included, is a cancel: the row is final with the outage
-        # flag unknown
+        # a signal to the script, Ctrl-C included, is a cancel: dispatch ends by it, and the seat's
+        # watchdog stops the seat and finalizes the row with the outage flag unknown
         for sig, gate in ((signal.SIGTERM, "g10"), (signal.SIGINT, "g10i")):
             (root / "cancel.up").unlink(missing_ok=True)
             child = seat("cancel", gate)
@@ -343,8 +351,8 @@ def self_check() -> int:
                 time.sleep(0.05)
             child.send_signal(sig)
             out = child.communicate(timeout=60)[0]
-            assert final(f"{gate}-r1-review-gpt-6-sol") == ("-", "final", "-"), out
-            assert "cancelled" in out, out
+            assert child.returncode == -sig, (child.returncode, out)
+            assert finalized(f"{gate}-r1-review-gpt-6-sol") == ("-", "final", "-"), out
             with contextlib.suppress(ProcessLookupError):  # a cancel takes the seat's children too
                 os.kill(int((root / "cancel.pid").read_text()), 0)
                 raise AssertionError("the cancelled seat's child outlived it")
@@ -382,10 +390,10 @@ def self_check() -> int:
             raise AssertionError("the capture never started; the cancel would test nothing")
         child.send_signal(signal.SIGTERM)
         out = child.communicate(timeout=60)[0]
-        assert final("g11-cancel") == ("-", "final", "-") and not rival_diff.exists(), out
-        with contextlib.suppress(ProcessLookupError):  # the capture's git dies with the cancel
-            os.kill(int((fakes / "git.pid").read_text()), 0)
-            raise AssertionError("the cancelled capture's git outlived it")
+        assert finalized("g11-cancel") == ("-", "final", "-") and not rival_diff.exists(), out
+        # dispatch's own short-lived git may finish after it: the fake one sleeps, so end it here
+        with contextlib.suppress(ProcessLookupError):
+            os.kill(int((fakes / "git.pid").read_text()), signal.SIGKILL)
         # a rival that leaves no change is an outage
         subprocess.run(["git", "-C", str(racer), "reset", "-q", "--hard", base], check=True)
         subprocess.run(["git", "-C", str(racer), "clean", "-qfd"], check=True)

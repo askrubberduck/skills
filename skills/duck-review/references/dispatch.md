@@ -54,8 +54,8 @@ still counts.
 
 Run each seat with `python3 "$DISPATCH"` (`$DISPATCH` is the absolute path of `duck-review`'s
 `scripts/dispatch.py`, whatever the working directory), in the background; its `--help` lists the flags, so run that rather than reading the script. Where the turn is the
-whole session (`claude -p`), its end kills a background seat (`error: interrupted`) and strands its
-row `pending`: poll the seat's exit in bounded waits and end the turn only after it. The pinned ids
+whole session (`claude -p`), its end kills a background seat (`error: interrupted`) and its review is
+lost: poll the seat's exit in bounded waits and end the turn only after it. The pinned ids
 come from `~/.askrubberduck/config.toml`, never from memory (a `[repo."<origin>"]` table there
 overrides any key for that origin): `[models].review` (a review or a disposition), `[models].race`
 and `[models].plan`, each defaulting to `[families].reviewers` (default empty: the owner's setup
@@ -70,8 +70,7 @@ python3 "$DISPATCH" --gate "$GATE" --round "$N" --stage review --setup independe
 The script picks `codex exec`, `agy` or `claude -p` by the pin's family, runs from the
 `--out` file's directory — the seat's own scratch directory, never the target checkout, unless
 `--workdir` names a worktree the seat is meant to change (codex `-C`; refused for agy and Claude) — closes
-stdin, kills the whole process group past `[bounds].dispatch_timeout` (default 45m) and confirms it
-exited, and refuses a round past the caller's bound unless `--extended` carries the owner's
+stdin, kills the whole process group past `[bounds].dispatch_timeout` (default 45m), and refuses a round past the caller's bound unless `--extended` carries the owner's
 words. It exits 0 with a verdict, 1 on an outage and its cause, 2 when it refused, 3 when the seat
 changed the `--candidate` checkout. A race rival adds `--diff-base <sha> --diff-out <path>`: after
 a verdict the script writes the `--workdir` diff against that base whole; an outage writes none, and
@@ -156,5 +155,8 @@ of the same repository.
 
 Every dispatch attempt gets a row in `~/.askrubberduck/dispatches.tsv`, and `$DISPATCH` writes it:
 `pending` before the seat launches, finalized when the seat exits with minutes, verdict and outage.
-A row left `pending` is an interrupted run. `$LEDGER schema` prints the columns and their domains;
+The seat runs under a watchdog process: however dispatch ends, by any signal including SIGKILL, the
+watchdog stops the seat's process group and finalizes a row still `pending` with outage `-` a moment
+later. SIGTERM, SIGHUP and SIGINT leave the watchdog running; a row that stays `pending` means
+something else ended it (SIGKILL), or the ledger is locked. A seat process that leaves its process group (`setsid`) is beyond the stop. `$LEDGER schema` prints the columns and their domains;
 a plan critic's `PLAN: CONCUR | OBJECT` is recorded as verdict `CONCUR | OBJECT`.
