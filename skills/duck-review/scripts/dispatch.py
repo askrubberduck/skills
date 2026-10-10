@@ -200,7 +200,15 @@ def record(row: dict, new: bool) -> bool:
 
 def stop(child: subprocess.Popen) -> None:
     """Kill the seat's whole process group and wait until it is gone: a seat still writing after
-    the wait returns hands the next reader a shared file."""
+    the wait returns hands the next reader a shared file. A cancel waits until it is done."""
+    held = signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)
+    try:
+        _stop(child)
+    finally:
+        signal.pthread_sigmask(signal.SIG_SETMASK, held)
+
+
+def _stop(child: subprocess.Popen) -> None:
     for sig in (signal.SIGTERM, signal.SIGKILL):
         try:
             os.killpg(child.pid, sig)
