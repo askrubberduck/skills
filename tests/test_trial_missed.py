@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import contextlib
-import csv
 import io
 import os
 import sys
@@ -50,10 +49,10 @@ def findings(*causes: tuple[str, str, str]) -> list[dict]:
 def write_tables(root: Path, found: list[dict]) -> None:
     for name, columns, rows in (("dispatches.tsv", DISPATCH_COLUMNS, dispatches()),
                                 ("findings.tsv", FINDING_COLUMNS, found)):
-        with (root / name).open("w", encoding="utf-8", newline="") as stream:
-            writer = csv.DictWriter(stream, fieldnames=columns, delimiter="\t")
-            writer.writeheader()
-            writer.writerows(rows)
+        # as dispatch writes them: plain tab-joined fields, no quoting
+        (root / name).write_text("".join("\t".join(r) + "\n" for r in
+                                         [columns, *[[row[c] for c in columns] for row in rows]]),
+                                 encoding="utf-8")
 
 
 class PromoteTest(unittest.TestCase):
