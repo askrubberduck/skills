@@ -193,5 +193,60 @@ print(dispatch.launch([str(root / "codex")], root / "out", 0.3, root))
                 f"observed (SIGTERM disposition, late_write)={observed!r}")
 
 
+class CancelDuringSeatHomeFailure(unittest.TestCase):
+    def test_cancel_finalizes_pending_row_when_seat_home_creation_fails(self):
+        with tempfile.TemporaryDirectory(prefix="duck-rally-home-failure-") as directory:
+            root = Path(directory).resolve()
+            fake = root / "codex"
+            fake.write_text("#!/bin/sh\nprintf 'started' > \"$0.started\"\n")
+            fake.chmod(0o755)
+            brief = root / "brief"
+            brief.write_text("Review the fixture")
+            unavailable = root / "temp-parent"
+            unavailable.write_text("a file cannot hold temporary seat directories")
+            driver = """
+import os
+import signal
+import sys
+from unittest.mock import patch
+
+sys.dont_write_bytecode = True
+sys.path.insert(0, sys.argv.pop(1))
+import dispatch
+
+unavailable = sys.argv.pop(1)
+real_mkdtemp = dispatch.tempfile.mkdtemp
+
+def cancel_during_home_creation(*args, **kwargs):
+    os.kill(os.getpid(), signal.SIGTERM)
+    # Exercise a real filesystem failure after the pending row, before the guard.
+    return real_mkdtemp(*args, dir=unavailable, **kwargs)
+
+with patch.object(dispatch.tempfile, "mkdtemp", cancel_during_home_creation):
+    raise SystemExit(dispatch.main(sys.argv[1:]))
+"""
+            env = {**os.environ, "PATH": str(root), "HOME": str(root),
+                   "CODEX_HOME": str(root / "owner"),
+                   "ASKRUBBERDUCK_HOME": str(root / "ledger")}
+            completed = subprocess.run(
+                [sys.executable, "-c", driver, str(SCRIPTS), str(unavailable),
+                 "--gate", "home-failure-cancel", "--round", "1", "--stage", "review",
+                 "--setup", "independent", "--trust", "0", "--pin", "openai:fixture",
+                 "--prompt", str(brief), "--out", str(root / "out"), "--repo", "r"],
+                env=env, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=10)
+            with patch.dict(os.environ, env):
+                rows = ledger.read_table("dispatches.tsv", ledger.DISPATCH_COLUMNS,
+                                         ledger.DISPATCH_ENUMS)
+            self.assertEqual(len(rows), 1, completed.stdout + completed.stderr)
+            self.assertFalse((root / "codex.started").exists())
+            observed = (completed.returncode, rows[0]["status"], rows[0]["outage"])
+            self.assertEqual(
+                observed, (128 + signal.SIGTERM, "final", "-"),
+                "C1: a cancel after the pending row must exit 143 and finalize it even when "
+                "seat-home creation fails before the guard; "
+                f"observed {observed!r}. stdout={completed.stdout!r}, "
+                f"stderr={completed.stderr!r}")
+
+
 if __name__ == "__main__":
     unittest.main()

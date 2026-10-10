@@ -390,9 +390,10 @@ def run_seat(args) -> int:
     started = time.monotonic()
     verdict, cause, moved = "-", "crashed", []
     diff = Path(args.diff_out).resolve() if args.diff_out else None
-    isolated = Path(tempfile.mkdtemp(prefix=f"askrubberduck-{via}-")) if via != "claude" else None
+    isolated = None
     try:
         signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)  # a held cancel lands here, guarded
+        isolated = Path(tempfile.mkdtemp(prefix=f"askrubberduck-{via}-")) if via != "claude" else None
         if diff:
             diff.unlink(missing_ok=True)  # a reader waiting for it must not take a stale one
         answer.unlink(missing_ok=True)  # a stale answer from an earlier run is no answer
