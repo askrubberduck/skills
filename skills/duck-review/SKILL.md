@@ -32,7 +32,10 @@ Resolve the target, applicable base, constraints and prior dispositions as in pr
 for re-review also apply step 5. Inspect relevant risk surfaces such as behavior, failure recovery
 and maintainability. Use distinct lenses rather than a fixed reviewer count; delegate only when
 useful and authorized; what counts as a different family is in
-[challenge selection](references/challenge.md).
+[challenge selection](references/challenge.md). A seat from another family runs through
+[dispatch](references/dispatch.md) like a gate seat, with its ledger row (`--setup independent`) and
+its adjudicated findings in `findings.tsv`; its verdict line is that seat's result, never a gate
+verdict.
 
 Substantiate and adjudicate findings against the current target using the criteria below. Why a value,
 guard or construction already in the history exists is answered by [`duck-why`](../duck-why/SKILL.md)'s
