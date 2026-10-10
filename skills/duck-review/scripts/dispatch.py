@@ -44,7 +44,7 @@ OUTAGES = (("credits", r"out of credits|insufficient credits?|credit balance"),
            ("quota", r"quota|RESOURCE_EXHAUSTED|\b429\b|rate.?limit"),
            ("model rejected", r"not supported|unknown model|invalid model|model.not.found"),
            ("permission denied", r"permission\b[\s\S]{0,200}?\bdenied"))  # a wrapped message too
-TOKENS = re.compile(r"tokens used\s*:?\s*([\d,]+)", re.IGNORECASE)
+TOKENS = re.compile(r"tokens used\s*:?\s*(\d[\d,]*)", re.IGNORECASE)  # a count starts with a digit
 # A stage with its own ceiling counts against it; review and disposition share the round bound.
 STAGE_BOUNDS = {"plan": ("plan_rounds", 2), "rally": ("rally_turns", DEFAULT_RALLY_TURNS),
                 "roast": ("roast_passes", 2)}

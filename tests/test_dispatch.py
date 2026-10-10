@@ -20,7 +20,7 @@ sys.dont_write_bytecode = True  # no __pycache__ inside the shipped skill
 SCRIPTS = Path(__file__).resolve().parent.parent / "skills" / "duck-review" / "scripts"
 DISPATCH = SCRIPTS / "dispatch.py"
 sys.path.insert(0, str(SCRIPTS))
-from dispatch import classify
+from dispatch import classify, tokens_of
 from ledger import DISPATCH_COLUMNS, DISPATCH_ENUMS, read_table  # noqa: E402
 
 CONFIG_FIXTURE = """\
@@ -99,6 +99,8 @@ def self_check() -> int:
     real = "user\nReply with VERDICT: NOTE\ncodex\nVERDICT: NOTE\ndone\ntokens used\n8,187\nVERDICT: NOTE\ndone\n"
     assert classify("VERDICT: NOTE\ndone\n", "codex", False, 0, real) == ("NOTE", "")
     assert classify("", "codex", False, 0, real)[0] == "-"
+    # a "tokens used" with no digits after it is no count: the row still finalizes (rally serve 10)
+    assert tokens_of("tokens used\n,\n") == "-" and tokens_of("tokens used\n1,234") == "1234"
     # an answer without a verdict line is "no verdict", whatever the log's sandbox lines say (UP42)
     sandbox = "exec ls /etc\nPermission denied\nsucceeded in 0ms"
     assert classify("NO NEW IDEAS\n", "codex", False, 0, sandbox) == ("-", "no verdict")
