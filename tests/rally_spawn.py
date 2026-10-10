@@ -248,5 +248,75 @@ with patch.object(dispatch.tempfile, "mkdtemp", cancel_during_home_creation):
                 f"stderr={completed.stderr!r}")
 
 
+class CancelDuringFifoOpen(unittest.TestCase):
+    def test_cancel_ends_dispatch_while_output_fifo_has_no_reader(self):
+        with tempfile.TemporaryDirectory(prefix="duck-rally-fifo-") as directory:
+            root = Path(directory).resolve()
+            fake = root / "codex"
+            fake.write_text("#!/bin/sh\nprintf started > \"$0.started\"\n")
+            fake.chmod(0o755)
+            brief = root / "brief"
+            brief.write_text("Review the fixture")
+            out = root / "out"
+            os.mkfifo(out)
+            driver = """
+import sys
+from pathlib import Path
+from unittest.mock import patch
+
+sys.dont_write_bytecode = True
+sys.path.insert(0, sys.argv.pop(1))
+import dispatch
+
+root = Path(sys.argv.pop(1))
+real_open = Path.open
+
+def observe_output_open(path, mode="r", *args, **kwargs):
+    if path == root / "out" and mode == "w":
+        (root / "opening-output").touch()
+    return real_open(path, mode, *args, **kwargs)
+
+with patch.object(Path, "open", observe_output_open):
+    raise SystemExit(dispatch.main(sys.argv[1:]))
+"""
+            env = {**os.environ, "PATH": str(root), "HOME": str(root),
+                   "CODEX_HOME": str(root / "owner"),
+                   "ASKRUBBERDUCK_HOME": str(root / "ledger")}
+            child = subprocess.Popen(
+                [sys.executable, "-c", driver, str(SCRIPTS), str(root),
+                 "--gate", "fifo-cancel", "--round", "1", "--stage", "review",
+                 "--setup", "independent", "--trust", "0", "--pin", "openai:fixture",
+                 "--prompt", str(brief), "--out", str(out), "--repo", "r"],
+                env=env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE, text=True)
+            try:
+                deadline = time.monotonic() + 10
+                while not (root / "opening-output").exists():
+                    if child.poll() is not None or time.monotonic() >= deadline:
+                        self.fail("fixture did not reach the real output FIFO open")
+                    time.sleep(0.01)
+                child.send_signal(signal.SIGTERM)
+                try:
+                    stdout, stderr = child.communicate(timeout=2)
+                except subprocess.TimeoutExpired:
+                    stdout, stderr = "", ""
+                with patch.dict(os.environ, env):
+                    rows = ledger.read_table("dispatches.tsv", ledger.DISPATCH_COLUMNS,
+                                             ledger.DISPATCH_ENUMS)
+                self.assertEqual(len(rows), 1, stdout + stderr)
+                self.assertFalse((root / "codex.started").exists())
+                observed = (child.poll(), rows[0]["status"], rows[0]["outage"])
+                self.assertEqual(
+                    observed, (128 + signal.SIGTERM, "final", "-"),
+                    "C1: SIGTERM after the pending row must end dispatch and finalize the row "
+                    "without requiring a reader for its output FIFO; "
+                    f"observed (exit, status, outage)={observed!r}. "
+                    f"stdout={stdout!r}, stderr={stderr!r}")
+            finally:
+                if child.poll() is None:
+                    child.kill()
+                child.communicate(timeout=10)
+
+
 if __name__ == "__main__":
     unittest.main()

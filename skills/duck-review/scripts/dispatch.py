@@ -260,24 +260,25 @@ def seat_signals() -> None:
 def launch(argv: list[str], out: Path, limit: float, workdir: Path,
            env: dict[str, str] | None = None) -> tuple[bool, int]:
     """Run to completion or the limit: (whether the limit ended it, the exit code)."""
-    # A cancel during the spawn would skip stop(child) and leave the seat running: hold cancels until
-    # the child is in hand, then let one land inside the guard.
-    signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)
-    try:
-        with out.open("w") as sink:
+    # A cancel during the spawn would skip stop(child) and leave the seat running: hold cancels for
+    # the spawn alone, then let one land inside the guard. The output is opened first, so an open
+    # that blocks stays cancellable.
+    with out.open("w") as sink:
+        signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)
+        try:
             child = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=sink,
                                      stderr=subprocess.STDOUT, cwd=workdir, env=env,
                                      start_new_session=True, preexec_fn=seat_signals)
-        try:
-            signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)
-            return False, child.wait(timeout=limit)
-        except subprocess.TimeoutExpired:
-            return True, -1
-        finally:
-            stop(child)
+        except BaseException:
+            signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)  # no child: release a held cancel
+            raise
+    try:
+        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)
+        return False, child.wait(timeout=limit)
+    except subprocess.TimeoutExpired:
+        return True, -1
     finally:
-        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)  # the spawn failed: release a held cancel
-
+        stop(child)
 
 def capture(workdir: Path, base: str, dest: Path) -> str:
     """`add -A`, then the diff against `base`, landed whole: a reader never sees half a diff.
