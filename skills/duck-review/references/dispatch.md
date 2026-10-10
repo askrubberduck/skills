@@ -83,7 +83,13 @@ rival keeps `HOME`, and those skills with it, so the owner's toolchains still bu
 
 An agy seat runs with a fresh `HOME` holding only links to the owner's Google login
 (`~/.gemini/oauth_creds.json`, `~/.gemini/google_accounts.json`) and `~/Library/Keychains`,
-so the rules and skills in `~/.gemini/config` stay out.
+so the rules and skills in `~/.gemini/config` stay out. Headless agy ends a seat on any permission it
+would ask for: the seat's settings run every command in agy's sandbox and allow reading agy's own
+built-in skills and the `--add-dir` folders. The sandbox has no network and refuses a command's reads
+outside the workspace and its writes to the `--add-dir` folders, the seat's home and other scratch
+directories; it does let a command write directly under `/tmp`. A seat that writes with a tool, reads a file elsewhere, fetches a web page or
+asks to run a command outside the sandbox ends with no answer, so a brief for an agy seat asks for
+reading, not changing, names its files under an `--add-dir` folder and names no URL.
 
 **`--prompt` takes a UTF-8 brief file path; the script passes its contents as a CLI argument.**
 The material under review is a path inside that brief. Hand the reviewer
@@ -96,9 +102,7 @@ read-only file tools and no MCP servers. It excludes user settings, disables cus
 managed hooks; inspect those before claiming a shell-free seat. The tool route does not approve
 writes or shell execution. Claude and agy
 seats cannot take `--workdir` or serve as writable race/rally rivals; use a supported writable transport
-instead. agy runs in plan mode: headless, it denies whatever it would ask about, and plan mode keeps
-reads off that list while a write or a shell command still ends the seat with no answer, so an agy
-brief asks for file-reading tools only. Treat source-only findings as
+instead. Treat source-only findings as
 `tier = read`; claim executed evidence only when the seat supplies observed command output. The outer
 runner bounds all transports and finalizes their ledger rows on timeout or failure.
 
