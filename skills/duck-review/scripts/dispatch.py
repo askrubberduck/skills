@@ -127,7 +127,7 @@ def classify(text: str, via: str, timed_out: bool, code: int, log: str = "") -> 
         return verdict, ""
     answer = "\n".join(lines)
     for cause, pattern in OUTAGES:  # a seat that answered is judged by its answer, not its log
-        if re.search(pattern, answer if answer.strip() else log, re.IGNORECASE):
+        if re.search(pattern, text if text.strip() else log, re.IGNORECASE):
             return "-", cause
     if code != 0:
         return "-", f"exit {code}"
