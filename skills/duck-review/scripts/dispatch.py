@@ -249,20 +249,25 @@ def agy_env(home: Path) -> dict[str, str]:
     return {**os.environ, "HOME": str(home)}
 
 
+def seat_signals() -> None:
+    """In the seat, before exec: cancel signals at their defaults and unblocked, whatever dispatch
+    inherited or holds, so stop()'s SIGTERM reaches it."""
+    for sig in CANCELS:
+        signal.signal(sig, signal.SIG_DFL)
+    signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)
+
+
 def launch(argv: list[str], out: Path, limit: float, workdir: Path,
            env: dict[str, str] | None = None) -> tuple[bool, int]:
     """Run to completion or the limit: (whether the limit ended it, the exit code)."""
     # A cancel during the spawn would skip stop(child) and leave the seat running: hold cancels until
-    # the child is in hand (the child itself starts with them unblocked), then let one land inside
-    # the guard.
+    # the child is in hand, then let one land inside the guard.
     signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)
     try:
         with out.open("w") as sink:
             child = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=sink,
                                      stderr=subprocess.STDOUT, cwd=workdir, env=env,
-                                     start_new_session=True,
-                                     preexec_fn=lambda: signal.pthread_sigmask(signal.SIG_UNBLOCK,
-                                                                               CANCELS))
+                                     start_new_session=True, preexec_fn=seat_signals)
         try:
             signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)
             return False, child.wait(timeout=limit)
