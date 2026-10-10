@@ -549,3 +549,8 @@ Claude Code, default agent model, Sonnet judge, three runs per arm.
 With the plugin the agent proposes the promotion, as the new default says; the old grader fails it.
 Case score: 0.40 to 0.47 with, 0.27 to 0.60 without. `learn-01` now sets `discover = "auto"`
 explicitly, and `learn-02-promote-propose` covers the default: the promotion goes to the owner.
+
+Run on this change (2026-10-10, same setup, $1.85): `learn-01` 0.87 with the plugin, 0.60 without
+(+0.27); `learn-02` 0.93 with, 0.20 without (+0.73). With the plugin only `nothing-run` fails (the
+answer still claims a step ran, as before this change); without it the agent applies the promotion and
+puts both new models on trial.
