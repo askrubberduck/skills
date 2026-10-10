@@ -380,7 +380,8 @@ def shadow_rows(dispatches: list[dict], pin: str) -> list[dict]:
 def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
                   pin: str) -> tuple[str, str, list[tuple[str, str]]]:
     """(verdict, reason, missed) for a trial pin: `shadow` while it still rides along, then
-    `replace`, `add` or `drop`; missed holds a replace's (severity, cause_id) pairs. A trial that
+    `replace`, `add` or `drop`; missed holds the (severity, cause_id) pairs the trial missed on
+    its shared gates. A trial that
     cannot decide keeps riding up to twice its shadow count, then drops, so no pin sits in `trial`
     forever and blocks its family's next model."""
     needed = int(config.get("shadow", DEFAULT_SHADOW))
@@ -402,31 +403,12 @@ def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
             by_gate[(d["repo"], d["gate_id"])] = d
     rows = list(by_gate.values())[:2 * needed]
     counted = {(d["repo"], d["gate_id"]) for d in rows}  # any round of a counted gate
-    if any(d["outage"] == "1" for d in shadow_rows(dispatches, pin)
-           if (d["repo"], d["gate_id"]) in counted):
-        return "drop", "outage on a shadow gate", []
-    if len(rows) < needed:
-        return "shadow", f"{len(rows)}/{needed}", []
     distinct: dict[str, set[str]] = {}  # a cause recorded twice is still one cause
     for f in findings:
         if f["substantiated"] == "1":
             distinct.setdefault(f["dispatch_id"], set()).add(f["cause_id"])
-    caught = {ident: len(found) for ident, found in distinct.items()}
-    undecided = "drop" if len(rows) >= 2 * needed else "shadow"
-    if incumbent is None:
-        if sum(caught.get(d["id"], 0) for d in rows):
-            return "add", "no reviewer of its family; it substantiated a cause", []
-        return undecided, "no substantiated cause yet", []
-    # ponytail: "not worse on the shared gates" by summed substantiated causes; three gates cannot
-    # reach significance, so this only keeps out a clearly worse model. `paired` over more gates is
-    # the upgrade.
     shared = [d for d in rows if gate(d) in theirs]
-    own = sum(caught.get(d["id"], 0) for d in shared)
-    found = sum(caught.get(theirs[gate(d)]["id"], 0) for d in shared)
-    if len(shared) < needed or not (own or found):
-        # too few gates beside the incumbent, or all clean: nothing says which model is better
-        return undecided, f"{len(shared)} shared gates, {own} vs {found} causes", []
-    # the sum ignores severity: whoever applies the verdict sees what the trial missed
+    # the sum ignores severity: whoever applies the verdict sees what the trial missed so far
     rank = {"BLOCKER": 0, "SHOULD": 1, "NOTE": 2}
     known = lambda f: f.get("severity") if f.get("severity") in rank else "-"  # unknown sorts last
     missed = [(severity, cause) for _, severity, cause in sorted(
@@ -434,10 +416,28 @@ def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
          for f in findings if f["dispatch_id"] == theirs[gate(d)]["id"]
          and f["substantiated"] == "1"
          and f["cause_id"] not in distinct.get(d["id"], set())})]
+    if any(d["outage"] == "1" for d in shadow_rows(dispatches, pin)
+           if (d["repo"], d["gate_id"]) in counted):
+        return "drop", "outage on a shadow gate", missed
+    if len(rows) < needed:
+        return "shadow", f"{len(rows)}/{needed}", missed
+    caught = {ident: len(found) for ident, found in distinct.items()}
+    undecided = "drop" if len(rows) >= 2 * needed else "shadow"
+    if incumbent is None:
+        if sum(caught.get(d["id"], 0) for d in rows):
+            return "add", "no reviewer of its family; it substantiated a cause", missed
+        return undecided, "no substantiated cause yet", missed
+    # ponytail: "not worse on the shared gates" by summed substantiated causes; three gates cannot
+    # reach significance, so this only keeps out a clearly worse model. `paired` over more gates is
+    # the upgrade.
+    own = sum(caught.get(d["id"], 0) for d in shared)
+    found = sum(caught.get(theirs[gate(d)]["id"], 0) for d in shared)
+    if len(shared) < needed or not (own or found):
+        # too few gates beside the incumbent, or all clean: nothing says which model is better
+        return undecided, f"{len(shared)} shared gates, {own} vs {found} causes", missed
     if own >= found:
         return "replace", pin_of(incumbent), missed
     return "drop", f"{own} vs {found} causes on shared gates", missed
-
 
 def shadow_status(config: dict, dispatches: list[dict],
                   findings: list[dict]) -> list[tuple[str, str]]:

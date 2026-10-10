@@ -289,7 +289,7 @@ def roles_check(root: Path) -> None:
     rounds_f = findings + [dict(findings[2], dispatch_id=f"r{k}", cause_id=f"w{k}") for k in (2, 3)]
     three = dict(config, shadow=3)
     assert trial_verdict(three, dispatches + [dict(dispatches[2], id="r1", model="gpt-6-omega")]
-                         + rounds, rounds_f, "openai:gpt-6-omega:high") == ("shadow", "1/3", [])
+                         + rounds, rounds_f, "openai:gpt-6-omega:high")[:2] == ("shadow", "1/3")
     down = [dict(dispatches[0], id=f"o{g}", gate_id=g, candidate=g, outage="1") for g in "xyz"]
     ride = [dict(dispatches[2], id=f"t{g}", gate_id=g, candidate=g, model="gpt-6-tau") for g in "xyz"]
     tau_f = findings + [dict(findings[2], dispatch_id="tx", cause_id="u1", candidate="x")]
