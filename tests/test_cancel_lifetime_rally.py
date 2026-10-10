@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cancel-lifetime rally, serve 1: an inherited blocked cancel must still end the seat."""
+"""A cancel at any moment finalizes the row and stops the seat: cancel-lifetime rally serves 2, 4-7 (GPT-6.1 Sol, 2026-10-10)."""
 
 import os
 import signal
