@@ -43,7 +43,6 @@ OUTAGES = (("credits", r"out of credits|insufficient credits?|credit balance"),
            ("quota", r"quota|RESOURCE_EXHAUSTED|\b429\b|rate.?limit"),
            ("model rejected", r"not supported|unknown model|invalid model|model.not.found"),
            ("permission denied", r"permission\b[\s\S]{0,200}?\bdenied"))  # a wrapped message too
-CANCELS = {signal.SIGTERM, signal.SIGHUP, signal.SIGINT}  # the caller cancelling a seat
 TOKENS = re.compile(r"tokens used\s*:?\s*(\d[\d,]*)", re.IGNORECASE)  # a count starts with a digit
 # A stage with its own ceiling counts against it; review and disposition share the round bound.
 STAGE_BOUNDS = {"plan": ("plan_rounds", 2), "rally": ("rally_turns", DEFAULT_RALLY_TURNS),
@@ -200,15 +199,7 @@ def record(row: dict, new: bool) -> bool:
 
 def stop(child: subprocess.Popen) -> None:
     """Kill the seat's whole process group and wait until it is gone: a seat still writing after
-    the wait returns hands the next reader a shared file. A cancel waits until it is done."""
-    held = signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)
-    try:
-        _stop(child)
-    finally:
-        signal.pthread_sigmask(signal.SIG_SETMASK, held)
-
-
-def _stop(child: subprocess.Popen) -> None:
+    the wait returns hands the next reader a shared file."""
     for sig in (signal.SIGTERM, signal.SIGKILL):
         try:
             os.killpg(child.pid, sig)
@@ -249,40 +240,20 @@ def agy_env(home: Path) -> dict[str, str]:
     return {**os.environ, "HOME": str(home)}
 
 
-def seat_signals() -> None:
-    """In the seat, before exec: cancel signals at their defaults and unblocked, whatever dispatch
-    inherited or holds, so stop()'s SIGTERM reaches it."""
-    for sig in CANCELS:
-        signal.signal(sig, signal.SIG_DFL)
-    signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)
-
-
 def launch(argv: list[str], out: Path, limit: float, workdir: Path,
            env: dict[str, str] | None = None) -> tuple[bool, int]:
     """Run to completion or the limit: (whether the limit ended it, the exit code)."""
-    # A cancel during the spawn would skip stop(child) and leave the seat running: hold cancels for
-    # the spawn alone, then let one land inside the guard. The output is opened first, so an open
-    # that blocks stays cancellable, and closed only after the seat is stopped.
-    sink = out.open("w")
-    signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)
-    try:
+    with out.open("w") as sink:
         child = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=sink,
                                  stderr=subprocess.STDOUT, cwd=workdir, env=env,
-                                 start_new_session=True, preexec_fn=seat_signals)
-    except BaseException:
-        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)  # no child: release a held cancel
-        sink.close()
-        raise
+                                 start_new_session=True)
     try:
-        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)
         return False, child.wait(timeout=limit)
     except subprocess.TimeoutExpired:
         return True, -1
     finally:
-        try:
-            stop(child)
-        finally:
-            sink.close()
+        stop(child)
+
 
 def capture(workdir: Path, base: str, dest: Path) -> str:
     """`add -A`, then the diff against `base`, landed whole: a reader never sees half a diff.
@@ -376,30 +347,24 @@ def run_seat(args) -> int:
                status="pending", outage="-")
     if bad_values(row):
         return refuse(f"not a ledger value in {', '.join(bad_values(row))}")
+    if not record(row, new=True):
+        return refuse(f"{row_id} is already recorded; a rerun takes a new --id")
+    if reached > limit:
+        print(f"extended past the bound of {limit} rounds by the owner: {args.extended}")
+
     cancelled = []  # a signal to this script is the caller cancelling: no verdict, no outage
 
     def cancel(number, _):
         cancelled.append(number)
         sys.exit(128 + number)  # an interrupted run still finalizes its row
 
-    for sig in CANCELS:
+    for sig in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT):
         signal.signal(sig, cancel)
-    # handlers first: an inherited SIG_IGN would drop a cancel held across the pending write.
-    # From the pending row on, a cancel must finalize it: held until the guard below is in place
-    signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)
-    if not record(row, new=True):
-        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)
-        return refuse(f"{row_id} is already recorded; a rerun takes a new --id")
-
     started = time.monotonic()
     verdict, cause, moved = "-", "crashed", []
     diff = Path(args.diff_out).resolve() if args.diff_out else None
-    isolated = None
+    isolated = Path(tempfile.mkdtemp(prefix=f"askrubberduck-{via}-")) if via != "claude" else None
     try:
-        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)  # a held cancel lands here, guarded
-        if reached > limit:  # a print can block on a full pipe: never while cancels are held
-            print(f"extended past the bound of {limit} rounds by the owner: {args.extended}")
-        isolated = Path(tempfile.mkdtemp(prefix=f"askrubberduck-{via}-")) if via != "claude" else None
         if diff:
             diff.unlink(missing_ok=True)  # a reader waiting for it must not take a stale one
         answer.unlink(missing_ok=True)  # a stale answer from an earlier run is no answer
@@ -418,13 +383,11 @@ def run_seat(args) -> int:
             moved = [f"- {line}" for line in before if line not in after]
             moved += [f"+ {line}" for line in after if line not in before]
     finally:
-        signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)  # a second cancel waits for the final row
         if isolated:
             shutil.rmtree(isolated, ignore_errors=True)
         row.update(minutes=str(math.ceil((time.monotonic() - started) / 60)), verdict=verdict,
                    status="final", outage="0" if verdict != "-" else "-" if cancelled else "1")
         record(row, new=False)
-        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)  # before any print: one can block
         if cancelled:
             print(f"{row_id} cancelled {row['minutes']}m")
     for line in moved:
