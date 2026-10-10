@@ -149,5 +149,49 @@ while not (root / "release").exists():
                         pass
 
 
+class IgnoredTermInheritance(unittest.TestCase):
+    def test_launch_resets_inherited_ignored_sigterm_in_seat(self):
+        with tempfile.TemporaryDirectory(prefix="duck-rally-ignored-term-") as directory:
+            root = Path(directory).resolve()
+            fake = root / "codex"
+            fake.write_text(f"#!{sys.executable}\n" + """
+import signal
+import time
+from pathlib import Path
+
+root = Path(__file__).parent
+(root / "disposition").write_text(str(int(signal.getsignal(signal.SIGTERM))))
+time.sleep(0.6)
+(root / "late-write").write_text("seat ignored stop()'s SIGTERM")
+""")
+            fake.chmod(0o755)
+            driver = """
+import signal
+import sys
+from pathlib import Path
+
+sys.dont_write_bytecode = True
+sys.path.insert(0, sys.argv[1])
+import dispatch
+
+root = Path(sys.argv[2])
+# POSIX exec preserves SIG_IGN; exercise launch() with that inherited state.
+signal.signal(signal.SIGTERM, signal.SIG_IGN)
+print(dispatch.launch([str(root / "codex")], root / "out", 0.3, root))
+"""
+            completed = subprocess.run(
+                [sys.executable, "-c", driver, str(SCRIPTS), str(root)],
+                stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=10)
+            self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+            self.assertEqual(completed.stdout.strip(), "(True, -1)")
+            observed = (int((root / "disposition").read_text()),
+                        (root / "late-write").exists())
+            self.assertEqual(
+                observed, (int(signal.SIG_DFL), False),
+                "C2: the seat must start with default SIGTERM even when launch() inherits "
+                "SIG_IGN, so stop() can end it with SIGTERM; "
+                f"observed (SIGTERM disposition, late_write)={observed!r}")
+
+
 if __name__ == "__main__":
     unittest.main()
