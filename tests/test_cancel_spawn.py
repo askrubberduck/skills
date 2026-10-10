@@ -50,6 +50,31 @@ class CancelDuringSpawn(unittest.TestCase):
             self.assertFalse((worktree / "late-write.txt").exists(), "the cancelled seat ran on")
 
 
+class SpareFile(unittest.TestCase):
+    def test_a_fifo_at_the_spare_path_does_not_block_the_write(self):
+        # cancel-lifetime rally serve 1 (GPT-6.1 Sol): the final write opened a planted FIFO, held
+        with tempfile.TemporaryDirectory(prefix="duck-spare-fifo-") as directory:
+            root = Path(directory).resolve()
+            fake = root / "codex"
+            fake.write_text(f"#!{sys.executable}\nimport os, sys\nfrom pathlib import Path\n"
+                            "home = Path(os.environ['ASKRUBBERDUCK_HOME'])\n"
+                            "os.mkfifo(home / f'.dispatches.tsv.{os.getppid()}')\n"
+                            "Path(sys.argv[3]).write_text('VERDICT: NOTE\\n')\n")
+            fake.chmod(0o755)
+            (root / "brief").write_text("review the fixture")
+            env = {**os.environ, "PATH": f"{root}:{os.environ['PATH']}", "HOME": str(root),
+                   "CODEX_HOME": str(root / "owner"), "ASKRUBBERDUCK_HOME": str(root / "ledger")}
+            done = subprocess.run(
+                [sys.executable, str(SCRIPTS / "dispatch.py"), "--gate", "fifo", "--round", "1",
+                 "--stage", "review", "--setup", "independent", "--trust", "0", "--pin",
+                 "openai:fixture", "--prompt", str(root / "brief"), "--out", str(root / "out"),
+                 "--repo", "r"], env=env, capture_output=True, text=True, timeout=30)
+            with patch.dict(os.environ, env):
+                rows = ledger.read_table("dispatches.tsv", ledger.DISPATCH_COLUMNS,
+                                         ledger.DISPATCH_ENUMS)
+            self.assertEqual((done.returncode, rows[0]["status"]), (0, "final"), done.stderr)
+
+
 class BoundedLock(unittest.TestCase):
     def test_write_gives_up_when_another_writer_holds_the_lock(self):
         import fcntl

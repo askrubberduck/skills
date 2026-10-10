@@ -197,6 +197,8 @@ def record(row: dict, new: bool) -> bool:
         raise ValueError(f"refusing to write {', '.join(bad_values(row))}: {row}")
     line = "\t".join(row[c] for c in DISPATCH_COLUMNS) + "\n"
     with locked_ledger() as path:
+        if path.exists() and not path.is_file():  # a FIFO or device could block the held read
+            raise RuntimeError(f"{path}: not a regular file")
         try:  # rows end only at a newline, as ledger.read_table reads them
             text = path.read_text(encoding="utf-8")
             lines = [f"{line}\n" for line in text.removesuffix("\n").split("\n")] if text else []
@@ -213,7 +215,10 @@ def record(row: dict, new: bool) -> bool:
             lines.append(line)
         target = path.resolve()  # a symlinked table stays a symlink
         spare = target.with_name(f".{target.name}.{os.getpid()}")
-        spare.write_text("".join(lines), encoding="utf-8")
+        spare.unlink(missing_ok=True)  # created fresh: an existing FIFO there would block the write
+        with os.fdopen(os.open(spare, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644), "w",
+                       encoding="utf-8") as sink:
+            sink.write("".join(lines))
         os.replace(spare, target)
     return True
 
