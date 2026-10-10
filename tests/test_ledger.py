@@ -21,7 +21,7 @@ sys.path.insert(0, str(SCRIPTS))
 SEEDED = (f"import random, sys; random.seed(1); sys.path.insert(0, {str(SCRIPTS)!r}); "
           "import ledger; raise SystemExit(ledger.main(sys.argv[1:]))")
 from ledger import (DEFAULT_SHADOW, DISPATCH_COLUMNS, FINDING_COLUMNS, arm_of,  # noqa: E402
-                    chapman, load_config, load_tables, main, normalize_origin, number, pick_arms,
+                    chapman, home, load_config, load_tables, main, normalize_origin, number, pick_arms,
                     pin_of, precision_table, roster_for, sign_test, trial_verdict,
                     unique_blocker_dispatches, validate_row, with_effort)
 
@@ -269,7 +269,7 @@ def roles_check(root: Path) -> None:
                          dict(findings[0], cause_id="k6", severity="SHOULD"),
                          dict(findings[2], cause_id="k7")]  # the trial's own extra cause keeps it ahead
     assert trial_verdict(config, dispatches, missed, "openai:gpt-6-sol:high") == (
-        "replace", "openai:gpt-6-astra:high; missed SHOULD k6; missed NOTE k5")
+        "replace", "openai:gpt-6-astra:high", [("SHOULD", "k6"), ("NOTE", "k5")])
     clean = dict(dispatches[6], id="s9", gate_id="g10", candidate="c10")
     assert trial_verdict(config, dispatches + [clean], findings,
                          "google:gemini-3.8-flash-high")[0] == "drop"
@@ -289,7 +289,7 @@ def roles_check(root: Path) -> None:
     rounds_f = findings + [dict(findings[2], dispatch_id=f"r{k}", cause_id=f"w{k}") for k in (2, 3)]
     three = dict(config, shadow=3)
     assert trial_verdict(three, dispatches + [dict(dispatches[2], id="r1", model="gpt-6-omega")]
-                         + rounds, rounds_f, "openai:gpt-6-omega:high") == ("shadow", "1/3")
+                         + rounds, rounds_f, "openai:gpt-6-omega:high")[:2] == ("shadow", "1/3")
     down = [dict(dispatches[0], id=f"o{g}", gate_id=g, candidate=g, outage="1") for g in "xyz"]
     ride = [dict(dispatches[2], id=f"t{g}", gate_id=g, candidate=g, model="gpt-6-tau") for g in "xyz"]
     tau_f = findings + [dict(findings[2], dispatch_id="tx", cause_id="u1", candidate="x")]
@@ -554,6 +554,17 @@ def self_check() -> int:
 
         dispatches, findings = load_tables()
         assert len(dispatches) == 13 and len(findings) == 20
+        # a row ends only at a newline: U+2028 and its kin inside a cause id keep the row whole
+        odd = "a\u2028\u2029\x85\x0b\x0c\x1cz"
+        (root / "findings.tsv").write_text("\t".join(FINDING_COLUMNS) + "\n" + "\n".join(
+            FINDING_FIXTURE + [f"d1\tg1\tc1\t{odd}\tcorrectness\texecuted\tBLOCKER\t1\thuman"])
+            + "\n", encoding="utf-8")
+        assert load_tables()[1][-1]["cause_id"] == odd, load_tables()[1][-1]
+        (root / "findings.tsv").write_text("\t".join(FINDING_COLUMNS) + "\n"
+                                           + "\n".join(FINDING_FIXTURE) + "\n")
+        os.environ["ASKRUBBERDUCK_HOME"] = ""  # empty is unset, not the current directory
+        assert home() == Path("~/.askrubberduck").expanduser(), home()
+        os.environ["ASKRUBBERDUCK_HOME"] = str(root)
         assert number("-3") is None and number("3") == 3.0
         with contextlib.redirect_stderr(io.StringIO()) as complaint:
             assert not validate_row("t", 2, {"minutes": "-4", "round": "1", "tokens": "-"})

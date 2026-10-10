@@ -52,7 +52,7 @@ DRIFT_LIMIT = 0.5
 
 
 def home() -> Path:
-    return Path(os.environ.get("ASKRUBBERDUCK_HOME", "~/.askrubberduck")).expanduser()
+    return Path(os.environ.get("ASKRUBBERDUCK_HOME") or "~/.askrubberduck").expanduser()
 
 
 def normalize_origin(url: str) -> str:
@@ -102,7 +102,8 @@ def validate_row(name: str, line: int, row: dict) -> bool:
 def read_table(name: str, columns: tuple[str, ...], enums: dict[str, set]) -> list[dict]:
     path = home() / name
     try:
-        lines = path.read_text(encoding="utf-8").splitlines()
+        # rows end only at a newline: splitlines would also break at U+2028 and its kin in a field
+        lines = path.read_text(encoding="utf-8").removesuffix("\n").split("\n")
     except FileNotFoundError:
         if path.is_symlink() or home().is_symlink():  # dangling: configured, not absent
             raise SystemExit(f"{path}: dangling symlink")
@@ -113,7 +114,8 @@ def read_table(name: str, columns: tuple[str, ...], enums: dict[str, set]) -> li
         raise SystemExit(f"{path}: {error.strerror}")  # an unread table is no answer, not an empty one
     except UnicodeDecodeError as error:
         raise SystemExit(f"{path}: not UTF-8 ({error.reason} at byte {error.start})")
-    reader = csv.reader(lines, delimiter="\t")
+    # written as plain tab-joined fields: no quoting, no field limit, so no csv parser on the way back
+    reader = (line.split("\t") for line in lines)
     if next(reader, None) != list(columns):
         raise SystemExit(f"{path}:1: header does not match {', '.join(columns)}")
     rows = []
@@ -377,18 +379,12 @@ def shadow_rows(dispatches: list[dict], pin: str) -> list[dict]:
 
 
 def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
-                  pin: str) -> tuple[str, str]:
-    """(verdict, reason) for a trial pin: `shadow` while it still rides along, then `replace`,
-    `add` or `drop`. A trial that cannot decide keeps riding up to twice its shadow count, then
-    drops, so no pin sits in `trial` forever and blocks its family's next model."""
-    verdict, reason, missed = trial_result(config, dispatches, findings, pin)
-    return verdict, reason + "".join(f"; missed {severity} {cause}" for severity, cause in missed)
-
-
-def trial_result(config: dict, dispatches: list[dict], findings: list[dict],
-                 pin: str) -> tuple[str, str, list[tuple[str, str]]]:
-    """`trial_verdict`, with a replace's missed causes as (severity, cause_id) pairs: a cause id
-    may hold any text, so a caller never splits them back out of the reason."""
+                  pin: str) -> tuple[str, str, list[tuple[str, str]]]:
+    """(verdict, reason, missed) for a trial pin: `shadow` while it still rides along, then
+    `replace`, `add` or `drop`; missed holds the (severity, cause_id) pairs the trial missed on
+    its shared gates. A trial that
+    cannot decide keeps riding up to twice its shadow count, then drops, so no pin sits in `trial`
+    forever and blocks its family's next model."""
     needed = int(config.get("shadow", DEFAULT_SHADOW))
     family = arm_of(pin)[0]
     on_trial = {arm_of(p)[:2] for p in config.get("trial", [])}
@@ -408,48 +404,46 @@ def trial_result(config: dict, dispatches: list[dict], findings: list[dict],
             by_gate[(d["repo"], d["gate_id"])] = d
     rows = list(by_gate.values())[:2 * needed]
     counted = {(d["repo"], d["gate_id"]) for d in rows}  # any round of a counted gate
-    if any(d["outage"] == "1" for d in shadow_rows(dispatches, pin)
-           if (d["repo"], d["gate_id"]) in counted):
-        return "drop", "outage on a shadow gate", []
-    if len(rows) < needed:
-        return "shadow", f"{len(rows)}/{needed}", []
     distinct: dict[str, set[str]] = {}  # a cause recorded twice is still one cause
     for f in findings:
         if f["substantiated"] == "1":
             distinct.setdefault(f["dispatch_id"], set()).add(f["cause_id"])
+    shared = [d for d in rows if gate(d) in theirs]
+    # the sum ignores severity: whoever applies the verdict sees what the trial missed so far
+    rank = {"BLOCKER": 0, "SHOULD": 1, "NOTE": 2}
+    known = lambda f: f.get("severity") if f.get("severity") in rank else "-"  # unknown sorts last
+    missed = [(severity, cause) for _, severity, cause in sorted(
+        {(rank.get(known(f), 3), known(f), f["cause_id"]) for d in shared
+         for f in findings if f["dispatch_id"] == theirs[gate(d)]["id"]
+         and f["substantiated"] == "1"
+         and f["cause_id"] not in distinct.get(d["id"], set())})]
+    if any(d["outage"] == "1" for d in shadow_rows(dispatches, pin)
+           if (d["repo"], d["gate_id"]) in counted):
+        return "drop", "outage on a shadow gate", missed
+    if len(rows) < needed:
+        return "shadow", f"{len(rows)}/{needed}", missed
     caught = {ident: len(found) for ident, found in distinct.items()}
     undecided = "drop" if len(rows) >= 2 * needed else "shadow"
     if incumbent is None:
         if sum(caught.get(d["id"], 0) for d in rows):
-            return "add", "no reviewer of its family; it substantiated a cause", []
-        return undecided, "no substantiated cause yet", []
+            return "add", "no reviewer of its family; it substantiated a cause", missed
+        return undecided, "no substantiated cause yet", missed
     # ponytail: "not worse on the shared gates" by summed substantiated causes; three gates cannot
     # reach significance, so this only keeps out a clearly worse model. `paired` over more gates is
     # the upgrade.
-    shared = [d for d in rows if gate(d) in theirs]
     own = sum(caught.get(d["id"], 0) for d in shared)
     found = sum(caught.get(theirs[gate(d)]["id"], 0) for d in shared)
     if len(shared) < needed or not (own or found):
         # too few gates beside the incumbent, or all clean: nothing says which model is better
-        return undecided, f"{len(shared)} shared gates, {own} vs {found} causes", []
+        return undecided, f"{len(shared)} shared gates, {own} vs {found} causes", missed
     if own >= found:
-        # the sum ignores severity: whoever applies the replace sees what the trial missed
-        rank = {"BLOCKER": 0, "SHOULD": 1, "NOTE": 2}
-        known = lambda f: f.get("severity") if f.get("severity") in rank else "-"  # unknown sorts last
-        missed = sorted({(rank.get(known(f), 3), known(f), f["cause_id"]) for d in shared
-                         for f in findings if f["dispatch_id"] == theirs[gate(d)]["id"]
-                         and f["substantiated"] == "1"
-                         and f["cause_id"] not in {g["cause_id"] for g in findings
-                                                   if g["dispatch_id"] == d["id"]
-                                                   and g["substantiated"] == "1"}})
-        return "replace", pin_of(incumbent), [(severity, cause) for _, severity, cause in missed]
-    return "drop", f"{own} vs {found} causes on shared gates", []
-
+        return "replace", pin_of(incumbent), missed
+    return "drop", f"{own} vs {found} causes on shared gates", missed
 
 def shadow_status(config: dict, dispatches: list[dict],
                   findings: list[dict]) -> list[tuple[str, str]]:
     return [(pin, reason) for pin in config.get("trial", [])
-            for verdict, reason in [trial_verdict(config, dispatches, findings, pin)]
+            for verdict, reason, _ in [trial_verdict(config, dispatches, findings, pin)]
             if verdict == "shadow"]
 
 
@@ -485,7 +479,7 @@ def cmd_promote(args) -> int:
     config = load_config(args.repo or default_origin())
     dispatches, findings = load_tables()
     for pin in config.get("trial", []):
-        verdict, reason, missed = trial_result(config, dispatches, findings, pin)
+        verdict, reason, missed = trial_verdict(config, dispatches, findings, pin)
         if verdict == "replace":
             print(f"replace {reason} with {pin} in review")
             for severity, cause in missed:
