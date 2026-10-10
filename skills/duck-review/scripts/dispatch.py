@@ -240,7 +240,10 @@ def agy_env(home: Path) -> dict[str, str]:
             (home / part).symlink_to((owner / part).resolve())
     settings = home / ".gemini" / "antigravity-cli" / "settings.json"
     settings.parent.mkdir()
-    settings.write_text(json.dumps({"permissions": {"allow": ["command(*)"]}}))
+    # agy's built-in skills unpack into the seat's home; reading them must not end the seat, while
+    # the rest of the home, the login links, stays unreadable
+    builtin = (settings.parent / "builtin").resolve()
+    settings.write_text(json.dumps({"permissions": {"allow": ["command(*)", f"read_file({builtin})"]}}))
     return {**os.environ, "HOME": str(home)}
 
 

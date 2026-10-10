@@ -240,8 +240,9 @@ def self_check() -> int:
             f"{seat_home}/Library:", "Keychains"], (root / "env.gemini").read_text()
         assert not Path(seat_home).exists(), "the seat's home outlived the run"
         # its own settings allow every command; --sandbox in the argv keeps a command from writing
-        assert json.loads((root / "env.settings").read_text()) == {
-            "permissions": {"allow": ["command(*)"]}}, (root / "env.settings").read_text()
+        allowed = json.loads((root / "env.settings").read_text())["permissions"]["allow"]
+        assert allowed == ["command(*)", f"read_file({Path(seat_home).resolve()}"
+                           "/.gemini/antigravity-cli/builtin)"], allowed
         code, out = run("greeting", "g1b")  # the prompt's verdict is no answer
         assert code == 1 and final("g1b-r1-review-gpt-6-sol") == ("-", "final", "1"), out
         assert "no verdict" in out, out
