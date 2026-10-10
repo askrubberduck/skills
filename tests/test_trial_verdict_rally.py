@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Trial verdicts report missed causes under every verdict: rally serves 1-2 (GPT-6.1 Sol, 2026-10-10)."""
 import sys
 import unittest
 from pathlib import Path
@@ -9,7 +10,7 @@ sys.path.insert(0, str(SCRIPTS))
 from ledger import DISPATCH_COLUMNS, FINDING_COLUMNS, trial_verdict
 
 
-class RallyV3151(unittest.TestCase):
+class MissedEveryVerdict(unittest.TestCase):
     def test_shadow_trial_reports_missed_cause_before_threshold(self):
         incumbent = "openai:gpt-6-inc:high"
         pin = "openai:gpt-6-trial:high"
@@ -52,6 +53,7 @@ class RallyV3151(unittest.TestCase):
         self.assertEqual(
             trial_verdict(config, dispatches, findings, pin),
             ("drop", "1 vs 2 causes on shared gates", [("BLOCKER", "missed-blocker")]))
+
 
 
 if __name__ == "__main__":
