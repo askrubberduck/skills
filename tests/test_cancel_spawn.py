@@ -50,5 +50,26 @@ class CancelDuringSpawn(unittest.TestCase):
             self.assertFalse((worktree / "late-write.txt").exists(), "the cancelled seat ran on")
 
 
+class BoundedLock(unittest.TestCase):
+    def test_write_gives_up_when_another_writer_holds_the_lock(self):
+        import fcntl
+        with tempfile.TemporaryDirectory(prefix="duck-lock-") as directory:
+            row = {c: "-" for c in ledger.DISPATCH_COLUMNS}
+            row.update(id="locked", gate_id="g", round="1", date="2026-10-10", repo="r",
+                       stage="review", setup="independent", trust="0", family="openai",
+                       model="m", status="pending", outage="-")
+            holder = os.open(directory, os.O_RDONLY)
+            fcntl.flock(holder, fcntl.LOCK_EX)  # another writer, never letting go
+            try:
+                with patch.dict(os.environ, {"ASKRUBBERDUCK_HOME": directory}), \
+                        patch.object(dispatch, "LOCK_WAIT", 0.2):
+                    started = time.monotonic()
+                    with self.assertRaises(RuntimeError):
+                        dispatch.record(row, new=True)
+                    self.assertLess(time.monotonic() - started, 5)
+            finally:
+                os.close(holder)
+
+
 if __name__ == "__main__":
     unittest.main()

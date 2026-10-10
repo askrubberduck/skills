@@ -44,6 +44,7 @@ OUTAGES = (("credits", r"out of credits|insufficient credits?|credit balance"),
            ("model rejected", r"not supported|unknown model|invalid model|model.not.found"),
            ("permission denied", r"permission\b[\s\S]{0,200}?\bdenied"))  # a wrapped message too
 CANCELS = {signal.SIGTERM, signal.SIGHUP, signal.SIGINT}  # the caller cancelling a seat
+LOCK_WAIT = 30  # seconds another writer may hold the ledger before a write gives up
 TOKENS = re.compile(r"tokens used\s*:?\s*(\d[\d,]*)", re.IGNORECASE)  # a count starts with a digit
 # A stage with its own ceiling counts against it; review and disposition share the round bound.
 STAGE_BOUNDS = {"plan": ("plan_rounds", 2), "rally": ("rally_turns", DEFAULT_RALLY_TURNS),
@@ -165,10 +166,29 @@ def locked_ledger():
     home().mkdir(parents=True, exist_ok=True)
     fd = os.open(home(), os.O_RDONLY)
     try:
-        fcntl.flock(fd, fcntl.LOCK_EX)
+        deadline = time.monotonic() + LOCK_WAIT  # bounded: it may run while cancels are held
+        while True:
+            try:
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                break
+            except BlockingIOError:
+                if time.monotonic() > deadline:
+                    raise RuntimeError(f"{home()}: ledger lock held over {LOCK_WAIT}s") from None
+                time.sleep(0.05)
         yield home() / "dispatches.tsv"
     finally:
         os.close(fd)
+
+
+@contextlib.contextmanager
+def held():
+    """Cancels wait while a short, bounded step runs (a ledger write, the spawn, stopping a seat), and
+    land as it ends. Nothing that can block, an open or a print, runs held."""
+    previous = signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)
+    try:
+        yield
+    finally:
+        signal.pthread_sigmask(signal.SIG_SETMASK, previous)
 
 
 def record(row: dict, new: bool) -> bool:
@@ -200,12 +220,9 @@ def record(row: dict, new: bool) -> bool:
 
 def stop(child: subprocess.Popen) -> None:
     """Kill the seat's whole process group and wait until it is gone: a seat still writing after
-    the wait returns hands the next reader a shared file. A cancel waits until it is done."""
-    held = signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)
-    try:
+    the wait returns hands the next reader a shared file."""
+    with held():
         _stop(child)
-    finally:
-        signal.pthread_sigmask(signal.SIG_SETMASK, held)
 
 
 def _stop(child: subprocess.Popen) -> None:
@@ -260,27 +277,19 @@ def seat_signals() -> None:
 def launch(argv: list[str], out: Path, limit: float, workdir: Path,
            env: dict[str, str] | None = None) -> tuple[bool, int]:
     """Run to completion or the limit: (whether the limit ended it, the exit code)."""
-    # A cancel during the spawn would skip stop(child) and leave the seat running: hold cancels for
-    # the spawn alone, then let one land inside the guard. The output is opened first, so an open
-    # that blocks stays cancellable, and closed only after the seat is stopped.
-    sink = out.open("w")
-    signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)
+    sink, child = out.open("w"), None  # the open may block: not held
     try:
-        child = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=sink,
-                                 stderr=subprocess.STDOUT, cwd=workdir, env=env,
-                                 start_new_session=True, preexec_fn=seat_signals)
-    except BaseException:
-        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)  # no child: release a held cancel
-        sink.close()
-        raise
-    try:
-        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)
+        with held():  # a cancel mid-spawn lands once `child` is set, so stop() sees it
+            child = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=sink,
+                                     stderr=subprocess.STDOUT, cwd=workdir, env=env,
+                                     start_new_session=True, preexec_fn=seat_signals)
         return False, child.wait(timeout=limit)
     except subprocess.TimeoutExpired:
         return True, -1
     finally:
         try:
-            stop(child)
+            if child:
+                stop(child)
         finally:
             sink.close()
 
@@ -382,22 +391,18 @@ def run_seat(args) -> int:
         cancelled.append(number)
         sys.exit(128 + number)  # an interrupted run still finalizes its row
 
-    for sig in CANCELS:
+    for sig in CANCELS:  # before the pending row: an inherited SIG_IGN would drop a held cancel
         signal.signal(sig, cancel)
-    # handlers first: an inherited SIG_IGN would drop a cancel held across the pending write.
-    # From the pending row on, a cancel must finalize it: held until the guard below is in place
-    signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)
-    if not record(row, new=True):
-        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)
-        return refuse(f"{row_id} is already recorded; a rerun takes a new --id")
-
     started = time.monotonic()
     verdict, cause, moved = "-", "crashed", []
     diff = Path(args.diff_out).resolve() if args.diff_out else None
-    isolated = None
+    isolated, ours = None, False
     try:
-        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)  # a held cancel lands here, guarded
-        if reached > limit:  # a print can block on a full pipe: never while cancels are held
+        with held():  # a cancel after the pending write lands here, and the row is ours to finalize
+            ours = record(row, new=True)
+        if not ours:
+            return refuse(f"{row_id} is already recorded; a rerun takes a new --id")
+        if reached > limit:
             print(f"extended past the bound of {limit} rounds by the owner: {args.extended}")
         isolated = Path(tempfile.mkdtemp(prefix=f"askrubberduck-{via}-")) if via != "claude" else None
         if diff:
@@ -418,15 +423,16 @@ def run_seat(args) -> int:
             moved = [f"- {line}" for line in before if line not in after]
             moved += [f"+ {line}" for line in after if line not in before]
     finally:
-        signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)  # a second cancel waits for the final row
         if isolated:
             shutil.rmtree(isolated, ignore_errors=True)
-        row.update(minutes=str(math.ceil((time.monotonic() - started) / 60)), verdict=verdict,
-                   status="final", outage="0" if verdict != "-" else "-" if cancelled else "1")
-        record(row, new=False)
-        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)  # before any print: one can block
-        if cancelled:
-            print(f"{row_id} cancelled {row['minutes']}m")
+        if ours:
+            with held():  # a cancel landing now keeps the outcome already decided: exit code only
+                row.update(minutes=str(math.ceil((time.monotonic() - started) / 60)),
+                           verdict=verdict, status="final",
+                           outage="0" if verdict != "-" else "-" if cancelled else "1")
+                record(row, new=False)
+            if cancelled:
+                print(f"{row_id} cancelled {row['minutes']}m")
     for line in moved:
         print(f"candidate moved: {line}")
     print(f"{row_id} {verdict if verdict != '-' else f'outage: {cause}'} {row['minutes']}m")
