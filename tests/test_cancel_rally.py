@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cancellation immediately after the pending row is durable must finalize it (C1)."""
+"""Cancels finalize the row and stop the seat: spawn rally serves 1, 2, 4, 5, 7, 8 (GPT-6.1 Sol, 2026-10-10)."""
 
 import os
 import signal
