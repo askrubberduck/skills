@@ -43,7 +43,7 @@ OUTAGES = (("credits", r"out of credits|insufficient credits?|credit balance"),
            ("quota", r"quota|RESOURCE_EXHAUSTED|\b429\b|rate.?limit"),
            ("model rejected", r"not supported|unknown model|invalid model|model.not.found"),
            ("permission denied", r"permission\b[\s\S]{0,200}?\bdenied"))  # a wrapped message too
-TOKENS = re.compile(r"tokens used\s*:?\s*([\d,]+)", re.IGNORECASE)
+TOKENS = re.compile(r"tokens used\s*:?\s*(\d[\d,]*)", re.IGNORECASE)  # a count starts with a digit
 # A stage with its own ceiling counts against it; review and disposition share the round bound.
 STAGE_BOUNDS = {"plan": ("plan_rounds", 2), "rally": ("rally_turns", DEFAULT_RALLY_TURNS),
                 "roast": ("roast_passes", 2)}
@@ -119,8 +119,10 @@ def classify(text: str, via: str, timed_out: bool, code: int, log: str = "") -> 
     if verdict and code == 0:
         return verdict, ""
     answer = "\n".join(lines)
+    # a seat that answered and exited cleanly is judged by its answer, not its log
+    seen = text if text.strip() and code == 0 else text + "\n" + log
     for cause, pattern in OUTAGES:
-        if re.search(pattern, answer + "\n" + log, re.IGNORECASE):
+        if re.search(pattern, seen, re.IGNORECASE):
             return "-", cause
     if code != 0:
         return "-", f"exit {code}"
@@ -149,7 +151,9 @@ def snapshot(checkout: str) -> list[str]:
 
 def bad_values(row: dict) -> list[str]:
     bad = [c for c, allowed in DISPATCH_ENUMS.items() if row[c] != "-" and row[c] not in allowed]
-    bad += [c for c, value in row.items() if not value or re.search(r"[\t\r\n]", value)]
+    # one physical row per record: anything splitlines() breaks at would split it (record, ledger)
+    bad += [c for c, value in row.items() if not value or "\t" in value
+            or value.splitlines() != [value]]
     return bad if validate_row("dispatches.tsv", 0, row) else bad + ["numbers"]
 
 
@@ -172,8 +176,9 @@ def record(row: dict, new: bool) -> bool:
         raise ValueError(f"refusing to write {', '.join(bad_values(row))}: {row}")
     line = "\t".join(row[c] for c in DISPATCH_COLUMNS) + "\n"
     with locked_ledger() as path:
-        try:
-            lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
+        try:  # rows end only at a newline, as ledger.read_table reads them
+            text = path.read_text(encoding="utf-8")
+            lines = [f"{line}\n" for line in text.removesuffix("\n").split("\n")] if text else []
         except FileNotFoundError:
             lines = []
         lines = lines or ["\t".join(DISPATCH_COLUMNS) + "\n"]

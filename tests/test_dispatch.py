@@ -19,7 +19,7 @@ sys.dont_write_bytecode = True  # no __pycache__ inside the shipped skill
 SCRIPTS = Path(__file__).resolve().parent.parent / "skills" / "duck-review" / "scripts"
 DISPATCH = SCRIPTS / "dispatch.py"
 sys.path.insert(0, str(SCRIPTS))
-from dispatch import classify
+from dispatch import classify, tokens_of
 from ledger import DISPATCH_COLUMNS, DISPATCH_ENUMS, read_table  # noqa: E402
 
 CONFIG_FIXTURE = """\
@@ -96,6 +96,12 @@ def self_check() -> int:
     real = "user\nReply with VERDICT: NOTE\ncodex\nVERDICT: NOTE\ndone\ntokens used\n8,187\nVERDICT: NOTE\ndone\n"
     assert classify("VERDICT: NOTE\ndone\n", "codex", False, 0, real) == ("NOTE", "")
     assert classify("", "codex", False, 0, real)[0] == "-"
+    # an answer without a verdict line is "no verdict", whatever the log's sandbox lines say (UP42)
+    sandbox = "exec ls /etc\nPermission denied\nsucceeded in 0ms"
+    assert classify("NO NEW IDEAS\n", "codex", False, 0, sandbox) == ("-", "no verdict")
+    assert classify("", "codex", False, 1, "ERROR: You're out of credits.") == ("-", "credits")
+    # a "tokens used" with no digits after it is no count: the row still finalizes (rally serve 10)
+    assert tokens_of("tokens used\n,\n") == "-" and tokens_of("tokens used\n1,234") == "1234"
     with tempfile.TemporaryDirectory(prefix="askrubberduck-dispatch-") as directory:
         root = Path(directory).resolve()  # macOS: /var is /private/var
         os.environ["ASKRUBBERDUCK_HOME"] = str(root)
@@ -196,6 +202,20 @@ def self_check() -> int:
         assert code == 2 and "read-only" in out and len(rows()) == count, out
         code, out = run("reject", "g1w", "--workdir", "", "--id", "g1w-empty")
         assert code == 2 and "--workdir is empty" in out and len(rows()) == count, out
+        for odd in ("seat\u2028one", "seat\x85one", "seat\x0bone"):  # one record, one physical row
+            code, out = run("reject", "g1w", "--id", odd)
+            assert code == 2 and "not a ledger value in id" in out and len(rows()) == count, out
+        # a stored row from before that check, its id holding U+2028, is still one row: a new seat
+        # named like its second half is not taken for a duplicate (gate F2)
+        legacy = ["legacy\u2028collision", "g1l", "1", "2026-10-01", "r", "review", "independent", "0",
+                  "-", "openai", "gpt-6-sol", "high", "1", "-", "NOTE", "final", "0"]
+        with (root / "dispatches.tsv").open("a", encoding="utf-8") as table:
+            table.write("\t".join(legacy) + "\n")
+        code, out = run("reject", "g1l", "--id", "collision")
+        assert code == 0 and final("collision") == ("REJECT", "final", "0"), out
+        table = root / "dispatches.tsv"
+        table.write_text("".join(l + "\n" for l in table.read_text(encoding="utf-8").split("\n")
+                                 if l and not l.startswith("legacy")), encoding="utf-8")
         # a codex seat gets its own CODEX_HOME with only the owner's login linked in, and as HOME
         # too unless it is a rival; the home is gone after the run
         owner = root / "owner-codex"
