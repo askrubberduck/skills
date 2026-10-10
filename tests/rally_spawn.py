@@ -6,6 +6,7 @@ import signal
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -65,6 +66,87 @@ with patch.object(dispatch, "record", cancel_after_pending):
                 "C1: SIGTERM after the pending write must exit 143 and finalize the row; "
                 f"observed {observed!r}. stdout={completed.stdout!r}, "
                 f"stderr={completed.stderr!r}")
+
+
+class CancelDuringStop(unittest.TestCase):
+    def test_cancel_during_term_grace_period_stops_seat_before_exit(self):
+        with tempfile.TemporaryDirectory(prefix="duck-rally-stop-") as directory:
+            root = Path(directory).resolve()
+            fake = root / "codex"
+            fake.write_text(f"#!{sys.executable}\n" + """
+import os
+import signal
+import time
+from pathlib import Path
+
+root = Path(__file__).parent
+
+def term_received(number, frame):
+    (root / "term-received").write_text("SIGTERM")
+
+signal.signal(signal.SIGTERM, term_received)
+(root / "seat.pid").write_text(str(os.getpid()))
+while not (root / "release").exists():
+    time.sleep(0.01)
+(root / "late-write").write_text("seat ran after dispatch exited")
+""")
+            fake.chmod(0o755)
+            brief = root / "brief"
+            brief.write_text("Review the fixture")
+            home = root / "ledger"
+            home.mkdir()
+            (home / "config.toml").write_text('[bounds]\ndispatch_timeout = "1s"\n')
+            env = {**os.environ, "PATH": str(root), "HOME": str(root),
+                   "CODEX_HOME": str(root / "owner"), "ASKRUBBERDUCK_HOME": str(home)}
+            seat_pid = None
+            child = subprocess.Popen(
+                [sys.executable, str(SCRIPTS / "dispatch.py"),
+                 "--gate", "stop-cancel", "--round", "1", "--stage", "review",
+                 "--setup", "independent", "--trust", "0", "--pin", "openai:fixture",
+                 "--prompt", str(brief), "--out", str(root / "out"), "--repo", "r"],
+                env=env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE, text=True)
+            try:
+                deadline = time.monotonic() + 10
+                while not (root / "term-received").exists():
+                    if child.poll() is not None or time.monotonic() >= deadline:
+                        self.fail("fixture did not reach stop()'s SIGTERM grace period")
+                    time.sleep(0.01)
+                seat_pid = int((root / "seat.pid").read_text())
+                child.send_signal(signal.SIGTERM)
+                stdout, stderr = child.communicate(timeout=10)
+                try:
+                    os.killpg(seat_pid, 0)
+                    seat_survived = True
+                except (ProcessLookupError, PermissionError):
+                    seat_survived = False
+                # Release only after dispatch exits, so the write proves continued execution.
+                (root / "release").touch()
+                deadline = time.monotonic() + 1
+                while not (root / "late-write").exists() and time.monotonic() < deadline:
+                    time.sleep(0.01)
+                with patch.dict(os.environ, env):
+                    rows = ledger.read_table("dispatches.tsv", ledger.DISPATCH_COLUMNS,
+                                             ledger.DISPATCH_ENUMS)
+                self.assertEqual(len(rows), 1, stdout + stderr)
+                observed = (child.returncode, rows[0]["status"], rows[0]["outage"],
+                            seat_survived, (root / "late-write").exists())
+                self.assertEqual(
+                    observed, (128 + signal.SIGTERM, "final", "-", False, False),
+                    "C1: cancel during stop() must finish killing the seat before dispatch exits; "
+                    f"observed (exit, status, outage, seat_survived, late_write)={observed!r}; "
+                    f"stdout={stdout!r}, stderr={stderr!r}")
+            finally:
+                if child.poll() is None:
+                    child.kill()
+                child.communicate(timeout=10)
+                if seat_pid is None and (root / "seat.pid").exists():
+                    seat_pid = int((root / "seat.pid").read_text())
+                if seat_pid is not None:
+                    try:
+                        os.killpg(seat_pid, signal.SIGKILL)
+                    except (ProcessLookupError, PermissionError):
+                        pass
 
 
 if __name__ == "__main__":
