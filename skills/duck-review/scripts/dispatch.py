@@ -372,14 +372,6 @@ def run_seat(args) -> int:
                status="pending", outage="-")
     if bad_values(row):
         return refuse(f"not a ledger value in {', '.join(bad_values(row))}")
-    # from the pending row on, a cancel must finalize it: held until the guard below is in place
-    signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)
-    if not record(row, new=True):
-        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)
-        return refuse(f"{row_id} is already recorded; a rerun takes a new --id")
-    if reached > limit:
-        print(f"extended past the bound of {limit} rounds by the owner: {args.extended}")
-
     cancelled = []  # a signal to this script is the caller cancelling: no verdict, no outage
 
     def cancel(number, _):
@@ -388,12 +380,21 @@ def run_seat(args) -> int:
 
     for sig in CANCELS:
         signal.signal(sig, cancel)
+    # handlers first: an inherited SIG_IGN would drop a cancel held across the pending write.
+    # From the pending row on, a cancel must finalize it: held until the guard below is in place
+    signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)
+    if not record(row, new=True):
+        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)
+        return refuse(f"{row_id} is already recorded; a rerun takes a new --id")
+
     started = time.monotonic()
     verdict, cause, moved = "-", "crashed", []
     diff = Path(args.diff_out).resolve() if args.diff_out else None
     isolated = None
     try:
         signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)  # a held cancel lands here, guarded
+        if reached > limit:  # a print can block on a full pipe: never while cancels are held
+            print(f"extended past the bound of {limit} rounds by the owner: {args.extended}")
         isolated = Path(tempfile.mkdtemp(prefix=f"askrubberduck-{via}-")) if via != "claude" else None
         if diff:
             diff.unlink(missing_ok=True)  # a reader waiting for it must not take a stale one

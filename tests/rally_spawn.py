@@ -318,5 +318,61 @@ with patch.object(Path, "open", observe_output_open):
                 child.communicate(timeout=10)
 
 
+class CancelWithInheritedIgnoredTerm(unittest.TestCase):
+    def test_cancel_after_pending_is_not_discarded_when_sigterm_was_inherited_ignored(self):
+        with tempfile.TemporaryDirectory(prefix="duck-rally-ignored-pending-") as directory:
+            root = Path(directory).resolve()
+            fake = root / "codex"
+            fake.write_text("#!/bin/sh\nprintf started > \"$0.started\"\n"
+                            "printf 'VERDICT: NOTE\\n' > \"$3\"\n")
+            fake.chmod(0o755)
+            brief = root / "brief"
+            brief.write_text("Review the fixture")
+            driver = """
+import os
+import signal
+import sys
+from unittest.mock import patch
+
+sys.dont_write_bytecode = True
+sys.path.insert(0, sys.argv.pop(1))
+import dispatch
+
+assert signal.getsignal(signal.SIGTERM) == signal.SIG_IGN
+real_record = dispatch.record
+
+def cancel_after_pending(row, new):
+    written = real_record(row, new)
+    if new and written:
+        os.kill(os.getpid(), signal.SIGTERM)
+    return written
+
+with patch.object(dispatch, "record", cancel_after_pending):
+    raise SystemExit(dispatch.main(sys.argv[1:]))
+"""
+            env = {**os.environ, "PATH": str(root), "HOME": str(root),
+                   "CODEX_HOME": str(root / "owner"),
+                   "ASKRUBBERDUCK_HOME": str(root / "ledger")}
+            completed = subprocess.run(
+                [sys.executable, "-c", driver, str(SCRIPTS),
+                 "--gate", "ignored-pending-cancel", "--round", "1", "--stage", "review",
+                 "--setup", "independent", "--trust", "0", "--pin", "openai:fixture",
+                 "--prompt", str(brief), "--out", str(root / "out"), "--repo", "r"],
+                env=env, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=10,
+                preexec_fn=lambda: signal.signal(signal.SIGTERM, signal.SIG_IGN))
+            with patch.dict(os.environ, env):
+                rows = ledger.read_table("dispatches.tsv", ledger.DISPATCH_COLUMNS,
+                                         ledger.DISPATCH_ENUMS)
+            self.assertEqual(len(rows), 1, completed.stdout + completed.stderr)
+            observed = (completed.returncode, rows[0]["status"], rows[0]["outage"],
+                        (root / "codex.started").exists())
+            self.assertEqual(
+                observed, (128 + signal.SIGTERM, "final", "-", False),
+                "C1: inherited SIG_IGN must not discard SIGTERM delivered after the pending "
+                "write and let the seat run; "
+                f"observed (exit, status, outage, seat_started)={observed!r}. "
+                f"stdout={completed.stdout!r}, stderr={completed.stderr!r}")
+
+
 if __name__ == "__main__":
     unittest.main()
