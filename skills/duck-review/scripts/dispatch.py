@@ -16,6 +16,7 @@ import hashlib
 import math
 import os
 import re
+import select
 import shutil
 import signal
 import subprocess
@@ -45,9 +46,19 @@ OUTAGES = (("credits", r"out of credits|insufficient credits?|credit balance"),
            ("permission denied", r"permission\b[\s\S]{0,200}?\bdenied"))  # a wrapped message too
 CANCELS = {signal.SIGTERM, signal.SIGHUP, signal.SIGINT}  # the caller cancelling a seat
 LOCK_WAIT = 30  # seconds another writer may hold the ledger before a write gives up
-# Idempotent cleanup steps of the running seat (stop it, finalize its row): main() runs them, last
-# first, for a cancel that lands at an instruction before a step's own guard
+# A cancel (SIGTERM, SIGHUP, SIGINT) is the caller leaving. The first one latches and blocks every
+# later one for good; main() then runs the running seat's idempotent cleanup steps (stop it, finalize
+# its row), last first, whatever instruction the cancel interrupted, and leaves without blocking on
+# stdout.
+CANCELLED: list = []
 CLEANUP: list = []
+NOTICES: list = []
+
+
+def cancel(number, _) -> None:
+    signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)
+    CANCELLED.append(number)
+    raise SystemExit(128 + number)
 TOKENS = re.compile(r"tokens used\s*:?\s*(\d[\d,]*)", re.IGNORECASE)  # a count starts with a digit
 # A stage with its own ceiling counts against it; review and disposition share the round bound.
 STAGE_BOUNDS = {"plan": ("plan_rounds", 2), "rally": ("rally_turns", DEFAULT_RALLY_TURNS),
@@ -176,7 +187,7 @@ def locked_ledger():
                 break
             except BlockingIOError:
                 if time.monotonic() > deadline:
-                    raise RuntimeError(f"{home()}: ledger lock held over {LOCK_WAIT}s") from None
+                    raise TimeoutError(f"{home()}: ledger lock held over {LOCK_WAIT}s") from None
                 time.sleep(0.05)
         yield home() / "dispatches.tsv"
     finally:
@@ -398,16 +409,6 @@ def run_seat(args) -> int:
                status="pending", outage="-")
     if bad_values(row):
         return refuse(f"not a ledger value in {', '.join(bad_values(row))}")
-    cancelled = []  # a signal to this script is the caller cancelling: no verdict, no outage
-
-    def cancel(number, _):
-        signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)  # the first cancel wins; cleanup runs whole
-        cancelled.append(number)
-        sys.exit(128 + number)  # an interrupted run still finalizes its row
-
-    for sig in CANCELS:  # before the pending row: an inherited SIG_IGN would drop a held cancel
-        signal.signal(sig, cancel)
-    signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)  # and an inherited block would keep it held
     started = time.monotonic()
     verdict, cause, moved = "-", "crashed", []
     diff = Path(args.diff_out).resolve() if args.diff_out else None
@@ -425,8 +426,10 @@ def run_seat(args) -> int:
             if ours:
                 row.update(minutes=str(math.ceil((time.monotonic() - started) / 60)),
                            verdict=verdict, status="final",
-                           outage="0" if verdict != "-" else "-" if cancelled else "1")
+                           outage="0" if verdict != "-" else "-" if CANCELLED else "1")
                 record(row, new=False)
+                if CANCELLED:
+                    NOTICES.append(f"{row_id} cancelled {row['minutes']}m")
             finished = True
 
     CLEANUP.append(finish)
@@ -457,25 +460,31 @@ def run_seat(args) -> int:
             moved += [f"+ {line}" for line in after if line not in before]
     finally:
         finish()
-        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)  # the row is final: prints stay cancellable
-        if cancelled and ours:  # the caller is leaving: a full pipe must not keep dispatch alive
-            out_fd = sys.stdout.fileno()
-            try:
-                os.set_blocking(out_fd, False)
-                sys.stdout.flush()
-                os.write(out_fd, f"{row_id} cancelled {row['minutes']}m\n".encode())
-            except OSError:
-                pass
-            null = os.open(os.devnull, os.O_WRONLY)  # whatever is left flushes at exit, unblocked
-            os.dup2(null, out_fd)
-            os.close(null)
     for line in moved:
         print(f"candidate moved: {line}")
     print(f"{row_id} {verdict if verdict != '-' else f'outage: {cause}'} {row['minutes']}m")
     return 3 if moved else 0 if verdict != "-" else 1
 
 
+def leave_quietly() -> None:
+    """The caller is gone: write the notices without blocking, then point stdout at /dev/null so the
+    exit-time flush cannot block on a full pipe either."""
+    out_fd = sys.stdout.fileno()
+    try:  # the descriptor is shared with the caller: test it, never change its flags
+        if NOTICES and select.select([], [out_fd], [], 0)[1]:
+            os.write(out_fd, "".join(f"{notice}\n" for notice in NOTICES).encode())
+    except (OSError, ValueError):
+        pass
+    null = os.open(os.devnull, os.O_WRONLY)
+    os.dup2(null, out_fd)
+    os.close(null)
+
+
 def main(argv: list[str] | None = None) -> int:
+    CANCELLED.clear(), CLEANUP.clear(), NOTICES.clear()
+    for sig in CANCELS:  # first: an inherited SIG_IGN would drop a cancel, an inherited block hold it
+        signal.signal(sig, cancel)
+    signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--gate", required=True, help="gate id")
     parser.add_argument("--round", required=True, type=int, help="this gate's round, from 1")
@@ -501,9 +510,15 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--round counts from 1")
     try:
         return run_seat(args)
-    except SystemExit:  # a cancel can land at any instruction; the first one blocked the rest
+    except SystemExit:
+        if not CANCELLED:
+            raise
         for step in reversed(CLEANUP):
-            step()
+            try:
+                step()
+            except Exception:  # a seat that survived SIGKILL must not keep its row pending
+                pass
+        leave_quietly()
         raise
     except OSError as error:  # the CLI is missing or the scratch dir unwritable; the row is final
         print(f"outage: {error}")

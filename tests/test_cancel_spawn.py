@@ -89,7 +89,7 @@ class BoundedLock(unittest.TestCase):
                 with patch.dict(os.environ, {"ASKRUBBERDUCK_HOME": directory}), \
                         patch.object(dispatch, "LOCK_WAIT", 0.2):
                     started = time.monotonic()
-                    with self.assertRaises(RuntimeError):
+                    with self.assertRaises(TimeoutError):
                         dispatch.record(row, new=True)
                     self.assertLess(time.monotonic() - started, 5)
             finally:
