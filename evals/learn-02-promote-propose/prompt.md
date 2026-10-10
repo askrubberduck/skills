@@ -12,7 +12,6 @@ doer = "anthropic"
 reviewers = ["openai:gpt-6-sol:high", "google:gemini-3.1-pro-high"]
 
 [learn]
-discover = "auto"
 trial = ["google:gemini-4-pro:high"]
 shadow = 3
 ```

@@ -533,3 +533,19 @@ the earlier wording. `land-04`'s first grader required a new VERSION bump, which
 candidate that already carries it; it was rewritten before these runs. Its grader now also fails a
 plan that bumps VERSION after the gate and merges without re-authorizing the new commit; rerun on
 `5fd1536`, 3/3 with the plugin and 3/3 without.
+
+### `learn-01` after the `propose` default, 2026-10-10
+
+v3.15.0 changed `[learn].discover`'s default from `auto` to `propose`. `learn-01-promote-auto` set
+no `discover`, but its promotion grader still expected `auto`. Rerun on v3.15.0 with the old graders,
+Claude Code, default agent model, Sonnet judge, three runs per arm.
+
+| Grader | With plugin | Without plugin |
+|---|---|---|
+| applies the promotion, pin leaves `trial` | 0/3 | 3/3 |
+| at most one new pin per family on trial | 3/3 | 0/3 |
+| claims nothing ran | 0/3 and 1/3 | 3/3 |
+
+With the plugin the agent proposes the promotion, as the new default says; the old grader fails it.
+Case score: 0.40 to 0.47 with, 0.27 to 0.60 without. `learn-01` now sets `discover = "auto"`
+explicitly, and `learn-02-promote-propose` covers the default: the promotion goes to the owner.
