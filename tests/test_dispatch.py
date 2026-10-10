@@ -5,6 +5,7 @@ Run: python3 tests/test_dispatch.py"""
 from __future__ import annotations
 
 import contextlib
+import json
 import os
 import shlex
 import shutil
@@ -58,7 +59,9 @@ STUBS = {
     "cancel": 'sleep 30 & echo $! > "$0.pid"; touch "$0.up"; wait',
     "env": 'ls -A "$CODEX_HOME" > "$0.ls"; printf %s "$CODEX_HOME" > "$0.codex"; '
            'printf %s "$HOME" > "$0.HOME"; readlink "$CODEX_HOME/auth.json" > "$0.auth"; '
-           'ls -A "$HOME/.gemini" "$HOME/Library" > "$0.gemini" 2>&1; echo "VERDICT: APPROVE"',
+           'ls -A "$HOME/.gemini" "$HOME/Library" > "$0.gemini" 2>&1; '
+           'cat "$HOME/.gemini/antigravity-cli/settings.json" > "$0.settings" 2>&1; '
+           'echo "VERDICT: APPROVE"',
 }
 
 
@@ -96,6 +99,10 @@ def self_check() -> int:
     real = "user\nReply with VERDICT: NOTE\ncodex\nVERDICT: NOTE\ndone\ntokens used\n8,187\nVERDICT: NOTE\ndone\n"
     assert classify("VERDICT: NOTE\ndone\n", "codex", False, 0, real) == ("NOTE", "")
     assert classify("", "codex", False, 0, real)[0] == "-"
+    # an answer without a verdict line is "no verdict", whatever the log's sandbox lines say (UP42)
+    sandbox = "exec ls /etc\nPermission denied\nsucceeded in 0ms"
+    assert classify("NO NEW IDEAS\n", "codex", False, 0, sandbox) == ("-", "no verdict")
+    assert classify("", "codex", False, 1, "ERROR: You're out of credits.") == ("-", "credits")
     with tempfile.TemporaryDirectory(prefix="askrubberduck-dispatch-") as directory:
         root = Path(directory).resolve()  # macOS: /var is /private/var
         os.environ["ASKRUBBERDUCK_HOME"] = str(root)
@@ -225,9 +232,14 @@ def self_check() -> int:
         seat_home = (root / "env.HOME").read_text()
         assert code == 0 and seat_home != str(person), out
         assert (root / "env.gemini").read_text().split() == [
-            f"{seat_home}/.gemini:", "google_accounts.json", "oauth_creds.json",
+            f"{seat_home}/.gemini:", "antigravity-cli", "google_accounts.json", "oauth_creds.json",
             f"{seat_home}/Library:", "Keychains"], (root / "env.gemini").read_text()
         assert not Path(seat_home).exists(), "the seat's home outlived the run"
+        # its own settings allow reading commands only: headless agy ends a seat on any other
+        allowed = json.loads((root / "env.settings").read_text())["permissions"]["allow"]
+        assert "command(grep)" in allowed and "command(*)" not in allowed, allowed
+        assert not {"rm", "python3", "sh", "bash", "sed", "awk", "xargs"} & {
+            a[len("command("):-1] for a in allowed}, allowed
         code, out = run("greeting", "g1b")  # the prompt's verdict is no answer
         assert code == 1 and final("g1b-r1-review-gpt-6-sol") == ("-", "final", "1"), out
         assert "no verdict" in out, out

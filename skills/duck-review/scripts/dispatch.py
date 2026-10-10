@@ -13,6 +13,7 @@ import contextlib
 import datetime
 import fcntl
 import hashlib
+import json
 import math
 import os
 import re
@@ -30,6 +31,12 @@ from ledger import (DEFAULT_RALLY_TURNS, DISPATCH_COLUMNS, DISPATCH_ENUMS, arm_o
                     default_origin, home, load_config, read_table, validate_row)
 
 VIA = {"openai": "codex", "google": "agy", "anthropic": "claude"}  # by the pin's family
+# Commands an agy review seat may run without asking: headless, it denies anything else and ends
+# with no answer. Reading commands only; agy still denied `find -delete` and `cat > file` with
+# this list in a live probe (2026-10-10).
+AGY_COMMANDS = ("ls", "cat", "head", "tail", "wc", "grep", "rg", "find", "sort", "uniq", "cut",
+                "diff", "stat", "git log", "git show", "git status", "git diff", "git grep",
+                "git ls-files", "git blame")
 # Only boundary lines carry results; body markup only guards against quoted boundary examples.
 # A heading or bold marker around the label is allowed.
 VERDICT_LINE = re.compile(
@@ -119,8 +126,8 @@ def classify(text: str, via: str, timed_out: bool, code: int, log: str = "") -> 
     if verdict and code == 0:
         return verdict, ""
     answer = "\n".join(lines)
-    for cause, pattern in OUTAGES:
-        if re.search(pattern, answer + "\n" + log, re.IGNORECASE):
+    for cause, pattern in OUTAGES:  # a seat that answered is judged by its answer, not its log
+        if re.search(pattern, answer if answer.strip() else log, re.IGNORECASE):
             return "-", cause
     if code != 0:
         return "-", f"exit {code}"
@@ -232,6 +239,10 @@ def agy_env(home: Path) -> dict[str, str]:
     for part in (".gemini/oauth_creds.json", ".gemini/google_accounts.json", "Library/Keychains"):
         if (owner / part).exists():  # links, not copies: a refreshed token stays the owner's
             (home / part).symlink_to((owner / part).resolve())
+    settings = home / ".gemini" / "antigravity-cli" / "settings.json"
+    settings.parent.mkdir()
+    settings.write_text(json.dumps({"permissions": {"allow": [f"command({c})"
+                                                              for c in AGY_COMMANDS]}}))
     return {**os.environ, "HOME": str(home)}
 
 
