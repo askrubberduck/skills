@@ -45,6 +45,7 @@ OUTAGES = (("credits", r"out of credits|insufficient credits?|credit balance"),
            ("permission denied", r"permission\b[\s\S]{0,200}?\bdenied"))  # a wrapped message too
 CANCELS = {signal.SIGTERM, signal.SIGHUP, signal.SIGINT}  # the caller cancelling a seat
 LOCK_WAIT = 30  # seconds another writer may hold the ledger before a write gives up
+FINISH: list = []  # the running seat's finalizer: idempotent, so main() may call it after a cancel
 TOKENS = re.compile(r"tokens used\s*:?\s*(\d[\d,]*)", re.IGNORECASE)  # a count starts with a digit
 # A stage with its own ceiling counts against it; review and disposition share the round bound.
 STAGE_BOUNDS = {"plan": ("plan_rounds", 2), "rally": ("rally_turns", DEFAULT_RALLY_TURNS),
@@ -403,7 +404,25 @@ def run_seat(args) -> int:
     started = time.monotonic()
     verdict, cause, moved = "-", "crashed", []
     diff = Path(args.diff_out).resolve() if args.diff_out else None
-    isolated, ours = None, False
+    isolated, ours, finished = None, False, False
+
+    def finish() -> None:
+        """Remove the seat home and finalize the row, once. A cancel landing now keeps the outcome
+        already decided: exit code only."""
+        nonlocal finished
+        with held():
+            if finished:
+                return
+            if isolated:
+                shutil.rmtree(isolated, ignore_errors=True)
+            if ours:
+                row.update(minutes=str(math.ceil((time.monotonic() - started) / 60)),
+                           verdict=verdict, status="final",
+                           outage="0" if verdict != "-" else "-" if cancelled else "1")
+                record(row, new=False)
+            finished = True
+
+    FINISH.append(finish)  # main() runs it again if a cancel lands before this function's own guard
     try:
         with held():  # a cancel after the pending write lands here, and the row is ours to finalize
             ours = record(row, new=True)
@@ -430,14 +449,7 @@ def run_seat(args) -> int:
             moved = [f"- {line}" for line in before if line not in after]
             moved += [f"+ {line}" for line in after if line not in before]
     finally:
-        with held():  # a cancel landing now keeps the outcome already decided: exit code only
-            if isolated:
-                shutil.rmtree(isolated, ignore_errors=True)
-            if ours:
-                row.update(minutes=str(math.ceil((time.monotonic() - started) / 60)),
-                           verdict=verdict, status="final",
-                           outage="0" if verdict != "-" else "-" if cancelled else "1")
-                record(row, new=False)
+        finish()
         signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)  # the row is final: prints stay cancellable
         if cancelled and ours:
             print(f"{row_id} cancelled {row['minutes']}m")
@@ -473,6 +485,10 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--round counts from 1")
     try:
         return run_seat(args)
+    except SystemExit:  # a cancel can land at any instruction; the first one blocked the rest
+        for finish in FINISH:
+            finish()
+        raise
     except OSError as error:  # the CLI is missing or the scratch dir unwritable; the row is final
         print(f"outage: {error}")
         return 1

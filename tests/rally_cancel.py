@@ -181,5 +181,72 @@ with patch.object(dispatch.shutil, "rmtree", cancel_during_cleanup):
                         pass
 
 
+class CancelEnteringFinalizer(unittest.TestCase):
+    def test_first_cancel_entering_finalizer_after_output_read_failure_finalizes_row(self):
+        with tempfile.TemporaryDirectory(prefix="duck-rally-finalizer-entry-") as directory:
+            root = Path(directory).resolve()
+            fake = root / "codex"
+            fake.write_text(f"#!{sys.executable}\n" + """
+import sys
+from pathlib import Path
+
+root = Path(__file__).parent
+Path(sys.argv[3]).write_text("VERDICT: NOTE\\n")
+# The open stdout descriptor remains valid, but dispatch's subsequent read fails.
+(root / "out").unlink()
+""")
+            fake.chmod(0o755)
+            brief = root / "brief"
+            brief.write_text("Review the fixture")
+            driver = """
+import os
+import signal
+import sys
+
+sys.dont_write_bytecode = True
+sys.path.insert(0, sys.argv.pop(1))
+import dispatch
+
+armed = False
+
+def cancel_at_finalizer_entry(frame, event, arg):
+    global armed
+    if frame.f_code is dispatch.run_seat.__code__:
+        if event == "exception" and isinstance(arg[1], FileNotFoundError):
+            armed = bool(frame.f_locals.get("ours"))
+        elif event == "line" and armed:
+            # Deliver at the first finalizer instruction, before it holds signals.
+            # The output read failed before classify() could decide an outcome.
+            armed = False
+            sys.settrace(None)
+            os.kill(os.getpid(), signal.SIGTERM)
+    return cancel_at_finalizer_entry
+
+sys.settrace(cancel_at_finalizer_entry)
+raise SystemExit(dispatch.main(sys.argv[1:]))
+"""
+            env = {**os.environ, "PATH": str(root), "HOME": str(root),
+                   "CODEX_HOME": str(root / "owner"), "TMPDIR": str(root),
+                   "ASKRUBBERDUCK_HOME": str(root / "ledger")}
+            completed = subprocess.run(
+                [sys.executable, "-c", driver, str(SCRIPTS),
+                 "--gate", "finalizer-entry-cancel", "--round", "1", "--stage", "review",
+                 "--setup", "independent", "--trust", "0", "--pin", "openai:fixture",
+                 "--prompt", str(brief), "--out", str(root / "out"), "--repo", "r"],
+                env=env, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=10)
+            with patch.dict(os.environ, env):
+                rows = ledger.read_table("dispatches.tsv", ledger.DISPATCH_COLUMNS,
+                                         ledger.DISPATCH_ENUMS)
+            self.assertEqual(len(rows), 1, completed.stdout + completed.stderr)
+            observed = (completed.returncode, rows[0]["status"], rows[0]["outage"],
+                        rows[0]["verdict"])
+            self.assertEqual(
+                observed, (128 + signal.SIGTERM, "final", "-", "-"),
+                "C1: a first cancel entering finalization, after pending and before an outcome "
+                "is decided, must finalize the cancelled row; "
+                f"observed (exit, status, outage, verdict)={observed!r}; "
+                f"stdout={completed.stdout!r}, stderr={completed.stderr!r}")
+
+
 if __name__ == "__main__":
     unittest.main()
