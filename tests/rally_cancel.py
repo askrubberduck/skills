@@ -248,5 +248,90 @@ raise SystemExit(dispatch.main(sys.argv[1:]))
                 f"stdout={completed.stdout!r}, stderr={completed.stderr!r}")
 
 
+class CancelWithBackpressuredStdout(unittest.TestCase):
+    def test_cancel_exits_without_a_reader_draining_its_open_stdout_pipe(self):
+        with tempfile.TemporaryDirectory(prefix="duck-rally-full-stdout-") as directory:
+            root = Path(directory).resolve()
+            fake = root / "codex"
+            fake.write_text(f"#!{sys.executable}\n" + """
+import os
+import time
+from pathlib import Path
+
+root = Path(__file__).parent
+(root / "seat.pid").write_text(str(os.getpid()))
+while True:
+    time.sleep(0.01)
+""")
+            fake.chmod(0o755)
+            brief = root / "brief"
+            brief.write_text("Review the fixture")
+            env = {**os.environ, "PATH": str(root), "HOME": str(root),
+                   "CODEX_HOME": str(root / "owner"),
+                   "ASKRUBBERDUCK_HOME": str(root / "ledger")}
+            reader, writer = os.pipe()
+            child, seat_pid = None, None
+            try:
+                # Keep the read end open: this is backpressure, not closed stdout (C2).
+                os.set_blocking(writer, False)
+                for chunk in (b"x" * 4096, b"x"):
+                    while True:
+                        try:
+                            os.write(writer, chunk)
+                        except BlockingIOError:
+                            break
+                os.set_blocking(writer, True)
+                child = subprocess.Popen(
+                    [sys.executable, str(SCRIPTS / "dispatch.py"),
+                     "--gate", "full-stdout-cancel", "--round", "1", "--stage", "review",
+                     "--setup", "independent", "--trust", "0", "--pin", "openai:fixture",
+                     "--prompt", str(brief), "--out", str(root / "out"), "--repo", "r"],
+                    env=env, stdin=subprocess.DEVNULL, stdout=writer,
+                    stderr=subprocess.PIPE, text=True)
+                deadline = time.monotonic() + 10
+                while not (root / "seat.pid").exists():
+                    if child.poll() is not None or time.monotonic() >= deadline:
+                        self.fail("fixture did not start its fake seat")
+                    time.sleep(0.01)
+                seat_pid = int((root / "seat.pid").read_text())
+                with patch.dict(os.environ, env):
+                    before = ledger.read_table("dispatches.tsv", ledger.DISPATCH_COLUMNS,
+                                               ledger.DISPATCH_ENUMS)
+                self.assertEqual((len(before), before[0]["status"]), (1, "pending"))
+                child.send_signal(signal.SIGTERM)
+                try:
+                    child.wait(timeout=3)
+                except subprocess.TimeoutExpired:
+                    pass
+                with patch.dict(os.environ, env):
+                    rows = ledger.read_table("dispatches.tsv", ledger.DISPATCH_COLUMNS,
+                                             ledger.DISPATCH_ENUMS)
+                self.assertEqual(len(rows), 1)
+                try:
+                    os.killpg(seat_pid, 0)
+                    seat_survived = True
+                except (ProcessLookupError, PermissionError):
+                    seat_survived = False
+                observed = (child.poll(), rows[0]["status"], rows[0]["outage"],
+                            rows[0]["verdict"], seat_survived)
+                self.assertEqual(
+                    observed, (128 + signal.SIGTERM, "final", "-", "-", False),
+                    "C1: SIGTERM after pending must end dispatch without requiring its caller "
+                    "to drain an open, full stdout pipe; "
+                    f"observed (exit, status, outage, verdict, seat_survived)={observed!r}")
+            finally:
+                if child is not None:
+                    if child.poll() is None:
+                        child.kill()
+                    child.communicate(timeout=10)
+                if seat_pid is not None:
+                    try:
+                        os.killpg(seat_pid, signal.SIGKILL)
+                    except (ProcessLookupError, PermissionError):
+                        pass
+                os.close(writer)
+                os.close(reader)
+
+
 if __name__ == "__main__":
     unittest.main()

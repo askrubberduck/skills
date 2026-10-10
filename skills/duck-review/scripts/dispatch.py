@@ -451,8 +451,17 @@ def run_seat(args) -> int:
     finally:
         finish()
         signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)  # the row is final: prints stay cancellable
-        if cancelled and ours:
-            print(f"{row_id} cancelled {row['minutes']}m")
+        if cancelled and ours:  # the caller is leaving: a full pipe must not keep dispatch alive
+            out_fd = sys.stdout.fileno()
+            try:
+                os.set_blocking(out_fd, False)
+                sys.stdout.flush()
+                os.write(out_fd, f"{row_id} cancelled {row['minutes']}m\n".encode())
+            except OSError:
+                pass
+            null = os.open(os.devnull, os.O_WRONLY)  # whatever is left flushes at exit, unblocked
+            os.dup2(null, out_fd)
+            os.close(null)
     for line in moved:
         print(f"candidate moved: {line}")
     print(f"{row_id} {verdict if verdict != '-' else f'outage: {cause}'} {row['minutes']}m")
