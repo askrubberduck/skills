@@ -52,7 +52,7 @@ DRIFT_LIMIT = 0.5
 
 
 def home() -> Path:
-    return Path(os.environ.get("ASKRUBBERDUCK_HOME", "~/.askrubberduck")).expanduser()
+    return Path(os.environ.get("ASKRUBBERDUCK_HOME") or "~/.askrubberduck").expanduser()
 
 
 def normalize_origin(url: str) -> str:
@@ -102,7 +102,8 @@ def validate_row(name: str, line: int, row: dict) -> bool:
 def read_table(name: str, columns: tuple[str, ...], enums: dict[str, set]) -> list[dict]:
     path = home() / name
     try:
-        lines = path.read_text(encoding="utf-8").splitlines()
+        # rows end only at a newline: splitlines would also break at U+2028 and its kin in a field
+        lines = path.read_text(encoding="utf-8").removesuffix("\n").split("\n")
     except FileNotFoundError:
         if path.is_symlink() or home().is_symlink():  # dangling: configured, not absent
             raise SystemExit(f"{path}: dangling symlink")
@@ -377,18 +378,11 @@ def shadow_rows(dispatches: list[dict], pin: str) -> list[dict]:
 
 
 def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
-                  pin: str) -> tuple[str, str]:
-    """(verdict, reason) for a trial pin: `shadow` while it still rides along, then `replace`,
-    `add` or `drop`. A trial that cannot decide keeps riding up to twice its shadow count, then
-    drops, so no pin sits in `trial` forever and blocks its family's next model."""
-    verdict, reason, missed = trial_result(config, dispatches, findings, pin)
-    return verdict, reason + "".join(f"; missed {severity} {cause}" for severity, cause in missed)
-
-
-def trial_result(config: dict, dispatches: list[dict], findings: list[dict],
-                 pin: str) -> tuple[str, str, list[tuple[str, str]]]:
-    """`trial_verdict`, with a replace's missed causes as (severity, cause_id) pairs: a cause id
-    may hold any text, so a caller never splits them back out of the reason."""
+                  pin: str) -> tuple[str, str, list[tuple[str, str]]]:
+    """(verdict, reason, missed) for a trial pin: `shadow` while it still rides along, then
+    `replace`, `add` or `drop`; missed holds a replace's (severity, cause_id) pairs. A trial that
+    cannot decide keeps riding up to twice its shadow count, then drops, so no pin sits in `trial`
+    forever and blocks its family's next model."""
     needed = int(config.get("shadow", DEFAULT_SHADOW))
     family = arm_of(pin)[0]
     on_trial = {arm_of(p)[:2] for p in config.get("trial", [])}
@@ -439,9 +433,7 @@ def trial_result(config: dict, dispatches: list[dict], findings: list[dict],
         missed = sorted({(rank.get(known(f), 3), known(f), f["cause_id"]) for d in shared
                          for f in findings if f["dispatch_id"] == theirs[gate(d)]["id"]
                          and f["substantiated"] == "1"
-                         and f["cause_id"] not in {g["cause_id"] for g in findings
-                                                   if g["dispatch_id"] == d["id"]
-                                                   and g["substantiated"] == "1"}})
+                         and f["cause_id"] not in distinct.get(d["id"], set())})
         return "replace", pin_of(incumbent), [(severity, cause) for _, severity, cause in missed]
     return "drop", f"{own} vs {found} causes on shared gates", []
 
@@ -449,7 +441,7 @@ def trial_result(config: dict, dispatches: list[dict], findings: list[dict],
 def shadow_status(config: dict, dispatches: list[dict],
                   findings: list[dict]) -> list[tuple[str, str]]:
     return [(pin, reason) for pin in config.get("trial", [])
-            for verdict, reason in [trial_verdict(config, dispatches, findings, pin)]
+            for verdict, reason, _ in [trial_verdict(config, dispatches, findings, pin)]
             if verdict == "shadow"]
 
 
@@ -485,7 +477,7 @@ def cmd_promote(args) -> int:
     config = load_config(args.repo or default_origin())
     dispatches, findings = load_tables()
     for pin in config.get("trial", []):
-        verdict, reason, missed = trial_result(config, dispatches, findings, pin)
+        verdict, reason, missed = trial_verdict(config, dispatches, findings, pin)
         if verdict == "replace":
             print(f"replace {reason} with {pin} in review")
             for severity, cause in missed:
