@@ -426,16 +426,17 @@ def trial_verdict(config: dict, dispatches: list[dict], findings: list[dict],
     if len(shared) < needed or not (own or found):
         # too few gates beside the incumbent, or all clean: nothing says which model is better
         return undecided, f"{len(shared)} shared gates, {own} vs {found} causes", []
+    # the sum ignores severity: whoever applies the verdict sees what the trial missed
+    rank = {"BLOCKER": 0, "SHOULD": 1, "NOTE": 2}
+    known = lambda f: f.get("severity") if f.get("severity") in rank else "-"  # unknown sorts last
+    missed = [(severity, cause) for _, severity, cause in sorted(
+        {(rank.get(known(f), 3), known(f), f["cause_id"]) for d in shared
+         for f in findings if f["dispatch_id"] == theirs[gate(d)]["id"]
+         and f["substantiated"] == "1"
+         and f["cause_id"] not in distinct.get(d["id"], set())})]
     if own >= found:
-        # the sum ignores severity: whoever applies the replace sees what the trial missed
-        rank = {"BLOCKER": 0, "SHOULD": 1, "NOTE": 2}
-        known = lambda f: f.get("severity") if f.get("severity") in rank else "-"  # unknown sorts last
-        missed = sorted({(rank.get(known(f), 3), known(f), f["cause_id"]) for d in shared
-                         for f in findings if f["dispatch_id"] == theirs[gate(d)]["id"]
-                         and f["substantiated"] == "1"
-                         and f["cause_id"] not in distinct.get(d["id"], set())})
-        return "replace", pin_of(incumbent), [(severity, cause) for _, severity, cause in missed]
-    return "drop", f"{own} vs {found} causes on shared gates", []
+        return "replace", pin_of(incumbent), missed
+    return "drop", f"{own} vs {found} causes on shared gates", missed
 
 
 def shadow_status(config: dict, dispatches: list[dict],
