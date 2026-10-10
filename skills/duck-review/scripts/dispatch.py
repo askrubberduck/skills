@@ -398,6 +398,7 @@ def run_seat(args) -> int:
 
     for sig in CANCELS:  # before the pending row: an inherited SIG_IGN would drop a held cancel
         signal.signal(sig, cancel)
+    signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)  # and an inherited block would keep it held
     started = time.monotonic()
     verdict, cause, moved = "-", "crashed", []
     diff = Path(args.diff_out).resolve() if args.diff_out else None
