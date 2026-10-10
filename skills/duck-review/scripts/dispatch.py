@@ -31,12 +31,6 @@ from ledger import (DEFAULT_RALLY_TURNS, DISPATCH_COLUMNS, DISPATCH_ENUMS, arm_o
                     default_origin, home, load_config, read_table, validate_row)
 
 VIA = {"openai": "codex", "google": "agy", "anthropic": "claude"}  # by the pin's family
-# Commands an agy review seat may run without asking: headless, it denies anything else and ends
-# with no answer. Reading commands only; agy still denied `find -delete` and `cat > file` with
-# this list in a live probe (2026-10-10).
-AGY_COMMANDS = ("ls", "cat", "head", "tail", "wc", "grep", "rg", "find", "sort", "uniq", "cut",
-                "diff", "stat", "git log", "git show", "git status", "git diff", "git grep",
-                "git ls-files", "git blame")
 # Only boundary lines carry results; body markup only guards against quoted boundary examples.
 # A heading or bold marker around the label is allowed.
 VERDICT_LINE = re.compile(
@@ -78,9 +72,10 @@ def transport(via: str, family: str, model: str, effort: str, prompt: str, workd
                 "--mcp-config", '{"mcpServers":{}}', *dirs, "--", prompt]
     # agy takes the effort as part of the model id: `gemini-3.1-pro-high`
     pinned = model if effort == "-" else f"{model}-{effort}"
-    # headless agy auto-denies any tool it would ask about, reads included; plan mode reads freely
-    # and still denies writes
-    return ["agy", "--model", pinned, "--mode", "plan", *dirs, "--print-timeout",
+    # headless agy ends the seat on any permission it would ask for. The seat's settings allow every
+    # command; --sandbox turns a command's write into a write_file request, which plan mode denies:
+    # live probes 2026-10-10 found a review's commands running and no write landing
+    return ["agy", "--model", pinned, "--mode", "plan", "--sandbox", *dirs, "--print-timeout",
             f"{math.ceil(limit)}s", "-p", prompt]
 
 
@@ -158,7 +153,9 @@ def snapshot(checkout: str) -> list[str]:
 
 def bad_values(row: dict) -> list[str]:
     bad = [c for c, allowed in DISPATCH_ENUMS.items() if row[c] != "-" and row[c] not in allowed]
-    bad += [c for c, value in row.items() if not value or re.search(r"[\t\r\n]", value)]
+    # one physical row per record: anything splitlines() breaks at would split it (record, ledger)
+    bad += [c for c, value in row.items() if not value or "\t" in value
+            or value.splitlines() != [value]]
     return bad if validate_row("dispatches.tsv", 0, row) else bad + ["numbers"]
 
 
@@ -243,8 +240,7 @@ def agy_env(home: Path) -> dict[str, str]:
             (home / part).symlink_to((owner / part).resolve())
     settings = home / ".gemini" / "antigravity-cli" / "settings.json"
     settings.parent.mkdir()
-    settings.write_text(json.dumps({"permissions": {"allow": [f"command({c})"
-                                                              for c in AGY_COMMANDS]}}))
+    settings.write_text(json.dumps({"permissions": {"allow": ["command(*)"]}}))
     return {**os.environ, "HOME": str(home)}
 
 

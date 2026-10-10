@@ -174,7 +174,8 @@ def self_check() -> int:
         assert code == 0, out
         assert final("g1-r1-review-gemini-3.1-pro-high") == ("REJECT", "final", "0"), out
         assert (root / "reject.argv").read_text().split("\0")[:-1] == [
-            "agy", "--model", "gemini-3.1-pro-high", "--mode", "plan", "--add-dir", str(checkout),
+            "agy", "--model", "gemini-3.1-pro-high", "--mode", "plan", "--sandbox", "--add-dir",
+            str(checkout),
             "--print-timeout", "20s", "-p", prompt.read_text()]
         code, out = run("reject", "g1c", "--pin", "anthropic:claude-test:high", "--add-dir",
                         str(checkout))
@@ -203,6 +204,9 @@ def self_check() -> int:
         assert code == 2 and "read-only" in out and len(rows()) == count, out
         code, out = run("reject", "g1w", "--workdir", "", "--id", "g1w-empty")
         assert code == 2 and "--workdir is empty" in out and len(rows()) == count, out
+        for odd in ("seat\u2028one", "seat\x85one", "seat\x0bone"):  # one record, one physical row
+            code, out = run("reject", "g1w", "--id", odd)
+            assert code == 2 and "not a ledger value in id" in out and len(rows()) == count, out
         # a codex seat gets its own CODEX_HOME with only the owner's login linked in, and as HOME
         # too unless it is a rival; the home is gone after the run
         owner = root / "owner-codex"
@@ -235,11 +239,9 @@ def self_check() -> int:
             f"{seat_home}/.gemini:", "antigravity-cli", "google_accounts.json", "oauth_creds.json",
             f"{seat_home}/Library:", "Keychains"], (root / "env.gemini").read_text()
         assert not Path(seat_home).exists(), "the seat's home outlived the run"
-        # its own settings allow reading commands only: headless agy ends a seat on any other
-        allowed = json.loads((root / "env.settings").read_text())["permissions"]["allow"]
-        assert "command(grep)" in allowed and "command(*)" not in allowed, allowed
-        assert not {"rm", "python3", "sh", "bash", "sed", "awk", "xargs"} & {
-            a[len("command("):-1] for a in allowed}, allowed
+        # its own settings allow every command; --sandbox in the argv keeps a command from writing
+        assert json.loads((root / "env.settings").read_text()) == {
+            "permissions": {"allow": ["command(*)"]}}, (root / "env.settings").read_text()
         code, out = run("greeting", "g1b")  # the prompt's verdict is no answer
         assert code == 1 and final("g1b-r1-review-gpt-6-sol") == ("-", "final", "1"), out
         assert "no verdict" in out, out
