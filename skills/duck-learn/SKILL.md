@@ -26,7 +26,7 @@ within existing authority. A routing mention alone does not require loading ever
      roster -`; codex prints none, so the owner names its
      new pins) and prints ids nobody has configured, trialled or dispatched; `promote` prints each
      trial pin's verdict: still `shadow`, or `replace`, `add` or `drop` once decided; a `replace`
-     lists, with severity, each incumbent cause the trial missed, since the comparison sums causes.
+     lists, with severity, each incumbent cause the trial missed.
      `[learn].discover` (default `propose`) decides what follows: `off` ignores both; `propose` queues
      each through [`duck-decide`](../duck-decide/SKILL.md); `auto` puts at most one new pin per family
      into `[learn].trial` and

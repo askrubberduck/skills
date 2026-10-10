@@ -34,8 +34,9 @@ and maintainability. Use distinct lenses rather than a fixed reviewer count; del
 useful and authorized; what counts as a different family is in
 [challenge selection](references/challenge.md). A seat from another family runs through
 [dispatch](references/dispatch.md) like a gate seat, with its ledger row (`--setup independent`) and
-its adjudicated findings in `findings.tsv`; its verdict line is that seat's result, never a gate
-verdict.
+its adjudicated findings in `findings.tsv`. Its `--gate` id is the findings pass's own, such as
+`findings-<PR or branch>`, never a release gate's: dispatch counts every round under one gate id and
+stage against that gate's bound.
 
 Substantiate and adjudicate findings against the current target using the criteria below. Why a value,
 guard or construction already in the history exists is answered by [`duck-why`](../duck-why/SKILL.md)'s
