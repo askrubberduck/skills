@@ -358,7 +358,10 @@ def run_seat(args) -> int:
                status="pending", outage="-")
     if bad_values(row):
         return refuse(f"not a ledger value in {', '.join(bad_values(row))}")
+    # from the pending row on, a cancel must finalize it: held until the guard below is in place
+    signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)
     if not record(row, new=True):
+        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)
         return refuse(f"{row_id} is already recorded; a rerun takes a new --id")
     if reached > limit:
         print(f"extended past the bound of {limit} rounds by the owner: {args.extended}")
@@ -376,6 +379,7 @@ def run_seat(args) -> int:
     diff = Path(args.diff_out).resolve() if args.diff_out else None
     isolated = Path(tempfile.mkdtemp(prefix=f"askrubberduck-{via}-")) if via != "claude" else None
     try:
+        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)  # a held cancel lands here, guarded
         if diff:
             diff.unlink(missing_ok=True)  # a reader waiting for it must not take a stale one
         answer.unlink(missing_ok=True)  # a stale answer from an earlier run is no answer
@@ -394,6 +398,7 @@ def run_seat(args) -> int:
             moved = [f"- {line}" for line in before if line not in after]
             moved += [f"+ {line}" for line in after if line not in before]
     finally:
+        signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)  # a second cancel waits for the final row
         if isolated:
             shutil.rmtree(isolated, ignore_errors=True)
         row.update(minutes=str(math.ceil((time.monotonic() - started) / 60)), verdict=verdict,
@@ -401,6 +406,7 @@ def run_seat(args) -> int:
         record(row, new=False)
         if cancelled:
             print(f"{row_id} cancelled {row['minutes']}m")
+        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)
     for line in moved:
         print(f"candidate moved: {line}")
     print(f"{row_id} {verdict if verdict != '-' else f'outage: {cause}'} {row['minutes']}m")
