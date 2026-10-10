@@ -43,6 +43,7 @@ OUTAGES = (("credits", r"out of credits|insufficient credits?|credit balance"),
            ("quota", r"quota|RESOURCE_EXHAUSTED|\b429\b|rate.?limit"),
            ("model rejected", r"not supported|unknown model|invalid model|model.not.found"),
            ("permission denied", r"permission\b[\s\S]{0,200}?\bdenied"))  # a wrapped message too
+CANCELS = {signal.SIGTERM, signal.SIGHUP, signal.SIGINT}  # the caller cancelling a seat
 TOKENS = re.compile(r"tokens used\s*:?\s*(\d[\d,]*)", re.IGNORECASE)  # a count starts with a digit
 # A stage with its own ceiling counts against it; review and disposition share the round bound.
 STAGE_BOUNDS = {"plan": ("plan_rounds", 2), "rally": ("rally_turns", DEFAULT_RALLY_TURNS),
@@ -243,16 +244,26 @@ def agy_env(home: Path) -> dict[str, str]:
 def launch(argv: list[str], out: Path, limit: float, workdir: Path,
            env: dict[str, str] | None = None) -> tuple[bool, int]:
     """Run to completion or the limit: (whether the limit ended it, the exit code)."""
-    with out.open("w") as sink:
-        child = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=sink,
-                                 stderr=subprocess.STDOUT, cwd=workdir, env=env,
-                                 start_new_session=True)
+    # A cancel during the spawn would skip stop(child) and leave the seat running: hold cancels until
+    # the child is in hand (the child itself starts with them unblocked), then let one land inside
+    # the guard.
+    signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)
     try:
-        return False, child.wait(timeout=limit)
-    except subprocess.TimeoutExpired:
-        return True, -1
+        with out.open("w") as sink:
+            child = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=sink,
+                                     stderr=subprocess.STDOUT, cwd=workdir, env=env,
+                                     start_new_session=True,
+                                     preexec_fn=lambda: signal.pthread_sigmask(signal.SIG_UNBLOCK,
+                                                                               CANCELS))
+        try:
+            signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)
+            return False, child.wait(timeout=limit)
+        except subprocess.TimeoutExpired:
+            return True, -1
+        finally:
+            stop(child)
     finally:
-        stop(child)
+        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)  # the spawn failed: release a held cancel
 
 
 def capture(workdir: Path, base: str, dest: Path) -> str:
@@ -358,7 +369,7 @@ def run_seat(args) -> int:
         cancelled.append(number)
         sys.exit(128 + number)  # an interrupted run still finalizes its row
 
-    for sig in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT):
+    for sig in CANCELS:
         signal.signal(sig, cancel)
     started = time.monotonic()
     verdict, cause, moved = "-", "crashed", []
