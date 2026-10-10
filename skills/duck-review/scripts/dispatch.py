@@ -262,23 +262,27 @@ def launch(argv: list[str], out: Path, limit: float, workdir: Path,
     """Run to completion or the limit: (whether the limit ended it, the exit code)."""
     # A cancel during the spawn would skip stop(child) and leave the seat running: hold cancels for
     # the spawn alone, then let one land inside the guard. The output is opened first, so an open
-    # that blocks stays cancellable.
-    with out.open("w") as sink:
-        signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)
-        try:
-            child = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=sink,
-                                     stderr=subprocess.STDOUT, cwd=workdir, env=env,
-                                     start_new_session=True, preexec_fn=seat_signals)
-        except BaseException:
-            signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)  # no child: release a held cancel
-            raise
+    # that blocks stays cancellable, and closed only after the seat is stopped.
+    sink = out.open("w")
+    signal.pthread_sigmask(signal.SIG_BLOCK, CANCELS)
+    try:
+        child = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=sink,
+                                 stderr=subprocess.STDOUT, cwd=workdir, env=env,
+                                 start_new_session=True, preexec_fn=seat_signals)
+    except BaseException:
+        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)  # no child: release a held cancel
+        sink.close()
+        raise
     try:
         signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)
         return False, child.wait(timeout=limit)
     except subprocess.TimeoutExpired:
         return True, -1
     finally:
-        stop(child)
+        try:
+            stop(child)
+        finally:
+            sink.close()
 
 def capture(workdir: Path, base: str, dest: Path) -> str:
     """`add -A`, then the diff against `base`, landed whole: a reader never sees half a diff.
@@ -420,9 +424,9 @@ def run_seat(args) -> int:
         row.update(minutes=str(math.ceil((time.monotonic() - started) / 60)), verdict=verdict,
                    status="final", outage="0" if verdict != "-" else "-" if cancelled else "1")
         record(row, new=False)
+        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)  # before any print: one can block
         if cancelled:
             print(f"{row_id} cancelled {row['minutes']}m")
-        signal.pthread_sigmask(signal.SIG_UNBLOCK, CANCELS)
     for line in moved:
         print(f"candidate moved: {line}")
     print(f"{row_id} {verdict if verdict != '-' else f'outage: {cause}'} {row['minutes']}m")
