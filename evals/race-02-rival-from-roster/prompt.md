@@ -11,7 +11,7 @@ My `~/.askrubberduck/config.toml`:
 ```toml
 [families]
 doer = "anthropic"
-reviewers = ["google:gemini-3.1-pro-high"]
+reviewers = ["openai:gpt-6.1-sol"]
 
 [bounds]
 dispatch_timeout = "7m"
