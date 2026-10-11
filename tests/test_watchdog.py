@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """The seat's watchdog: however dispatch ends, SIGKILL included, the seat stops and its row is final;
 a seat's leftover children are stopped even when its leader exits first. Fake CLIs only."""
+import contextlib
+import io
+import json
 import os
 import signal
 import subprocess
@@ -14,6 +17,7 @@ from unittest.mock import patch
 sys.dont_write_bytecode = True
 SCRIPTS = Path(__file__).resolve().parent.parent / "skills" / "duck-review" / "scripts"
 sys.path.insert(0, str(SCRIPTS))
+import dispatch  # noqa: E402
 import ledger  # noqa: E402
 
 
@@ -137,6 +141,42 @@ class Watchdog(unittest.TestCase):
         self.assertEqual(child.returncode, 0, out)
         self.assertEqual(self.row("left-r1-review-fixture", wait=False)["verdict"], "NOTE")
         self.assertFalse(alive(int((self.root / "child.pid").read_text())), "a seat child outlived it")
+
+    def test_an_unwritable_ledger_is_named_in_the_outage(self):
+        self.fake("exit 0")
+        (self.root / "ledger").mkdir()
+        (self.root / "ledger").chmod(0o500)
+        try:
+            child = self.dispatch("locked")
+            out = child.communicate(timeout=30)[0]
+        finally:
+            (self.root / "ledger").chmod(0o700)
+        self.assertEqual(child.returncode, 1, out)
+        self.assertIn("Permission denied", out)
+        self.assertNotIn("Traceback", out)
+
+    def test_a_taken_id_with_dispatch_gone_leaves_no_traceback(self):
+        self.fake("printf 'VERDICT: NOTE\\n' > \"$3\"")
+        self.dispatch("taken").communicate(timeout=60)
+        row = self.row("taken-r1-review-fixture")
+        read, write = os.pipe()
+        os.close(read)  # dispatch is gone before the watchdog answers
+        try:
+            done = subprocess.run([sys.executable, str(SCRIPTS / "dispatch.py"), dispatch.WATCHDOG,
+                                   json.dumps(row)], env=self.env, stdin=subprocess.DEVNULL,
+                                  stdout=write, stderr=subprocess.PIPE, text=True, timeout=30)
+        finally:
+            os.close(write)
+        self.assertEqual((done.returncode, done.stderr), (0, ""))
+
+    def test_a_group_that_survives_sigkill_is_named_in_the_outage(self):
+        spec = {"argv": ["true"], "out": str(self.root / "out"), "limit": 30, "workdir": str(self.root),
+                "env": dict(os.environ)}
+        survived = RuntimeError("process group 1 survived SIGKILL")
+        with patch.object(dispatch, "stop", side_effect=survived), \
+                contextlib.redirect_stdout(io.StringIO()) as out:
+            dispatch.serve(spec)
+        self.assertEqual(json.loads(out.getvalue()), {"error": str(survived)})
 
 
 if __name__ == "__main__":
