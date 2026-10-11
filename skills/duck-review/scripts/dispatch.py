@@ -259,7 +259,10 @@ def guard(row: dict) -> subprocess.Popen | None:
     recorded = watchdog.stdout.readline()
     if not recorded:
         raise OSError("the seat's watchdog could not write its row")
-    if json.loads(recorded):
+    recorded = json.loads(recorded)
+    if isinstance(recorded, dict):
+        raise OSError(recorded["error"])
+    if recorded:
         return watchdog
     watchdog.stdin.close()
     watchdog.wait()
@@ -292,8 +295,13 @@ def watch(row_json: str) -> int:
     for sig in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT):
         signal.signal(sig, lambda *_: None)
     signal.signal(signal.SIGCHLD, signal.SIG_DFL)  # an inherited SIG_IGN would reap the seat for us
-    if not record(row, new=True):
-        print(json.dumps(False), flush=True)
+    try:
+        recorded = record(row, new=True)
+    except OSError as error:  # the ledger is unwritable: dispatch reports it as the outage
+        recorded = {"error": str(error)}
+    if recorded is not True:
+        with contextlib.suppress(OSError):  # unbuffered: a dispatch already gone leaves nothing to flush
+            os.write(sys.stdout.fileno(), (json.dumps(recorded) + "\n").encode())
         return 0
     try:
         print(json.dumps(True), flush=True)
@@ -323,19 +331,23 @@ def serve(spec: dict | None) -> None:
     except OSError as error:  # the CLI is missing: dispatch reports it as the outage
         print(json.dumps({"error": str(error)}), flush=True)
         return
-    with sink:  # closed only once the seat is stopped: a failed close cannot skip the stop
-        deadline = time.monotonic() + spec["limit"]
-        timed_out = gone = False
-        try:
-            while seat.poll() is None:
-                if time.monotonic() > deadline:
-                    timed_out = True
-                    break
-                if select.select([sys.stdin], [], [], 0.05)[0] and not os.read(sys.stdin.fileno(), 1):
-                    gone = True  # EOF: dispatch is gone
-                    break
-        finally:
-            stop(seat)
+    try:
+        with sink:  # closed only once the seat is stopped: a failed close cannot skip the stop
+            deadline = time.monotonic() + spec["limit"]
+            timed_out = gone = False
+            try:
+                while seat.poll() is None:
+                    if time.monotonic() > deadline:
+                        timed_out = True
+                        break
+                    if select.select([sys.stdin], [], [], 0.05)[0] and not os.read(sys.stdin.fileno(), 1):
+                        gone = True  # EOF: dispatch is gone
+                        break
+            finally:
+                stop(seat)
+    except RuntimeError as error:  # the group survived SIGKILL: dispatch reports it as the outage
+        print(json.dumps({"error": str(error)}), flush=True)
+        return
     if not gone:
         print(json.dumps({"timed_out": timed_out, "code": -1 if timed_out else seat.returncode}),
               flush=True)
