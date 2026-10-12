@@ -1,6 +1,6 @@
 ---
 name: duck-sweep
-description: Clean out stale branches, worktrees, checkouts, scratch directories, and ignore rules; the pond stays clean. Use when the user asks for repository cleanup across one or more repos, or when stale worktrees and temporary artifacts have accumulated after merged work.
+description: Clean out stale branches, worktrees, checkouts, scratch directories, and ignore rules; the pond stays clean. Use before deleting branches or worktrees, even on a blanket order to delete them all, and when the user asks for repository cleanup across one or more repos, or when stale worktrees and temporary artifacts have accumulated after merged work.
 ---
 
 # Duck Sweep

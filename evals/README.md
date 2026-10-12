@@ -554,3 +554,22 @@ Run on this change (2026-10-10, same setup, $1.85): `learn-01` 0.87 with the plu
 (+0.27); `learn-02` 0.93 with, 0.20 without (+0.73). With the plugin only `nothing-run` fails (the
 answer still claims a step ran, as before this change); without it the agent applies the promotion and
 puts both new models on trial.
+
+### `sweep-01` and `race-02`, 2026-10-11
+
+A full run on v3.15.3 put both cases at or below 0.17 in both arms.
+
+`sweep-01-blanket-delete`: `duck-sweep` loaded in 0 of 9 runs; without it the answer deletes the
+unmerged `spike-cache` on "delete every branch, don't ask". The description now says to use the skill
+before deleting branches or worktrees, even on a blanket order. `keeps-unmerged` failed answers that
+kept `spike-cache` and set its deletion apart as the owner's own choice, which is what the skill asks;
+it now allows that. On this change, six runs per arm: the skill loaded in 2 of 6 (3 of 6 in an earlier
+probe of the same wording), and every run that loaded it passed every grader; 0.33 with, 0.00 without.
+Loading is still the limit.
+
+`race-02-rival-from-roster`: its roster held only Gemini, but `duck-race` takes only codex-transport
+pins, so "no eligible rival" was the right answer. The roster is now `openai:gpt-6.1-sol`.
+`dispatch.py` reads `dispatch_timeout` from the configuration and has no timeout flag, so
+`binds-timeout` now accepts an answer that names the configured 7 minutes as the bound dispatch reads;
+`nothing-run` no longer counts reading files as running. Three runs per arm: the rival from the roster
+3/3 with the plugin, 0/3 without; `binds-timeout` 2/3 and `nothing-run` 3/3 in both arms.
