@@ -39,7 +39,10 @@ Use these as inspection prompts (the necessity checks), not automatic deletion r
 - A unit that does several unrelated jobs, or two units that always change together: the split
   follows what changes together, and callers pass data rather than reach into shared state.
 - Dead paths, exports and flags: check callers, configuration and external use before deleting.
-- Pass-through wrappers and speculative options: identify the contract they actually protect.
+- Pass-through wrappers, speculative options and methods that exist for one caller: identify the
+  contract they actually protect, or the general operation that would replace several of them.
+- Special-case branches: can a different representation let the normal path cover the edge case
+  (empty instead of absent, zero-length instead of a flag)?
 - Reimplemented helpers or platform features: compare the existing facility's real guarantees.
 - Defensive branches and fallbacks: distinguish required boundary validation and recovery from
   impossible internal states or errors silently converted into success.

@@ -51,7 +51,9 @@ framework to make the obvious change look considered.
 Apply [`duck-shape`](../duck-shape/SKILL.md) in analysis mode: which added rule, state store, wrapper,
 option or dependency is necessary, and what existing mechanism can disappear? Reuse prior structural
 analysis. Reject speculative extension points unless a current contract or evidenced change requires
-them.
+them. An interface that serves today's callers with fewer, more general operations is not
+speculative. Signs of the opposite problem: a method that exists for one caller, or callers that
+must loop around a too-primitive API.
 
 For boundaries that change, state the interface, owner of each rule and datum, allowed transitions
 and conflict handling. Explain the concrete tradeoff behind the recommendation and why a credible
