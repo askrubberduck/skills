@@ -12,8 +12,8 @@ A comment earns its place by carrying one of these, and says only it:
   an obsolete alternative does not need archiving merely because its comment is deleted.
 - **An external contract** — a wire format, an API's documented quirk at the version the project
   pins, a spec section, an ordering the protocol demands.
-- **An interface** — what a caller needs to use the unit without reading its body (effects,
-  errors, units), when the name and signature cannot carry it.
+- **An interface** — an effect or error a caller cannot see from the name, the signature or a
+  glance at the body.
 - **A trap** — non-obvious ordering or lifetime, concurrency, precision or units, a security
   property, a bound the input must satisfy, the invariant a dense algorithm maintains.
 - **A knob** — a tuned constant and what to tune it against. Hardware, timing, and money carry
