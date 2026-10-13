@@ -184,7 +184,8 @@ archiving, over-planning, invented findings and unsupported cost claims, with pa
 ## Runner suites
 
 The `why-*`, `dry-*`, `shape-*` and `scan-*` directories are `claude plugin eval` cases: a prompt
-with its fixture pasted inline, outcome graders beside it. Each prompt runs with the plugin and
+with its fixture pasted inline, outcome graders beside it; the runner starts each in an empty git
+repository, so the prompt is the whole fixture. Each prompt runs with the plugin and
 without it; the number to read is the difference. One flow per run, because a mean across flows
 describes none of them:
 
@@ -573,3 +574,14 @@ pins, so "no eligible rival" was the right answer. The roster is now `openai:gpt
 `binds-timeout` now accepts an answer that names the configured 7 minutes as the bound dispatch reads;
 `nothing-run` no longer counts reading files as running. Three runs per arm: the rival from the roster
 3/3 with the plugin, 0/3 without; `binds-timeout` 2/3 and `nothing-run` 3/3 in both arms.
+
+### `run-05`, `review-05` and `dry-08` graders, 2026-10-13
+
+`run-05-selected-findings`: `scope` asked the answer to route through `duck-run`, which a judge of
+the last message cannot see; routing is now a `tool_used` trigger. Three runs per arm: `duck-run`
+fired 3/3 with the plugin; `scope` passed 3/3 in both arms, so the case shows selection, not a better
+answer. `review-05-brief-quotes`: `nothing-run` no longer fails an answer that reports what it read;
+2/3 with the plugin (one 1-2 judge split), 3/3 without. `criteria-quoted` stays 0/3 in both arms: the
+answers cite the plugin's rules with placeholders, section names or bare file names. `dry-08`: the
+contract grader now requires "there is no release" and the restating grader fails a comment that
+restates the name; 3/3 with, 2/3 without.

@@ -75,7 +75,7 @@ def transport(via: str, family: str, model: str, effort: str, prompt: str, workd
     # agy takes the effort as part of the model id: `gemini-3.1-pro-high`
     pinned = model if effort == "-" else f"{model}-{effort}"
     # headless agy auto-denies any tool it would ask about, reads included; plan mode reads freely
-    # and still denies writes
+    # and still denies writes and shell commands
     return ["agy", "--model", pinned, "--mode", "plan", *dirs, "--print-timeout",
             f"{math.ceil(limit)}s", "-p", prompt]
 
