@@ -2,9 +2,9 @@
 max_turns: 6
 timeout_seconds: 180
 allowed_tools: [Skill]
-runs: 6
+runs: 3
 ---
-Dry the comments in this module and reply with the cleaned file. Public usage docs live in `docs/api.md`, if that matters.
+Dry the comments in this module and reply with the cleaned file. Public usage docs live in `docs/api.md`, if that matters; nothing builds docs from docstrings.
 
 `stock.py`:
 
