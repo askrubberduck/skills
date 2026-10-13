@@ -261,12 +261,13 @@ def agy_env(home: Path, reads: list[str]) -> dict[str, str]:
     return {**os.environ, "HOME": str(home)}
 
 
-def guard(row: dict) -> subprocess.Popen | None:
+def guard(row: dict, home: Path | None) -> subprocess.Popen | None:
     """Start the seat's watchdog, which writes `row` pending; None when its id is taken. From here on,
-    however dispatch ends, even by SIGKILL, the watchdog sees EOF on its stdin, stops the seat and
-    finalizes a row left pending."""
+    however dispatch ends, even by SIGKILL, the watchdog sees EOF on its stdin, stops the seat,
+    finalizes a row left pending and removes the seat's `home`."""
     watchdog = subprocess.Popen([sys.executable, str(Path(__file__).resolve()), WATCHDOG,
-                                 json.dumps(row)], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                 json.dumps(row), str(home or "")], stdin=subprocess.PIPE,
+                                stdout=subprocess.PIPE,
                                 text=True, start_new_session=True)
     recorded = watchdog.stdout.readline()
     if not recorded:
@@ -297,11 +298,20 @@ def launch(watchdog: subprocess.Popen, argv: list[str], out: Path, limit: float,
     return result["timed_out"], result["code"]
 
 
-def watch(row_json: str) -> int:
+def watch(row_json: str, home: str) -> int:
     """The watchdog: write the pending row, start the seat in its own group, stop it at the limit,
     report to dispatch, then wait for dispatch to finish; if dispatch went away first, stop the seat
-    and finalize the row as cancelled."""
-    row, started = json.loads(row_json), time.time()
+    and finalize the row as cancelled. Either way it removes the seat's `home`: a cancel ends
+    dispatch with no cleanup of its own."""
+    try:
+        return guarded(json.loads(row_json))
+    finally:
+        if home:
+            shutil.rmtree(home, ignore_errors=True)
+
+
+def guarded(row: dict) -> int:
+    started = time.time()
     # a cancel meant for dispatch (pkill, a tree kill) must leave the watchdog to clean up. A handler,
     # not SIG_IGN: exec resets a handler to the default, so the seat still gets its SIGTERM
     for sig in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT):
@@ -459,7 +469,8 @@ def run_seat(args) -> int:
                status="pending", outage="-")
     if bad_values(row):
         return refuse(f"not a ledger value in {', '.join(bad_values(row))}")
-    watchdog = guard(row)
+    isolated = Path(tempfile.mkdtemp(prefix=f"askrubberduck-{via}-")) if via != "claude" else None
+    watchdog = guard(row, isolated)  # the watchdog owns `isolated` from here, cancels included
     if watchdog is None:
         return refuse(f"{row_id} is already recorded; a rerun takes a new --id")
     if reached > limit:
@@ -468,9 +479,7 @@ def run_seat(args) -> int:
     started = time.monotonic()
     verdict, cause, moved = "-", "crashed", []
     diff = Path(args.diff_out).resolve() if args.diff_out else None
-    isolated = None
     try:
-        isolated = Path(tempfile.mkdtemp(prefix=f"askrubberduck-{via}-")) if via != "claude" else None
         if diff:
             diff.unlink(missing_ok=True)  # a reader waiting for it must not take a stale one
         answer.unlink(missing_ok=True)  # a stale answer from an earlier run is no answer
@@ -489,8 +498,6 @@ def run_seat(args) -> int:
             moved = [f"- {line}" for line in before if line not in after]
             moved += [f"+ {line}" for line in after if line not in before]
     finally:
-        if isolated:
-            shutil.rmtree(isolated, ignore_errors=True)
         row.update(minutes=str(math.ceil((time.monotonic() - started) / 60)), verdict=verdict,
                    status="final", outage="0" if verdict != "-" else "1")
         record(row, new=False)
@@ -541,5 +548,5 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     if sys.argv[1:2] == [WATCHDOG]:
-        raise SystemExit(watch(sys.argv[2]))
+        raise SystemExit(watch(sys.argv[2], sys.argv[3]))
     raise SystemExit(main())

@@ -35,7 +35,9 @@ class Watchdog(unittest.TestCase):
         self.root = Path(self.directory.name).resolve()
         (self.root / "brief").write_text("review the fixture")
         self.env = {**os.environ, "PATH": f"{self.root}:{os.environ['PATH']}", "HOME": str(self.root),
-                    "CODEX_HOME": str(self.root / "owner"), "ASKRUBBERDUCK_HOME": str(self.root / "ledger")}
+                    "CODEX_HOME": str(self.root / "owner"), "ASKRUBBERDUCK_HOME": str(self.root / "ledger"),
+                    "TMPDIR": str(self.root / "tmp")}
+        (self.root / "tmp").mkdir()
 
     def tearDown(self):
         for name in ("seat.pid", "child.pid"):
@@ -82,6 +84,7 @@ class Watchdog(unittest.TestCase):
         self.assertEqual((row["status"], row["outage"], row["verdict"]), ("final", "-", "-"))
         time.sleep(0.3)
         self.assertFalse(alive(int((self.root / "child.pid").read_text())), "the seat outlived dispatch")
+        self.assertEqual(list((self.root / "tmp").iterdir()), [], "the seat's home outlived dispatch")
 
     def test_sigkill_before_the_seat_starts_finalizes_its_row(self):
         self.fake("exit 0")
@@ -163,7 +166,7 @@ class Watchdog(unittest.TestCase):
         os.close(read)  # dispatch is gone before the watchdog answers
         try:
             done = subprocess.run([sys.executable, str(SCRIPTS / "dispatch.py"), dispatch.WATCHDOG,
-                                   json.dumps(row)], env=self.env, stdin=subprocess.DEVNULL,
+                                   json.dumps(row), ""], env=self.env, stdin=subprocess.DEVNULL,
                                   stdout=write, stderr=subprocess.PIPE, text=True, timeout=30)
         finally:
             os.close(write)
