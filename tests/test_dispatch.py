@@ -5,6 +5,7 @@ Run: python3 tests/test_dispatch.py"""
 from __future__ import annotations
 
 import contextlib
+import json
 import os
 import shlex
 import shutil
@@ -58,7 +59,9 @@ STUBS = {
     "cancel": 'sleep 30 & echo $! > "$0.pid"; touch "$0.up"; wait',
     "env": 'ls -A "$CODEX_HOME" > "$0.ls"; printf %s "$CODEX_HOME" > "$0.codex"; '
            'printf %s "$HOME" > "$0.HOME"; readlink "$CODEX_HOME/auth.json" > "$0.auth"; '
-           'ls -A "$HOME/.gemini" "$HOME/Library" > "$0.gemini" 2>&1; echo "VERDICT: APPROVE"',
+           'ls -A "$HOME/.gemini" "$HOME/Library" > "$0.gemini" 2>&1; '
+           'cat "$HOME/.gemini/antigravity-cli/settings.json" > "$0.settings" 2>&1; '
+           'echo "VERDICT: APPROVE"',
 }
 
 
@@ -181,7 +184,8 @@ def self_check() -> int:
         assert code == 0, out
         assert final("g1-r1-review-gemini-3.1-pro-high") == ("REJECT", "final", "0"), out
         assert (root / "reject.argv").read_text().split("\0")[:-1] == [
-            "agy", "--model", "gemini-3.1-pro-high", "--mode", "plan", "--add-dir", str(checkout),
+            "agy", "--model", "gemini-3.1-pro-high", "--mode", "plan", "--sandbox", "--add-dir",
+            str(checkout),
             "--print-timeout", "20s", "-p", prompt.read_text()]
         code, out = run("reject", "g1c", "--pin", "anthropic:claude-test:high", "--add-dir",
                         str(checkout))
@@ -249,13 +253,23 @@ def self_check() -> int:
         (person / "Library" / "Keychains").mkdir(parents=True)
         for name in ("oauth_creds.json", "google_accounts.json", "config/AGENTS.md"):
             (person / ".gemini" / name).write_text("{}")
-        code, out = run("env", "g1g", "--pin", "google:gemini-3.1-pro", HOME=str(person))
+        code, out = run("env", "g1g", "--pin", "google:gemini-3.1-pro", "--add-dir", str(checkout),
+                        HOME=str(person))
         seat_home = (root / "env.HOME").read_text()
         assert code == 0 and seat_home != str(person), out
         assert (root / "env.gemini").read_text().split() == [
-            f"{seat_home}/.gemini:", "google_accounts.json", "oauth_creds.json",
+            f"{seat_home}/.gemini:", "antigravity-cli", "google_accounts.json", "oauth_creds.json",
             f"{seat_home}/Library:", "Keychains"], (root / "env.gemini").read_text()
         assert not Path(seat_home).exists(), "the seat's home outlived the run"
+        # its own settings run commands in the sandbox, never a command(*) grant that approves a
+        # bypass, and allow reading agy's built-in skills and its --add-dir folders
+        settings = json.loads((root / "env.settings").read_text())
+        assert settings["toolPermission"] == "proceed-in-sandbox", settings
+        assert settings["enableTerminalSandbox"] is True, settings
+        allowed = settings["permissions"]["allow"]
+        assert allowed == [f"read_file({Path(seat_home).resolve()}"
+                           "/.gemini/antigravity-cli/builtin)",
+                           f"read_file({checkout.resolve()})"], allowed
         code, out = run("greeting", "g1b")  # the prompt's verdict is no answer
         assert code == 1 and final("g1b-r1-review-gpt-6-sol") == ("-", "final", "1"), out
         assert "no verdict" in out, out

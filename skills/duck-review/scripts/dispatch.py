@@ -74,9 +74,10 @@ def transport(via: str, family: str, model: str, effort: str, prompt: str, workd
                 "--mcp-config", '{"mcpServers":{}}', *dirs, "--", prompt]
     # agy takes the effort as part of the model id: `gemini-3.1-pro-high`
     pinned = model if effort == "-" else f"{model}-{effort}"
-    # headless agy auto-denies any tool it would ask about, reads included; plan mode reads freely
-    # and still denies writes and shell commands
-    return ["agy", "--model", pinned, "--mode", "plan", *dirs, "--print-timeout",
+    # headless agy ends the seat on any permission it would ask for. The seat's settings run every
+    # command in the sandbox and allow reading the --add-dir folders; the sandbox refuses network,
+    # reads outside the workspace and writes but directly under /tmp (live probes 2026-10-13)
+    return ["agy", "--model", pinned, "--mode", "plan", "--sandbox", *dirs, "--print-timeout",
             f"{math.ceil(limit)}s", "-p", prompt]
 
 
@@ -236,16 +237,27 @@ def codex_env(home: Path, rival: bool) -> dict[str, str]:
     return {**os.environ, "CODEX_HOME": str(home), **({} if rival else {"HOME": str(home)})}
 
 
-def agy_env(home: Path) -> dict[str, str]:
+def agy_env(home: Path, reads: list[str]) -> dict[str, str]:
     """An agy seat's environment: `home` as HOME, holding only the owner's login, so the owner's
     ~/.gemini/config rules and skills stay out. The login is two files under ~/.gemini plus the
-    keychain, which macOS finds under HOME."""
+    keychain, which macOS finds under HOME. The seat may read `reads`, its --add-dir folders."""
     owner = Path.home()
     (home / ".gemini").mkdir()
     (home / "Library").mkdir()
     for part in (".gemini/oauth_creds.json", ".gemini/google_accounts.json", "Library/Keychains"):
         if (owner / part).exists():  # links, not copies: a refreshed token stays the owner's
             (home / part).symlink_to((owner / part).resolve())
+    settings = home / ".gemini" / "antigravity-cli" / "settings.json"
+    settings.parent.mkdir()
+    # agy's built-in skills unpack into the seat's home; reading them must not end the seat, while
+    # the rest of the home, the login links, stays out of the file tool's reach
+    builtin = (settings.parent / "builtin").resolve()
+    readable = [builtin, *(Path(d).resolve() for d in reads)]
+    # proceed-in-sandbox runs every command in the sandbox unasked and asks before BypassSandbox,
+    # which headless denies; a command(*) grant would approve the bypass too (probes 2026-10-13)
+    settings.write_text(json.dumps({
+        "toolPermission": "proceed-in-sandbox", "enableTerminalSandbox": True,
+        "permissions": {"allow": [f"read_file({p})" for p in readable]}}))
     return {**os.environ, "HOME": str(home)}
 
 
@@ -463,7 +475,7 @@ def run_seat(args) -> int:
             diff.unlink(missing_ok=True)  # a reader waiting for it must not take a stale one
         answer.unlink(missing_ok=True)  # a stale answer from an earlier run is no answer
         env = (codex_env(isolated, rival=bool(args.workdir)) if via == "codex"
-               else agy_env(isolated) if isolated else None)
+               else agy_env(isolated, args.add_dir) if isolated else None)
         timed_out, code = launch(watchdog, argv, out, timeout, workdir, env)
         text = out.read_text(encoding="utf-8", errors="replace")
         reply = answer.read_text(encoding="utf-8", errors="replace") if answer.exists() else ""
