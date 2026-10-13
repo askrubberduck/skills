@@ -97,7 +97,8 @@ managed hooks; inspect those before claiming a shell-free seat. The tool route d
 writes or shell execution. Claude and agy
 seats cannot take `--workdir` or serve as writable race/rally rivals; use a supported writable transport
 instead. agy runs in plan mode: headless, it denies whatever it would ask about, and plan mode keeps
-reads off that list while a write still ends the seat with no answer. Treat source-only findings as
+reads off that list while a write or a shell command still ends the seat with no answer, so an agy
+brief names file-reading tools and hands git output (log, diff) over as files. Treat source-only findings as
 `tier = read`; claim executed evidence only when the seat supplies observed command output. The outer
 runner bounds all transports and finalizes their ledger rows on timeout or failure.
 
