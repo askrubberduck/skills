@@ -31,7 +31,8 @@ document or backlog item merely to archive deleted prose.
 When a fact still affects a contract, decision or future action, keep it where its reader needs it:
 
 - A local trap or constraint stays beside the affected code, stated once.
-- Caller-facing usage belongs in existing public documentation when it cannot live in the API.
+- Caller-facing usage belongs in existing public documentation when the name, the signature and
+  an interface comment cannot carry it.
 - A still-relevant design decision or authorized deferral belongs in the existing project record;
   link to an adequate record rather than copying it. Preserve unresolved owner decisions.
 - A test rename or changed assertion message is a code change, not comment-only cleanup. Do not
