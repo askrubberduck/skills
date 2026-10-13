@@ -4,8 +4,8 @@
 the OpenAI plugin directory and the regression set for skill triggering, and they are the same
 cases either way.
 
-Every case runs in a clone of this repository with no credentials, no network, and no third-party
-CLIs. A reviewer needs nothing that is not in the clone.
+Every case runs in an empty git repository with no credentials, no network, and no third-party
+CLIs; its fixture is pasted into the prompt. A reviewer needs nothing that is not in the case.
 
 ## Running one
 
