@@ -187,9 +187,8 @@ The `why-*`, `dry-*`, `shape-*` and `scan-*` directories are `claude plugin eval
 with its fixture pasted inline, outcome graders beside it; the runner starts each in an empty git
 repository, so the prompt is the whole fixture. Each prompt runs with the plugin and
 without it; the number to read is the difference. One flow per run, because a mean across flows
-describes none of them:
-
-    claude plugin eval . --ablation with-without --judge-model sonnet -j 4 --case 'scan-*'
+describes none of them. Point `claude plugin eval` at the repository root with
+`--ablation with-without`, `--judge-model sonnet` and one `--case` glob such as `scan-*`.
 
 Cases grant only the Skill tool, so nothing is edited or executed. The reproduce and verify halves
 of `duck-why`, `duck-dry` and `duck-shape` are untested here; the cases check that the answer
