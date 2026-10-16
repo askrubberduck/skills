@@ -2,15 +2,13 @@
   "name": "askrubberduck",
   "displayName": "Ask Rubber Duck",
   "description": "Make the work prove itself. Challenge the goal, cut the clutter, and check what actually happened.",
-  "version": "3.16.4",
+  "version": "3.16.5",
   "author": {
     "name": "askrubberduck",
     "url": "https://github.com/askrubberduck"
   },
   "repository": "https://github.com/askrubberduck/skills",
   "homepage": "https://askrubberduck.github.io/skills/",
-  "documentationUrl": "https://askrubberduck.github.io/skills/",
-  "supportUrl": "https://github.com/askrubberduck/skills/issues",
   "keywords": [
     "code-review",
     "debugging",
