@@ -367,13 +367,17 @@ Standard library only. A `-` means unknown; unknown never counts as zero.
 
 Your work reaches another model only through a dispatch. A reviewer or rival from another family
 runs through that vendor's CLI on your machine: `codex` for OpenAI, `agy` for Google, `claude` for
-Anthropic, signed in with your account and run with your environment. Its prompt, and the files and
-diffs it reads, go to that vendor under its terms. `codex` can run commands and change files inside
-its sandbox. The Claude review route uses plan permissions, read-only file tools and no MCP servers;
-user customizations and session persistence are disabled, while admin-managed settings still apply.
-It cannot serve as a writable rival. agy runs in plan mode: it reads without asking, and a write is
-denied. Adding a transport grants no vendor dispatch authority. The duck has no
-server and sends no telemetry.
+Anthropic. The duck reads no token and asks for no key. A `codex` or `agy` review seat runs in a
+temporary home whose only links back are that CLI's login files (for agy, also your macOS keychain
+folder, where it keeps its token), so your rules and skills stay out; the CLI signs in to its own
+vendor with the login you already made for it. The CLI inherits your
+environment. Its prompt, and the files and diffs it reads, go to that vendor under its terms.
+`codex` can run commands and change files inside its sandbox. The Claude review route uses plan
+permissions, read-only file tools and no MCP servers; user customizations and session persistence
+are disabled, while admin-managed settings still apply. It cannot serve as a writable rival. agy
+runs commands inside its own sandbox, which has no network and refuses writes to the material and
+the seat's home. Adding a transport grants no vendor dispatch authority. The duck has no server and
+sends no telemetry.
 `duck-learn` reads your Claude Code and Codex session transcripts on disk to count what you asked
 for. Anything else the agent reads enters your host model's context and goes only where your host
 already sends it.

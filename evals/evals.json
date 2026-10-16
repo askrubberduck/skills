@@ -1,7 +1,7 @@
 {
   "plugin": "askrubberduck",
   "version": "3.0.0",
-  "fixture": "A clone of https://github.com/askrubberduck/skills at the submitted version, plugin installed. No credentials, no network, no third-party CLIs. Every case is a fresh session started at the repository root.",
+  "fixture": "This repository at the submitted version, prepared locally with the plugin enabled; a case checks out, downloads and installs nothing. No credentials, no network, no third-party CLIs. Every case is a fresh session started at the repository root.",
   "evals": [
     {
       "id": 1,
