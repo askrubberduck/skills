@@ -367,11 +367,11 @@ Standard library only. A `-` means unknown; unknown never counts as zero.
 
 Your work reaches another model only through a dispatch. A reviewer or rival from another family
 runs through that vendor's CLI on your machine: `codex` for OpenAI, `agy` for Google, `claude` for
-Anthropic. The duck reads no token and asks for no key. A `codex` or `agy` review seat runs in a
-temporary home whose only links back are that CLI's login files (for agy, also your macOS keychain
-folder, where it keeps its token), so your rules and skills stay out; the CLI signs in to its own
-vendor with the login you already made for it. The CLI inherits your
-environment. Its prompt, and the files and diffs it reads, go to that vendor under its terms.
+Anthropic. The duck asks for no key and opens no login file. So that your rules and skills stay
+out, a `codex` or `agy` review seat runs in a temporary home, and dispatch links that CLI's existing
+login storage into it: `auth.json` for codex; for agy, its two login files under `~/.gemini` and
+your macOS keychain folder. The CLI uses that login only to sign in to its own vendor. The CLI
+inherits your environment. Its prompt, and the files and diffs it reads, go to that vendor under its terms.
 `codex` can run commands and change files inside its sandbox. The Claude review route uses plan
 permissions, read-only file tools and no MCP servers; user customizations and session persistence
 are disabled, while admin-managed settings still apply. It cannot serve as a writable rival. agy
