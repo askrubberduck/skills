@@ -29,7 +29,7 @@ from pathlib import Path
 sys.dont_write_bytecode = True  # no __pycache__ inside an installed skill
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from ledger import (DEFAULT_RALLY_TURNS, DISPATCH_COLUMNS, DISPATCH_ENUMS, arm_of,  # noqa: E402
-                    default_origin, home, load_config, read_table, validate_row)
+                    default_origin, home, load_config, normalize_origin, read_table, validate_row)
 
 VIA = {"openai": "codex", "google": "agy", "anthropic": "claude"}  # by the pin's family
 # Only boundary lines carry results; body markup only guards against quoted boundary examples.
@@ -528,7 +528,7 @@ def main(argv: list[str] | None = None) -> int:
                         help="UTF-8 brief file path; its contents become the CLI prompt argument")
     parser.add_argument("--out", required=True,
                         help="the seat's output file; its directory is the scratch dir")
-    parser.add_argument("--repo", help="default: this checkout's origin")
+    parser.add_argument("--repo", type=normalize_origin, help="default: this checkout's origin")
     parser.add_argument("--candidate", help="checkout the seat must not change")
     parser.add_argument("--workdir", help="the seat's working directory; default: --out's")
     parser.add_argument("--add-dir", action="append", default=[], help="material directory")
