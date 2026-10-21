@@ -123,9 +123,15 @@ plausible reviews at exit 0:
   compare each round's output with the last: an identical body is an outage, not a verdict.
 
 A zero-byte, greeting-only, timed-out, or crashed dispatch is an outage: a dispatch attempted that
-produced no verdict; the script names its cause. An output that holds only a quota or credit
-error, or a rejection of the pinned model id, is an outage no retry clears: skip the retry and
-report the missing participant, naming the config file that holds a dead pin. **A degraded
+produced no verdict; the script names its cause. A `capacity` outage (overload, a bare rate limit)
+clears in minutes, so the one retry applies. A `credits` or `quota` outage is the account's, and an
+immediate retry only adds a row: send that family no further seat until it answers again, and say
+once that its seats are parked and resume without the owner's word. Where the owner's procedure
+offers waiting against a waiver, that offer comes first. To wait: at a stated reset time, one
+wakeup then; otherwise a background probe, the bare CLI with `Reply with exactly: OK` every 15
+minutes within a budget the report names. On `OK`, recheck each parked candidate's SHA and dispatch
+its seats. A `model rejected` outage is a dead pin: no retry; report the missing participant, name
+the config file that holds the pin, and never substitute another model. **A degraded
 dispatch is the harder case — full length, well formed, and wrong.** Nothing in the exit status
 distinguishes it, so before trusting any result, check that its quoted justifications actually
 support its verdict.

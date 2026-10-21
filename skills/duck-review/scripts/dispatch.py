@@ -41,8 +41,8 @@ BARE_RESULT = re.compile(r"\s*[*_]*(?:APPROVE|REJECT|CONCUR|OBJECT|DIFF)[*_]*\.?
 # Checked only when no verdict was found, first match wins: while credits are out, codex reports
 # that before anything else, so a later pin rejection proves nothing.
 OUTAGES = (("credits", r"out of credits|insufficient credits?|credit balance"),
-           ("capacity", r"at capacity|over capacity|overloaded"),
-           ("quota", r"quota|RESOURCE_EXHAUSTED|\b429\b|rate.?limit"),
+           ("quota", r"quota|RESOURCE_EXHAUSTED"),  # before capacity: a quota message may carry 429
+           ("capacity", r"at capacity|over capacity|overloaded|\b429\b|rate.?limit"),
            ("model rejected", r"not supported|unknown model|invalid model|model.not.found"),
            ("permission denied", r"permission\b[\s\S]{0,200}?\bdenied"))  # a wrapped message too
 WATCHDOG = "--watchdog"  # internal: dispatch.py --watchdog <row json> runs a seat's watchdog
