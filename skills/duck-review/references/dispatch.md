@@ -53,9 +53,12 @@ still counts.
 ## Run the reviewers
 
 Run each seat with `python3 "$DISPATCH"` (`$DISPATCH` is the absolute path of `duck-review`'s
-`scripts/dispatch.py`, whatever the working directory), in the background; its `--help` lists the flags, so run that rather than reading the script. Where the turn is the
-whole session (`claude -p`), its end kills a background seat (`error: interrupted`) and its review is
-lost: poll the seat's exit in bounded waits and end the turn only after it. The pinned ids
+`scripts/dispatch.py`, whatever the working directory), in the background; its `--help` lists the flags, so run that rather than reading the script. Take the
+seat's exit from the host's completion notice. Where none reaches you — a subagent, or a turn that
+is the whole session (`claude -p`), whose end kills a background seat (`error: interrupted`) and
+loses its review — wait on the exit in one bounded call: a condition monitor, or a single until-loop
+inside the tool's time limit, repeated as needed. Never `sleep` and then read the output file;
+Claude Code refuses that call, and the refusal becomes a retry loop. The pinned ids
 come from `~/.askrubberduck/config.toml`, never from memory (a `[repo."<origin>"]` table there
 overrides any key for that origin): `[models].review` (a review or a disposition), `[models].race`
 and `[models].plan`, each defaulting to `[families].reviewers` (default empty: the owner's setup

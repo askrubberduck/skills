@@ -65,6 +65,10 @@ another go-ahead. Do not open a new packet while another waits on review or inte
 run could finish first; finished work beats started work. Reconcile concurrent changes and
 verify the combined result before completion.
 
+The owner cannot see background work, and silence reads as a stall. Before a turn ends with work
+still running, say in one line what runs, what each item waits on, and which event brings the next
+update and roughly when; on each completion, one roster line.
+
 Count each worker message once: treat a status notice older than your last instruction to that
 worker as a repeat, and accept a cut-off report only after its tail arrives. Brief each worker so a
 replacement can start from the brief alone — worktree, base, candidate identity, findings with
