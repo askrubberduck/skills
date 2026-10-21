@@ -550,10 +550,17 @@ def self_check() -> int:
         assert round(chapman(10, 7, 6), 3) == 11.571 and chapman(4, 4, 4) == 4.0
         assert normalize_origin("git@github.com:askrubberduck/skills.git") == \
             normalize_origin("https://github.com/askrubberduck/skills.git") == repo[1]
+        assert normalize_origin("local:dayworkbook") == "local:dayworkbook"  # a name, not scp
         assert load_config()["review_rounds"] == 3 and load_config(repo[1])["review_rounds"] == 2
 
         dispatches, findings = load_tables()
         assert len(dispatches) == 13 and len(findings) == 20
+        # a row recorded under the scp spelling counts for the same repo as the normalized one
+        raw = DISPATCH_FIXTURE[0].replace("\tr\t", "\tgit@github.com:askrubberduck/skills.git\t", 1)
+        (root / "dispatches.tsv").write_text("\t".join(DISPATCH_COLUMNS) + "\n" + raw + "\n")
+        assert load_tables()[0][0]["repo"] == repo[1], load_tables()[0][0]
+        (root / "dispatches.tsv").write_text("\t".join(DISPATCH_COLUMNS) + "\n"
+                                             + "\n".join(DISPATCH_FIXTURE) + "\n")
         # a row ends only at a newline: U+2028 and its kin inside a cause id keep the row whole
         odd = "a\u2028\u2029\x85\x0b\x0c\x1cz"
         (root / "findings.tsv").write_text("\t".join(FINDING_COLUMNS) + "\n" + "\n".join(

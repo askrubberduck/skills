@@ -62,7 +62,7 @@ def normalize_origin(url: str) -> str:
     _, _, url = url.rpartition("://")
     _, _, url = url.rpartition("@")
     host, colon, path = url.partition(":")
-    return f"{host}/{path.lstrip('/')}" if colon else url
+    return f"{host}/{path.lstrip('/')}" if colon and "/" in path else url
 
 
 def default_origin() -> str | None:
@@ -124,6 +124,8 @@ def read_table(name: str, columns: tuple[str, ...], enums: dict[str, set]) -> li
             print(f"{name}:{line}: {len(values)} columns, expected {len(columns)}", file=sys.stderr)
             continue
         row = dict(zip(columns, values))
+        if "repo" in row:  # rows written before `--repo` was normalized keep their raw spelling
+            row["repo"] = normalize_origin(row["repo"])
         bad = [c for c, allowed in enums.items() if row[c] != "-" and row[c] not in allowed]
         if bad:
             print(f"{name}:{line}: unknown value in {', '.join(bad)}", file=sys.stderr)
@@ -609,11 +611,11 @@ def main(argv: list[str] | None = None) -> int:
     remaining.add_argument("gate_id")
     remaining.add_argument("--round", help="default: the gate's latest round")
     remaining.add_argument("--candidate", help="default: the round's only candidate")
-    remaining.add_argument("--repo", help="default: this checkout's origin")
+    remaining.add_argument("--repo", type=normalize_origin, help="default: this checkout's origin")
     remaining.set_defaults(run=cmd_remaining)
     precision = subparsers.add_parser("precision",
                                       help="substantiation rate per family, class and tier")
-    precision.add_argument("--repo", help="default: this checkout's origin")
+    precision.add_argument("--repo", type=normalize_origin, help="default: this checkout's origin")
     precision.add_argument("--all", action="store_true", help="pool every repository")
     precision.set_defaults(run=cmd_precision)
     subparsers.add_parser("missed", help="production causes per arm that approved the candidate"
@@ -621,7 +623,7 @@ def main(argv: list[str] | None = None) -> int:
     pick = subparsers.add_parser("pick", help="pick in list order; opt-in adaptive review ranking")
     pick.add_argument("stage")
     pick.add_argument("--trust", action="store_true")
-    pick.add_argument("--repo", help="default: this checkout's origin")
+    pick.add_argument("--repo", type=normalize_origin, help="default: this checkout's origin")
     pick.set_defaults(run=cmd_pick)
     paired = subparsers.add_parser("paired", help="sign test and SPRT over a paired trial")
     paired.add_argument("results")
@@ -631,16 +633,16 @@ def main(argv: list[str] | None = None) -> int:
     cost = subparsers.add_parser("cost", help="expected dispatches and minutes for a setup")
     cost.add_argument("setup")
     cost.add_argument("--trust", action="store_true")
-    cost.add_argument("--repo", help="default: this checkout's origin")
+    cost.add_argument("--repo", type=normalize_origin, help="default: this checkout's origin")
     cost.set_defaults(run=cmd_cost)
     subparsers.add_parser("schema", help="the ledger's columns and enum domains"
                           ).set_defaults(run=cmd_schema)
     roster = subparsers.add_parser("roster", help="host model ids not yet configured or tried")
     roster.add_argument("models", help="file of host model ids, one per line, or - for stdin")
-    roster.add_argument("--repo", help="default: this checkout's origin")
+    roster.add_argument("--repo", type=normalize_origin, help="default: this checkout's origin")
     roster.set_defaults(run=cmd_roster)
     promote = subparsers.add_parser("promote", help="verdict for each trial pin past its shadow")
-    promote.add_argument("--repo", help="default: this checkout's origin")
+    promote.add_argument("--repo", type=normalize_origin, help="default: this checkout's origin")
     promote.set_defaults(run=cmd_promote)
 
     args = parser.parse_args(argv)
