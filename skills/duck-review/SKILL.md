@@ -1,6 +1,6 @@
 ---
 name: duck-review
-description: Review work from multiple angles or deliver an independent judgment. Use for designs, plans, documents, code, local changes, completed work or PRs; findings-only reviews; an independent second opinion; a release gate; or to answer a review you received, saying which comments still apply to what you pushed since and drafting the replies. Findings-only review stays in-session; independent and release reviews use cross-model scrutiny and return APPROVE, REJECT, or NOTE. It does not fix, repeat, or land.
+description: Review work from multiple angles or deliver an independent judgment. Use for designs, plans, documents, code, local changes, completed work or PRs; findings-only reviews; an independent or decorrelated second opinion; a release gate; or to answer a review you received, saying which comments still apply to what you pushed since and drafting the replies. Findings-only review stays in-session; independent and release reviews use cross-model scrutiny and return APPROVE, REJECT, or NOTE. It does not fix, repeat, or land.
 ---
 
 # Duck Review
@@ -22,7 +22,9 @@ authorized action.
 
 ## Findings or independent judgment
 
-An explicit independent, cross-model or release-gate review uses the workflow below. Otherwise a
+An explicit independent, cross-model, decorrelated or release-gate review uses the workflow below;
+each needs a seat outside the doer's family, and a second reader from that family adds a lens, not
+decorrelation. Otherwise a
 findings-only, analysis-only or "multiple angles" request, or an answer to a received review, uses this
 in-session path. With no scope specified, `[review].default` in `~/.askrubberduck/config.toml` decides
 (default `findings`); [`duck-run`](../duck-run/SKILL.md) and [`duck-land`](../duck-land/SKILL.md) name

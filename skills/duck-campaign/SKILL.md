@@ -57,7 +57,9 @@ Use [`duck-run`](../duck-run/SKILL.md) for execution and verification, passing t
 shared decisions and remaining authority. Parallelize only independent work that benefits from it;
 otherwise execute sequentially. Isolate concurrent writers or destructive checks as that skill
 requires. Apply [`duck-diet`](../duck-diet/SKILL.md) to preserve useful context and keep dispatch
-overhead proportionate.
+overhead proportionate. Send every packet review through [`duck-review`](../duck-review/SKILL.md),
+never a reviewer CLI run by hand: its ledger, round bound, loop diagnosis and outage parking exist
+only there.
 
 Maintain one roster in the durable work record: packet, state, dependencies, evidence and next
 action; include branch/worktree only when used. Finish a ready unit and continue to the next without
@@ -67,7 +69,8 @@ verify the combined result before completion.
 
 The owner cannot see background work, and silence reads as a stall. Before a turn ends with work
 still running, say in one line what runs, what each item waits on, and which event brings the next
-update and roughly when; on each completion, one roster line.
+update and roughly when; on each completion, one roster line. Shut a worker down once its packet
+lands or hands back, and flag one that sits idle with uncommitted changes.
 
 Count each worker message once: treat a status notice older than your last instruction to that
 worker as a repeat, and accept a cut-off report only after its tail arrives. Brief each worker so a
@@ -77,7 +80,8 @@ evidence paths, gates and rules — and ask for reports that lead with gates and
 When blocked, record the actual blocker and a concrete next action. Continue independent work;
 do not invent consent, rescope away a required outcome or retry an unchanged failure indefinitely.
 Contrary execution evidence reopens the affected shared design before dependent work continues.
-Stop when the authorized work is complete or all remaining work is blocked, and state which.
+Stop when the authorized work is complete or all remaining work is blocked, and state which. A
+"complete" on a broad request lists what it left out and why.
 
 At a context boundary, preserve the roster, candidate identities and valid evidence. A scheduled
 continuation needs a supported authorized mechanism and confirmed booking; a written next step is not a

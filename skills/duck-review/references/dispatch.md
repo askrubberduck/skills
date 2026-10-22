@@ -130,7 +130,9 @@ once that its seats are parked and resume without the owner's word. Where the ow
 offers waiting against a waiver, that offer comes first. To wait: at a stated reset time, one
 wakeup then; otherwise a background probe, the bare CLI with `Reply with exactly: OK` every 15
 minutes within a budget the report names. On `OK`, recheck each parked candidate's SHA and dispatch
-its seats. A `model rejected` outage is a dead pin: no retry; report the missing participant, name
+its seats. A family with a `credits` or `quota` outage among its last twenty ledger dispatches runs
+one seat at a time, so the next one loses a single review, not a batch. A `model rejected` outage
+is a dead pin: no retry; report the missing participant, name
 the config file that holds the pin, and never substitute another model. **A degraded
 dispatch is the harder case — full length, well formed, and wrong.** Nothing in the exit status
 distinguishes it, so before trusting any result, check that its quoted justifications actually

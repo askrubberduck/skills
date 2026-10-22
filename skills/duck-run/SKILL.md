@@ -89,7 +89,8 @@ owns claim-specific counterexamples, final-state observations and the realistic 
 proof or shape edit returns to affected executable checks before completion or dispatch.** Earlier
 green evidence does not survive a relevant repair. Read the outputs and the resulting state, not just
 exit codes. A red check stops new work on that surface until it is green or its cause is named; do not
-build the next unit on a failure you plan to look at later.
+build the next unit on a failure you plan to look at later. A symptom that returns after its fix
+means the fix missed the cause: load [`duck-why`](../duck-why/SKILL.md) before the next patch.
 
 Use [`duck-break`](../duck-break/SKILL.md) for requested broad attacks and the dynamic evidence
 required for trust-touching work. Select attacks appropriate to the artifact: agent behavior trials for
