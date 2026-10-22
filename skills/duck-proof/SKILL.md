@@ -90,8 +90,14 @@ A failure can refute a line, a shared contract, the mechanism, or the goal. Expl
 repairing it. Would deleting the unnecessary thing end the defect? Inspect sibling callers and
 classify which can reach the cause; shared code does not imply every caller is broken.
 
-When repairs are authorized, fix the cause locally, then rerun every affected check against the
-edited candidate. Earlier green results are invalidated by relevant changes. Run the relevant
+On a REJECT or an owner correction, first name the decision the work rests on — the goal, a frame or
+plan decision, the mechanism — and ask whether it still holds against the new evidence. Patch only
+when it holds; otherwise reopen it where it was made ([`duck-frame`](../duck-frame/SKILL.md),
+[`duck-plan`](../duck-plan/SKILL.md), [`duck-decide`](../duck-decide/SKILL.md)) before any edit.
+The repair record names the decision and its verdict: holds or reopened.
+
+When repairs are authorized, fix the cause at the decision that produced it, then rerun every
+affected check against the edited candidate. Earlier green results are invalidated by relevant changes. Run the relevant
 project gates before declaring completion; broaden for affected seams or unresolved risks, not
 ceremony. A repair that fails sends the claim back through the challenge, at most twice per
 claim; at that bound the claim stays UNPROVEN with the failed repairs named.
