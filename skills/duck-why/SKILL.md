@@ -30,7 +30,8 @@ cannot be enumerated. Shared code does not imply every caller is broken.
 
 Identify the cause at the level needed to explain those paths. A shared rule may need one repair at
 its owner rather than a guard in each caller. An incorrect comparison may need only that comparison
-corrected. Investigate a deeper design or policy decision only when evidence points to it.
+corrected. A fix that would work around a recorded design or policy decision makes that decision a
+cause candidate.
 
 ## Separate plausible causes
 

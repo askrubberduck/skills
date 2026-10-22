@@ -116,8 +116,10 @@ Act on the single adjudicated result:
 - APPROVE: continue only to the already authorized release action.
 - REJECT: name each substantiated blocker's cause, using [`duck-why`](../duck-why/SKILL.md) when it is
   not established.
-  Repair at the level the evidence refutes: line, shared contract, mechanism, or goal. Rerun
-  affected verification before reviewing the changed candidate.
+  From the first round, check the decision the blocker rests on, as
+  [`duck-proof`](../duck-proof/SKILL.md)'s repair section requires, then repair at the level the
+  evidence refutes: line, shared contract, mechanism, or goal. Rerun affected verification before
+  reviewing the changed candidate. An owner correction of the result is evidence of the same kind.
 - NOTE: obtain the missing material evidence or criteria, or report which is missing. It is
   neither approval nor a reason to invent a repair. An unavailable gate does not prevent
   completing authorized local work.

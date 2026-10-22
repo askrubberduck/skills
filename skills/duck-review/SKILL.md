@@ -160,7 +160,9 @@ and name the uncertainty.
 - Check the repository's own conventions before accepting a demand for a new artifact. Existing
   evidence beats reviewer-invented ceremony.
 - Ask what the code is for, and whether the mechanism delivers the stated benefit, before
-  recommending a patch; challenge the goal itself only when asked. If removing the feature, flag,
+  recommending a patch; challenge the goal itself only when asked. Where a blocker follows from a
+  recorded design or plan decision, name that decision, so the doer reopens it rather than patching
+  around it. If removing the feature, flag,
   branch, or check ends the defect without losing a required outcome, recommend deletion. Sunk
   effort does not keep a mechanism that fails its outcome.
 - On deletion-heavy diffs, inspect the diff prefix and post-change file before accepting a claim

@@ -79,7 +79,8 @@ evidence paths, gates and rules — and ask for reports that lead with gates and
 
 When blocked, record the actual blocker and a concrete next action. Continue independent work;
 do not invent consent, rescope away a required outcome or retry an unchanged failure indefinitely.
-Contrary execution evidence reopens the affected shared design before dependent work continues.
+Contrary execution evidence, or the owner correcting a result, reopens the affected shared design
+before dependent work continues.
 Stop when the authorized work is complete or all remaining work is blocked, and state which. A
 "complete" on a broad request lists what it left out and why.
 
