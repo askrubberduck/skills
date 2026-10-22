@@ -1,6 +1,6 @@
 ---
 name: duck-land
-description: Merge approved work, run a described release process when asked, record what landed, and clean up the branch and worktree; landed means nothing left behind. Use when a change has passed its review gate and the user authorizes landing, merging or a release, when a gate-passed PR or version bump is ready, when the user asks what the landing or the push itself will check first, including a push that makes a repository public, or when merged work was never recorded in status or outcome documentation.
+description: Merge approved work, run a described release process when asked, record what landed, and clean up the branch and worktree; landed means nothing left behind. Use when the user authorizes landing, merging or a release — of gate-passed work, or with the gate waived ("PR, admin merge, release, no gate") — when a gate-passed PR or version bump is ready, when the user asks what the landing or the push itself will check first, including a push that makes a repository public, or when merged work was never recorded in status or outcome documentation.
 ---
 
 # Duck Land
