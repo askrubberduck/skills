@@ -1,6 +1,6 @@
 ---
 name: duck-run
-description: Challenge the goal, shape the plan, build it, and make it prove itself; local means local. Use when the user asks to duck a task, apply selected findings, or carry work through the delivery flow. Continue to independent review and landing only within the authorized endpoint.
+description: Challenge the goal, shape the plan, build it, and make it prove itself; local means local. Use when the user asks to duck a task, apply selected findings, or carry work through the delivery flow; when a review came back REJECT and the work must be fixed; or when the user says a result is wrong or not what they wanted and asks for it fixed, even when the fix looks like one line. Continue to independent review and landing only within the authorized endpoint.
 ---
 
 # Duck Run

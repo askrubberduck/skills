@@ -20,7 +20,11 @@ Record the candidate and relevant environment. Read its outcome, contracts and r
 conditions before choosing attacks. Do not invent deployment states or require irrelevant attacks
 for every task. A goal or plan with no running artifact can have premises tested, but cannot claim
 runtime correctness. Instruction changes need realistic agent trials with actions and final-state
-checks; a packaging validator does not establish behavior.
+checks; a packaging validator does not establish behavior. Run each arm with only its own text
+loaded, since an installed copy of the same skill answers in the candidate's place: in Claude Code,
+`claude -p --setting-sources project --plugin-dir <arm>`, which drops the user's skills, hooks and
+instructions that `--plugin-dir` alone leaves in. A prompt that names no skill measures whether the
+description fires; one that names it measures only the body.
 
 Attack a disposable copy for mutations or destructive tests, never the candidate checkout or live user
 data. Git worktrees/clones carry committed state only: capture staged, unstaged and relevant untracked
