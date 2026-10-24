@@ -75,9 +75,9 @@ touched unit without its callers open, and did a duplicate rule, state owner, or
 or unnecessary hop disappear? Do not trade obvious code for dense expressions or hidden coupling.
 
 Report the material removals or simplifications, any questionable mechanism retained with its
-concrete reason, and the checks run with their limits. Unchanged code is a valid result. Stop when
-the scoped findings are resolved and affected checks pass; another pass needs an unresolved defect,
-not a cleanup quota.
+concrete reason, and the checks run with their limits. Unchanged code is a valid result when no
+candidate survives inspection. Stop when the scoped findings are resolved and affected checks
+pass; another pass needs an unresolved defect, not a cleanup quota.
 
 [`duck-proof`](../duck-proof/SKILL.md) can challenge a remaining contract claim. This cleanup is not
 the independent release approval owned by [`duck-review`](../duck-review/SKILL.md).

@@ -62,7 +62,8 @@ only, and only threads already fixed; the rest stay open and are listed.
    as [`duck-split`](../duck-split/SKILL.md) describes (a ref, not a stash) can be reviewed; landing
    later needs an authorized exact commit. Review a change with what depends on it: callers, config
    and tests for code; citing sections and consumers for a document. A finding outside the change is
-   in scope; report what was read beyond it, and state the change alone as a coverage limit.
+   in scope; report what was read beyond it. Reading the change alone is a coverage limit to
+   state, never the default.
 2. Use the caller's recorded outcome, constraints and acceptance baseline across rounds; for a
    standalone review, establish that baseline and the effort bound once, by default the setup's
    budget in [challenge selection](references/challenge.md). Name the coordinating caller who owns
