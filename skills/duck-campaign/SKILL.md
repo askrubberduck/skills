@@ -25,7 +25,7 @@ investigation only when it helps.
 
 Apply [`duck-cut`](../duck-cut/SKILL.md)'s existence check to the candidates: what required outcome
 is missing, what already satisfies it, and which findings share a cause? Remove speculative or
-superseded work. Recheck a candidate that grows against the user's goal.
+superseded work. Recheck a candidate that grows; do not quietly expand the user's goal.
 
 Use [`duck-frame`](../duck-frame/SKILL.md) to settle shared contracts and consequential unknowns
 before dependent plans, reusing valid design decisions rather than framing each packet afresh. Keep

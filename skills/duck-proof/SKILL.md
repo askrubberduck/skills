@@ -64,9 +64,10 @@ necessary checks itself; a caller's output is reusable only for the same candida
 environment. For proposals, test uncertain premises with a small experiment when possible; this
 does not prove an unbuilt implementation correct.
 
-Challenge the oracle as well as the code, per [`duck-break`](../duck-break/SKILL.md)'s oracle
-check. Adjudicate differing permitted outputs against the contract, including ordering and
-tolerance, never by vote.
+Challenge the oracle as well as the code. Where useful, show that a negative control or targeted
+mutation fails for the intended reason; a surviving mutation may be equivalent, outside the contract
+or expose unnecessary code, so investigate before calling the tests weak. Adjudicate differing
+permitted outputs against the contract, including ordering and tolerance, never by vote.
 
 [`duck-break`](../duck-break/SKILL.md) owns destructive attack isolation and recovery mechanics. Use
 them for selected attacks here; invoke a full break when requested or required by risk or policy.

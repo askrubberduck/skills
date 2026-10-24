@@ -58,11 +58,11 @@ only, and only threads already fixed; the rest stay open and are listed.
 
 1. Resolve the exact target, its version and the requested judgment: for a code release, the last
    released tag through the candidate; for a PR, its own base; for a design, plan or document, the
-   supplied revision or snapshot; no PR, commit or Git base is needed. A dirty worktree captured as
-   [`duck-split`](../duck-split/SKILL.md) describes (a ref, not a stash) can be reviewed; landing
+   supplied revision or snapshot, which needs no PR, commit or Git base. A dirty worktree captured
+   as [`duck-split`](../duck-split/SKILL.md) describes (a ref, not a stash) can be reviewed; landing
    later needs an authorized exact commit. Review a change with what depends on it: callers, config
-   and tests for code; citing sections and consumers for a document. A finding outside the change
-   is in scope; report what was read beyond it, and state the change alone as a coverage limit.
+   and tests for code; citing sections and consumers for a document. A finding outside the change is
+   in scope; report what was read beyond it, and state the change alone as a coverage limit.
 2. Use the caller's recorded outcome, constraints and acceptance baseline across rounds; for a
    standalone review, establish that baseline and the effort bound once, by default the setup's
    budget in [challenge selection](references/challenge.md). Name the coordinating caller who owns

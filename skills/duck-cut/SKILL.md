@@ -19,7 +19,7 @@ within existing authority; a conditional or routing mention needs no load until 
 1. Enumerate all items from every registry by running [`duck-scan`](../duck-scan/SKILL.md), which
    owns the registry locator; blocked delivery items and stale active-work dirs are the same
    disease. Not installed? Say so and ask where the backlog is, once; never guess.
-2. Per item, argue **against its existence** first. Verdict, one of:
+2. Per item, argue **against its existence** first (the existence check). Verdict, one of:
    - **CLOSE NOW**: satisfied, obsolete or superseded; close with evidence (the commit, the
      shipped PR, the doc), never a recollection.
    - **CUT**: speculative need or the product moved past it; cite the requirement that no longer
