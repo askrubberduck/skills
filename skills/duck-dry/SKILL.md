@@ -6,61 +6,56 @@ description: Strip comments, docstrings, commit messages, and PR descriptions un
 # Duck Dry
 
 Remove commentary that repeats the code or records an obsolete story. Keep the facts a maintainer
-needs but cannot recover from the code: constraints, external contracts, traps and calibration.
+cannot recover from the code: constraints, external contracts, traps and calibration.
 
 Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
-Default to the current task's diff, including staged changes. Sweep committed files or a tree only
+Default to the current task's diff, including staged changes; sweep committed files or a tree only
 when named. Report-only means no edits. Local cleanup does not authorize commits or publication.
 
 ## Read before deleting
 
 Read the code each comment describes and apply [the prose bar](references/bar.md). Check whether
-tools consume the text: directives, licenses, doctests and published docstrings are not disposable
-commentary. Fix generated prose at its source, or leave it when that generator is outside scope.
+tools consume the text: directives, licenses, doctests and published docstrings are not disposable.
+Fix generated prose at its source, or leave it when the generator is outside scope.
 
-A contradiction between code and commentary needs resolution against the actual contract. Do not
-silently delete the only evidence of a defect or change behavior during a prose sweep. Report a
-necessary code repair unless it is already authorized; identify it separately when making it.
+Resolve a code/commentary contradiction against the actual contract. Never silently delete the
+only evidence of a defect or change behavior during a prose sweep. Report a necessary code repair
+unless already authorized; identify it separately when making it.
 
 ## Delete, consolidate or preserve
 
-Delete what [the bar](references/bar.md) marks for deletion. Do not create a bug record, design
-document or backlog item merely to archive deleted prose.
+Delete what the bar marks for deletion; do not create a bug record, design document or backlog
+item merely to archive deleted prose. A fact that still affects a contract, decision or future
+action stays where its reader needs it:
 
-When a fact still affects a contract, decision or future action, keep it where its reader needs it:
+- A local trap or constraint beside the affected code, stated once.
+- Caller-facing usage in existing public documentation when the name, signature and an interface
+  comment cannot carry it.
+- A still-relevant design decision or authorized deferral in the existing project record; link to
+  it rather than copying it. Preserve unresolved owner decisions.
 
-- A local trap or constraint stays beside the affected code, stated once.
-- Caller-facing usage belongs in existing public documentation when the name, the signature and
-  an interface comment cannot carry it.
-- A still-relevant design decision or authorized deferral belongs in the existing project record;
-  link to an adequate record rather than copying it. Preserve unresolved owner decisions.
-- A test rename or changed assertion message is a code change, not comment-only cleanup. Do not
-  perform it outside authorized scope.
+Remove repeated explanations of one rule, keeping the authoritative one useful. Stripping an
+internal ID must not leave a meaningless sentence. Do not add an abstraction just to make its
+comment unnecessary; first establish the ambiguity.
 
-Remove repeated explanations of the same rule while keeping the authoritative explanation useful.
-An internal ID is not the fact it refers to: stripping the ID must not leave a meaningless sentence.
-Do not add an abstraction just to make its comment unnecessary; first establish the ambiguity.
-
-Commit messages and PR prose should carry intent, constraints and verification the reader needs,
-without narrating the editing process or restating each changed line. Preserve the repository's
-required format.
+Commit messages and PR prose carry intent, constraints and verification, not the editing process
+or each changed line, in the repository's required format.
 
 ## Verify the actual edit
 
-For a comment-only sweep, compare both revisions with a language-aware parser or tokenizer.
-Non-comment tokens must match, preserving significant whitespace; never strip comments with a
-regex that can consume strings or URLs. Parsed directives need their own preservation check even
-when the language parser ignores them. Docstring or string changes are not token-identical; state
-what changed and run the checks that consume them rather than claiming comment-only equivalence.
+For a comment-only sweep, compare both revisions with a language-aware parser or tokenizer:
+non-comment tokens must match, significant whitespace preserved. Never strip comments with a regex
+that can consume strings or URLs. Parsed directives need their own preservation check. Docstring or
+string changes are not token-identical: state what changed and run the checks that consume them.
 
-Run affected lint, type, test or documentation checks and repository-required gates. Check
-formatting when deletion can change alignment. Keep declaration regrouping, renames and behavior
-changes out of a comment-only sweep. If a needed check cannot run, report the gap instead of
-claiming equivalence. The prose introduced by an authorized code change can be dried in that same
-change.
+Run affected lint, type, test or documentation checks and repository-required gates; check
+formatting when deletion can change alignment. Declaration regrouping, renames, changed assertion
+messages and behavior changes are code changes: keep them out of a comment-only sweep, and do not
+perform them outside authorized scope. If a needed check cannot run, report the gap instead of
+claiming equivalence. Prose introduced by an authorized code change can be dried in that change.
 
-Report material deletions, retained constraints and actual verification; no deletion quota or new
-receipt is needed for a standalone cleanup. Stop when the scoped prose meets the keep test and
-relevant checks pass. Apply that test while writing new comments too: intent notes written before
-the code are scaffolding, and once the code says the same thing they come down.
+Report material deletions, retained constraints and actual verification; a standalone cleanup needs
+no deletion quota or new receipt. Stop when the scoped prose meets the keep test and relevant
+checks pass. New comments meet the same test: intent notes written before the code come down once
+the code says the same thing.
