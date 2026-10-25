@@ -48,8 +48,8 @@ independent critics the same constraints and complementary questions, not each o
 
 For each finding, name the violated contract or concrete cost, cite its source and execute a
 counterexample when feasible. Distinguish demonstrated defects, supported maintenance findings and
-untested suspicions. Prefer the smallest fix, including deletion or reuse. Do not rank by lines
-removed, file age or reviewer confidence.
+untested suspicions. Propose the fix at the level the evidence refutes; deletion or reuse when that
+suffices. Do not rank by lines removed, file age or reviewer confidence.
 
 Group findings by cause; keep substantiated ones, resolve previously disputed claims explicitly,
 drop discarded hunches. The pass ceiling is `[bounds].roast_passes` in

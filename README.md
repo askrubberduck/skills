@@ -33,7 +33,7 @@ selection probes, plus with/without runs for four skills — see the [eval guide
 | "why is this broken?" | `duck-why`: the cause, its evidence and where the fix goes, or the hypotheses still standing and the check that would decide. Nobody has written the fix yet. |
 | "prove this goal or plan" | `duck-proof`: what would make it wrong, what was tried, and what survived. Your favorite answer gets no head start. |
 | "frame it before we plan" | `duck-frame`: the smallest design that meets the contract, traced through what already exists. Deleting something is one of the options. |
-| "plan it" | `duck-plan`: units someone can build and check, and the cheap experiment run before the expensive guess. Everyone agreeing does not make it feasible. |
+| "plan it" | `duck-plan`: units someone can build and check, and the experiment that could prove the guess wrong, run before building on it. Everyone agreeing does not make it feasible. |
 | "clean up the AI slop" | `duck-shape`: make every layer earn its place. Cut the needless machinery, keep the contracts, run the checks. |
 | "simplify it deeply" | `duck-shape`: take the mechanism apart, keep the contracts, rebuild the path with less to remember. Then check it. |
 | "gate it" | `duck-review`: one verdict, the reviewers named, and the evidence behind every finding. No participation trophies. |
@@ -192,7 +192,7 @@ Set `[learn].discover` to `auto` and it puts a new model on trial and applies tr
 1. **Frame**, `duck-frame`. What outcome dies if this never ships? What already solves it?
    Use `duck-shape` while choosing the boundaries, before a bad seam becomes a plan.
 2. **Plan**, `duck-plan`. Shape the path before dividing the work. Name the assumptions and the
-   checks that could kill them. Run the cheap experiment before building on the expensive guess.
+   checks that could kill them. Run one before building on the guess.
 3. **Execute.** Make the meaningful check fail, make it pass, then apply `duck-shape` and
    `duck-dry` inside that unit. “We'll simplify it later” has had enough chances.
 4. **Prove**, `duck-proof`. Attack the goal, the behavior and the finished shape. Use a cross-family
