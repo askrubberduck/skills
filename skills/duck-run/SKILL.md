@@ -35,10 +35,10 @@ worktree before deleting it.
 Load [`duck-frame`](../duck-frame/SKILL.md) (the Skill tool, or read its SKILL.md) and carry it to
 its exit state before any edit to the candidate; a frame written from memory is not a frame. It
 establishes or reuses the outcome, flow, constraints and plausible paths, at the depth it would have
-run alone; a small settled task takes its short form. If the goal is refuted, recommend the
-corrected path; never silently substitute a new goal. READY continues; CUT ends work demonstrably
-unnecessary under the owner's criteria; OWNER DECISION goes to
-[`duck-decide`](../duck-decide/SKILL.md) and holds only the dependent work.
+run alone; only its short form is quick. If the goal is refuted, recommend the corrected path;
+never silently substitute a new goal. READY continues; CUT ends work demonstrably unnecessary under
+the owner's criteria; OWNER DECISION goes to [`duck-decide`](../duck-decide/SKILL.md) and holds
+only the dependent work.
 
 ## 2. Plan with proof
 
@@ -48,7 +48,7 @@ final observation. Reuse a settled plan when its scope and assumptions still hol
 
 Select challenge approach and participants from [challenge
 selection](../duck-review/references/challenge.md); record actual participation. Attack
-consequential assumptions with the cheapest experiment before building on them.
+consequential assumptions with an experiment that could prove them wrong before building on them.
 A refuted decomposition is replanned; agreement alone never makes it ready. Bound critique as
 `duck-plan` specifies.
 

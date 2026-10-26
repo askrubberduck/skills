@@ -18,9 +18,9 @@ continue within existing authority; a standalone planning request ends with the 
 ## Start from the actual decision
 
 Reuse the outcome, constraints, affected flow and decisions established by
-[`duck-frame`](../duck-frame/SKILL.md). If they are missing or contradicted, resolve only the
-unsettled design before planning dependent work. A small settled task can use the short form. Read
-relevant source, tests and project instructions before naming changes.
+[`duck-frame`](../duck-frame/SKILL.md). If they are missing or contradicted, load `duck-frame` for
+the unsettled design before planning dependent work. A short-form frame can take a short plan.
+Read relevant source, tests and project instructions before naming changes.
 
 Use [`duck-shape`](../duck-shape/SKILL.md) in analysis mode on proposed mechanisms, reusing valid
 analysis. Search for existing helpers and platform capabilities. Remove speculative layers,
@@ -44,7 +44,7 @@ cannot stand in for them. State the final user-visible observation, not that all
 ## Try to invalidate the plan
 
 Ask whether its checks could pass while the outcome fails. Test the consequential assumption with
-the cheapest available experiment before endorsing dependent work. Record what ran, what
+an experiment that could prove it wrong before endorsing dependent work. Record what ran, what
 happened and what remains untested. A plan for an unbuilt implementation cannot prove runtime
 correctness.
 

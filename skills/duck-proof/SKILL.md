@@ -44,7 +44,7 @@ exists, but state the gap when it limits coverage.
   observation that separates them; use [`duck-why`](../duck-why/SKILL.md) when the cause needs
   investigation.
 - **Plan:** name the assumption that would invalidate dependent steps. Could the planned tests
-  succeed while the outcome fails? Run the cheapest feasibility probe before endorsing that
+  succeed while the outcome fails? Run a feasibility probe that could fail before endorsing that
   path.
 - **Implementation:** identify a contract violation ordinary tests might miss: duplicate,
   reordered, interrupted, stale, malformed or concurrent input as relevant to the real system.

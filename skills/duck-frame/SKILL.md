@@ -23,14 +23,17 @@ requirements, source and assumptions still hold; a READY label or commit alone i
 check provenance and evidence. Contrary evidence or a moved cited boundary makes the record stale,
 even when cited files are unchanged; an unrelated HEAD change alone does not.
 
-A small settled change needs only a short outcome, constraints, source, check and decision record.
-Expand analysis when the change affects a public interface, state ownership, trust boundary or
-consequential failure path.
+A change touching no public interface, state ownership, trust boundary or consequential failure
+path needs only a short outcome, constraints, source, check and decision record, bought with one
+line, `short-form because: …`. Otherwise the analysis expands. Execution that later moves one of
+those seams re-frames in full.
 
 ## Establish what the choice depends on
 
 - Separate the desired benefit from the requested mechanism; search for existing behavior that
-  already delivers it. State non-goals and observable success criteria.
+  already delivers it. A mechanism or fix proposed by the owner, a backlog item or a reviewer is
+  one candidate, held to the same evidence as yours. State non-goals and observable success
+  criteria.
 - Trace the affected flow from input to effect: callers, rule and state owners, failure paths.
   Group findings by shared cause or boundary.
 - Record requirements with sources, including project gates. Distinguish inspected facts,
@@ -63,12 +66,21 @@ Security-, privacy- and data-sensitive changes also identify affected assets, tr
 abuse cases, data classes and retention. Scale detail to the risk; never drop a real invariant for
 brevity.
 
+When the analysis expands, try to break the chosen design before READY: walk it from the source
+through the states the affected flow can be in while the new mechanism is armed or acts, covering
+the relevant classes among modes, ownership handoffs, queued or replayed input, blocked or
+recovering paths and other callers of the changed state, and the applicable classes in
+`defect-classes.md` when one exists (home as [`duck-proof`](../duck-proof/SKILL.md), section
+"Evidence and handoff", resolves it). Name what was not walked instead of claiming every state. A
+state the design mishandles reopens the choice; a walk that could not have failed is not one.
+
 ## Return the decision
 
 Use one exit state:
 
 - **READY**: settled, with no material unresolved premise blocking planning. State the target
   change, preserved contracts and checks needed; a ready design is not a tested implementation.
+  When the analysis expanded, READY records that walk and what it showed.
 - **CUT**: existing behavior satisfies the outcome, or the proposal fails an explicit owner/project
   criterion. Cite that evidence; do not substitute your own product priorities.
 - **OWNER DECISION**: a material product, policy, public-contract, cost or schedule tradeoff needs
