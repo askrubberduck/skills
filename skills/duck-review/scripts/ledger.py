@@ -623,9 +623,38 @@ def cmd_schema(args) -> int:
     for table, enums in (("dispatches.tsv", DISPATCH_ENUMS), ("findings.tsv", FINDING_ENUMS)):
         for column, allowed in sorted(enums.items()):
             print(f"{table} {column} = {', '.join(sorted(allowed))} or -")
-    print("findings.tsv class = the first of these that fits, or -")
+    print("findings.tsv class = the first of these that fits")
     for name, meaning in FINDING_CLASSES.items():
         print(f"  {name}: {meaning}")
+    return 0
+
+
+def cmd_record(args) -> int:
+    """Append one findings row from column=value pairs; unnamed columns take `-`. Old rows keep
+    any class, a new one takes the vocabulary."""
+    row = dict.fromkeys(FINDING_COLUMNS, "-")
+    for field in args.fields:
+        column, _, value = field.partition("=")
+        if column not in row or not value or "\t" in value or value.splitlines() != [value]:
+            print(f"not a column=value pair: {field!r}")
+            return 1
+        row[column] = value
+    if set(row["candidate"]) <= set("0123456789abcdef"):  # a SHA, cut as dispatch.py cuts it
+        row["candidate"] = row["candidate"][:7]
+    bad = [c for c in ("candidate", "cause_id") if row[c] == "-"]
+    bad += [c for c, allowed in FINDING_ENUMS.items() if row[c] != "-" and row[c] not in allowed]
+    bad += ["class"] if row["class"] not in FINDING_CLASSES else []
+    if bad:
+        print(f"missing or unknown value in {', '.join(bad)}; see schema")
+        return 1
+    path = home() / "findings.tsv"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a+", encoding="utf-8") as table:
+        table.seek(0)
+        text = table.read()
+        table.write(("" if text.endswith("\n") or not text else "\n")
+                    + ("" if text else "\t".join(FINDING_COLUMNS) + "\n")
+                    + "\t".join(row[c] for c in FINDING_COLUMNS) + "\n")
     return 0
 
 
@@ -662,6 +691,9 @@ def main(argv: list[str] | None = None) -> int:
     cost.set_defaults(run=cmd_cost)
     subparsers.add_parser("schema", help="the ledger's columns and enum domains"
                           ).set_defaults(run=cmd_schema)
+    record = subparsers.add_parser("record", help="append one findings.tsv row")
+    record.add_argument("fields", nargs="+", metavar="column=value")
+    record.set_defaults(run=cmd_record)
     roster = subparsers.add_parser("roster", help="host model ids not yet configured or tried")
     roster.add_argument("models", help="file of host model ids, one per line, or - for stdin")
     roster.add_argument("--repo", type=normalize_origin, help="default: this checkout's origin")

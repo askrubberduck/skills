@@ -15,9 +15,9 @@ within existing authority; a conditional or routing mention needs no load until 
 
 ## Recipe
 
-1. **Gather evidence.** `$LEDGER` below is `python3` with the absolute path of
-   `../duck-review/scripts/ledger.py`, resolved from this skill's directory, typed out as
-   `python3 "<path>" <subcommand>` rather than held in one variable.
+1. **Gather evidence.** `$LEDGER` below means
+   `python3 "<absolute path of ../duck-review/scripts/ledger.py>"`, resolved from this skill's
+   directory and typed out in every command.
    - **Numbers first.** `$LEDGER thresholds` reads `~/.askrubberduck/dispatches.tsv` and prints
      lesson candidates — a pin's outage rate, a pin whose reviews among its last twenty dispatches
      found no unique blocker, minutes that drifted — each an occurrence for step 3's bar.

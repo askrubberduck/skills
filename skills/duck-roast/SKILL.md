@@ -52,10 +52,10 @@ untested suspicions. Propose the fix at the level the evidence refutes; deletion
 suffices. Do not rank by lines removed, file age or reviewer confidence.
 
 Group findings by cause; keep substantiated ones, resolve previously disputed claims explicitly,
-drop discarded hunches. The pass ceiling is `[bounds].roast_passes` in
-`~/.askrubberduck/config.toml` (default 2) unless the user supplies another. Another pass needs an
-unresolved question and new evidence or a materially different approach; never repeat until the
-finding list is empty or every critic agrees.
+drop discarded hunches. The pass ceiling is `[bounds].roast_passes` (default 2), which `dispatch.py`
+enforces on dispatched passes, unless the user supplies another. Another pass needs an unresolved
+question and new evidence or a materially different approach; never repeat until the finding list is
+empty or every critic agrees.
 
 ## Return the useful result
 

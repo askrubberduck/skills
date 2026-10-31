@@ -115,15 +115,14 @@ short a reviewer, and both leave findings that are still claims to adjudicate.
 
 Read relevant project constraints and `defect-classes.md` before adjudication; resolve its home
 using [`duck-proof`](../duck-proof/SKILL.md), section "Evidence and handoff". Check applicable
-classes against the candidate; the ledger supplies counterexamples, not a finding quota. An absent
-ledger does not block a narrow review; state the coverage limit.
+classes against the candidate; `defect-classes.md` supplies counterexamples, not a finding quota. An
+absent `defect-classes.md` does not block a narrow review; state the coverage limit.
 
-For each finding, inspect the current target and classify it as a substantiated `BLOCKER`,
-retained `SHOULD`, retained `NOTE`, or dismissed with a recorded reason. Record `adjudicated_by`
-per finding in `~/.askrubberduck/findings.tsv`, and in `class` the first name `$LEDGER schema` lists
-that fits. `$LEDGER` is `python3` with the absolute path of this skill's `scripts/ledger.py`,
-whatever the working directory, typed out as `python3 "<path>" <subcommand>` rather than held in
-one variable. `$LEDGER precision` measures past substantiation; it is not evidence that a current
+For each finding, inspect the current target and classify it as a substantiated `BLOCKER`, retained
+`SHOULD`, retained `NOTE`, or dismissed with a recorded reason. Record each with `$LEDGER record
+column=value …`, `adjudicated_by` included and in `class` the first name `$LEDGER schema` lists that
+fits. `$LEDGER` means `python3 "<absolute path of this skill's scripts/ledger.py>"`, typed out in
+every command. `$LEDGER precision` measures past substantiation; it is not evidence that a current
 finding is correct.
 
 **When the actor adjudicating built the candidate, say so in the report**, dismiss only on evidence
@@ -155,8 +154,8 @@ after that is a `NOTE` with the disagreement named, not a `BLOCKER`.
   level.
 - If supplied history shows the same rule drawing repeated findings, ask whether that rule should
   exist. When two consecutive rounds' substantiated blockers target code introduced by remediation
-  rather than the original candidate, **or fall in one `defect-classes.md` class whatever code they land on**,
-  say so in the report, naming the class, and recommend the caller's circuit breaker
+  rather than the original candidate, **or fall in one `defect-classes.md` class whatever code they
+  land on**, say so in the report, naming the class, and recommend the caller's circuit breaker
   ([`duck-run`](../duck-run/SKILL.md)'s loop diagnosis) over the next round.
 - Count concepts, not lines: a new branch, exception or second home for a fact, an abstraction
   without a required contract or credible change path, a unit with a second job.
@@ -188,7 +187,7 @@ may land only `APPROVE`; a superreview `NOTE` is a non-decision, not a hidden pa
 Report the authoritative result, each reviewer's pinned model id and family, each raw verdict,
 every finding's adjudicated classification and evidence, any outage or downgrade, and the exact
 target and criteria reviewed. The dispatch script finalizes each participant's row in
-`dispatches.tsv`; append one row per adjudicated finding to `findings.tsv`, with a stable
+`dispatches.tsv`; record one row per adjudicated finding with `$LEDGER record`, with a stable
 `cause_id` shared across participants that found the same cause. When measurement is requested,
 report `$LEDGER remaining <gate_id>` as an advisory estimate, never a gate or continuation
 criterion.

@@ -79,10 +79,9 @@ Return READY when units and checks are actionable with no substantiated blocker.
 refuted premise, missing evidence or owner decision and the work depending on it. Report actual
 challenge participants and unresolved findings; a solo draft stays labeled solo.
 
-Bound critique before dispatch: `[bounds].plan_rounds` in `~/.askrubberduck/config.toml` (default 2)
-rounds after the initial draft unless the owner sets another limit. Another round needs new
-evidence or a materially changed approach. At the bound stop redispatching and preserve unresolved
-claims.
+Bound critique before dispatch: `[bounds].plan_rounds` (default 2), which `dispatch.py` enforces on
+dispatched rounds, unless the owner sets another limit. Another round needs new evidence or a
+materially changed approach. At the bound stop redispatching and preserve unresolved claims.
 
 Update one existing plan when a durable execution handoff is needed, under
 [`duck-proof`](../duck-proof/SKILL.md)'s durable-home rules; a short standalone plan can stay in the

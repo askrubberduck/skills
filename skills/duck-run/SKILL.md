@@ -129,11 +129,10 @@ only the user settles a genuinely new product, policy or scope decision.
 
 Before the first review, record the outcome, non-goals, required contracts, acceptance checks,
 release policy, participants and effort bound; carry that baseline across rounds. The round ceiling
-is `[bounds].review_rounds` in `~/.askrubberduck/config.toml` (default 3: initial review plus two
-re-reviews; `[bounds].trust_rounds` (default 2) for trust-touching work) unless the user or
-repository sets another; the stop rule inside it is evidence, per the challenge reference.
-Reframing, changing reviewers or renaming the task does not reset it. Transport retries follow
-[`duck-review`](../duck-review/SKILL.md)'s separate bounded outage rule.
+is `[bounds].review_rounds`, or `[bounds].trust_rounds` for trust-touching work, as `dispatch.py`
+enforces it, unless the user or repository sets another; the stop rule inside it is evidence, per
+the challenge reference. Reframing, changing reviewers or renaming the task does not reset it.
+Transport retries follow [`duck-review`](../duck-review/SKILL.md)'s separate bounded outage rule.
 
 Track findings by stable cause with the violated criterion, evidence, disposition and closure
 check. A reworded finding is not new; reopen a closed cause only with contrary evidence or an

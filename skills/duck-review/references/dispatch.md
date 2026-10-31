@@ -146,8 +146,8 @@ gate is short a reviewer, and its findings are still claims. **A REJECT is never
 
 **A pin on trial rides along.** A pin in `[learn].trial` (default empty) rides along for its first
 `[learn].shadow` (default 3) gates, and up to twice that while its comparison stays undecided;
-`$LEDGER pick review` names it on a `shadow` line while it does (`$LEDGER` is `python3` with the
-absolute path of `duck-review`'s `scripts/ledger.py`). Dispatch it beside the required
+`$LEDGER pick review` names it on a `shadow` line while it does (`$LEDGER` means
+`python3 "<absolute path of duck-review's scripts/ledger.py>"`). Dispatch it beside the required
 set with the same brief and the same export authorization for its vendor, or skip it and say so.
 Its verdict never counts toward the gate, its outage never leaves the gate short, and its findings
 are adjudicated like any other. Its row carries `setup = shadow`. A trial's gates count in

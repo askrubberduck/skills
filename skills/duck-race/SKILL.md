@@ -27,9 +27,9 @@ test and the other satisfying it.
 2. Name the participants and families before starting. The doer (this session's family) is one;
    the rival is a **proven different family** from `[models].race` in
    `~/.askrubberduck/config.toml` or the owner's setup, and `$LEDGER pick race` chooses
-   `$RIVAL_MODEL` within it (`$LEDGER` is `python3` with the absolute path of
-   `../duck-review/scripts/ledger.py`, resolved from this skill's directory, typed out as
-   `python3 "<path>" <subcommand>` rather than held in one variable; `$DISPATCH` is the absolute
+   `$RIVAL_MODEL` within it (`$LEDGER` means
+   `python3 "<absolute path of ../duck-review/scripts/ledger.py>"`, resolved from this skill's
+   directory and typed out in every command; `$DISPATCH` is the absolute
    path of `dispatch.py` beside it, run as `python3 "$DISPATCH"`). Prove the rival's family and pin
    by dispatch mechanics' identity checks (roster line and pinned id recorded) before spending a
    round; executable names are not identities, and unknown identity is not a different family.
@@ -117,7 +117,7 @@ A void (a peek, an edited test, a clarification one side did not receive) ends t
 is the last green before it, and a re-run starts a new turn count.
 
 Stop when any holds: every acceptance criterion has a passing test; the turn ceiling
-`[bounds].rally_turns` in `~/.askrubberduck/config.toml` (default 10) is reached, counting every
+`[bounds].rally_turns`, which `dispatch.py` enforces, is reached, counting every
 serve, return, rejected serve and objection as one turn; or both sides serve a no-new-test-ideas
 pass back to back. Then run the full suite once more and record it; the last green is the
 candidate's evidence.
