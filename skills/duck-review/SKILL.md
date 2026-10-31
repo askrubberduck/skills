@@ -120,8 +120,11 @@ ledger does not block a narrow review; state the coverage limit.
 
 For each finding, inspect the current target and classify it as a substantiated `BLOCKER`,
 retained `SHOULD`, retained `NOTE`, or dismissed with a recorded reason. Record `adjudicated_by`
-per finding in `~/.askrubberduck/findings.tsv`. `$LEDGER precision` measures past substantiation;
-it is not evidence that a current finding is correct.
+per finding in `~/.askrubberduck/findings.tsv`, and in `class` the first name `$LEDGER schema` lists
+that fits. `$LEDGER` is `python3` with the absolute path of this skill's `scripts/ledger.py`,
+whatever the working directory, typed out as `python3 "<path>" <subcommand>` rather than held in
+one variable. `$LEDGER precision` measures past substantiation; it is not evidence that a current
+finding is correct.
 
 **When the actor adjudicating built the candidate, say so in the report**, dismiss only on evidence
 a third party can re-check from the artifacts, and let a finding you cannot settle stand. Under the
@@ -152,7 +155,7 @@ after that is a `NOTE` with the disagreement named, not a `BLOCKER`.
   level.
 - If supplied history shows the same rule drawing repeated findings, ask whether that rule should
   exist. When two consecutive rounds' substantiated blockers target code introduced by remediation
-  rather than the original candidate, **or fall in one ledger class whatever code they land on**,
+  rather than the original candidate, **or fall in one `defect-classes.md` class whatever code they land on**,
   say so in the report, naming the class, and recommend the caller's circuit breaker
   ([`duck-run`](../duck-run/SKILL.md)'s loop diagnosis) over the next round.
 - Count concepts, not lines: a new branch, exception or second home for a fact, an abstraction
@@ -188,9 +191,7 @@ target and criteria reviewed. The dispatch script finalizes each participant's r
 `dispatches.tsv`; append one row per adjudicated finding to `findings.tsv`, with a stable
 `cause_id` shared across participants that found the same cause. When measurement is requested,
 report `$LEDGER remaining <gate_id>` as an advisory estimate, never a gate or continuation
-criterion. `$LEDGER` is `python3` with the absolute path of this skill's `scripts/ledger.py`,
-whatever the working directory, typed out as `python3 "<path>" <subcommand>` rather than held in
-one variable.
+criterion.
 
 **Write that report where the landing gate can read it** — the same durable records home as the
 receipts, never only into the caller's context or `$SP`, and never as a commit on the candidate

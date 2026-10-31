@@ -31,6 +31,28 @@ DISPATCH_ENUMS = {
     "trust": {"0", "1"}, "status": {"pending", "final"}, "outage": {"0", "1"},
     "verdict": {"APPROVE", "REJECT", "NOTE", "DIFF", "CONCUR", "OBJECT"},
 }
+# A finding takes the first class that fits, in this order, so one defect lands in one class.
+# Advisory, not an enum: rows written before the vocabulary keep their old class and still count.
+FINDING_CLASSES = {
+    "lost-obligation": "a requirement, action or record dropped across a handoff, rewrite or deletion",
+    "contract": "one party to a shared interface, format or rule moved and another did not",
+    "race": "ordering, concurrency, cancellation or a wait that can interleave wrongly",
+    "partial-state": "an update that can stop halfway or leave copies of one fact disagreeing",
+    "data-loss": "a migration or destructive path that can lose or corrupt stored data",
+    "failure-path": "an error swallowed, a guard lost, or cleanup missing when something fails",
+    "unbounded": "a loop, wait, retry or obligation with no bound",
+    "authority": "an action past its authorization, a leaked secret or broken isolation",
+    "evidence": "a receipt, report or claim stronger than what was measured, or stale",
+    "test-gap": "a test, eval or grader that cannot fail on the defect it guards",
+    "false-doc": "documentation or a comment that states something false or contradictory",
+    "prose": "wording, language, translation or format that misleads or breaks a style rule",
+    "shape": "duplication, a second home for one fact, or machinery the problem does not need",
+    "ui": "layout, routing or accessibility defect in an interface",
+    "resource": "cost, performance, limit or leak",
+    "process": "release, packaging or commit procedure not followed",
+    "spec-gap": "a stated requirement or outcome missed or contradicted, none of the above",
+    "logic": "a computation, parse or condition that gives the wrong result, none of the above",
+}
 FINDING_ENUMS = {
     "tier": {"executed", "static", "read", "production"},
     "severity": {"BLOCKER", "SHOULD", "NOTE"}, "substantiated": {"0", "1"},
@@ -601,6 +623,9 @@ def cmd_schema(args) -> int:
     for table, enums in (("dispatches.tsv", DISPATCH_ENUMS), ("findings.tsv", FINDING_ENUMS)):
         for column, allowed in sorted(enums.items()):
             print(f"{table} {column} = {', '.join(sorted(allowed))} or -")
+    print("findings.tsv class = the first of these that fits, or -")
+    for name, meaning in FINDING_CLASSES.items():
+        print(f"  {name}: {meaning}")
     return 0
 
 

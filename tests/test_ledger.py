@@ -20,9 +20,9 @@ sys.path.insert(0, str(SCRIPTS))
 # a seeded Thompson draw: a reader's output compares equal across runs
 SEEDED = (f"import random, sys; random.seed(1); sys.path.insert(0, {str(SCRIPTS)!r}); "
           "import ledger; raise SystemExit(ledger.main(sys.argv[1:]))")
-from ledger import (DEFAULT_SHADOW, DISPATCH_COLUMNS, FINDING_COLUMNS, arm_of,  # noqa: E402
-                    chapman, home, load_config, load_tables, main, normalize_origin, number, pick_arms,
-                    pin_of, precision_table, roster_for, sign_test, trial_verdict,
+from ledger import (DEFAULT_SHADOW, DISPATCH_COLUMNS, FINDING_CLASSES, FINDING_COLUMNS,  # noqa: E402
+                    arm_of, chapman, home, load_config, load_tables, main, normalize_origin, number,
+                    pick_arms, pin_of, precision_table, roster_for, sign_test, trial_verdict,
                     unique_blocker_dispatches, validate_row, with_effort)
 
 CONFIG_FIXTURE = """\
@@ -51,26 +51,26 @@ DISPATCH_FIXTURE = [
     "d13\tg6\t1\t2026-09-06\telsewhere\treview\tindependent\t0\tc6\topenai\tgpt-6-astra\thigh\t4\t-\tAPPROVE\tfinal\t0",
 ]
 FINDING_FIXTURE = [
-    "d1\tg1\tc1\ta1\tcorrectness\texecuted\tBLOCKER\t1\thuman",
-    "d1\tg1\tc1\ta2\tcorrectness\texecuted\tSHOULD\t1\thuman",
-    "d1\tg1\tc1\ta3\tstyle\tread\tNOTE\t0\t-",
-    "d2\tg1\tc1\ta2\tcorrectness\tstatic\tSHOULD\t1\thuman",
-    "d2\tg1\tc1\tb1\tstyle\tread\tNOTE\t1\thuman",
-    "d3\tg2\tc2\tc1\tcorrectness\texecuted\tBLOCKER\t1\thuman",
-    "d3\tg2\tc2\tc2\tcorrectness\texecuted\tNOTE\t-\t-",
-    "d4\tg2\tc2\tc3\tcorrectness\tstatic\tBLOCKER\t0\thuman",
-    "d4\tg2\tc2\tc4\tperf\tstatic\tSHOULD\t1\thuman",
-    "d5\tg3\tc3\te1\tstyle\tread\tNOTE\t1\thuman",
-    "d5\tg3\tc3\te2\tstyle\tread\tNOTE\t0\t-",
-    "d6\tg3\tc3\te3\tcorrectness\tstatic\tBLOCKER\t1\thuman",
-    "d7\tg4\tc4\tf1\tcorrectness\texecuted\tBLOCKER\t1\thuman",
-    "-\tg3\tc3\te4\tcorrectness\tproduction\tBLOCKER\t1\towner",
-    "-\tg1\tc1\ta9\tcorrectness\tproduction\tBLOCKER\t1\towner",
-    "d9\tg5\tc5\th1\tcorrectness\texecuted\tSHOULD\t1\tgoogle",
-    "d10\tg5\tc5\th1\tcorrectness\tstatic\tSHOULD\t1\topenai",
-    "d10\tg5\tc5\th2\tstyle\tread\tNOTE\t1\topenai",
-    "-\tg4\tc4\tp9\tcorrectness\tproduction\tBLOCKER\t0\towner",
-    "d13\tg6\tc6\tz1\tcorrectness\texecuted\tSHOULD\t1\thuman",
+    "d1\tg1\tc1\ta1\tlogic\texecuted\tBLOCKER\t1\thuman",
+    "d1\tg1\tc1\ta2\tlogic\texecuted\tSHOULD\t1\thuman",
+    "d1\tg1\tc1\ta3\tprose\tread\tNOTE\t0\t-",
+    "d2\tg1\tc1\ta2\tlogic\tstatic\tSHOULD\t1\thuman",
+    "d2\tg1\tc1\tb1\tprose\tread\tNOTE\t1\thuman",
+    "d3\tg2\tc2\tc1\tlogic\texecuted\tBLOCKER\t1\thuman",
+    "d3\tg2\tc2\tc2\tlogic\texecuted\tNOTE\t-\t-",
+    "d4\tg2\tc2\tc3\tlogic\tstatic\tBLOCKER\t0\thuman",
+    "d4\tg2\tc2\tc4\tresource\tstatic\tSHOULD\t1\thuman",
+    "d5\tg3\tc3\te1\tprose\tread\tNOTE\t1\thuman",
+    "d5\tg3\tc3\te2\tprose\tread\tNOTE\t0\t-",
+    "d6\tg3\tc3\te3\tlogic\tstatic\tBLOCKER\t1\thuman",
+    "d7\tg4\tc4\tf1\tlogic\texecuted\tBLOCKER\t1\thuman",
+    "-\tg3\tc3\te4\tlogic\tproduction\tBLOCKER\t1\towner",
+    "-\tg1\tc1\ta9\tlogic\tproduction\tBLOCKER\t1\towner",
+    "d9\tg5\tc5\th1\tlogic\texecuted\tSHOULD\t1\tgoogle",
+    "d10\tg5\tc5\th1\tlogic\tstatic\tSHOULD\t1\topenai",
+    "d10\tg5\tc5\th2\tprose\tread\tNOTE\t1\topenai",
+    "-\tg4\tc4\tp9\tlogic\tproduction\tBLOCKER\t0\towner",
+    "d13\tg6\tc6\tz1\tlogic\texecuted\tSHOULD\t1\thuman",
 ]
 
 
@@ -105,12 +105,12 @@ ROLES_DISPATCHES = [
     "s8\tg9\t1\t2026-09-09\tr\treview\tbroad\t1\tc9\topenai\tgpt-6-astra\txhigh\t5\t-\tREJECT\tfinal\t0",
 ]
 ROLES_FINDINGS = [
-    "s1\tg7\tc7\tk1\tcorrectness\tread\tBLOCKER\t1\thuman",
-    "s3\tg7\tc7\tk1\tcorrectness\tread\tBLOCKER\t1\thuman",
-    "s3\tg7\tc7\tk2\tcorrectness\tread\tBLOCKER\t1\thuman",
-    "s4\tg7\tc7\tk3\tcorrectness\tread\tSHOULD\t1\thuman",
-    "s4\tg7\tc7\tk2\tcorrectness\tread\tBLOCKER\t1\thuman",
-    "s8\tg9\tc9\tk9\tcorrectness\tread\tBLOCKER\t1\thuman",
+    "s1\tg7\tc7\tk1\tlogic\tread\tBLOCKER\t1\thuman",
+    "s3\tg7\tc7\tk1\tlogic\tread\tBLOCKER\t1\thuman",
+    "s3\tg7\tc7\tk2\tlogic\tread\tBLOCKER\t1\thuman",
+    "s4\tg7\tc7\tk3\tlogic\tread\tSHOULD\t1\thuman",
+    "s4\tg7\tc7\tk2\tlogic\tread\tBLOCKER\t1\thuman",
+    "s8\tg9\tc9\tk9\tlogic\tread\tBLOCKER\t1\thuman",
 ]
 
 
@@ -370,10 +370,10 @@ def rally_check(root: Path) -> None:
     vouch = [{"id": "s1", "repo": "r", "stage": "review", "family": "openai", "setup": "shadow"},
              {"id": "c1", "repo": "r", "stage": "review", "family": "openai",
               "setup": "independent"}]
-    claims = ([{"dispatch_id": "s1", "class": "correctness", "tier": "read", "substantiated": "1"}]
-              * 3 + [{"dispatch_id": "c1", "class": "correctness", "tier": "read",
+    claims = ([{"dispatch_id": "s1", "class": "logic", "tier": "read", "substantiated": "1"}]
+              * 3 + [{"dispatch_id": "c1", "class": "logic", "tier": "read",
                       "substantiated": "0"}])
-    assert precision_table(vouch, claims, "r")[("openai", "correctness", "read")] == (1, 0)
+    assert precision_table(vouch, claims, "r")[("openai", "logic", "read")] == (1, 0)
     # a gate id recurs across repositories: another repository's gate is no shared baseline
     other = [dict(rows[0], id="x-inc", repo="elsewhere", gate_id="g9", candidate="g9"),
              dict(rows[1], id="x-t", gate_id="g9", candidate="g9")]
@@ -482,9 +482,9 @@ def home_check(parent: Path) -> None:
     done = call(roast, ["cost", "independent", "--repo", "r"])
     assert done.returncode == 0 and "mean minutes = -" in done.stdout, done
     (roast / "findings.tsv").write_text(header["findings.tsv"] + "\t".join(
-        ["x", "g", "c", "cause", "roastclass", "read", "SHOULD", "0", "doer"]) + "\n")
+        ["x", "g", "c", "cause", "shape", "read", "SHOULD", "0", "doer"]) + "\n")
     done = call(roast, ["precision", "--all"])
-    assert done.returncode == 0 and "roastclass" not in done.stdout, done
+    assert done.returncode == 0 and done.stderr == "" and "shape" not in done.stdout, done
     latin = parent / "latin"  # the table is UTF-8 whatever the reader's locale says
     latin.mkdir()
     (latin / "dispatches.tsv").write_text(header["dispatches.tsv"] + "\t".join(
@@ -564,9 +564,19 @@ def self_check() -> int:
         # a row ends only at a newline: U+2028 and its kin inside a cause id keep the row whole
         odd = "a\u2028\u2029\x85\x0b\x0c\x1cz"
         (root / "findings.tsv").write_text("\t".join(FINDING_COLUMNS) + "\n" + "\n".join(
-            FINDING_FIXTURE + [f"d1\tg1\tc1\t{odd}\tcorrectness\texecuted\tBLOCKER\t1\thuman"])
+            FINDING_FIXTURE + [f"d1\tg1\tc1\t{odd}\tlogic\texecuted\tBLOCKER\t1\thuman"])
             + "\n", encoding="utf-8")
         assert load_tables()[1][-1]["cause_id"] == odd, load_tables()[1][-1]
+        # the class vocabulary is advisory: a row written before it loads, silently
+        (root / "findings.tsv").write_text("\t".join(FINDING_COLUMNS) + "\n" + "\n".join(
+            FINDING_FIXTURE + ["d1\tg1\tc1\ta8\tcorrectness\texecuted\tBLOCKER\t1\thuman"]) + "\n")
+        with contextlib.redirect_stderr(io.StringIO()) as complaint:
+            assert len(load_tables()[1]) == len(FINDING_FIXTURE) + 1
+        assert complaint.getvalue() == "", complaint
+        code, out = run(["schema"])
+        assert code == 0 and all(f"  {name}: {meaning}\n" in out
+                                 for name, meaning in FINDING_CLASSES.items()), out
+        assert out.index("  spec-gap:") < out.index("  logic:"), out  # first that fits, in order
         (root / "findings.tsv").write_text("\t".join(FINDING_COLUMNS) + "\n"
                                            + "\n".join(FINDING_FIXTURE) + "\n")
         os.environ["ASKRUBBERDUCK_HOME"] = ""  # empty is unset, not the current directory
@@ -579,9 +589,9 @@ def self_check() -> int:
         assert max(["2", "10"], key=lambda r: number(r) or 0) == "10"
 
         # d3's c2 is `-`: an unadjudicated claim is neither a hit nor a miss, so it never counts.
-        assert precision_table(dispatches, findings)[("anthropic", "correctness", "executed")] == (4, 4)
+        assert precision_table(dispatches, findings)[("anthropic", "logic", "executed")] == (4, 4)
         # foreign history stays foreign: repo "r" never sees the elsewhere row
-        key = ("openai", "correctness", "executed")
+        key = ("openai", "logic", "executed")
         assert precision_table(dispatches, findings)[key] == (2, 2)
         assert precision_table(dispatches, findings, "r")[key] == (1, 1)
         assert precision_table(dispatches, findings, "elsewhere")[key] == (1, 1)
@@ -622,7 +632,7 @@ def self_check() -> int:
                 (["remaining", "g1", "--repo", "r"], 0, ["remaining = 0.500"]),
                 (["remaining", "g4", "--repo", "r"], 0, ["n2 = 0", "insufficient evidence"]),
                 (["remaining", "g3", "--repo", "r"], 0, ["insufficient evidence: 1 eligible captures"]),
-                (["precision", "--repo", "r"], 0, ["anthropic correctness executed claimed=4"]),
+                (["precision", "--repo", "r"], 0, ["anthropic logic executed claimed=4"]),
                 (["missed"], 0, ["anthropic claude-opus-5 missed=1"]),  # the c4 production row is unsubstantiated: openai is not charged
                 (["remaining", "g5", "--repo", "r"], 0, ["n1 = 1", "n2 = 2", "m = 1", "remaining = 0.000"]),  # two dispositions present, not captures
                 (["pick", "review", "--trust", *repo], 0,

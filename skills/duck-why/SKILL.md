@@ -67,11 +67,11 @@ not the cause, and is not offered as the fix.
 
 For a cause in code landed from a reviewed candidate, append a row to
 `~/.askrubberduck/findings.tsv` with `dispatch_id = -`, `tier = production`, `substantiated = 1`, a
-new `cause_id`, and in `candidate` the SHA the gate reviewed ([`duck-land`](../duck-land/SKILL.md)'s
-outcome record maps the landed commit back to it). `$LEDGER missed` (`python3` with the absolute
-path of `../duck-review/scripts/ledger.py`, resolved from this skill's directory, typed out as
-`python3 "<path>" <subcommand>` rather than held in one variable) joins that SHA to every dispatch
-that returned `APPROVE` on it.
+new `cause_id`, in `class` the first name `$LEDGER schema` lists that fits, and in `candidate` the
+SHA the gate reviewed ([`duck-land`](../duck-land/SKILL.md)'s outcome record maps the landed commit
+back to it). `$LEDGER missed` (`python3` with the absolute path of `../duck-review/scripts/ledger.py`,
+resolved from this skill's directory, typed out as `python3 "<path>" <subcommand>` rather than held
+in one variable) joins that SHA to every dispatch that returned `APPROVE` on it.
 
 Keep ruled-out hypotheses only when their evidence prevents repeating a consequential dead end. Do
 not create a design or work item to explain a local defect: an unsettled architectural contract
