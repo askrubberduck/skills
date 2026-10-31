@@ -39,11 +39,10 @@ uncertainty, not approval or an invented defect.
 `remaining` and `precision` are optional measurements, not stop, continuation, escalation or
 approval criteria. Do not turn an estimate or its absence into a finding.
 
-`[bounds].review_rounds` and `[bounds].trust_rounds` in `~/.askrubberduck/config.toml` cap the run;
-`duck-run` states their defaults. Broad's budget is its two reviews, their two cross-family
-dispositions, and one outage retry per participant. Before dispatch, `$LEDGER cost <setup>` reports
-past cost when useful; `$LEDGER` is `python3` with the absolute path of `duck-review`'s
-`scripts/ledger.py`.
+`[bounds].review_rounds` and `[bounds].trust_rounds`, enforced by `dispatch.py`, cap the run.
+Broad's budget is its two reviews, their two cross-family dispositions, and one outage retry per
+participant. Before dispatch, `$LEDGER cost <setup>` reports past cost when useful; `$LEDGER` means
+`python3 "<absolute path of duck-review's scripts/ledger.py>"`.
 
 Choose the method that separates plausible explanations: rival causes, a deletion alternative, an
 independent plan, an outcome oracle, or a reconstruction. Different role names or contexts are not

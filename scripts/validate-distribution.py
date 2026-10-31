@@ -265,26 +265,16 @@ CONFIG_KEY = re.compile(r"`\[(bounds|review|families|models|effort|learn|release
 
 
 def check_config_keys(root: Path, readme: str, errors: list[str]) -> None:
-    """Every `[section].key` a skill reads is listed in the README config block, and its
-    built-in default is stated in exactly one skill — the number's single home."""
+    """Every `[section].key` a skill reads is listed in the README config block, the home of its
+    built-in default beside the script that applies it."""
     block = re.search(r"```toml\n(.*?)```", readme, re.DOTALL)
     listed = set(re.findall(r"^\s*(\w+)\s*=", block.group(1) if block else "", re.MULTILINE))
-    referenced: dict[str, set[str]] = {}
-    defaults: dict[str, list[str]] = {}
     for path in sorted((root / "skills").glob("*/**/*.md")):
         body = path.read_text(errors="replace")
         where = str(path.relative_to(root))
         for section, key in sorted(set(CONFIG_KEY.findall(body))):
-            referenced.setdefault(key, set()).add(where)
             if key not in listed:
                 errors.append(f"{where}: `[{section}].{key}` is not in README's config block")
-            if re.search(rf"`\[{section}\]\.{key}`[\s\S]{{0,120}}?\(default ", body):
-                defaults.setdefault(key, []).append(where)
-    for key in sorted(referenced):
-        homes = defaults.get(key, [])
-        if len(homes) != 1:
-            errors.append(f"`{key}` states its default in {len(homes)} skills, expected exactly "
-                          f"one: {', '.join(homes) or 'none'}")
 
 
 # A path to ledger.py in a command resolves against whatever directory the agent stands in, and the
@@ -298,7 +288,7 @@ def check_ledger_citations(root: Path, errors: list[str]) -> None:
         where = str(path.relative_to(root))
         if LEDGER_COMMAND.search(body):
             errors.append(f"{where}: a ledger command names a path; write `$LEDGER <subcommand>`")
-        if "`$LEDGER " in body and "`python3` with the absolute path" not in " ".join(body.split()):
+        if "`$LEDGER " in body and '`python3 "<absolute path of' not in " ".join(body.split()):
             errors.append(f"{where}: uses `$LEDGER` without saying what it is")
 
 
@@ -350,9 +340,6 @@ def edit(copy: Path, relative: str, old: str, new: str) -> None:
 SCAN = "skills/duck-scan/SKILL.md"
 RUN = "skills/duck-run/SKILL.md"
 CASES: list[tuple[str, str, Callable[[Path], None]]] = [
-    ("config key with two default homes", "states its default in 2 skills",
-     lambda c: edit(c, "skills/duck-roast/SKILL.md", "`[bounds].roast_passes` in",
-                    "`[bounds].review_rounds` (default 3) `[bounds].roast_passes` in")),
     ("config key missing from README", "is not in README's config block",
      lambda c: edit(c, "README.md", "roast_passes = 2", "roast_pass = 2")),
     ("language rule reworded", "language rule missing or reworded",
@@ -405,7 +392,7 @@ CASES: list[tuple[str, str, Callable[[Path], None]]] = [
      lambda c: edit(c, "skills/duck-why/SKILL.md", "`$LEDGER missed`",
                     "`../duck-review/scripts/ledger.py missed`")),
     ("ledger shorthand undefined", "uses `$LEDGER` without saying what it is",
-     lambda c: edit(c, "skills/duck-race/SKILL.md", "`python3` with the absolute path", "the path")),
+     lambda c: edit(c, "skills/duck-race/SKILL.md", '`python3 "<absolute path of', "the path")),
     ("dispatch without the by-path rule", "never states the by-path rule",
      lambda c: edit(c, "skills/duck-race/SKILL.md", "by absolute path", "somehow")),
     ("required reference names a retired skill", "REQUIRED_REFERENCES names duck-shape",

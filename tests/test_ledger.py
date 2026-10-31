@@ -535,6 +535,27 @@ def selection_check(root: Path) -> None:
         assert code == 0 and "insufficient evidence" in out and "remaining =" not in out, out
 
 
+def record_check(root: Path) -> None:
+    """A recorded row joins the dispatch that approved it: full SHA in, dispatch.py's seven out."""
+    saved, os.environ["ASKRUBBERDUCK_HOME"] = os.environ["ASKRUBBERDUCK_HOME"], str(root)
+    try:
+        root.mkdir()
+        (root / "dispatches.tsv").write_text("\t".join(DISPATCH_COLUMNS) + "\n" + DISPATCH_FIXTURE[4]
+                                             .replace("\tc3\t", "\tabcdef0\t") + "\n")
+        production = ["dispatch_id=-", "gate_id=g3", "candidate=abcdef0123456789", "cause_id=e4",
+                      "class=logic", "tier=production", "severity=BLOCKER", "substantiated=1"]
+        assert run(["record", *production]) == (0, "")
+        (root / "findings.tsv").write_text((root / "findings.tsv").read_text().rstrip("\n"))
+        assert run(["record", *production[:4], "class=correctness"])[0] == 1  # not the vocabulary
+        assert run(["record", "candidate=abcdef0", "class=logic"])[0] == 1  # no cause
+        assert run(["record", "candidate=design-notes", "cause_id=d1", "class=prose"]) == (0, "")
+        assert run(["record", *production[:5]]) == (0, "")  # appended past a missing newline
+        assert [f["candidate"] for f in load_tables()[1]] == ["abcdef0", "design-notes", "abcdef0"]
+        assert run(["missed"]) == (0, "anthropic claude-opus-5 missed=1\n")
+    finally:
+        os.environ["ASKRUBBERDUCK_HOME"] = saved
+
+
 def self_check() -> int:
     with tempfile.TemporaryDirectory(prefix="askrubberduck-ledger-") as directory:
         root = Path(directory)
@@ -652,6 +673,7 @@ def self_check() -> int:
         selection_check(root)
         eligibility_check()
         rally_check(root)
+        record_check(root / "record")
     for gone in (["--self-check"], ["pick", "review", "--seed", "1"]):  # test hooks stay in tests/
         result = subprocess.run([sys.executable, "-B", str(LEDGER), *gone], capture_output=True,
                                 text=True)
