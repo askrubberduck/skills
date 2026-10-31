@@ -22,6 +22,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import tomllib
 from pathlib import Path
 from typing import Any, Callable
 
@@ -265,16 +266,35 @@ CONFIG_KEY = re.compile(r"`\[(bounds|review|families|models|effort|learn|release
 
 
 def check_config_keys(root: Path, readme: str, errors: list[str]) -> None:
-    """Every `[section].key` a skill reads is listed in the README config block, the home of its
-    built-in default beside the script that applies it."""
+    """Every `[section].key` a skill reads is listed in the README config block, and every bound
+    stated there or in a skill's `(default …)` equals the one dispatch.py applies."""
     block = re.search(r"```toml\n(.*?)```", readme, re.DOTALL)
     listed = set(re.findall(r"^\s*(\w+)\s*=", block.group(1) if block else "", re.MULTILINE))
+    script = root / "skills" / "duck-review" / "scripts" / "dispatch.py"
+    spec = importlib.util.spec_from_file_location("dispatch_bounds", script)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    for name in ("README.md", "README.ru.md"):
+        found = re.search(r"```toml\n(.*?)```", (root / name).read_text(), re.DOTALL)
+        try:
+            stated = tomllib.loads(found.group(1) if found else "").get("bounds", {})
+        except tomllib.TOMLDecodeError as exc:
+            stated = {}
+            errors.append(f"{name}: config block is not TOML: {exc}")
+        for key, default in module.BOUND_DEFAULTS.items():
+            if stated.get(key) != default:
+                errors.append(f"{name}: [bounds].{key} = {stated.get(key)!r}, dispatch.py applies "
+                              f"{default!r}")
     for path in sorted((root / "skills").glob("*/**/*.md")):
         body = path.read_text(errors="replace")
         where = str(path.relative_to(root))
         for section, key in sorted(set(CONFIG_KEY.findall(body))):
             if key not in listed:
                 errors.append(f"{where}: `[{section}].{key}` is not in README's config block")
+        for key, value in re.findall(r"`\[bounds\]\.(\w+)`\s+\(default ([^)]+)\)", body):
+            if value != str(module.BOUND_DEFAULTS.get(key)):
+                errors.append(f"{where}: [bounds].{key} default {value}, dispatch.py applies "
+                              f"{module.BOUND_DEFAULTS.get(key)!r}")
 
 
 # A path to ledger.py in a command resolves against whatever directory the agent stands in, and the
@@ -340,6 +360,14 @@ def edit(copy: Path, relative: str, old: str, new: str) -> None:
 SCAN = "skills/duck-scan/SKILL.md"
 RUN = "skills/duck-run/SKILL.md"
 CASES: list[tuple[str, str, Callable[[Path], None]]] = [
+    ("README bound differs from the script", "dispatch.py applies 10",
+     lambda c: edit(c, "README.md", "rally_turns = 10", "rally_turns = 11")),
+    ("skill bound differs from the script", "default 3, dispatch.py applies 2",
+     lambda c: edit(c, "skills/duck-roast/SKILL.md", "(default 2)", "(default 3)")),
+    ("wrapped skill bound differs from the script", "default 3, dispatch.py applies 2",
+     lambda c: edit(c, "skills/duck-roast/SKILL.md", "` (default 2)", "`\n(default 3)")),
+    ("translated README bound differs from the script", "README.ru.md: [bounds].rally_turns",
+     lambda c: edit(c, "README.ru.md", "rally_turns = 10", "rally_turns = 11")),
     ("config key missing from README", "is not in README's config block",
      lambda c: edit(c, "README.md", "roast_passes = 2", "roast_pass = 2")),
     ("language rule reworded", "language rule missing or reworded",
