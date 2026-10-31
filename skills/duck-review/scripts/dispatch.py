@@ -48,8 +48,10 @@ OUTAGES = (("credits", r"out of credits|insufficient credits?|credit balance"),
 WATCHDOG = "--watchdog"  # internal: dispatch.py --watchdog <row json> runs a seat's watchdog
 TOKENS = re.compile(r"tokens used\s*:?\s*(\d[\d,]*)", re.IGNORECASE)  # a count starts with a digit
 # A stage with its own ceiling counts against it; review and disposition share the round bound.
-STAGE_BOUNDS = {"plan": ("plan_rounds", 2), "rally": ("rally_turns", DEFAULT_RALLY_TURNS),
-                "roast": ("roast_passes", 2)}
+STAGE_BOUNDS = {"plan": "plan_rounds", "rally": "rally_turns", "roast": "roast_passes"}
+# README's config block states these too; the distribution validator holds the two equal.
+BOUND_DEFAULTS = {"review_rounds": 3, "trust_rounds": 2, "plan_rounds": 2, "roast_passes": 2,
+                  "rally_turns": DEFAULT_RALLY_TURNS, "dispatch_timeout": "45m"}
 
 
 def seconds(value: str) -> float:
@@ -427,8 +429,8 @@ def run_seat(args) -> int:
     row_id = args.id or f"{args.gate}-r{args.round}-{args.stage}-{model}"
 
     trust = args.trust == "1"
-    key, default = STAGE_BOUNDS.get(args.stage, ("trust_rounds", 2) if trust else ("review_rounds", 3))
-    limit = int(config.get(key, default))
+    key = STAGE_BOUNDS.get(args.stage, "trust_rounds" if trust else "review_rounds")
+    limit = int(config.get(key, BOUND_DEFAULTS[key]))
     # Renumbering does not reset the bound: the gate's recorded rounds count too.
     rounds = {d["round"] for d in read_table("dispatches.tsv", DISPATCH_COLUMNS, DISPATCH_ENUMS)
               if d["repo"] == repo and d["gate_id"] == args.gate and d["stage"] == args.stage}
@@ -443,7 +445,7 @@ def run_seat(args) -> int:
         before = snapshot(args.candidate) if args.candidate else None
     except (OSError, UnicodeDecodeError, subprocess.CalledProcessError) as error:
         return refuse(f"unreadable input: {error}")
-    timeout = seconds(str(config.get("dispatch_timeout", "45m")))
+    timeout = seconds(str(config.get("dispatch_timeout", BOUND_DEFAULTS["dispatch_timeout"])))
     out = Path(args.out).resolve()
     out.parent.mkdir(parents=True, exist_ok=True)
     workdir = Path(args.workdir).resolve() if args.workdir else out.parent

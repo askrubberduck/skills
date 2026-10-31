@@ -456,7 +456,7 @@ def self_check() -> int:
     import dispatch
     import importlib
     importlib.reload(dispatch)
-    assert dispatch.STAGE_BOUNDS["rally"] == ("rally_turns", 7), dispatch.STAGE_BOUNDS
+    assert dispatch.BOUND_DEFAULTS["rally_turns"] == 7, dispatch.BOUND_DEFAULTS
     print("dispatch self-check passed")
     return 0
 

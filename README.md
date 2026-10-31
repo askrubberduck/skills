@@ -392,11 +392,11 @@ A rejection goes back to its cause: `duck-why` if it is hidden, frame if the pre
 if the decomposition failed, race or rally if the method keeps missing the same class of defect.
 Before a third round, the agent must explain what new evidence that round will buy.
 
-The default ceiling is three review rounds for ordinary work and two for trust-touching work.
-Changing reviewers or renaming the problem does not reset the clock. At the limit, the agent stops
-dispatching, preserves the candidate and unresolved findings, and leaves the release unapproved. A
-different bound comes from you or the repo's policy. No endless pursuit of unanimous approval. No
-passing because everyone got tired.
+The ceiling is `review_rounds` for ordinary work and `trust_rounds` for trust-touching work, set
+above. Changing reviewers or renaming the problem does not reset the clock. At the limit, the agent
+stops dispatching, preserves the candidate and unresolved findings, and leaves the release
+unapproved. A different bound comes from you or the repo's policy. No endless pursuit of unanimous
+approval. No passing because everyone got tired.
 
 When you are away, the agent still owns technical decisions within the task. It continues
 independent work and holds only what needs your answer. Your silence does not choose a new goal.
