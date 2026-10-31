@@ -76,9 +76,11 @@ def transport(via: str, family: str, model: str, effort: str, prompt: str, workd
     pinned = model if effort == "-" else f"{model}-{effort}"
     # headless agy ends the seat on any permission it would ask for. The seat's settings run every
     # command in the sandbox and allow reading the --add-dir folders; the sandbox refuses network,
-    # reads outside the workspace and writes but directly under /tmp (live probes 2026-10-13)
-    return ["agy", "--model", pinned, "--mode", "plan", "--sandbox", *dirs, "--print-timeout",
-            f"{math.ceil(limit)}s", "-p", prompt]
+    # reads outside the workspace and writes but directly under /tmp (live probes 2026-10-13).
+    # No `--mode plan`: agy 1.4.12 expands it into a `/plan` turn that must write a plan artifact,
+    # which headless denies (probe 2026-10-31); without that mode a review seat needs no write.
+    return ["agy", "--model", pinned, "--disable-slash-commands", "--sandbox", *dirs,
+            "--print-timeout", f"{math.ceil(limit)}s", "-p", prompt]
 
 
 def classify(text: str, via: str, timed_out: bool, code: int, log: str = "") -> tuple[str, str]:
@@ -249,10 +251,11 @@ def agy_env(home: Path, reads: list[str]) -> dict[str, str]:
             (home / part).symlink_to((owner / part).resolve())
     settings = home / ".gemini" / "antigravity-cli" / "settings.json"
     settings.parent.mkdir()
-    # agy's built-in skills unpack into the seat's home; reading them must not end the seat, while
+    # agy's built-in skills unpack into the seat's home, and `brain` holds the logs of the seat's own
+    # commands, which it reads back (probe 2026-10-31); reading either must not end the seat, while
     # the rest of the home, the login links, stays out of the file tool's reach
-    builtin = (settings.parent / "builtin").resolve()
-    readable = [builtin, *(Path(d).resolve() for d in reads)]
+    readable = [(settings.parent / part).resolve() for part in ("builtin", "brain")]
+    readable += [Path(d).resolve() for d in reads]
     # proceed-in-sandbox runs every command in the sandbox unasked and asks before BypassSandbox,
     # which headless denies; a command(*) grant would approve the bypass too (probes 2026-10-13)
     settings.write_text(json.dumps({

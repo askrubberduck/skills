@@ -184,7 +184,7 @@ def self_check() -> int:
         assert code == 0, out
         assert final("g1-r1-review-gemini-3.1-pro-high") == ("REJECT", "final", "0"), out
         assert (root / "reject.argv").read_text().split("\0")[:-1] == [
-            "agy", "--model", "gemini-3.1-pro-high", "--mode", "plan", "--sandbox", "--add-dir",
+            "agy", "--model", "gemini-3.1-pro-high", "--disable-slash-commands", "--sandbox", "--add-dir",
             str(checkout),
             "--print-timeout", "20s", "-p", prompt.read_text()]
         code, out = run("reject", "g1c", "--pin", "anthropic:claude-test:high", "--add-dir",
@@ -262,13 +262,14 @@ def self_check() -> int:
             f"{seat_home}/Library:", "Keychains"], (root / "env.gemini").read_text()
         assert not Path(seat_home).exists(), "the seat's home outlived the run"
         # its own settings run commands in the sandbox, never a command(*) grant that approves a
-        # bypass, and allow reading agy's built-in skills and its --add-dir folders
+        # bypass, and allow reading agy's built-in skills, its own command logs and its --add-dir
+        # folders
         settings = json.loads((root / "env.settings").read_text())
         assert settings["toolPermission"] == "proceed-in-sandbox", settings
         assert settings["enableTerminalSandbox"] is True, settings
         allowed = settings["permissions"]["allow"]
-        assert allowed == [f"read_file({Path(seat_home).resolve()}"
-                           "/.gemini/antigravity-cli/builtin)",
+        agy_dir = f"{Path(seat_home).resolve()}/.gemini/antigravity-cli"
+        assert allowed == [f"read_file({agy_dir}/builtin)", f"read_file({agy_dir}/brain)",
                            f"read_file({checkout.resolve()})"], allowed
         code, out = run("greeting", "g1b")  # the prompt's verdict is no answer
         assert code == 1 and final("g1b-r1-review-gpt-6-sol") == ("-", "final", "1"), out

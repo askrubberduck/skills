@@ -78,13 +78,13 @@ seat also gets that directory as `HOME`, which hides `~/.agents/skills`; a `--wo
 An agy seat runs with a fresh `HOME` holding only links to the owner's Google login
 (`~/.gemini/oauth_creds.json`, `~/.gemini/google_accounts.json`) and `~/Library/Keychains`, so
 `~/.gemini/config` stays out. Headless agy ends a seat on any permission it would ask for: the
-seat's settings run every command in agy's sandbox and allow reading agy's built-in skills and the
-`--add-dir` folders. The sandbox has no network and refuses a command's reads outside the
-workspace and its writes to the `--add-dir` folders, the seat's home and other scratch
-directories; it does let a command write directly under `/tmp`. A seat that writes with a tool,
-reads a file elsewhere, fetches a web page or asks to run a command outside the sandbox ends with
-no answer, so a brief for an agy seat asks for reading, not changing, names its files under an
-`--add-dir` folder and names no URL.
+seat's settings run every command in agy's sandbox and allow reading agy's built-in skills, the logs
+of the seat's own commands under its home's `.gemini/antigravity-cli/brain`, and the `--add-dir`
+folders. The sandbox has no network and refuses a command's reads outside the workspace and its
+writes to the `--add-dir` folders, the seat's home and other scratch directories; it does let a
+command write directly under `/tmp`. A seat that writes with a tool, reads a file elsewhere, fetches
+a web page or asks to run a command outside the sandbox ends with no answer, so a brief for an agy
+seat asks for reading, not changing, names its files under an `--add-dir` folder and names no URL.
 
 **`--prompt` takes a UTF-8 brief file path; the script passes its contents as a CLI argument.**
 The brief names the diff, corpus or files by absolute path for the reviewer to open — never paste
