@@ -99,8 +99,8 @@ execution. Claude and agy seats cannot take `--workdir` or serve as writable rac
 a supported writable transport. Read-only seats give source evidence for break/proof, not executed
 behavioral checks: treat source-only findings as `tier = read` and claim executed evidence only
 when the seat supplies observed command output. Selection still excludes the doer's family; an
-Anthropic doer cannot use a Claude pin as its different-family seat. The outer runner bounds all
-transports and finalizes their ledger rows on timeout or failure.
+Anthropic doer cannot use a Claude pin as its different-family participant. The outer runner bounds
+all transports and finalizes their ledger rows on timeout or failure.
 
 Sanity-check a new invocation form with the prompt `Reply with exactly: OK`, run as the bare CLI
 command outside `$DISPATCH`, which would record that answer as an outage. These traps yield
@@ -119,10 +119,10 @@ A zero-byte, greeting-only, timed-out or crashed dispatch is an outage; the scri
 cause. A `capacity` outage (overload, a bare rate limit)
 clears in minutes, so the one retry applies. A `credits` or `quota` outage is the account's, and an
 immediate retry only adds a row: send that family no further seat until it answers again, say once
-that its seats are parked, and resume without the owner's word. Where the owner's procedure offers
+that its seats are paused, and resume without the owner's word. Where the owner's procedure offers
 waiting against a waiver, that offer comes first. To wait: at a stated reset time, one wakeup then;
 otherwise a background probe, the bare CLI with `Reply with exactly: OK` every 15 minutes within a
-budget the report names. On `OK`, recheck each parked candidate's SHA and dispatch its seats. A
+budget the report names. On `OK`, recheck each paused candidate's SHA and dispatch its seats. A
 family with a `credits` or `quota` outage among its last twenty ledger dispatches runs one seat at
 a time, so the next one loses a single review, not a batch. A `model rejected` outage is a dead
 pin: no retry; report the missing participant, name the config file that holds the pin, and never

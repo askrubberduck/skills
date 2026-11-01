@@ -78,7 +78,7 @@ state the design mishandles reopens the choice; a walk that could not have faile
 
 Use one exit state:
 
-- **READY**: settled, with no material unresolved premise blocking planning. State the target
+- **READY**: settled, with no material unresolved premise blocking planning. State the intended
   change, preserved contracts and checks needed; a ready design is not a tested implementation.
   When the analysis expanded, READY records that walk and what it showed.
 - **CUT**: existing behavior satisfies the outcome, or the proposal fails an explicit owner/project

@@ -18,10 +18,11 @@ and leave the mode alone; findings are not a plan awaiting approval.
 
 ## Scope, endpoint and isolation
 
-Read the user's existing authority first. Local implementation ends with a verified local candidate;
-report-only ends with findings or a plan. Commit, PR, push and merge are distinct actions: perform
-them only when authorized; a passed review does not expand that authority. A release whose gate
-cannot run stays unapproved; finish the authorized local work and report what remains.
+Read the owner's existing authority first. Local implementation ends with a verified local
+candidate; report-only ends with findings or a plan. Commit, PR, push and merge are distinct
+actions: perform them only when authorized; a passed review does not expand that authority. A
+release whose gate cannot run stays unapproved; finish the authorized local work and report what
+remains.
 
 Use a dedicated worktree or equivalent copy when runs write concurrently or destructive checks need
 isolation; a small single-worker edit can use the existing checkout after checking its state. Each
@@ -124,13 +125,13 @@ the method, not buying another round on the same basis.
 
 The coordinating caller owns convergence: named in the existing work record, preserved across
 handoffs. Reviewers produce evidence and judgments, not a backlog for automatic execution. The
-coordinator resolves technical findings within authority, tracks causes and owns the next action;
-only the user settles a genuinely new product, policy or scope decision.
+coordinating caller resolves technical findings within authority, tracks causes and owns the next
+action; only the owner settles a genuinely new product, policy or scope decision.
 
 Before the first review, record the outcome, non-goals, required contracts, acceptance checks,
 release policy, participants and effort bound; carry that baseline across rounds. The round ceiling
 is `[bounds].review_rounds`, or `[bounds].trust_rounds` for trust-touching work, as `dispatch.py`
-enforces it, unless the user or repository sets another; the stop rule inside it is evidence, per
+enforces it, unless the owner or repository sets another; the stop rule inside it is evidence, per
 the challenge reference. Reframing, changing reviewers or renaming the task does not reset it.
 Transport retries follow [`duck-review`](../duck-review/SKILL.md)'s separate bounded outage rule.
 
@@ -142,7 +143,7 @@ Do not silently promote SHOULD/NOTE items into required repairs.
 
 At the bound, stop redispatching and preserve the candidate, unresolved evidence and next action;
 release stays unapproved. If new evidence undermines the agreed goal, report the contradiction and
-hold dependent work without inventing replacement criteria. Without the user, make authorized
+hold dependent work without inventing replacement criteria. Without the owner, make authorized
 technical decisions and continue independent work; do not guess their tradeoff or wait for
 agreement. A later explicit continuation can supply a new bound; elapsed time cannot.
 

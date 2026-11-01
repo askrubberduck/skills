@@ -185,6 +185,25 @@ The duck's own config asks too: `duck-learn` proposes each new model trial and e
 Set `[learn].discover` to `auto` and it puts a new model on trial and applies trial verdicts to
 `~/.askrubberduck/config.toml` itself, then tells you what it changed.
 
+## Words the duck uses
+
+Each word below has one meaning in every skill.
+
+| Word | Meaning |
+|---|---|
+| owner | You, as the one who decides: goal, scope, policy, waivers, and anything that leaves your checkout. |
+| user | The person in the session, or a person who uses the product. A decision is always the owner's. |
+| doer | The agent that does the work in this session. It checks its own work before anyone reviews it. |
+| caller | The skill or workflow that started the current one. It owns the repairs and the next step. |
+| worker | A subagent that does part of the work for the doer. |
+| participant | A model from outside the doer's family in a challenge: a reviewer in a review, a rival in a race. |
+| seat | One run of a participant through `dispatch.py`. Each seat gets one ledger row. |
+| candidate | The exact version under judgment: a commit, a checkout, or a document revision. |
+| target | What a review covers: the candidate and the range from its base or the last release tag. |
+| records home | Where the project keeps receipts. `duck-proof` finds it in your instructions first, then in the repo's convention. |
+| receipt | A file in the records home that a later stage reads: `proof-rN.md`, `break-rN.md`, `race-rN.md`, or a review report. |
+| work record | One shared document that holds proof, break and plan sections in place of separate receipts. |
+
 ## How the duck carries a task
 
 `duck-run` carries the work. Each stage hands the next something it can check.

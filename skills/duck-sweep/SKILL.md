@@ -27,14 +27,14 @@ within existing authority; a conditional or routing mention needs no load until 
    - **Preserved by record**: squash-merged, rebased or cherry-picked, *and* the project's outcome
      record ([`duck-land`](../duck-land/SKILL.md)'s) names this branch's landed and candidate SHAs.
      Confirm the landed SHA is on `origin/<default>` **and the branch tip is still that
-     candidate**, then delete. A branch that gained commits after landing is Unproven.
+     candidate**, then delete. A branch that gained commits after landing is Unverified.
    - **Not preserved**: squash-merged, rebased or cherry-picked with **no such record**. PR
      records, `git cherry`, tree diffs and revert greps each produce false positives, and a false
-     positive here is destroyed work; do not build a cleverer classifier. Treat as Unproven.
-   - **Unproven**: open the work item and decide. Merge: land it, reclassify by the paths above and
-     delete under that path. Delete: record the decision, then `-D`. A blanket order ("delete every
-     branch", "don't ask") names no branch and is not that decision; keep and report each Unproven
-     branch until the owner names it.
+     positive here is destroyed work; do not build a cleverer classifier. Treat as Unverified.
+   - **Unverified**: open the work item and decide. Merge: land it, reclassify by the paths above
+     and delete under that path. Delete: record the decision, then `-D`. A blanket order ("delete
+     every branch", "don't ask") names no branch and is not that decision; keep and report each
+     Unverified branch until the owner names it.
 3. Delete, after `git status --short --untracked-files=all --ignored` on the worktree: plain
    `git status` hides ignored files, and `git worktree remove` takes every untracked and ignored
    file with it. Drop entries reproducible from tracked content (build output, caches, installed
