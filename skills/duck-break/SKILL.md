@@ -14,7 +14,7 @@ quoted errors and machine-readable verdicts unchanged; the duck asks for evidenc
 Before a step that requires a skill's procedure, load that skill and follow the named section
 within existing authority; a conditional or routing mention needs no load until it applies.
 
-## Bound the target and isolate destructive work
+## Bound the attacks and isolate destructive work
 
 Record the candidate and environment. Read its outcome, contracts and realistic operating
 conditions before choosing attacks; do not invent deployment states or require irrelevant attacks.
@@ -32,8 +32,8 @@ untracked changes as [`duck-split`](../duck-split/SKILL.md) does, as a ref, not 
 the copy matches the candidate before attacking. Record the pre-attack state and restore it between
 attacks. Use isolated data, ports and process groups for crash tests; verify no children survive
 before restart. Point every database, queue, external API and cloud account the copy reaches at a
-disposable or stubbed target and strip live credentials first, or leave that attack unattempted and
-say so. Preserve original uncommitted and ignored files.
+disposable or stubbed endpoint and strip live credentials first, or leave that attack unattempted
+and say so. Preserve original uncommitted and ignored files.
 
 ## Select attacks that discriminate
 
@@ -62,7 +62,14 @@ implementations wrong; identical results can share a defect.
 
 ## Report and hand off
 
-Capture each command/input, candidate identity, expected violation, observed output and final state.
+Capture for each attack:
+
+- the command or input;
+- the candidate identity;
+- the expected violation;
+- the observed output;
+- the final state.
+
 Read exit status directly: a pipeline can report a filter's status instead of the artifact's. A
 defect is a contract violation observed directly; a captured invariant breach counts once even when
 a race will not trigger twice. Reproduce when the capture is inconclusive; record repeatability

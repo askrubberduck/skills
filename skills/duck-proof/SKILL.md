@@ -106,7 +106,7 @@ breaker. Repeated one-off patches and increasingly long checklists are not closu
 
 Run [`duck-shape`](../duck-shape/SKILL.md)'s necessity checks and realistic change probe on the
 assembled result once correctness and operational constraints hold. For each mechanism, name what
-removing it loses or the contract that requires it; line or abstraction counts are not targets.
+removing it loses or the contract that requires it; line or abstraction counts are not goals.
 Shape edits return to section 3's executable checks. Run [`duck-dry`](../duck-dry/SKILL.md) on
 authorized edits; a prose cleanup that changes behavior also invalidates evidence.
 
@@ -133,13 +133,23 @@ stage consumes the pass, write or update the project's existing durable work rec
 candidate identity, environment, attack, observation, repairs and final reruns. Resolve the home
 from instructions — including a location outside the tree — then existing convention, then an
 owner-provided task directory; ask only if a durable handoff is required and none is available. Do
-not invent a records branch. The home holds `proof-rN.md`, `break-rN.md`, `race-rN.md`, review
-reports, landing outcomes, `defect-classes.md` and `merge-pin-<host>.md`; dispatch measurements
-live apart, in `~/.askrubberduck/`.
+not invent a records branch.
+
+Every handoff, from any skill, carries:
+
+- the outcome, in that skill's own status words;
+- the candidate identity;
+- the evidence, by paths that survive scratch cleanup;
+- the claims still unresolved, and the coverage limits;
+- the next authorized action and who owns it.
+
+The home holds `proof-rN.md`, `break-rN.md`, `race-rN.md`, review reports, landing outcomes,
+`defect-classes.md` and `merge-pin-<host>.md`; dispatch measurements live apart, in
+`~/.askrubberduck/`.
 
 Use `proof-rN.md` when the consumer expects it, or give the exact section of a shared work record.
 Evidence and referenced artifacts must survive the handoff; scratch paths that will vanish are not
 durable citations. Raw logs and CLI stdout stay in scratch, never in a commit. Do not advance a
 candidate or its base merely to save a receipt; local work needs no commit to record a pass.
 [`duck-run`](../duck-run/SKILL.md) and [`duck-land`](../duck-land/SKILL.md) handle authorized
-release transitions and exact target checks.
+release transitions and exact candidate checks.

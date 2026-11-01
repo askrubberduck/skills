@@ -14,7 +14,7 @@ Before a step that requires a skill's procedure, load that skill and follow the 
 within existing authority; a conditional or routing mention needs no load until it applies.
 
 A passed gate establishes readiness, not permission to merge. Use the endpoint already authorized
-by the user: a request only to push or prepare a PR does not authorize merging or branch deletion.
+by the owner: a request only to push or prepare a PR does not authorize merging or branch deletion.
 
 Merged-but-unrecorded work enters at the read-back: verify what is on the default branch, record
 it, name any evidence that can no longer be recovered, and merge nothing.

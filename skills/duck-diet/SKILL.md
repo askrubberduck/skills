@@ -20,10 +20,10 @@ requirements and required workflow evidence.
 ## Runtime rules
 
 1. **Preserve state at context boundaries.** Compact or isolate a session when useful, not
-   automatically per stage. The handoff carries outcome, source/candidate identity, valid evidence,
-   unresolved claims and next authorized action; evidence needed later survives scratch cleanup. A
-   scheduled continuation needs a supported, authorized host mechanism and a confirmed booking; a
-   written next step is not a scheduled task.
+   automatically per stage. The handoff carries the fields that
+   [`duck-proof`](../duck-proof/SKILL.md)'s "Evidence and handoff" lists. A scheduled continuation
+   needs a supported, authorized host mechanism and a confirmed booking; a written next step is not
+   a scheduled task.
 2. **Read what the task needs.** Search first, then read relevant sections with enough context,
    paths and working directories explicit. Large output may call for filtering, paging or a bounded
    investigator, not automatically another agent. Never compress away an error, contract or
@@ -33,7 +33,7 @@ requirements and required workflow evidence.
    identity and a named executable check that catches its failure, run before accepting the result;
    without both there is no validated cheaper route. On failure inspect the cause and escalate when
    capability is the limit; two failed attempts at one slice end the experiment. `[models].worker`
-   for delegated builders (default the host's choice) and `[models].explore` for read-only search
+   for delegated workers (default the host's choice) and `[models].explore` for read-only search
    (default the host's choice) name the model to ask the host for; identity and check still apply,
    and a same-family worker is never an independent reviewer. Independent or high-risk judgments
    follow [`duck-review`](../duck-review/SKILL.md)'s challenge-selection policy.
