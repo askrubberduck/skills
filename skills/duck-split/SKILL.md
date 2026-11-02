@@ -50,9 +50,15 @@ unless extraction was asked for.
    each source part once (a copy left in the original counts as the original's). Then run each
    unit's checks alone; one that passes only beside its sibling depends on it: return it to step 2
    as a dependency, or fold the two.
-5. Report what each unit carries and sits on, the backup, the comparison, the checks, whether the
-   original was rewritten, and the publishing steps left unrun. Once the comparison passed and the
-   units exist, say the backup has done its job so the next sweep can retire it.
+5. Report:
+   - what each unit carries and sits on;
+   - the backup and the comparison;
+   - the checks;
+   - whether the original was rewritten;
+   - the publishing steps left unrun.
+
+   Once the comparison passed and the units exist, say the backup has done its job so the next
+   sweep can retire it.
 
 ## On a git branch
 
@@ -62,7 +68,8 @@ unless extraction was asked for.
 - The backup is a ref at the current tip with staged, uncommitted and untracked work committed
   onto it; a stash will not do, since the comparison reads commits. Those files stay uncommitted
   in the checkout and are the one difference the comparison may show: name each.
-- Ignored files stay out of the backup, and a checkout overwrites one whose path the target tracks.
+- Ignored files stay out of the backup, and a checkout overwrites one whose path the checked-out
+  branch tracks.
   List `git status --ignored`, and build the new branches in a separate worktree so this checkout
   never switches.
 - Split a mixed commit with `git apply --cached <patch>` over a patch holding the selected hunks,
@@ -76,5 +83,5 @@ unless extraction was asked for.
   each base before any force-push, or the forge marks a child whose commits its base reaches as
   merged and may delete its branch.
 - The backup's commits land under new SHAs, so [`duck-sweep`](../duck-sweep/SKILL.md) will find it
-  Unproven: name it in the report as the work item its Unmerged path reads, with the comparison
+  Unverified: name it in the report as the work item its Unverified path reads, with the comparison
   result as the decision that lets it be deleted.

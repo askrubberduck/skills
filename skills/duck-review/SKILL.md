@@ -6,7 +6,7 @@ description: Review work from multiple angles or deliver an independent judgment
 # Duck Review
 
 Review the specified work at its current stage. Test a design's assumptions without demanding an
-implementation; judge completed work against observable results. The builder validates the
+implementation; judge completed work against observable results. The doer validates the
 candidate first; a reviewer is no substitute for the doer's own breaking attempts.
 
 Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
@@ -21,17 +21,17 @@ authorized action.
 ## Findings or independent judgment
 
 An explicit independent, cross-model, decorrelated or release-gate review uses the workflow below;
-each needs a seat outside the doer's family. Otherwise a findings-only, analysis-only or "multiple
-angles" request, or an answer to a received review, uses this in-session path. With no scope
-specified, `[review].default` in `~/.askrubberduck/config.toml` decides (default `findings`);
+each needs a participant outside the doer's family. Otherwise a findings-only, analysis-only or
+"multiple angles" request, or an answer to a received review, uses this in-session path. With no
+scope specified, `[review].default` in `~/.askrubberduck/config.toml` decides (default `findings`);
 [`duck-run`](../duck-run/SKILL.md) and [`duck-land`](../duck-land/SKILL.md) name the release-gate
 path when they call it. A findings pass never satisfies a required gate.
 
 Resolve the target, base, constraints and prior dispositions as in preparation steps 1–2; for
 re-review also apply step 5. Use distinct lenses rather than a fixed reviewer count; delegate only
 when useful and authorized; inspect relevant risk surfaces such as behavior, failure recovery and
-maintainability. A seat from another family runs through [dispatch](references/dispatch.md) like a
-gate seat, with its ledger row (`--setup independent`) and its adjudicated findings in
+maintainability. A participant from another family runs through [dispatch](references/dispatch.md)
+like a gate reviewer, with its ledger row (`--setup independent`) and its adjudicated findings in
 `findings.tsv`. Its `--gate` id is the findings pass's own, such as `findings-<PR or branch>`, never
 a release gate's.
 
@@ -184,13 +184,17 @@ Reviewer unanimity is neither required nor sufficient. A false `REJECT` may be d
 evidence, and an `APPROVE` cannot erase a defect the superreview substantiates. A release workflow
 may land only `APPROVE`; a superreview `NOTE` is a non-decision, not a hidden pass or failure.
 
-Report the authoritative result, each reviewer's pinned model id and family, each raw verdict,
-every finding's adjudicated classification and evidence, any outage or downgrade, and the exact
-target and criteria reviewed. The dispatch script finalizes each participant's row in
-`dispatches.tsv`; record one row per adjudicated finding with `$LEDGER record`, with a stable
-`cause_id` shared across participants that found the same cause. When measurement is requested,
-report `$LEDGER remaining <gate_id>` as an advisory estimate, never a gate or continuation
-criterion.
+Report:
+
+- the authoritative result, and the exact target and criteria reviewed;
+- each reviewer's pinned model id, family and raw verdict;
+- every finding's adjudicated classification and evidence;
+- any outage or downgrade.
+
+The dispatch script finalizes each participant's row in `dispatches.tsv`; record one row per
+adjudicated finding with `$LEDGER record`, with a stable `cause_id` shared across participants that
+found the same cause. When measurement is requested, report `$LEDGER remaining <gate_id>` as an
+advisory estimate, never a gate or continuation criterion.
 
 **Write that report where the landing gate can read it** — the same durable records home as the
 receipts, never only into the caller's context or `$SP`, and never as a commit on the candidate

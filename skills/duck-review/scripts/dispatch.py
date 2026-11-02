@@ -66,7 +66,8 @@ def seconds(value: str) -> float:
 # 2026-11-02: `bun test`, then a hostd started from source, then BypassSandbox auto-denied). First, so the brief's
 # own format instruction stays last; no format of its own, so the answer's first and last lines stay the brief's.
 def agy_limits(dirs: list[str]) -> str:
-    return ("Your limits in this session. You can read files only under: " + ", ".join(dirs) + ". Commands run in a "
+    return ("Your limits in this session. You can read files only under: " + (", ".join(dirs) or "your working folder")
+            + ". Commands run in a "
             "sandbox with no network, no sockets and none of the project's dependencies installed; a command that needs "
             "any of them, or asks to leave the sandbox, ends this session with no answer. So do not run the project's "
             "tests, builds or servers; judge by reading.\n\n---\n\n")
