@@ -85,6 +85,8 @@ writes to the `--add-dir` folders, the seat's home and other scratch directories
 command write directly under `/tmp`. A seat that writes with a tool, reads a file elsewhere, fetches
 a web page or asks to run a command outside the sandbox ends with no answer, so a brief for an agy
 seat asks for reading, not changing, names its files under an `--add-dir` folder and names no URL.
+A seat checking a claim tries the project's tests, finds no dependencies or sockets, and asks out;
+the script appends those limits to every agy prompt, with "judge by reading", whatever the brief says.
 
 **`--prompt` takes a UTF-8 brief file path; the script passes its contents as a CLI argument.**
 The brief names the diff, corpus or files by absolute path for the reviewer to open — never paste

@@ -61,6 +61,15 @@ def seconds(value: str) -> float:
     return float(match[1]) * {"": 1, "s": 1, "m": 60, "h": 3600}[match[2]]
 
 
+# Told to every agy seat, whatever its brief asks: a seat that tries to run a project's tests finds no installed
+# dependencies and no sockets in the sandbox, asks to leave it, and headless agy ends it with no answer (probe
+# 2026-11-02: `bun test`, then a hostd started from source, then BypassSandbox auto-denied).
+AGY_LIMITS = ("\n\n---\nYour limits in this session: you can read files only under the folders listed above, and "
+              "commands run in a sandbox with no network, no sockets and no installed dependencies. Do not run the "
+              "project's tests, builds or servers, and do not ask to leave the sandbox: either ends this session "
+              "with no answer. Judge by reading; name what you could not execute as a coverage limit.")
+
+
 def transport(via: str, family: str, model: str, effort: str, prompt: str, workdir: Path,
               add_dirs: list[str], limit: float) -> list[str]:
     dirs = [part for d in add_dirs for part in ("--add-dir", str(Path(d).resolve()))]
@@ -82,7 +91,7 @@ def transport(via: str, family: str, model: str, effort: str, prompt: str, workd
     # No `--mode plan`: agy 1.4.12 expands it into a `/plan` turn that must write a plan artifact,
     # which headless denies (probe 2026-10-31); without that mode a review seat needs no write.
     return ["agy", "--model", pinned, "--disable-slash-commands", "--sandbox", *dirs,
-            "--print-timeout", f"{math.ceil(limit)}s", "-p", prompt]
+            "--print-timeout", f"{math.ceil(limit)}s", "-p", prompt + AGY_LIMITS]
 
 
 def classify(text: str, via: str, timed_out: bool, code: int, log: str = "") -> tuple[str, str]:

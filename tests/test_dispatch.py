@@ -20,7 +20,7 @@ sys.dont_write_bytecode = True  # no __pycache__ inside the shipped skill
 SCRIPTS = Path(__file__).resolve().parent.parent / "skills" / "duck-review" / "scripts"
 DISPATCH = SCRIPTS / "dispatch.py"
 sys.path.insert(0, str(SCRIPTS))
-from dispatch import classify, tokens_of
+from dispatch import AGY_LIMITS, classify, tokens_of
 from ledger import DISPATCH_COLUMNS, DISPATCH_ENUMS, read_table  # noqa: E402
 
 CONFIG_FIXTURE = """\
@@ -186,7 +186,7 @@ def self_check() -> int:
         assert (root / "reject.argv").read_text().split("\0")[:-1] == [
             "agy", "--model", "gemini-3.1-pro-high", "--disable-slash-commands", "--sandbox", "--add-dir",
             str(checkout),
-            "--print-timeout", "20s", "-p", prompt.read_text()]
+            "--print-timeout", "20s", "-p", prompt.read_text() + AGY_LIMITS]
         code, out = run("reject", "g1c", "--pin", "anthropic:claude-test:high", "--add-dir",
                         str(checkout))
         assert code == 0 and final("g1c-r1-review-claude-test") == ("REJECT", "final", "0"), out
