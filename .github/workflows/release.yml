@@ -1,0 +1,63 @@
+# Tags a landed commit and publishes its GitHub release, so a session that cannot push tags can still release.
+name: release
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version without the v, as in both plugin.json files at the target (3.21.0)
+        required: true
+      target:
+        description: Full SHA of the landed commit on master
+        required: true
+      title:
+        description: Release title after the tag (one word, one meaning)
+        required: true
+      notes:
+        description: Release notes in Markdown
+        required: true
+      latest:
+        description: Mark as the latest release; false when a newer version is already out
+        type: boolean
+        default: true
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      # Inputs reach the shell through env only; ${{ }} inside run would let notes inject commands.
+      - name: Check the target
+        env:
+          VERSION: ${{ inputs.version }}
+          TARGET: ${{ inputs.target }}
+        run: |
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "version must be X.Y.Z"; exit 1; }
+          [[ "$TARGET" =~ ^[0-9a-f]{40}$ ]] || { echo "target must be a full SHA"; exit 1; }
+          git merge-base --is-ancestor "$TARGET" origin/master || { echo "$TARGET is not on master"; exit 1; }
+          for f in .claude-plugin/plugin.json .codex-plugin/plugin.json; do
+            got=$(git show "$TARGET:$f" | python3 -c 'import json,sys; print(json.load(sys.stdin)["version"])')
+            [ "$got" = "$VERSION" ] || { echo "$f at $TARGET says $got, not $VERSION"; exit 1; }
+          done
+          if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" >/dev/null; then
+            echo "v$VERSION already exists"; exit 1
+          fi
+      - name: Tag and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+          TARGET: ${{ inputs.target }}
+          TITLE: ${{ inputs.title }}
+          NOTES: ${{ inputs.notes }}
+          LATEST: ${{ inputs.latest }}
+        run: |
+          git config user.name askrubberduck
+          git config user.email askrubberduck@users.noreply.github.com
+          git tag -a "v$VERSION" -m "v$VERSION" "$TARGET"
+          git push origin "refs/tags/v$VERSION"
+          printf '%s\n' "$NOTES" > "$RUNNER_TEMP/notes.md"
+          gh release create "v$VERSION" --verify-tag --title "v$VERSION — $TITLE" \
+            --notes-file "$RUNNER_TEMP/notes.md" --latest="$LATEST"
+          gh release view "v$VERSION" --json tagName,name,isLatest
