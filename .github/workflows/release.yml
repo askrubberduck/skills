@@ -60,4 +60,4 @@ jobs:
           printf '%s\n' "$NOTES" > "$RUNNER_TEMP/notes.md"
           gh release create "v$VERSION" --verify-tag --title "v$VERSION — $TITLE" \
             --notes-file "$RUNNER_TEMP/notes.md" --latest="$LATEST"
-          gh release view "v$VERSION" --json tagName,name,isLatest
+          gh release view "v$VERSION" --json tagName,name,url
