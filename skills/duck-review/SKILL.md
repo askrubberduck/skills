@@ -31,8 +31,7 @@ Resolve the target, base, constraints and prior dispositions as in preparation s
 re-review step 5. Use distinct lenses, not a fixed reviewer count. Delegate only when useful and
 authorized. Inspect relevant risk surfaces such as behavior, failure recovery and maintainability. A
 participant from another family runs through [dispatch](references/dispatch.md) like a gate
-reviewer, with its ledger row (`--setup independent`) and its adjudicated findings in
-`findings.tsv`. Its `--gate` id is the findings pass's own, such as `findings-<PR or branch>`, never
+reviewer, with its ledger row (`--setup independent`). Its `--gate` id is the findings pass's own, such as `findings-<PR or branch>`, never
 a release gate's.
 
 Adjudicate findings against the current target with the criteria below. Answer why a value, guard or
@@ -127,18 +126,13 @@ against the candidate; `defect-classes.md` supplies counterexamples, not a findi
 `defect-classes.md` does not block a narrow review; state the coverage limit.
 
 For each finding, inspect the current target and classify it as a substantiated `BLOCKER`, retained
-`SHOULD`, retained `NOTE`, or dismissed with a recorded reason. Record each with
-`$LEDGER record column=value …`, `adjudicated_by` included and in `class` the first name
-`$LEDGER schema` lists that fits. `$LEDGER` means
-`python3 "<absolute path of this skill's scripts/ledger.py>"`, typed out in every command.
-`$LEDGER precision` measures past substantiation; it is not evidence that a current finding is
-correct.
+`SHOULD`, retained `NOTE`, or dismissed with a recorded reason, in the report.
 
 **If the adjudicator built the candidate, say so in the report.** Then dismiss only on evidence a
 third party can re-check from the artifacts, and let a finding you cannot settle stand. Under the
 Broad setup, the other family first gives a disposition on each family's findings. Each disposition
-is one findings-list dispatch, smaller than a review, recorded with `stage = disposition` so
-`remaining` never counts it as a capture. Where the dispositions agree, the doer synthesizes; where
+is one findings-list dispatch, smaller than a review, recorded with `stage = disposition`: a dispatch,
+never a capture. Where the dispositions agree, the doer synthesizes; where
 they disagree, the doer dismisses only on executed evidence. A finding still unsubstantiated after
 that is a `NOTE` naming the disagreement, not a `BLOCKER`.
 
@@ -198,10 +192,7 @@ Report:
 - every finding's adjudicated classification and evidence;
 - any outage or downgrade.
 
-The dispatch script finalizes each participant's row in `dispatches.tsv`. Record one row per
-adjudicated finding with `$LEDGER record`; participants that found the same cause share one stable
-`cause_id`. If measurement is requested, report `$LEDGER remaining <gate_id>` as an advisory
-estimate, never a gate or continuation criterion.
+The dispatch script finalizes each participant's row in `dispatches.tsv`.
 
 **Write that report where the landing gate can read it**: the same durable records home as the
 receipts, never only the caller's context or `$SP`, and never a commit on the candidate branch.

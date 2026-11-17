@@ -20,8 +20,7 @@ sys.dont_write_bytecode = True  # no __pycache__ inside the shipped skill
 SCRIPTS = Path(__file__).resolve().parent.parent / "skills" / "duck-review" / "scripts"
 DISPATCH = SCRIPTS / "dispatch.py"
 sys.path.insert(0, str(SCRIPTS))
-from dispatch import agy_limits, classify, tokens_of
-from ledger import DISPATCH_COLUMNS, DISPATCH_ENUMS, read_table  # noqa: E402
+from dispatch import agy_limits, classify, read_dispatches, tokens_of  # noqa: E402
 
 CONFIG_FIXTURE = """\
 [bounds]
@@ -151,8 +150,7 @@ def self_check() -> int:
             return child.returncode, out
 
         def rows() -> dict[str, dict]:
-            return {d["id"]: d for d in read_table("dispatches.tsv", DISPATCH_COLUMNS,
-                                                   DISPATCH_ENUMS)}
+            return {d["id"]: d for d in read_dispatches()}
 
         def final(row_id: str) -> tuple[str, str, str]:
             row = rows()[row_id]
@@ -450,13 +448,6 @@ def self_check() -> int:
         code, out = run("absent", "g8", PATH=str(root / "bin" / "absent"))  # no codex anywhere
         assert code == 1 and final("g8-r1-review-gpt-6-sol") == ("-", "final", "1"), out
         assert "outage: [Errno 2]" in out and "'codex'" in out, out
-    # the rally bound's default is ledger's, read at import, not a second literal
-    import ledger
-    ledger.DEFAULT_RALLY_TURNS = 7
-    import dispatch
-    import importlib
-    importlib.reload(dispatch)
-    assert dispatch.BOUND_DEFAULTS["rally_turns"] == 7, dispatch.BOUND_DEFAULTS
     print("dispatch self-check passed")
     return 0
 

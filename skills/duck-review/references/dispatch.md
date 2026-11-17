@@ -173,20 +173,10 @@ Two kinds of result are malformed:
 
 **A REJECT is never an outage.**
 
-**A pin on trial rides along.** A pin in `[learn].trial` (default empty) rides along for its first
-`[learn].shadow` (default 3) gates, and for up to twice that while its comparison stays undecided.
-Meanwhile, `$LEDGER pick review` names it on a `shadow` line (`$LEDGER` means
-`python3 "<absolute path of duck-review's scripts/ledger.py>"`). Dispatch it beside the required set
-with the same brief and the same export authorization for its vendor, or skip it and say so. Its
-verdict never counts toward the gate, and its outage never leaves the gate short. Adjudicate its
-findings like any other. Its row carries `setup = shadow`. A trial's gates count in the repository
-where they ran; its comparison pairs it with its family's reviewer on the same gate of the same
-repository.
-
 `$DISPATCH` writes a row in `~/.askrubberduck/dispatches.tsv` for every dispatch attempt: `pending`
 before the seat launches, finalized with minutes, verdict and outage when the seat exits. However
 dispatch ends, by any signal including SIGKILL, a watchdog process stops the seat's process group. A
 moment later, it finalizes a row still `pending` with outage `-`. SIGTERM, SIGHUP and SIGINT leave
 the watchdog running. A row that stays `pending` means SIGKILL ended the watchdog or the ledger is
 locked. The stop does not reach a seat process that leaves its process group (`setsid`).
-`$LEDGER schema` prints the columns and their domains.
+The file's first line names the columns.
