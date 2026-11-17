@@ -5,43 +5,42 @@ description: Shrink a backlog the honest way; obsolete work out, duplicates merg
 
 # Duck Cut
 
-Adversarial sweep over **every** open, blocked, and deferred item with a cut bias: the goal is a
-smaller backlog, not a tidier one. "Cut this" findings are first-class, equal to "do this". A
-disposition flow acts on IDs the owner names; this one hunts.
+Challenge **every** open, blocked and deferred item with a cut bias. The goal is a smaller
+backlog, not a tidier one. A "Cut this" finding weighs the same as "do this". A disposition flow
+acts on IDs the owner names; this skill hunts.
 
 Follow the user's language unless they ask otherwise. Keep commands, paths, identifiers,
 quoted errors and machine-readable verdicts unchanged; the duck asks for evidence in any language.
-Before a step that requires a skill's procedure, load that skill and follow the named section
-within existing authority; a conditional or routing mention needs no load until it applies.
+Before a step that requires the procedure of a skill, load that skill. Follow its named section
+within existing authority. A conditional or routing mention needs no load until it applies.
 
 ## Sweep
 
-1. Enumerate all items from every registry by running [`duck-scan`](../duck-scan/SKILL.md), which
-   owns the registry locator; blocked delivery items and stale active-work dirs are the same
-   disease. Not installed? Say so and ask where the backlog is, once; never guess.
-2. Per item, argue **against its existence** first (the existence check). Verdict, one of:
-   - **CLOSE NOW**: satisfied, obsolete or superseded; close with evidence (the commit, the
-     shipped PR, the doc), never a recollection.
-   - **CUT**: speculative need or the product moved past it; cite the requirement that no longer
-     exists or the decision that superseded it, same evidence bar as CLOSE NOW. Delete, don't
-     park; a parked item is still backlog.
-   - **MERGE**: duplicate or subset of another item; fold and close.
-   - **UNBLOCK**: the stated blocker no longer holds (verify, don't assume); make it pickable.
-     [`duck-scan`](../duck-scan/SKILL.md)'s attribution rule decides whether an entry lifting it
-     counts: unattributed stays blocked.
-   - **KEEP**: survives; record the one-sentence justification that saved it.
+1. Run [`duck-scan`](../duck-scan/SKILL.md) to list every registry's items; it owns the registry
+   locator. Include blocked delivery items and stale active-work directories. If it is
+   missing, say so and ask once where the backlog is; never guess.
+2. For each item, argue **against its existence** first (the existence check). Give one verdict:
+   - **CLOSE NOW**: If satisfied, obsolete or superseded, close it with evidence (commit,
+     shipped PR, doc), not a recollection.
+   - **CUT**: If the need is speculative or the product moved past it, delete it; do not park it.
+     Cite the lapsed requirement or the superseding decision, to the CLOSE NOW evidence bar.
+   - **MERGE**: If it duplicates or is a subset of another item, fold and close it.
+   - **UNBLOCK**: If the stated blocker no longer holds (verified, not assumed), make the item
+     pickable. [`duck-scan`](../duck-scan/SKILL.md)'s attribution rule decides if an entry that
+     lifts the blocker counts: an unattributed one does not.
+   - **KEEP**: If it survives, record the one-sentence justification that saved it.
 
-   Judge state by the landing, not the label: CLOSE NOW an item labelled in progress or in review
-   whose work is on the default branch (branch merged, or candidate tree matching a landed commit),
-   and a closed item filed under an open heading.
-3. Make CLOSE/CUT/MERGE/UNBLOCK edits in the registries with evidence, autonomously. Local edits do
-   not authorize a commit or publication. A versioned registry keeps the cut text in its history;
-   for one outside version control, keep it in the report until the owner has read it.
-4. Items needing the owner (sign-offs, policy calls, anything the doer may not close): queue them
-   and run [`duck-decide`](../duck-decide/SKILL.md). Never close or silently drop an owner-gated
-   item; the sweep continues past it.
+   Judge state by the landing, not the label. Give CLOSE NOW to an item labelled in progress or in
+   review whose work is on the default branch (branch merged, or candidate tree matching a landed
+   commit). Also give it to a closed item under an open heading.
+3. Edit the registries for CLOSE/CUT/MERGE/UNBLOCK autonomously, with evidence. Local edits do
+   not authorize a commit or publication. If a registry is outside version control, keep the cut
+   text in the report until the owner has read it.
+4. Queue items that need the owner (sign-offs, policy calls, anything the doer must not close)
+   and run [`duck-decide`](../duck-decide/SKILL.md). Never close or silently drop an
+   owner-gated item; continue past it.
 
 ## Report shape
 
-Counts first ("14 items: 4 closed, 2 cut, 1 merged, 2 unblocked, 3 kept, 2 to owner"), then the
-per-item verdict list with evidence links.
+Give counts first ("14 items: 4 closed, 2 cut, 1 merged, 2 unblocked, 3 kept, 2 to owner"),
+then each item's verdict with evidence links.

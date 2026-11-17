@@ -1,52 +1,59 @@
 # The prose bar, applied
 
-Read this to dry a diff you are already editing. `duck-dry` owns the method, the sweep of a
-committed tree, and the proof that a sweep changed no code; this file is the bar itself.
+Read this to dry a diff in progress. `duck-dry` owns the method, the sweep of a committed
+tree, and the proof that a sweep changed no code. This is the bar itself.
 
 ## The keep test
 
-A comment earns its place by carrying one of these, and says only it:
+A comment earns its place only if it carries one of these, and only that:
 
 - **Why not the simpler code**: the constraint that killed the shape a maintainer would write
-  instead. Broader still-relevant rationale belongs in the existing design record; an obsolete
-  alternative needs no archiving.
-- **An external contract**: a wire format, an API quirk at the version the project pins, a spec
-  section, an ordering the protocol demands.
-- **An interface**: an effect or error a caller cannot see from the name, the signature or a
+  instead. Broader still-relevant rationale belongs in the existing design record. An obsolete
+  alternative needs no archive.
+- **An external contract**: a wire format, an API quirk at the pinned version, a spec section, an
+  order the protocol demands.
+- **An interface**: an effect or error a caller cannot see from the name, signature or a
   glance at the body.
-- **A trap**: non-obvious ordering or lifetime, concurrency, precision or units, a security
-  property, a bound the input must satisfy, the invariant a dense algorithm maintains.
-- **A knob**: a tuned constant and what to tune it against; hardware, timing and money carry
-  values no model derives.
+- **A trap**: non-obvious order or lifetime, concurrency, precision or units, a security property,
+  a bound the input must satisfy, or the invariant a dense algorithm keeps.
+- **A knob**: a tuned constant and what to tune it against. Hardware, timing and money carry values
+  no model derives.
 - **A deliberate ceiling**: the shortcut, the limit it accepts, and the upgrade path.
 
-What survives is dry: present tense, one or two lines, the fact and not the journey to it.
+A surviving comment is dry: present tense, one or two lines, the fact, not the journey.
 
 ## Load-bearing comments are code
 
-Shebangs, encoding cookies, linter and type-checker directives, compiler and generator pragmas,
-build-file syntax directives, formatter guards, license and SPDX headers, doctests, and docstrings a
-doc build publishes are parsed by tools. **Ask whether anything parses it.** If yes it is code, and
-no comment-quality argument touches it.
+Tools parse these comments:
+
+- shebangs and encoding cookies;
+- linter and type-checker directives;
+- compiler and generator pragmas, and build-file syntax directives;
+- formatter guards;
+- license and SPDX headers;
+- doctests, and docstrings a doc build publishes.
+
+**Ask whether anything parses it.** If yes, it is code: no comment-quality argument touches it.
 
 ## One of three dispositions per comment
 
-1. **Delete**: it restates the code, narrates the next line, banners a section, apologizes for or
-   praises itself, records history ("changed from", "previously", "new:", "as requested in review",
-   in whatever language the codebase uses), or is commented-out code.
-2. **Fix the code**: a name, a signature or a boundary is unclear. Identify the concrete ambiguity
-   and repair it within authorized scope; prefer a clearer name or simpler control flow before
-   extracting a helper. A list in a docstring or a caller/flag explanation prompts inspecting
-   responsibilities, not splitting the function. Keep an explanation of a necessary contract; do
-   not create machinery just to delete its comment.
-3. **Keep and tighten**: it passes the keep test. Cut it to the fact and put it where the reader
-   hits the surprise, not at the top of the file.
+1. **Delete**: it restates the code, narrates the next line, banners a section, apologizes
+   for or praises itself, or is commented-out code. Also delete history notes
+   ("changed from", "previously", "new:", "as requested in review", in whatever language the
+   codebase uses).
+2. **Fix the code**: a name, signature or boundary is unclear. Identify the concrete ambiguity
+   and repair it within authorized scope. Try a clearer name or simpler control flow before you
+   extract a helper. If a docstring holds a list or explains callers or flags, inspect the
+   function's responsibilities; do not split it for that alone. Keep
+   a necessary contract's explanation. Do not create machinery only to delete its comment.
+3. **Keep and tighten**: it passes the keep test. Cut it to the fact. Put it where the reader meets
+   the surprise, not at the top of the file.
 
-There is no fourth option: rewording slop into fluent slop is still slop.
+There is no fourth option: reworded slop is still slop.
 
 ## Tests get the same pass, harder
 
-A test's name states its intent: a docstring restating it, `Arrange / Act / Assert` banners and a
-comment explaining an assertion are duplication. What earns its place: why a fixture value is
-*that* value, the defect id a regression test pins, and why tests must run in a given order. A
-skip's why goes in the framework's skip reason, never in a comment beside it.
+A test's name states its intent. A docstring that restates it, `Arrange / Act / Assert` banners and
+a comment on an assertion are duplication. These earn their place: why a fixture value
+is *that* value, the defect id a regression test pins, and why tests must run in a given order. Put
+a skip's reason in the framework's skip reason, never in a comment.
