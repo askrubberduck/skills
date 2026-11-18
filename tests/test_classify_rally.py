@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 sys.dont_write_bytecode = True
-SCRIPTS = Path(__file__).resolve().parent.parent / "skills" / "duck-review" / "scripts"
+SCRIPTS = Path(__file__).resolve().parent.parent / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 from dispatch import classify
 

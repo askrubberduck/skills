@@ -76,8 +76,11 @@ Or link a clone into your personal skills directory, which loads them unnamespac
 ```bash
 git clone https://github.com/askrubberduck/skills ~/askrubberduck-skills
 mkdir -p ~/.claude/skills
-ln -s ~/askrubberduck-skills/skills/* ~/.claude/skills/
+ln -sf ~/askrubberduck-skills/plugin/skills/* ~/.claude/skills/
 ```
+
+Linked before v3.24.0? The skills moved to `plugin/skills/`. Run `git pull`, then the `ln -sf`
+line again: it replaces the old links.
 
 **Cloud sessions.** Claude Code on the web, `claude --cloud`, and routines clone the repo into a
 fresh container and never read `~/.claude/`. Declare the plugin in the repository's
@@ -109,8 +112,11 @@ Link the clone into the directory these hosts share:
 ```bash
 git clone https://github.com/askrubberduck/skills ~/askrubberduck-skills
 mkdir -p ~/.agents/skills
-ln -s ~/askrubberduck-skills/skills/* ~/.agents/skills/
+ln -sf ~/askrubberduck-skills/plugin/skills/* ~/.agents/skills/
 ```
+
+Linked before v3.24.0? The skills moved to `plugin/skills/`. Run `git pull`, then the `ln -sf`
+line again: it replaces the old links.
 
 `npx skills add askrubberduck/skills` does the same through the `skills` CLI and picks the
 directory per host. A host that reads `AGENTS.md` but discovers no skills gets
@@ -311,7 +317,7 @@ ordinary work; two reviewers of different families, at least one different from 
 security, privacy, data or gate-policy changes and for edits to skills or instruction files. Your
 explicit setup and repository policy govern. A smaller analysis does not satisfy a stronger release
 gate. A missing participant does not lower the bar. The [challenge
-rules](skills/duck-review/references/challenge.md) carry the details.
+rules](plugin/skills/duck-review/references/challenge.md) carry the details.
 
 Sending your repository to another vendor needs your authorization. Once it covers the work,
 the duck remembers it. Asking twice is not being careful.
@@ -356,6 +362,9 @@ default = "findings"        # what a bare duck-review runs
 
 [release]
 procedure = "~/notes/releasing.md"   # your release process, kept outside the repository; the repository's own rules come first
+
+[dispatch]
+script = "~/code/skills/scripts/dispatch.py"   # a GitHub install finds its own copy; set this for any other install
 
 [repo."github.com/askrubberduck/skills"]   # one origin's overrides; a list replaces, never merges
 review_rounds = 2

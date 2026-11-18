@@ -15,7 +15,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 sys.dont_write_bytecode = True
-SCRIPTS = Path(__file__).resolve().parent.parent / "skills" / "duck-review" / "scripts"
+SCRIPTS = Path(__file__).resolve().parent.parent / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 import dispatch  # noqa: E402
 

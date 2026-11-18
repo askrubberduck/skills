@@ -50,13 +50,19 @@ counts.
 
 ## Run the reviewers
 
-Run each seat in the background with `python3 "$DISPATCH"`. `$DISPATCH` is the absolute path of
-`duck-review`'s `scripts/dispatch.py`, whatever the working directory. Its `--help` lists the flags;
-run it instead of reading the script. Get the seat's exit from the host's completion notice. If no
-notice reaches you, wait on the exit in one bounded call, repeated as needed. This happens in a
-subagent or a `claude -p` turn whose end kills a background seat (`error: interrupted`). Use a
-condition monitor, or an until-loop inside the tool's time limit. Never `sleep`, then read the
-output file; Claude Code refuses that call.
+Run each seat in the background with `python3 "$DISPATCH"`. `$DISPATCH` is an absolute path,
+whatever the working directory. Take the first one that exists:
+
+1. `[dispatch].script` in `~/.askrubberduck/config.toml`.
+2. `../../../scripts/dispatch.py`, resolved from the real path of `duck-review`'s directory, after
+   symlinks. A GitHub install or a linked clone has it.
+
+If neither exists, no seat runs. Report each missing participant and name both sources. The script's
+`--help` lists the flags; run it instead of reading the script. Get the seat's exit from the host's
+completion notice. If no notice reaches you, wait on the exit in one bounded call, repeated as
+needed. This happens in a subagent or a `claude -p` turn whose end kills a background seat
+(`error: interrupted`). Use a condition monitor, or an until-loop inside the tool's time limit.
+Never `sleep`, then read the output file; Claude Code refuses that call.
 
 Take the pinned ids from `~/.askrubberduck/config.toml`, never from memory; a `[repo."<origin>"]`
 table there overrides any key for that origin. The keys are `[models].review` (a review or a

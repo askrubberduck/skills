@@ -17,7 +17,7 @@ import time
 from pathlib import Path
 
 sys.dont_write_bytecode = True  # no __pycache__ inside the shipped skill
-SCRIPTS = Path(__file__).resolve().parent.parent / "skills" / "duck-review" / "scripts"
+SCRIPTS = Path(__file__).resolve().parent.parent / "scripts"
 DISPATCH = SCRIPTS / "dispatch.py"
 sys.path.insert(0, str(SCRIPTS))
 from dispatch import agy_limits, classify, read_dispatches, tokens_of  # noqa: E402
