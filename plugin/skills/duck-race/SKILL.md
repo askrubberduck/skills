@@ -28,8 +28,8 @@ defines.
 2. Name the participants and families first. The doer (this session's family) is one. The
    rival must be a **proven different family** from `[models].race` in
    `~/.askrubberduck/config.toml` or the owner's setup. `$RIVAL_MODEL` is the first pin in that
-   list outside the doer's family. `$DISPATCH` is the absolute path of
-   `../duck-review/scripts/dispatch.py`, resolved from this skill's directory and typed out in every
+   list outside the doer's family. `$DISPATCH` is the path that
+   [dispatch mechanics](../duck-review/references/dispatch.md) resolve, typed out in every
    command, run as `python3 "$DISPATCH"`. Before you spend a round, prove the rival's family and
    pin with dispatch mechanics' identity checks. Record the roster line and pinned id.
    Executable names are not identities, and an unknown identity is not a different family.

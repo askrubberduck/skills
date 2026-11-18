@@ -27,11 +27,12 @@ from pathlib import Path
 from typing import Any, Callable
 
 NAME = "askrubberduck"
+SKILLS = "plugin/skills"
 # Fixed by convention and not this gate's business beyond parsing: a manifest that loads is a
 # manifest install can read. What it says is set; that it is JSON is what can break.
 MANIFESTS = (
     ".codex-plugin/plugin.json",
-    ".claude-plugin/plugin.json",
+    "plugin/.claude-plugin/plugin.json",
     ".agents/plugins/marketplace.json",
     ".claude-plugin/marketplace.json",
 )
@@ -53,8 +54,8 @@ def check_codex(codex: dict[str, Any], errors: list[str]) -> None:
     """The only manifest with structure beyond parsing: it points at the skills directory,
     declares the UI interface Codex renders, and must not quietly grow capabilities."""
     where = ".codex-plugin/plugin.json"
-    if codex.get("skills") != "./skills/":
-        errors.append(f'{where}: skills must be "./skills/", got {codex.get("skills")!r}')
+    if codex.get("skills") != "./plugin/skills/":
+        errors.append(f'{where}: skills must be "./plugin/skills/", got {codex.get("skills")!r}')
     for key in ("mcpServers", "apps", "hooks"):
         if key in codex:
             errors.append(f"{where}: unrequested capability {key!r}")
@@ -73,12 +74,37 @@ def check_codex(codex: dict[str, Any], errors: list[str]) -> None:
         errors.append(f"{where}: defaultPrompt must contain 1-3 prompts")
 
 
+# The plugin directory takes no script from an unverified organization and scans only plugin/.
+ALLOWED = {".md", ".txt", ".json", ".yaml", ".yml", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico"}
+
+
+def check_layout(root: Path, manifests: dict[str, Any], errors: list[str]) -> None:
+    """plugin/ is what the directory receives; the repo root is what a GitHub install copies, so
+    the root marketplace entry must keep source ./ (dispatch.py rides along) and name the skills."""
+    entry = (manifests[".claude-plugin/marketplace.json"].get("plugins") or [{}])[0]
+    where = ".claude-plugin/marketplace.json"
+    for key, wanted in (("source", "./"), ("skills", "./plugin/skills/")):
+        if entry.get(key) != wanted:
+            errors.append(f"{where}: plugin {key} must be {wanted!r}, got {entry.get(key)!r}")
+    for path in sorted((root / "plugin").rglob("*")):
+        if not path.is_file():
+            continue
+        where = str(path.relative_to(root))
+        if path.suffix.lower() not in ALLOWED:
+            errors.append(f"{where}: the plugin directory refuses this file type")
+        elif path.read_bytes()[:2] == b"#!":
+            errors.append(f"{where}: the plugin directory refuses a file that starts with #!")
+
+
 def check_versions(manifests: dict[str, Any], errors: list[str]) -> None:
-    """Both manifests carry the release version and nothing compared them until a roast noticed."""
+    """Three files carry the release version and nothing compared them until a roast noticed.
+    The root marketplace entry is the GitHub install's whole manifest: the repo root has none."""
     declared = {
         relative: manifests[relative].get("version")
-        for relative in (".claude-plugin/plugin.json", ".codex-plugin/plugin.json")
+        for relative in ("plugin/.claude-plugin/plugin.json", ".codex-plugin/plugin.json")
     }
+    entry = (manifests[".claude-plugin/marketplace.json"].get("plugins") or [{}])[0]
+    declared[".claude-plugin/marketplace.json"] = entry.get("version")
     if len(set(declared.values())) != 1 or None in declared.values():
         errors.append(f"release version disagrees across files: {declared}")
 
@@ -110,9 +136,9 @@ LANGUAGE_RULE = ("Follow the user's language unless they ask otherwise. Keep com
 
 
 def check_language_rule(root: Path, name: str, errors: list[str]) -> None:
-    body = (root / "skills" / name / "SKILL.md").read_text(errors="replace")
+    body = (root / SKILLS / name / "SKILL.md").read_text(errors="replace")
     if LANGUAGE_RULE not in body:
-        errors.append(f"skills/{name}/SKILL.md: language rule missing or reworded")
+        errors.append(f"plugin/skills/{name}/SKILL.md: language rule missing or reworded")
 
 
 REQUIRED_REFERENCES = [
@@ -142,9 +168,9 @@ def check_required_references(root: Path, found: set[str], errors: list[str]) ->
             errors.append(f"REQUIRED_REFERENCES names {', '.join(sorted(retired))}, which no "
                           "longer exists — retire the entry with the skill")
             continue
-        body = (root / "skills" / holder / "SKILL.md").read_text(errors="replace")
+        body = (root / SKILLS / holder / "SKILL.md").read_text(errors="replace")
         if f"`{referenced}`" not in body:
-            errors.append(f"skills/{holder}/SKILL.md: must reference `{referenced}` — {why}")
+            errors.append(f"plugin/skills/{holder}/SKILL.md: must reference `{referenced}` — {why}")
 
 
 def visible(directory: Path) -> set[str]:
@@ -156,21 +182,21 @@ def visible(directory: Path) -> set[str]:
 
 def check_skill_tree(root: Path, errors: list[str]) -> set[str]:
     """The skill set is whatever is on disk."""
-    found = {path.parent.name for path in (root / "skills").glob("*/SKILL.md")}
+    found = {path.parent.name for path in (root / SKILLS).glob("*/SKILL.md")}
     if not found:
-        errors.append("skills/: no skills found")
+        errors.append("plugin/skills/: no skills found")
 
     # A directory whose SKILL.md was never written is not "no skill" — it is a skill nobody can
     # see. The glob above cannot report it, so a half-added skill would ship and the count would
     # read correct.
-    for name in sorted(visible(root / "skills") - found):
-        if (root / "skills" / name).is_dir():
-            errors.append(f"skills/{name}: directory without a SKILL.md")
+    for name in sorted(visible(root / SKILLS) - found):
+        if (root / SKILLS / name).is_dir():
+            errors.append(f"plugin/skills/{name}: directory without a SKILL.md")
     return found
 
 
 def check_skill(root: Path, name: str, found: set[str], errors: list[str]) -> None:
-    where = f"skills/{name}/SKILL.md"
+    where = f"plugin/skills/{name}/SKILL.md"
     text = (root / where).read_text(errors="replace")
     frontmatter = re.match(r"^---\n(.*?)\n---\n", text, re.S)
     if not frontmatter:
@@ -201,16 +227,16 @@ def check_skill(root: Path, name: str, found: set[str], errors: list[str]) -> No
             errors.append(f"{where}: description contains {token!r} — a plain YAML scalar ends "
                           "there, so no host can load the skill")
 
-    interface_path = root / "skills" / name / "agents" / "openai.yaml"
+    interface_path = root / SKILLS / name / "agents" / "openai.yaml"
     try:
         interface_text = interface_path.read_text()
     except OSError as exc:
-        errors.append(f"skills/{name}/agents/openai.yaml: missing or unreadable: {exc}")
+        errors.append(f"plugin/skills/{name}/agents/openai.yaml: missing or unreadable: {exc}")
     else:
         wanted = ["display_name", "short_description", "default_prompt"]
         keys = re.findall(r"^\s+([a-z_]+):", interface_text, re.M)
         if not interface_text.startswith("interface:") or keys != wanted:
-            errors.append(f"skills/{name}/agents/openai.yaml: expected an interface block with "
+            errors.append(f"plugin/skills/{name}/agents/openai.yaml: expected an interface block with "
                           f"{', '.join(wanted)}")
 
     body = text[frontmatter.end():]
@@ -226,7 +252,7 @@ def check_skill(root: Path, name: str, found: set[str], errors: list[str]) -> No
     for hit in re.findall(r"[$/]?askrubberduck:[a-z-]+", body):
         errors.append(f"{where}: namespaced cross-skill reference {hit!r} "
                       "does not resolve on standalone installs")
-    documents = [root / where, *sorted((root / "skills" / name / "references").rglob("*.md"))]
+    documents = [root / where, *sorted((root / SKILLS / name / "references").rglob("*.md"))]
     for document in documents:
         content = document.read_text(errors="replace")
         location = str(document.relative_to(root))
@@ -262,7 +288,7 @@ def check_routing(root: Path, found: set[str], errors: list[str]) -> None:
         errors.append(f"evals/routing.json: no selection probe for {name}")
 
 
-CONFIG_KEY = re.compile(r"`\[(bounds|review|families|models|effort|learn|release)\]\.(\w+)`")
+CONFIG_KEY = re.compile(r"`\[(bounds|review|families|models|effort|learn|release|dispatch)\]\.(\w+)`")
 
 
 def check_config_keys(root: Path, readme: str, errors: list[str]) -> None:
@@ -270,7 +296,7 @@ def check_config_keys(root: Path, readme: str, errors: list[str]) -> None:
     stated there or in a skill's `(default …)` equals the one dispatch.py applies."""
     block = re.search(r"```toml\n(.*?)```", readme, re.DOTALL)
     listed = set(re.findall(r"^\s*(\w+)\s*=", block.group(1) if block else "", re.MULTILINE))
-    script = root / "skills" / "duck-review" / "scripts" / "dispatch.py"
+    script = root / "scripts" / "dispatch.py"
     spec = importlib.util.spec_from_file_location("dispatch_bounds", script)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -285,7 +311,7 @@ def check_config_keys(root: Path, readme: str, errors: list[str]) -> None:
             if stated.get(key) != default:
                 errors.append(f"{name}: [bounds].{key} = {stated.get(key)!r}, dispatch.py applies "
                               f"{default!r}")
-    for path in sorted((root / "skills").glob("*/**/*.md")):
+    for path in sorted((root / SKILLS).glob("*/**/*.md")):
         body = path.read_text(errors="replace")
         where = str(path.relative_to(root))
         for section, key in sorted(set(CONFIG_KEY.findall(body))):
@@ -317,6 +343,7 @@ def validate(root: Path, run_scripts: bool = True) -> list[str]:
     check_tests(root, errors, run=run_scripts)
     manifests = {relative: load_json(root, relative, errors) for relative in MANIFESTS}
     check_codex(manifests[".codex-plugin/plugin.json"], errors)
+    check_layout(root, manifests, errors)
     found = check_skill_tree(root, errors)
     check_required_references(root, found, errors)
     for name in sorted(found):
@@ -341,30 +368,30 @@ def edit(copy: Path, relative: str, old: str, new: str) -> None:
 
 # One corruption per structural check, as (label, expected error fragment, mutation). A gate
 # nobody proves is a gate nobody has — CI runs this, so a deleted check fails loudly here.
-SCAN = "skills/duck-scan/SKILL.md"
-RUN = "skills/duck-run/SKILL.md"
+SCAN = "plugin/skills/duck-scan/SKILL.md"
+RUN = "plugin/skills/duck-run/SKILL.md"
 CASES: list[tuple[str, str, Callable[[Path], None]]] = [
     ("README bound differs from the script", "dispatch.py applies 10",
      lambda c: edit(c, "README.md", "rally_turns = 10", "rally_turns = 11")),
     ("skill bound differs from the script", "default 3, dispatch.py applies 2",
-     lambda c: edit(c, "skills/duck-roast/SKILL.md", "(default 2)", "(default 3)")),
+     lambda c: edit(c, "plugin/skills/duck-roast/SKILL.md", "(default 2)", "(default 3)")),
     ("wrapped skill bound differs from the script", "default 3, dispatch.py applies 2",
-     lambda c: edit(c, "skills/duck-roast/SKILL.md", "` (default 2)", "`\n(default 3)")),
+     lambda c: edit(c, "plugin/skills/duck-roast/SKILL.md", "` (default 2)", "`\n(default 3)")),
     ("translated README bound differs from the script", "README.ru.md: [bounds].rally_turns",
      lambda c: edit(c, "README.ru.md", "rally_turns = 10", "rally_turns = 11")),
     ("config key missing from README", "is not in README's config block",
      lambda c: edit(c, "README.md", "roast_passes = 2", "roast_pass = 2")),
     ("language rule reworded", "language rule missing or reworded",
-     lambda c: edit(c, "skills/duck-scan/SKILL.md", "machine-readable verdicts", "verdicts")),
+     lambda c: edit(c, "plugin/skills/duck-scan/SKILL.md", "machine-readable verdicts", "verdicts")),
     ("missing dispatch resource", "missing linked resource",
-     lambda c: (c / "skills/duck-review/references/dispatch.md").unlink()),
+     lambda c: (c / "plugin/skills/duck-review/references/dispatch.md").unlink()),
     ("reference dispatch without by-path rule", "never states the by-path rule",
-     lambda c: edit(c, "skills/duck-review/references/dispatch.md", "by absolute path", "somehow")),
+     lambda c: edit(c, "plugin/skills/duck-review/references/dispatch.md", "by absolute path", "somehow")),
     ("reference unbalanced fence", "unbalanced",
-     lambda c: (c / "skills/duck-review/references/challenge.md").write_text("```\n")),
+     lambda c: (c / "plugin/skills/duck-review/references/challenge.md").write_text("```\n")),
     ("invalid manifest JSON", "invalid or unreadable JSON",
      lambda c: (c / ".codex-plugin/plugin.json").write_text("{")),
-    ("codex skills path", 'skills must be "./skills/"',
+    ("codex skills path", 'skills must be "./plugin/skills/"',
      lambda c: rewrite_json(c / ".codex-plugin/plugin.json", lambda m: m.__setitem__("skills", "./x/"))),
     ("codex unrequested capability", "unrequested capability",
      lambda c: rewrite_json(c / ".codex-plugin/plugin.json", lambda m: m.__setitem__("hooks", {}))),
@@ -384,7 +411,7 @@ CASES: list[tuple[str, str, Callable[[Path], None]]] = [
     ("name does not match directory", "must match directory",
      lambda c: edit(c, SCAN, "name: duck-scan", "name: duck-scanner")),
     ("openai interface shape", "expected an interface block",
-     lambda c: (c / "skills/duck-scan/agents/openai.yaml").write_text("interface:\n")),
+     lambda c: (c / "plugin/skills/duck-scan/agents/openai.yaml").write_text("interface:\n")),
     ("dangling cross-skill reference", "names no installed skill",
      lambda c: edit(c, RUN, "`duck-proof`", "`duck-proofread`")),
     ("host-prefixed skill reference", "bodies use the bare frontmatter name",
@@ -392,21 +419,21 @@ CASES: list[tuple[str, str, Callable[[Path], None]]] = [
     ("namespaced skill reference", "does not resolve on standalone installs",
      lambda c: edit(c, RUN, "`duck-proof`", "askrubberduck:duck-proof")),
     ("unbalanced code fence", "unbalanced",
-     lambda c: (c / "skills/duck-review/SKILL.md").write_text(
-         (c / "skills/duck-review/SKILL.md").read_text() + "\n```bash\nstray\n")),
+     lambda c: (c / "plugin/skills/duck-review/SKILL.md").write_text(
+         (c / "plugin/skills/duck-review/SKILL.md").read_text() + "\n```bash\nstray\n")),
     ("README map missing a skill", "README skills map must list",
      lambda c: edit(c, "README.md", "| `duck-scan` |", "| `duck-missing` |")),
     ("stale generated catalog", "stale", lambda c: (c / "AGENTS-CATALOG.md").write_text("# stale\n")),
     ("release version disagrees", "release version disagrees",
-     lambda c: rewrite_json(c / ".claude-plugin/plugin.json",
+     lambda c: rewrite_json(c / "plugin/.claude-plugin/plugin.json",
                             lambda m: m.__setitem__("version", "9.9.9"))),
     ("dispatch without the by-path rule", "never states the by-path rule",
-     lambda c: edit(c, "skills/duck-race/SKILL.md", "by absolute path", "somehow")),
+     lambda c: edit(c, "plugin/skills/duck-race/SKILL.md", "by absolute path", "somehow")),
     ("required reference names a retired skill", "REQUIRED_REFERENCES names duck-shape",
-     lambda c: shutil.rmtree(c / "skills/duck-shape")),
+     lambda c: shutil.rmtree(c / "plugin/skills/duck-shape")),
     ("required reference deleted", "must reference `duck-shape`",
-     lambda c: (c / "skills/duck-review/SKILL.md").write_text(
-         (c / "skills/duck-review/SKILL.md").read_text().replace("`duck-shape`", "shape"))),
+     lambda c: (c / "plugin/skills/duck-review/SKILL.md").write_text(
+         (c / "plugin/skills/duck-review/SKILL.md").read_text().replace("`duck-shape`", "shape"))),
     ("description ends a plain YAML scalar", "no host can load the skill",
      lambda c: edit(c, SCAN, "description: ", "description: Note: ")),
     ("description over budget", "over the 600 budget",
@@ -414,8 +441,20 @@ CASES: list[tuple[str, str, Callable[[Path], None]]] = [
     ("skill without a routing probe", "no selection probe for duck-scan",
      lambda c: edit(c, "evals/routing.json", '"skill": "duck-scan"', '"skill": "duck-scam"')),
     ("skill directory without a SKILL.md", "directory without a SKILL.md",
-     lambda c: (c / "skills" / "duck-ghost").mkdir()),
+     lambda c: (c / SKILLS / "duck-ghost").mkdir()),
     ("tests deleted", "no test_*.py to run", lambda c: shutil.rmtree(c / "tests")),
+    ("GitHub install drops the script", "plugin source must be './'",
+     lambda c: rewrite_json(c / ".claude-plugin/marketplace.json",
+                            lambda m: m["plugins"][0].__setitem__("source", "./plugin"))),
+    ("GitHub install misses the skills", "plugin skills must be './plugin/skills/'",
+     lambda c: rewrite_json(c / ".claude-plugin/marketplace.json",
+                            lambda m: m["plugins"][0].__setitem__("skills", "./skills/"))),
+    ("script inside the plugin", "refuses this file type",
+     lambda c: (c / "plugin/skills/duck-scan/helper.py").write_text("print(1)\n")),
+    ("hidden script inside the plugin", "refuses this file type",
+     lambda c: (c / "plugin/.probe.py").write_text("#!/bin/sh\n")),
+    ("shebang inside the plugin", "starts with #!",
+     lambda c: (c / "plugin/skills/duck-scan/run.md").write_text("#!/bin/sh\n")),
 ]
 
 
@@ -480,7 +519,7 @@ def main() -> int:
             print(f"ERROR: {error}")
         return 1
     suffix = " and corruption self-tests" if args.self_test else ""
-    skills = len(list((root / "skills").glob("*/SKILL.md")))
+    skills = len(list((root / SKILLS).glob("*/SKILL.md")))
     print(f"distribution validation passed ({skills} skills{suffix})")
     return 0
 

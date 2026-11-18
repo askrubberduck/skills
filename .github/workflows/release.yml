@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Version without the v, as in both plugin.json files at the target (3.21.0)
+        description: Version without the v, as in plugin/.claude-plugin/plugin.json, .codex-plugin/plugin.json and the .claude-plugin/marketplace.json entry at the target (3.21.0)
         required: true
       target:
         description: Full SHA of the landed commit on master
@@ -37,10 +37,12 @@ jobs:
           [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "version must be X.Y.Z"; exit 1; }
           [[ "$TARGET" =~ ^[0-9a-f]{40}$ ]] || { echo "target must be a full SHA"; exit 1; }
           git merge-base --is-ancestor "$TARGET" origin/master || { echo "$TARGET is not on master"; exit 1; }
-          for f in .claude-plugin/plugin.json .codex-plugin/plugin.json; do
+          for f in plugin/.claude-plugin/plugin.json .codex-plugin/plugin.json; do
             got=$(git show "$TARGET:$f" | python3 -c 'import json,sys; print(json.load(sys.stdin)["version"])')
             [ "$got" = "$VERSION" ] || { echo "$f at $TARGET says $got, not $VERSION"; exit 1; }
           done
+          got=$(git show "$TARGET:.claude-plugin/marketplace.json" | python3 -c 'import json,sys; print(json.load(sys.stdin)["plugins"][0]["version"])')
+          [ "$got" = "$VERSION" ] || { echo ".claude-plugin/marketplace.json at $TARGET says $got, not $VERSION"; exit 1; }
           if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" >/dev/null; then
             echo "v$VERSION already exists"; exit 1
           fi

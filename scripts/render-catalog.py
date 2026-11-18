@@ -20,13 +20,13 @@ The duck reads before it speaks. When a task matches a skill below, read its `SK
 follow it before proceeding. Challenge the claim, run the check, keep the evidence.
 English is the home language; match task intent across languages. Follow the user's
 language unless they ask otherwise, keeping commands, paths, identifiers, quoted errors and verdicts unchanged.
-Installed location: `~/.agents/skills/<name>/SKILL.md` (or this repo's `skills/<name>/SKILL.md`).
+Installed location: `~/.agents/skills/<name>/SKILL.md` (or this repo's `plugin/skills/<name>/SKILL.md`).
 """
 
 
 def skill_rows(root: Path) -> list[tuple[str, str]]:
     rows: list[tuple[str, str]] = []
-    for path in sorted((root / "skills").glob("*/SKILL.md")):
+    for path in sorted((root / "plugin" / "skills").glob("*/SKILL.md")):
         text = path.read_text()
         frontmatter = re.match(r"^---\n(.*?)\n---\n", text, re.S)
         if not frontmatter:

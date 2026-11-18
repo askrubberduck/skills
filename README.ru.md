@@ -1,4 +1,4 @@
-<!-- translation-source: README.md sha256=11bcff7319a11c79017978c3bf009f6939c80fd6cf4d7a5ee66f550745b3a597 -->
+<!-- translation-source: README.md sha256=4e26acd8798971c71cb3d96957a4dcefc4efe4a16a03b99c29b64127f5f8e3c3 -->
 
 <p align="center">
   <img src="assets/logo.svg" width="112" alt="askrubberduck">
@@ -80,8 +80,11 @@ claude plugin install askrubberduck@askrubberduck --yes
 ```bash
 git clone https://github.com/askrubberduck/skills ~/askrubberduck-skills
 mkdir -p ~/.claude/skills
-ln -s ~/askrubberduck-skills/skills/* ~/.claude/skills/
+ln -sf ~/askrubberduck-skills/plugin/skills/* ~/.claude/skills/
 ```
+
+Делал симлинки до v3.24.0? Навыки переехали в `plugin/skills/`. Сделай `git pull` и запусти
+строку с `ln -sf` ещё раз: она заменит старые ссылки.
 
 **Облачные сессии.** Claude Code в браузере, `claude --cloud` и routines клонируют репозиторий в
 чистый контейнер и `~/.claude/` не видят. Пропиши плагин в `.claude/settings.json` репозитория —
@@ -113,8 +116,11 @@ codex plugin add askrubberduck@askrubberduck
 ```bash
 git clone https://github.com/askrubberduck/skills ~/askrubberduck-skills
 mkdir -p ~/.agents/skills
-ln -s ~/askrubberduck-skills/skills/* ~/.agents/skills/
+ln -sf ~/askrubberduck-skills/plugin/skills/* ~/.agents/skills/
 ```
+
+Делал симлинки до v3.24.0? Навыки переехали в `plugin/skills/`. Сделай `git pull` и запусти
+строку с `ln -sf` ещё раз: она заменит старые ссылки.
 
 `npx skills add askrubberduck/skills` делает то же самое через CLI `skills` и сам выбирает папку
 под каждого агента. Если агент читает `AGENTS.md`, но навыки сам не находит, вставь туда
@@ -323,7 +329,7 @@ ln -s ~/askrubberduck-skills/skills/* ~/.agents/skills/
 самого гейта или затрагивают скилы и файлы инструкций, — два ревьюера из разных семейств, и хотя бы
 один не из того семейства, что писало код. Твои явные настройки и правила репозитория важнее.
 Проверка поменьше не заменяет обязательный гейт. Если участника нет, планка от этого не опускается.
-Подробности — в [правилах выбора проверки](skills/duck-review/references/challenge.md).
+Подробности — в [правилах выбора проверки](plugin/skills/duck-review/references/challenge.md).
 
 Отправлять твой репозиторий другому вендору можно только с твоего разрешения. Если разрешение
 уже покрывает эту работу, утка его помнит. Спрашивать ещё раз — не осторожность.
@@ -370,6 +376,9 @@ default = "findings"        # что делает duck-review без уточн�
 
 [release]
 procedure = "~/notes/releasing.md"   # твой процесс релиза, вне репозитория; правила самого репозитория главнее
+
+[dispatch]
+script = "~/code/skills/scripts/dispatch.py"   # установка с GitHub находит свою копию; для любой другой укажи путь
 
 [repo."github.com/askrubberduck/skills"]   # настройки для одного origin; список заменяется, а не дополняется
 review_rounds = 2

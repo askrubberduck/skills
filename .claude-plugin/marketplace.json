@@ -9,8 +9,11 @@
   "plugins": [
     {
       "name": "askrubberduck",
+      "displayName": "Ask Rubber Duck",
       "description": "Make the work prove itself. Challenge the goal, cut the clutter, and check what actually happened.",
+      "version": "3.24.0",
       "source": "./",
+      "skills": "./plugin/skills/",
       "category": "development",
       "author": {
         "name": "askrubberduck",

@@ -11,7 +11,7 @@ The duck reads before it speaks. When a task matches a skill below, read its `SK
 follow it before proceeding. Challenge the claim, run the check, keep the evidence.
 English is the home language; match task intent across languages. Follow the user's
 language unless they ask otherwise, keeping commands, paths, identifiers, quoted errors and verdicts unchanged.
-Installed location: `~/.agents/skills/<name>/SKILL.md` (or this repo's `skills/<name>/SKILL.md`).
+Installed location: `~/.agents/skills/<name>/SKILL.md` (or this repo's `plugin/skills/<name>/SKILL.md`).
 
 - **duck-break** — Try to break a system's claimed behavior, then show what actually happened. Use when the user asks to break or red-team work, when a behavioral proof needs hostile inputs, or when high-risk work lacks dynamic evidence. Test the actual candidate and substantiate failures.
 - **duck-campaign** — Carve a grand vision into independent workstreams that ship without waiting on each other. Use when the user asks to start a campaign, execute all plannable work, turn a vision, a backlog, or competitor gaps into parallel builds, or provides a broad directive spanning many work items without an existing campaign structure.
