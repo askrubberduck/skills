@@ -297,21 +297,6 @@ def check_config_keys(root: Path, readme: str, errors: list[str]) -> None:
                               f"{module.BOUND_DEFAULTS.get(key)!r}")
 
 
-# A path to ledger.py in a command resolves against whatever directory the agent stands in, and the
-# script is not executable: every skill command says `$LEDGER <subcommand>`, defined where it is used.
-LEDGER_COMMAND = re.compile(r"ledger\.py [a-z-]")
-
-
-def check_ledger_citations(root: Path, errors: list[str]) -> None:
-    for path in sorted((root / "skills").glob("*/**/*.md")):
-        body = path.read_text(errors="replace")
-        where = str(path.relative_to(root))
-        if LEDGER_COMMAND.search(body):
-            errors.append(f"{where}: a ledger command names a path; write `$LEDGER <subcommand>`")
-        if "`$LEDGER " in body and '`python3 "<absolute path of' not in " ".join(body.split()):
-            errors.append(f"{where}: uses `$LEDGER` without saying what it is")
-
-
 def check_tests(root: Path, errors: list[str], run: bool) -> None:
     tests = sorted((root / "tests").glob("test_*.py"))
     if not tests:
@@ -330,7 +315,6 @@ def validate(root: Path, run_scripts: bool = True) -> list[str]:
     check_config_keys(root, readme, errors)
     # the corruption copies only change text; their tests are the root's
     check_tests(root, errors, run=run_scripts)
-    check_ledger_citations(root, errors)
     manifests = {relative: load_json(root, relative, errors) for relative in MANIFESTS}
     check_codex(manifests[".codex-plugin/plugin.json"], errors)
     found = check_skill_tree(root, errors)
@@ -416,11 +400,6 @@ CASES: list[tuple[str, str, Callable[[Path], None]]] = [
     ("release version disagrees", "release version disagrees",
      lambda c: rewrite_json(c / ".claude-plugin/plugin.json",
                             lambda m: m.__setitem__("version", "9.9.9"))),
-    ("ledger command by path", "a ledger command names a path",
-     lambda c: edit(c, "skills/duck-why/SKILL.md", "`$LEDGER missed`",
-                    "`../duck-review/scripts/ledger.py missed`")),
-    ("ledger shorthand undefined", "uses `$LEDGER` without saying what it is",
-     lambda c: edit(c, "skills/duck-race/SKILL.md", '`python3 "<absolute path of', "the path")),
     ("dispatch without the by-path rule", "never states the by-path rule",
      lambda c: edit(c, "skills/duck-race/SKILL.md", "by absolute path", "somehow")),
     ("required reference names a retired skill", "REQUIRED_REFERENCES names duck-shape",

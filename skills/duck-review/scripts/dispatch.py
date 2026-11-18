@@ -3,7 +3,7 @@
 launch, the CLI bounded by `[bounds].dispatch_timeout` with stdin closed, the output classified as a
 verdict or an outage with its cause, and the row finalized on every exit. It refuses a round past
 the recorded bound unless the owner's extension is given, and reports a candidate the seat changed.
-Writing rows is this script's job; ledger.py stays the reader. Stdlib only, like ledger.py.
+Stdlib only: no install step anywhere it runs.
 """
 
 from __future__ import annotations
@@ -23,13 +23,22 @@ import signal
 import subprocess
 import sys
 import tempfile
+import tomllib
 import time
 from pathlib import Path
 
-sys.dont_write_bytecode = True  # no __pycache__ inside an installed skill
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from ledger import (DEFAULT_RALLY_TURNS, DISPATCH_COLUMNS, DISPATCH_ENUMS, arm_of,  # noqa: E402
-                    default_origin, home, load_config, normalize_origin, read_table, validate_row)
+DISPATCH_COLUMNS = ("id", "gate_id", "round", "date", "repo", "stage", "setup", "trust",
+                    "candidate", "family", "model", "effort", "minutes", "tokens", "verdict",
+                    "status", "outage")
+DISPATCH_ENUMS = {
+    # `disposition` is Broad's cross-family adjudication call: a dispatch, never a capture.
+    "stage": {"review", "disposition", "plan", "proof", "break", "race", "rally", "roast"},
+    # `shadow`: an extra reviewer that never counts toward the gate (kept for recorded rows).
+    "setup": {"self-check", "independent", "broad", "race", "rally", "shadow"},
+    "trust": {"0", "1"}, "status": {"pending", "final"}, "outage": {"0", "1"},
+    "verdict": {"APPROVE", "REJECT", "NOTE", "DIFF", "CONCUR", "OBJECT"},
+}
+NUMERIC_COLUMNS = ("round", "minutes", "tokens")
 
 VIA = {"openai": "codex", "google": "agy", "anthropic": "claude"}  # by the pin's family
 # Only boundary lines carry results; body markup only guards against quoted boundary examples.
@@ -51,7 +60,104 @@ TOKENS = re.compile(r"tokens used\s*:?\s*(\d[\d,]*)", re.IGNORECASE)  # a count 
 STAGE_BOUNDS = {"plan": "plan_rounds", "rally": "rally_turns", "roast": "roast_passes"}
 # README's config block states these too; the distribution validator holds the two equal.
 BOUND_DEFAULTS = {"review_rounds": 3, "trust_rounds": 2, "plan_rounds": 2, "roast_passes": 2,
-                  "rally_turns": DEFAULT_RALLY_TURNS, "dispatch_timeout": "45m"}
+                  "rally_turns": 10, "dispatch_timeout": "45m"}
+
+
+def home() -> Path:
+    return Path(os.environ.get("ASKRUBBERDUCK_HOME") or "~/.askrubberduck").expanduser()
+
+
+def normalize_origin(url: str) -> str:
+    """Both spellings of one remote name one repo: drop the transport, the login, the `.git`, and
+    the scp-style colon standing in for the first slash."""
+    url = url.strip().removesuffix("/").removesuffix(".git")
+    _, _, url = url.rpartition("://")
+    _, _, url = url.rpartition("@")
+    host, colon, path = url.partition(":")
+    return f"{host}/{path.lstrip('/')}" if colon and "/" in path else url
+
+
+def default_origin() -> str | None:
+    try:
+        done = subprocess.run(["git", "remote", "get-url", "origin"], capture_output=True,
+                              text=True, timeout=5)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return normalize_origin(done.stdout) if done.returncode == 0 else None
+
+
+def load_config(repo: str | None = None) -> dict:
+    """Flattened: sections collapse into one namespace because a repo override table carries keys
+    from any of them, and lists replace wholesale rather than merging."""
+    try:
+        raw = tomllib.loads((home() / "config.toml").read_text())
+    except (OSError, tomllib.TOMLDecodeError):
+        return {}
+    config: dict = {}
+    for key, value in raw.items():
+        if key != "repo" and isinstance(value, dict):
+            config.update(value)
+        elif key != "repo":
+            config[key] = value
+    if repo:
+        config.update(raw.get("repo", {}).get(repo, {}))
+    return config
+
+
+def arm_of(reviewer: str) -> tuple[str, str, str]:
+    parts = reviewer.split(":")
+    return (parts[0], parts[1] if len(parts) > 1 else "-", parts[2] if len(parts) > 2 else "-")
+
+
+def number(value: str) -> float | None:
+    # `-` is unknown, not zero. A negative minute or token count is malformed, so unknown too.
+    try:
+        parsed = float(value)
+    except ValueError:
+        return None
+    return parsed if parsed >= 0 else None
+
+
+def validate_row(line: int, row: dict) -> bool:
+    bad = [c for c in NUMERIC_COLUMNS if c in row and row[c] != "-" and number(row[c]) is None]
+    if bad:
+        print(f"dispatches.tsv:{line}: not a non-negative number in {', '.join(bad)}",
+              file=sys.stderr)
+    return not bad
+
+
+def read_dispatches() -> list[dict]:
+    path = home() / "dispatches.tsv"
+    try:
+        # rows end only at a newline: splitlines would also break at U+2028 and its kin in a field
+        lines = path.read_text(encoding="utf-8").removesuffix("\n").split("\n")
+    except FileNotFoundError:
+        if path.is_symlink() or home().is_symlink():  # dangling: configured, not absent
+            raise SystemExit(f"{path}: dangling symlink")
+        return []
+    except OSError as error:
+        raise SystemExit(f"{path}: {error.strerror}")  # an unread table is no answer, not an empty one
+    except UnicodeDecodeError as error:
+        raise SystemExit(f"{path}: not UTF-8 ({error.reason} at byte {error.start})")
+    # written as plain tab-joined fields: no quoting, no field limit, so no csv parser on the way back
+    reader = (line.split("\t") for line in lines)
+    if next(reader, None) != list(DISPATCH_COLUMNS):
+        raise SystemExit(f"{path}:1: header does not match {', '.join(DISPATCH_COLUMNS)}")
+    rows = []
+    for line, values in enumerate(reader, start=2):
+        if len(values) != len(DISPATCH_COLUMNS):
+            print(f"dispatches.tsv:{line}: {len(values)} columns, expected {len(DISPATCH_COLUMNS)}",
+                  file=sys.stderr)
+            continue
+        row = dict(zip(DISPATCH_COLUMNS, values))
+        row["repo"] = normalize_origin(row["repo"])  # rows from before `--repo` was normalized
+        bad = [c for c, allowed in DISPATCH_ENUMS.items() if row[c] != "-" and row[c] not in allowed]
+        if bad:
+            print(f"dispatches.tsv:{line}: unknown value in {', '.join(bad)}", file=sys.stderr)
+            continue
+        if validate_row(line, row):
+            rows.append(row)
+    return rows
 
 
 def seconds(value: str) -> float:
@@ -175,7 +281,7 @@ def bad_values(row: dict) -> list[str]:
     # one physical row per record: anything splitlines() breaks at would split it (record, ledger)
     bad += [c for c, value in row.items() if not value or "\t" in value
             or value.splitlines() != [value]]
-    return bad if validate_row("dispatches.tsv", 0, row) else bad + ["numbers"]
+    return bad if validate_row(0, row) else bad + ["numbers"]
 
 
 @contextlib.contextmanager
@@ -198,7 +304,7 @@ def record(row: dict, new: bool, if_pending: bool = False) -> bool:
         raise ValueError(f"refusing to write {', '.join(bad_values(row))}: {row}")
     line = "\t".join(row[c] for c in DISPATCH_COLUMNS) + "\n"
     with locked_ledger() as path:
-        try:  # rows end only at a newline, as ledger.read_table reads them
+        try:  # rows end only at a newline, as read_dispatches reads them
             text = path.read_text(encoding="utf-8")
             lines = [f"{line}\n" for line in text.removesuffix("\n").split("\n")] if text else []
         except FileNotFoundError:
@@ -445,7 +551,7 @@ def run_seat(args) -> int:
     key = STAGE_BOUNDS.get(args.stage, "trust_rounds" if trust else "review_rounds")
     limit = int(config.get(key, BOUND_DEFAULTS[key]))
     # Renumbering does not reset the bound: the gate's recorded rounds count too.
-    rounds = {d["round"] for d in read_table("dispatches.tsv", DISPATCH_COLUMNS, DISPATCH_ENUMS)
+    rounds = {d["round"] for d in read_dispatches()
               if d["repo"] == repo and d["gate_id"] == args.gate and d["stage"] == args.stage}
     rounds |= {str(args.round)}
     reached = max(args.round, len(rounds))

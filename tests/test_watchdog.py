@@ -18,7 +18,6 @@ sys.dont_write_bytecode = True
 SCRIPTS = Path(__file__).resolve().parent.parent / "skills" / "duck-review" / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 import dispatch  # noqa: E402
-import ledger  # noqa: E402
 
 
 def alive(pid: int) -> bool:
@@ -64,8 +63,7 @@ class Watchdog(unittest.TestCase):
     def row(self, row_id: str, wait: bool = True) -> dict:
         with patch.dict(os.environ, self.env):
             for _ in range(200 if wait else 1):
-                rows = {r["id"]: r for r in ledger.read_table("dispatches.tsv", ledger.DISPATCH_COLUMNS,
-                                                              ledger.DISPATCH_ENUMS)}
+                rows = {r["id"]: r for r in dispatch.read_dispatches()}
                 if row_id in rows and rows[row_id]["status"] == "final":
                     break
                 time.sleep(0.05)

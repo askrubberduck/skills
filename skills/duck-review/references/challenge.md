@@ -36,20 +36,15 @@ effort limit. A substantiated blocker holds approval. Repair and recheck it befo
 complete review with no substantiated blocker needs no extra round. Uncertainty at the limit stays
 uncertainty, not approval or an invented defect.
 
-`remaining` and `precision` are optional measurements, not stop, continuation, escalation or
-approval criteria. Do not turn an estimate or its absence into a finding.
 
 `dispatch.py` enforces the run caps `[bounds].review_rounds` and `[bounds].trust_rounds`. The Broad
 budget is two reviews, their two cross-family dispositions, and one outage retry per participant.
-Before dispatch, `$LEDGER cost <setup>` shows past cost when useful. `$LEDGER` means
-`python3 "<absolute path of duck-review's scripts/ledger.py>"`.
 
 Choose the method that separates plausible explanations: rival causes, a deletion alternative, an
 independent plan, an outcome oracle or a reconstruction. Different role names or contexts are not
 different families. Different families can share a faulty premise; test it too. Select an available
-pinned model capable of the challenge. By default, `$LEDGER pick <stage>` chooses within the
-required set in configured list order (`[learn].select = "fixed"`). Explicit `adaptive` selection
-uses recorded catches per minute for `review` only. The pin's effort is `[effort].trust`
+pinned model capable of the challenge. Take the first pin in the stage's configured list outside
+the doer's family; Broad also takes the first pin from a second family. The pin's effort is `[effort].trust`
 (default the pin's own) for trust-touching work and `[effort].ordinary` (default the pin's own)
 otherwise. Unless the owner specifies otherwise, use the strongest available tier for trust-touching
 or unfamiliar high-risk judgments. Ordinary work may use a cheaper tier. Record the choice, with no

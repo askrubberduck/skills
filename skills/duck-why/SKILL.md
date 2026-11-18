@@ -65,13 +65,9 @@ For a failure, start with the cause or the unresolved question, then give:
 A repair restores the contract. Deletion of the failing file, directory or check removes the
 evidence, not the cause; do not offer it as the fix.
 
-For a cause in code landed from a reviewed candidate, run `$LEDGER record dispatch_id=-
-tier=production substantiated=1` with a new `cause_id`, the `candidate` SHA the gate reviewed
-([`duck-land`](../duck-land/SKILL.md)'s outcome record maps the landed commit back to it),
-`severity`, `adjudicated_by`, and in `class` the first name `$LEDGER schema` lists that
-fits. `$LEDGER missed` then charges the cause to every dispatch that returned `APPROVE` on that SHA.
-`$LEDGER` means `python3 "<absolute path of ../duck-review/scripts/ledger.py>"`, resolved from this
-skill's directory and typed out in every command.
+For a cause in code landed from a reviewed candidate, add the defect, the candidate SHA the gate
+reviewed and its approving reviewers to [`duck-land`](../duck-land/SKILL.md)'s outcome record for
+that landing.
 
 Keep ruled-out hypotheses only when their evidence prevents a repeat of a consequential dead end.
 Do not create a design or work item to explain a local defect. An unsettled architectural contract

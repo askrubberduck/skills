@@ -181,9 +181,8 @@ just because the code reached it.
 posted review comments and resolved threads each need your go-ahead; a passed review does not
 grant one. So does sending your code to another model vendor, deleting work that exists nowhere
 else, and waiving any rule a gate enforces. Local edits you asked for need no second permission.
-The duck's own config asks too: `duck-learn` proposes each new model trial and each trial verdict.
-Set `[learn].discover` to `auto` and it puts a new model on trial and applies trial verdicts to
-`~/.askrubberduck/config.toml` itself, then tells you what it changed.
+The duck's own config asks too: `duck-learn` proposes each new model; you edit
+`~/.askrubberduck/config.toml`.
 
 ## Words the duck uses
 
@@ -324,10 +323,8 @@ Proof and break can share a page. A pile of receipts is not a pile of proof.
 ### Where the duck keeps score
 
 Who caught the bug last time? The duck writes it down. Every dispatch — a reviewer, a rival, a
-critic — leaves one row in `~/.askrubberduck/dispatches.tsv`; every finding, once judged, one row
-in `~/.askrubberduck/findings.tsv`. Your repository gets nothing. The rows stay on your machine, and
-`~/.askrubberduck/config.toml` holds the pins and the ceilings. No file there? The bounds and the
-`[learn]` values below are the defaults, and the duck works as before. The models and effort
+critic — leaves one row in `~/.askrubberduck/dispatches.tsv`. Your repository gets nothing. The rows stay on your machine, and
+`~/.askrubberduck/config.toml` holds the pins and the ceilings. No file there? The bounds below are the defaults, and the duck works as before. The models and effort
 levels are an example; the reviewer list is empty until you name one.
 
 ```toml
@@ -345,12 +342,6 @@ explore = ["anthropic:claude-haiku-4-5:low"]
 [effort]                    # by risk; overrides a pin's effort, unset keeps it
 ordinary = "medium"
 trust = "high"
-
-[learn]
-select = "fixed"            # list order; adaptive opts into review-only ranking
-discover = "propose"        # new models: off | propose | auto
-shadow = 3                  # gates a trial model rides along without counting
-trial = []                  # models on trial; duck-learn fills and empties it
 
 [bounds]                    # ceilings; inside them, evidence decides when to stop
 review_rounds = 3           # duck-run
@@ -370,17 +361,8 @@ procedure = "~/notes/releasing.md"   # your release process, kept outside the re
 review_rounds = 2
 ```
 
-The rows support optional measurement. `skills/duck-review/scripts/ledger.py remaining <gate_id>`
-estimates missed findings from overlap; empty captures are insufficient evidence, and shared blind
-spots limit the estimate. It never decides whether a review stops or passes. `precision` measures
-past substantiation, not missed defects. `pick <stage>` follows configured order inside the required
-set; explicit adaptive mode ranks reviews by recorded catches per minute. Other stages keep list
-order. Did the change help? `paired`
-compares two arms on the same cases. What is drifting? `thresholds` hands `duck-learn` its
-occurrences. What will this gate cost? `cost <setup>` reads past gates. Is there a new model?
-`roster <models|->` lists host models that are in no role list, no trial and no ledger row; after
-its shadow gates, `promote` says whether it replaces its family's reviewer, joins the list, or goes.
-Standard library only. A `-` means unknown; unknown never counts as zero.
+A reviewer is the first pin in its role's list outside the doer's family. `duck-learn` reads the
+rows for outage rates and drifting minutes. A `-` means unknown; unknown never counts as zero.
 
 ### What leaves your machine
 
@@ -424,8 +406,8 @@ independent work and holds only what needs your answer. Your silence does not ch
 
 Every push runs `scripts/validate-distribution.py --self-test`: manifests parse, skills are linked,
 references resolve, generated files match, and deliberate corruptions get caught. It also runs
-`tests/`, which drives the ledger commands and the dispatch outcomes on fixtures and asserts what
-they print.
+`tests/`, which drives the dispatch outcomes, bound refusals and seat isolation on fixtures and
+asserts what they print.
 
 That proves the package holds together. To find out whether the duck does its job, give it a task
 where agreement would be wrong, a green test hides a bug, or a reviewer moves the goalposts. Inspect

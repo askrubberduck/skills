@@ -15,25 +15,13 @@ within existing authority. A conditional or routing mention needs no load until 
 
 ## Recipe
 
-1. **Gather evidence.** `$LEDGER` below means
-   `python3 "<absolute path of ../duck-review/scripts/ledger.py>"`, resolved from this skill's
-   directory and typed out in every command.
-   - **Numbers first.** `$LEDGER thresholds` reads `~/.askrubberduck/dispatches.tsv` and prints
-     lesson candidates: a pin's outage rate, a pin whose reviews among its last twenty dispatches
-     found no unique blocker, minutes that drifted. Each is one occurrence for step 3's bar.
-   - **New models.** `$LEDGER roster -` reads host model ids on stdin
-     (`agy models | $LEDGER roster -`) and prints ids nobody has configured, trialled or
-     dispatched. Codex prints none, so the owner names its new pins. `promote` prints each trial
-     pin's verdict: still `shadow`, or `replace`, `add` or `drop` once decided. A `replace` lists,
-     with severity, each incumbent cause the trial missed. `[learn].discover`
-     (default `propose`) decides what follows:
-     - `off` ignores both.
-     - `propose` queues each through [`duck-decide`](../duck-decide/SKILL.md).
-     - `auto` puts at most one new pin per family into `[learn].trial`. It applies each `replace`,
-       `add` or `drop` verdict to `~/.askrubberduck/config.toml`, takes the pin out of
-       `[learn].trial` in the same edit, and reports it.
-
-     That file is the owner's config, not policy; step 4's review path does not apply.
+1. **Gather evidence.**
+   - **Numbers first.** Read `~/.askrubberduck/dispatches.tsv`. A pin's outage rate above 20%, or
+     its minutes drifting by half from its mean, is a lesson candidate. Each is one occurrence for
+     step 3's bar.
+   - **New models.** Compare `agy models` with the pins in `~/.askrubberduck/config.toml`. Codex
+     prints no list, so the owner names its new pins. Queue each new pin through
+     [`duck-decide`](../duck-decide/SKILL.md); the owner changes that file, not this skill.
    - **Sources.** Known transcript stores: Claude `~/.claude/projects/<dir>/*.jsonl`, Codex
      `$CODEX_HOME/sessions` and `archived_sessions`. Locate another host's store before the mine,
      or mark the result partial and say so. Mark a missing or malformed store partial too. Use

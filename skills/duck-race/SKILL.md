@@ -27,16 +27,15 @@ defines.
    reaches only one participant voids the run. Resolve mid-run ambiguity in writing in that file.
 2. Name the participants and families first. The doer (this session's family) is one. The
    rival must be a **proven different family** from `[models].race` in
-   `~/.askrubberduck/config.toml` or the owner's setup. `$LEDGER pick race` chooses
-   `$RIVAL_MODEL` within it. `$LEDGER` means
-   `python3 "<absolute path of ../duck-review/scripts/ledger.py>"`, resolved from this skill's
-   directory and typed out in every command. `$DISPATCH` is the absolute path of `dispatch.py`
-   beside it, run as `python3 "$DISPATCH"`. Before you spend a round, prove the rival's family and
+   `~/.askrubberduck/config.toml` or the owner's setup. `$RIVAL_MODEL` is the first pin in that
+   list outside the doer's family. `$DISPATCH` is the absolute path of
+   `../duck-review/scripts/dispatch.py`, resolved from this skill's directory and typed out in every
+   command, run as `python3 "$DISPATCH"`. Before you spend a round, prove the rival's family and
    pin with dispatch mechanics' identity checks. Record the roster line and pinned id.
    Executable names are not identities, and an unknown identity is not a different family.
    `$DISPATCH` refuses agy and Claude pins for `--workdir`, so list only codex-transport pins in
    `[models].race`.
-   A pick that returns another pin is a missing participant.
+   A list with no such pin is a missing participant.
 3. As dispatch mechanics requires, confirm that the owner authorized the transfer of this
    repository to the rival's vendor. An outage (dispatch mechanics defines it) is not a forfeit.
    Unless dispatch mechanics rules out a retry:
